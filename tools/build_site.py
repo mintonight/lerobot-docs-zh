@@ -68,6 +68,15 @@ def main():
             shutil.rmtree(out_dir)
         shutil.copytree(kit_dir / "build", out_dir)
 
+        # site links/assets are rooted at /docs/<library>/<version>/<language> (same as the
+        # official site), so nest the built files under that prefix for static hosting
+        prefix_dir = out_dir / "docs" / args.library / args.version / args.language
+        prefix_dir.mkdir(parents=True, exist_ok=True)
+        for item in list(out_dir.iterdir()):
+            if item.name == "docs":
+                continue
+            shutil.move(str(item), str(prefix_dir / item.name))
+
     n_pages = len(list(out_dir.rglob("*.html")))
     print(f"Done. {n_pages} html pages written to {out_dir}")
 
