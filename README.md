@@ -29,14 +29,15 @@ python tools/serve_site.py
 - **Git 导入**：把本仓库推到 GitHub，在 Vercel 导入并直接 Deploy（`vercel.json` 已配置输出目录 `site/`）
 
 部署后访问 `https://<项目名>.vercel.app/docs/lerobot/main/en/`；访问根路径 `/` 会自动跳转到该首页。
-根路径重定向与无扩展名链接（`/installation` → `installation.html`）由 `vercel.json` 中的
+站点文件按官网 URL 结构放在 `site/docs/lerobot/main/en/` 下，站内绝对链接（`/docs/lerobot/main/en/...`）
+可直接命中；根路径重定向与无扩展名链接（`/installation` → `installation.html`）由 `vercel.json` 中的
 `redirects` 和 `cleanUrls` 处理。
 
 ## 目录结构
 
 | 路径 | 说明 |
 | --- | --- |
-| `site/` | **最终站点**（109 个 HTML + 自带 CSS/JS/图片引用） |
+| `site/` | **最终站点**（109 个 HTML + 自带 CSS/JS；位于 `site/docs/lerobot/main/en/`，与官网 URL 结构一致） |
 | `source/` | 官方仓库 `huggingface/lerobot` 的稀疏检出（`docs/`、`src/`、`pyproject.toml`） |
 | `tools/mdx_en/` | doc-builder 展开后的英文 MDX（`[[autodoc]]` 已展开为 API 文档） |
 | `tools/units_en/` | 从 MDX 抽取的翻译单元（JSON，代码/链接/标签用占位符 ⟦n⟧ 保护） |
