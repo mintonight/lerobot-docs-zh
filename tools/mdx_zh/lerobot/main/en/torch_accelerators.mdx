@@ -1,0 +1,108 @@
+<script lang="ts">
+import {onMount} from "svelte";
+import Tip from "$lib/Tip.svelte";
+import CopyLLMTxtMenu from "$lib/CopyLLMTxtMenu.svelte";
+import Youtube from "$lib/Youtube.svelte";
+import Docstring from "$lib/Docstring.svelte";
+import CodeBlock from "$lib/CodeBlock.svelte";
+import CodeBlockFw from "$lib/CodeBlockFw.svelte";
+import DocNotebookDropdown from "$lib/DocNotebookDropdown.svelte";
+import CourseFloatingBanner from "$lib/CourseFloatingBanner.svelte";
+import IconCopyLink from "$lib/IconCopyLink.svelte";
+import FrameworkContent from "$lib/FrameworkContent.svelte";
+import Markdown from "$lib/Markdown.svelte";
+import Question from "$lib/Question.svelte";
+import FrameworkSwitchCourse from "$lib/FrameworkSwitchCourse.svelte";
+import InferenceApi from "$lib/InferenceApi.svelte";
+import TokenizersLanguageContent from "$lib/TokenizersLanguageContent.svelte";
+import ExampleCodeBlock from "$lib/ExampleCodeBlock.svelte";
+import Added from "$lib/Added.svelte";
+import Changed from "$lib/Changed.svelte";
+import Deprecated from "$lib/Deprecated.svelte";
+import PipelineIcon from "$lib/PipelineIcon.svelte";
+import PipelineTag from "$lib/PipelineTag.svelte";
+import Heading from "$lib/Heading.svelte";
+import HfOptions from "$lib/HfOptions.svelte";
+import HfOption from "$lib/HfOption.svelte";
+import EditOnGithub from "$lib/EditOnGithub.svelte";
+import InferenceSnippet from "$lib/InferenceSnippet/InferenceSnippet.svelte";
+import MermaidChart from "$lib/MermaidChart.svelte";
+let fw: "pt" | "tf" = "pt";
+onMount(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    fw = urlParams.get("fw") || "pt";
+});
+</script>
+<svelte:head>
+  <meta name="hf:doc:metadata" content={metadata} >
+</svelte:head>
+
+<!--HF DOCBUILD BODY START-->
+
+HF_DOC_BODY_START
+
+<CopyLLMTxtMenu containerStyle="float: right; margin-left: 10px; display: inline-flex; position: relative; z-index: 10;"></CopyLLMTxtMenu>
+
+# PyTorch 加速器
+
+LeRobot 支持多种硬件加速选项，可用于训练和 inference。
+
+这些选项包括：
+
+- **CPU**：所有计算均由 CPU 执行，不使用专用加速器
+- **CUDA**：使用 NVIDIA 与 AMD GPU 加速
+- **MPS**：使用 Apple Silicon GPU 加速
+- **XPU**：使用 Intel 集成与独立 GPU 加速
+
+## 快速开始
+
+要使用特定的加速器，需安装合适版本的 PyTorch。
+
+对于 CPU、CUDA 和 MPS 后端，请遵循 [PyTorch 安装页面](https://pytorch.org/get-started/locally)提供的说明。
+对于 XPU 后端，请遵循 [PyTorch 文档](https://docs.pytorch.org/docs/stable/notes/get_start_xpu.html)中的说明。
+
+### 验证安装
+
+安装完成后，可通过运行以下命令验证加速器的可用性
+
+```python
+import torch
+print(torch.<backend_name>.is_available())  # <backend_name> is cuda, mps, or xpu
+```
+
+## 如何运行训练或评估
+
+要选择所需的加速器，在运行 `lerobot-train` 或 `lerobot-eval` 时使用 `--policy.device` 参数。例如，要在 Apple Silicon 上使用 MPS，请运行：
+
+```bash
+lerobot-train
+    --policy.device=mps ...
+```
+
+```bash
+lerobot-eval \
+    --policy.device=mps ...
+```
+
+不过在大多数情况下，会自动检测到加速器的存在，因此可从 CLI 命令中省略 `policy.device` 参数。
+
+## 混合精度
+
+训练精度由 `--accelerator.mixed_precision` 控制，它接受 `no`（默认）和 `bf16`：
+
+```bash
+lerobot-train \
+    --policy.type=act \
+    --accelerator.mixed_precision=bf16 ...
+```
+
+`bf16` 需要支持它的加速器。
+
+
+
+<EditOnGithub source="https://github.com/huggingface/lerobot/blob/main/docs/source/torch_accelerators.mdx" />
+
+<!--HF DOCBUILD BODY END-->
+
+HF_DOC_BODY_END
+

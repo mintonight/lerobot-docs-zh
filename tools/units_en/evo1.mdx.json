@@ -1,0 +1,753 @@
+{
+ "file": "evo1.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1930,
+   "text": "# EVO1",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1932,
+   "end": 2231,
+   "text": "EVO1 is a Vision-Language-Action policy for robot control built around an InternVL3 backbone and a continuous flow-matching action head. This LeRobot integration exposes EVO1 as a standard policy type so it can be trained and evaluated with the usual LeRobot dataset, checkpoint, and processor APIs.",
+   "tokens": []
+  },
+  {
+   "id": 2,
+   "kind": "heading",
+   "start": 2233,
+   "end": 2250,
+   "text": "## Model Overview",
+   "tokens": []
+  },
+  {
+   "id": 3,
+   "kind": "para",
+   "start": 2252,
+   "end": 2598,
+   "text": "The policy embeds one or more camera images and the language task prompt with InternVL3, pads robot state/action vectors to fixed maximum dimensions, and predicts future action chunks with a flow-matching action head. During inference, the policy samples an action chunk and returns ⟦0⟧ actions from that chunk before sampling again.",
+   "tokens": [
+    "`n_action_steps`"
+   ]
+  },
+  {
+   "id": 4,
+   "kind": "heading",
+   "start": 2600,
+   "end": 2639,
+   "text": "### What the LeRobot Integration Covers",
+   "tokens": []
+  },
+  {
+   "id": 5,
+   "kind": "list",
+   "start": 2641,
+   "end": 2700,
+   "text": "- Standard ⟦0⟧ configuration through LeRobot",
+   "tokens": [
+    "`policy.type=evo1`"
+   ]
+  },
+  {
+   "id": 6,
+   "kind": "list",
+   "start": 2701,
+   "end": 2771,
+   "text": "- InternVL3 image/text embedding with optional FlashAttention fallback",
+   "tokens": []
+  },
+  {
+   "id": 7,
+   "kind": "list",
+   "start": 2772,
+   "end": 2850,
+   "text": "- Stage-based finetuning controls for action-head-only and VLM finetuning runs",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "list",
+   "start": 2851,
+   "end": 2895,
+   "text": "- Continuous flow-matching action prediction",
+   "tokens": []
+  },
+  {
+   "id": 9,
+   "kind": "list",
+   "start": 2896,
+   "end": 2946,
+   "text": "- Checkpoint save/load through LeRobot policy APIs",
+   "tokens": []
+  },
+  {
+   "id": 10,
+   "kind": "list",
+   "start": 2947,
+   "end": 3029,
+   "text": "- Training with ⟦0⟧ and evaluation with standard policy inference APIs",
+   "tokens": [
+    "`lerobot-train`"
+   ]
+  },
+  {
+   "id": 11,
+   "kind": "para",
+   "start": 3031,
+   "end": 3176,
+   "text": "The broader EVO1 project may include additional training scripts and dataset tooling. This page focuses on the LeRobot robot-control policy path.",
+   "tokens": []
+  },
+  {
+   "id": 12,
+   "kind": "heading",
+   "start": 3178,
+   "end": 3206,
+   "text": "## Installation Requirements",
+   "tokens": []
+  },
+  {
+   "id": 13,
+   "kind": "list",
+   "start": 3208,
+   "end": 3281,
+   "text": "1. Install LeRobot by following the [Installation Guide](⟦0⟧).",
+   "tokens": [
+    "./installation"
+   ]
+  },
+  {
+   "id": 14,
+   "kind": "list",
+   "start": 3282,
+   "end": 3311,
+   "text": "2. Install EVO1 dependencies:",
+   "tokens": []
+  },
+  {
+   "id": 15,
+   "kind": "para",
+   "start": 3369,
+   "end": 3441,
+   "text": "   For LIBERO training and evaluation, install the LIBERO extra as well:",
+   "tokens": []
+  },
+  {
+   "id": 16,
+   "kind": "list",
+   "start": 3506,
+   "end": 3684,
+   "text": "3. Install a ⟦0⟧ wheel only if it is compatible with your Python, PyTorch, CUDA, and GPU stack. EVO1 falls back to standard attention when ⟦1⟧ is not available.",
+   "tokens": [
+    "`flash-attn`",
+    "`flash_attn`"
+   ]
+  },
+  {
+   "id": 17,
+   "kind": "para",
+   "start": 3686,
+   "end": 4000,
+   "text": "EVO1 uses the native Hugging Face ⟦0⟧ InternVL implementation, so ⟦1⟧ must point to a natively converted checkpoint such as ⟦2⟧ (note the ⟦3⟧ suffix). The first run downloads the configured VLM checkpoint and later runs reuse it from the Hugging Face cache.",
+   "tokens": [
+    "`transformers`",
+    "`policy.vlm_model_name`",
+    "`OpenGVLab/InternVL3-1B-hf`",
+    "`-hf`"
+   ]
+  },
+  {
+   "id": 18,
+   "kind": "heading",
+   "start": 4002,
+   "end": 4022,
+   "text": "## Data Requirements",
+   "tokens": []
+  },
+  {
+   "id": 19,
+   "kind": "para",
+   "start": 4024,
+   "end": 4060,
+   "text": "EVO1 expects a LeRobot dataset with:",
+   "tokens": []
+  },
+  {
+   "id": 20,
+   "kind": "list",
+   "start": 4062,
+   "end": 4149,
+   "text": "- One to ⟦0⟧ visual observations, for example ⟦1⟧",
+   "tokens": [
+    "`policy.max_views`",
+    "`observation.images.image`"
+   ]
+  },
+  {
+   "id": 21,
+   "kind": "list",
+   "start": 4183,
+   "end": 4294,
+   "text": "- A language task instruction in the dataset ⟦0⟧ field, or another field configured with ⟦1⟧",
+   "tokens": [
+    "`task`",
+    "`policy.task_field`"
+   ]
+  },
+  {
+   "id": 22,
+   "kind": "para",
+   "start": 4296,
+   "end": 4470,
+   "text": "State and action vectors are padded to ⟦0⟧ and ⟦1⟧. Predictions are cropped back to the dataset action dimension before being returned.",
+   "tokens": [
+    "`policy.max_state_dim`",
+    "`policy.max_action_dim`"
+   ]
+  },
+  {
+   "id": 23,
+   "kind": "heading",
+   "start": 4472,
+   "end": 4480,
+   "text": "## Usage",
+   "tokens": []
+  },
+  {
+   "id": 24,
+   "kind": "para",
+   "start": 4482,
+   "end": 4530,
+   "text": "To use EVO1 in a LeRobot configuration, specify:",
+   "tokens": []
+  },
+  {
+   "id": 25,
+   "kind": "para",
+   "start": 4564,
+   "end": 4619,
+   "text": "By default, a new EVO1 policy initializes its VLM from:",
+   "tokens": []
+  },
+  {
+   "id": 26,
+   "kind": "para",
+   "start": 4684,
+   "end": 4749,
+   "text": "Once a LeRobot-format EVO1 checkpoint is available, load it with:",
+   "tokens": []
+  },
+  {
+   "id": 27,
+   "kind": "heading",
+   "start": 4808,
+   "end": 4819,
+   "text": "## Training",
+   "tokens": []
+  },
+  {
+   "id": 28,
+   "kind": "heading",
+   "start": 4821,
+   "end": 4832,
+   "text": "### Stage 1",
+   "tokens": []
+  },
+  {
+   "id": 29,
+   "kind": "para",
+   "start": 4834,
+   "end": 4885,
+   "text": "Stage 1 freezes the VLM and trains the action head:",
+   "tokens": []
+  },
+  {
+   "id": 30,
+   "kind": "heading",
+   "start": 5320,
+   "end": 5331,
+   "text": "### Stage 2",
+   "tokens": []
+  },
+  {
+   "id": 31,
+   "kind": "para",
+   "start": 5333,
+   "end": 5410,
+   "text": "Stage 2 loads the Stage 1 policy, but starts a fresh optimizer and scheduler:",
+   "tokens": []
+  },
+  {
+   "id": 32,
+   "kind": "para",
+   "start": 5899,
+   "end": 6353,
+   "text": "By default, ⟦0⟧ reapplies the finetuning defaults for that stage. This is important when\nstarting Stage 2 from a Stage 1 checkpoint, because the Stage 1 checkpoint config stores the VLM finetuning\nflags as disabled. These stage defaults take precedence over saved or manually supplied ⟦1⟧\nflags unless ⟦2⟧, so set that flag only when manually controlling\nevery finetuning flag.",
+   "tokens": [
+    "`policy.training_stage`",
+    "`policy.finetune_*`",
+    "`policy.apply_training_stage_defaults=false`"
+   ]
+  },
+  {
+   "id": 33,
+   "kind": "heading",
+   "start": 6355,
+   "end": 6382,
+   "text": "### Key Training Parameters",
+   "tokens": []
+  },
+  {
+   "id": 34,
+   "kind": "table",
+   "start": 6384,
+   "end": 6531,
+   "text": "| Parameter                                     | Default                     | Description                                                       |",
+   "tokens": []
+  },
+  {
+   "id": 35,
+   "kind": "table",
+   "start": 6680,
+   "end": 6827,
+   "text": "| ⟦0⟧                       | ⟦1⟧ | Natively converted InternVL3 checkpoint or local model directory  |",
+   "tokens": [
+    "`policy.vlm_model_name`",
+    "`OpenGVLab/InternVL3-1B-hf`"
+   ]
+  },
+  {
+   "id": 36,
+   "kind": "table",
+   "start": 6828,
+   "end": 6975,
+   "text": "| ⟦0⟧                       | ⟦1⟧                    | ⟦2⟧ trains the action head; ⟦3⟧ finetunes VLM branches  |",
+   "tokens": [
+    "`policy.training_stage`",
+    "`stage1`",
+    "`stage1`",
+    "`stage2`"
+   ]
+  },
+  {
+   "id": 37,
+   "kind": "table",
+   "start": 6976,
+   "end": 7123,
+   "text": "| ⟦0⟧        | ⟦1⟧                      | Reapplies stage finetuning defaults after loading a checkpoint    |",
+   "tokens": [
+    "`policy.apply_training_stage_defaults`",
+    "`true`"
+   ]
+  },
+  {
+   "id": 38,
+   "kind": "table",
+   "start": 7124,
+   "end": 7271,
+   "text": "| ⟦0⟧                       | ⟦1⟧                        | Number of InternVL3 language layers kept for the policy           |",
+   "tokens": [
+    "`policy.vlm_num_layers`",
+    "`14`"
+   ]
+  },
+  {
+   "id": 39,
+   "kind": "table",
+   "start": 7272,
+   "end": 7419,
+   "text": "| ⟦0⟧                            | ⟦1⟧                  | Requested VLM dtype                                               |",
+   "tokens": [
+    "`policy.vlm_dtype`",
+    "`bfloat16`"
+   ]
+  },
+  {
+   "id": 40,
+   "kind": "table",
+   "start": 7420,
+   "end": 7567,
+   "text": "| ⟦0⟧                       | ⟦1⟧                      | Requests FlashAttention when installed; otherwise falls back      |",
+   "tokens": [
+    "`policy.use_flash_attn`",
+    "`true`"
+   ]
+  },
+  {
+   "id": 41,
+   "kind": "table",
+   "start": 7568,
+   "end": 7715,
+   "text": "| ⟦0⟧        | ⟦1⟧                      | Enables checkpointing on supported InternVL3 modules              |",
+   "tokens": [
+    "`policy.enable_gradient_checkpointing`",
+    "`true`"
+   ]
+  },
+  {
+   "id": 42,
+   "kind": "table",
+   "start": 7716,
+   "end": 7863,
+   "text": "| ⟦0⟧ | ⟦1⟧                     | Reentrant setting passed to gradient checkpointing when supported |",
+   "tokens": [
+    "`policy.gradient_checkpointing_use_reentrant`",
+    "`false`"
+   ]
+  },
+  {
+   "id": 43,
+   "kind": "table",
+   "start": 7864,
+   "end": 8011,
+   "text": "| ⟦0⟧                           | ⟦1⟧                        | Number of future actions predicted per chunk                      |",
+   "tokens": [
+    "`policy.chunk_size`",
+    "`50`"
+   ]
+  },
+  {
+   "id": 44,
+   "kind": "table",
+   "start": 8012,
+   "end": 8159,
+   "text": "| ⟦0⟧                       | ⟦1⟧                        | Number of actions consumed from a sampled chunk                   |",
+   "tokens": [
+    "`policy.n_action_steps`",
+    "`50`"
+   ]
+  },
+  {
+   "id": 45,
+   "kind": "table",
+   "start": 8160,
+   "end": 8307,
+   "text": "| ⟦0⟧                        | ⟦1⟧                        | State padding dimension                                           |",
+   "tokens": [
+    "`policy.max_state_dim`",
+    "`24`"
+   ]
+  },
+  {
+   "id": 46,
+   "kind": "table",
+   "start": 8308,
+   "end": 8455,
+   "text": "| ⟦0⟧                       | ⟦1⟧                        | Action padding dimension                                          |",
+   "tokens": [
+    "`policy.max_action_dim`",
+    "`24`"
+   ]
+  },
+  {
+   "id": 47,
+   "kind": "table",
+   "start": 8456,
+   "end": 8603,
+   "text": "| ⟦0⟧               | ⟦1⟧                      | Optional action dimension returned after EVO1 postprocessing      |",
+   "tokens": [
+    "`policy.postprocess_action_dim`",
+    "`null`"
+   ]
+  },
+  {
+   "id": 48,
+   "kind": "table",
+   "start": 8604,
+   "end": 8751,
+   "text": "| ⟦0⟧                     | ⟦1⟧                     | Binarizes the postprocessed gripper channel for LIBERO-style eval |",
+   "tokens": [
+    "`policy.binarize_gripper`",
+    "`false`"
+   ]
+  },
+  {
+   "id": 49,
+   "kind": "table",
+   "start": 8752,
+   "end": 8899,
+   "text": "| ⟦0⟧                           | ⟦1⟧                      | Batch field used as the language prompt                           |",
+   "tokens": [
+    "`policy.task_field`",
+    "`task`"
+   ]
+  },
+  {
+   "id": 50,
+   "kind": "heading",
+   "start": 8901,
+   "end": 8913,
+   "text": "## Inference",
+   "tokens": []
+  },
+  {
+   "id": 51,
+   "kind": "para",
+   "start": 8915,
+   "end": 8957,
+   "text": "Try it out with a trained EVO1 checkpoint:",
+   "tokens": []
+  },
+  {
+   "id": 52,
+   "kind": "heading",
+   "start": 9080,
+   "end": 9090,
+   "text": "## Results",
+   "tokens": []
+  },
+  {
+   "id": 53,
+   "kind": "heading",
+   "start": 9092,
+   "end": 9113,
+   "text": "### LIBERO Evaluation",
+   "tokens": []
+  },
+  {
+   "id": 54,
+   "kind": "heading",
+   "start": 9115,
+   "end": 9136,
+   "text": "#### Reference result",
+   "tokens": []
+  },
+  {
+   "id": 55,
+   "kind": "quote",
+   "start": 9138,
+   "end": 9651,
+   "text": "> [!NOTE]\n> The released Stage-2 checkpoint passed clean-download and rollout verification:\n> [⟦0⟧](⟦1⟧), revision\n> [⟦2⟧](⟦3⟧).\n> The clean-download evaluation used LeRobot revision\n> [⟦4⟧](⟦5⟧).",
+   "tokens": [
+    "`zuoxingdong/evo1_libero`",
+    "https://huggingface.co/zuoxingdong/evo1_libero",
+    "`515921f4a2c1d3f3ad523721eafa26fdf2af315b`",
+    "https://huggingface.co/zuoxingdong/evo1_libero/commit/515921f4a2c1d3f3ad523721eafa26fdf2af315b",
+    "`e40b58a8dfa9e7b86918c374791599d070518d11`",
+    "https://github.com/huggingface/lerobot/commit/e40b58a8dfa9e7b86918c374791599d070518d11"
+   ]
+  },
+  {
+   "id": 56,
+   "kind": "para",
+   "start": 9653,
+   "end": 9711,
+   "text": "The single-run Stage-2 checkpoint at step 70,000 produced:",
+   "tokens": []
+  },
+  {
+   "id": 57,
+   "kind": "table",
+   "start": 9713,
+   "end": 9780,
+   "text": "| Suite          | Successful episodes |  Episodes | Success rate |",
+   "tokens": []
+  },
+  {
+   "id": 58,
+   "kind": "table",
+   "start": 9849,
+   "end": 9916,
+   "text": "| LIBERO Spatial |                 485 |       500 |        97.0% |",
+   "tokens": []
+  },
+  {
+   "id": 59,
+   "kind": "table",
+   "start": 9917,
+   "end": 9984,
+   "text": "| LIBERO Object  |                 496 |       500 |        99.2% |",
+   "tokens": []
+  },
+  {
+   "id": 60,
+   "kind": "table",
+   "start": 9985,
+   "end": 10052,
+   "text": "| LIBERO Goal    |                 483 |       500 |        96.6% |",
+   "tokens": []
+  },
+  {
+   "id": 61,
+   "kind": "table",
+   "start": 10053,
+   "end": 10120,
+   "text": "| LIBERO-10      |                 469 |       500 |        93.8% |",
+   "tokens": []
+  },
+  {
+   "id": 62,
+   "kind": "table",
+   "start": 10121,
+   "end": 10188,
+   "text": "| **Overall**    |           **1,933** | **2,000** |   **96.65%** |",
+   "tokens": []
+  },
+  {
+   "id": 63,
+   "kind": "para",
+   "start": 10190,
+   "end": 10313,
+   "text": "These results use one trained checkpoint and evaluation seed ⟦0⟧; they are not a multi-seed\nmean or confidence estimate.",
+   "tokens": [
+    "`1000`"
+   ]
+  },
+  {
+   "id": 64,
+   "kind": "heading",
+   "start": 10315,
+   "end": 10345,
+   "text": "#### Reference training recipe",
+   "tokens": []
+  },
+  {
+   "id": 65,
+   "kind": "para",
+   "start": 10347,
+   "end": 11079,
+   "text": "The released checkpoint records the complete resolved Stage-2 configuration in\n[⟦0⟧](⟦1⟧).\nThe measured run used two H100 GPUs with two DDP processes and batch 64 per process, giving global batch 128. Both stages used the same topology. The base VLM came from revision\n⟦2⟧ of ⟦3⟧.\nThe released artifact does not record the exact LeRobot training commit or its original dependency lock,\nso the commands below reproduce the recorded configuration and topology from a current checkout rather\nthan reconstructing the software environment bit for bit.",
+   "tokens": [
+    "`train_config.json`",
+    "https://huggingface.co/zuoxingdong/evo1_libero/blob/515921f4a2c1d3f3ad523721eafa26fdf2af315b/train_config.json",
+    "`014c0583a0d4bedf29fbe2dbff4f865eb998e171`",
+    "`OpenGVLab/InternVL3-1B-hf`"
+   ]
+  },
+  {
+   "id": 66,
+   "kind": "para",
+   "start": 11081,
+   "end": 11182,
+   "text": "From a LeRobot source checkout, install the locked dependencies and download that exact VLM revision:",
+   "tokens": []
+  },
+  {
+   "id": 67,
+   "kind": "para",
+   "start": 11371,
+   "end": 11438,
+   "text": "Stage 1 freezes the VLM and trains the action head for 5,000 steps:",
+   "tokens": []
+  },
+  {
+   "id": 68,
+   "kind": "para",
+   "start": 12948,
+   "end": 13104,
+   "text": "Stage 2 loads the Stage-1 policy but starts a fresh optimizer and scheduler. It trains for 80,000 steps;\nthe reported checkpoint is the save at step 70,000:",
+   "tokens": []
+  },
+  {
+   "id": 69,
+   "kind": "heading",
+   "start": 14703,
+   "end": 14740,
+   "text": "#### Author-format evaluation profile",
+   "tokens": []
+  },
+  {
+   "id": 70,
+   "kind": "para",
+   "start": 14742,
+   "end": 15341,
+   "text": "The author-format EVO1 LIBERO profile uses the raw LIBERO camera feature names\n(⟦0⟧ and ⟦1⟧), replans every\n14 actions, and binarizes the gripper command before stepping the simulator. The EVO1 policy postprocessor\ncan crop the padded 24D action back to the 7D LIBERO action space and apply that gripper binarization. To\nevaluate an author-format checkpoint under the same one-episode-per-task setting, keep the raw camera names\ninstead of the default ⟦2⟧/⟦3⟧ mapping and set the LIBERO action postprocessing flags:",
+   "tokens": [
+    "`observation.images.agentview_image`",
+    "`observation.images.robot0_eye_in_hand_image`",
+    "`image`",
+    "`image2`"
+   ]
+  },
+  {
+   "id": 71,
+   "kind": "heading",
+   "start": 15923,
+   "end": 15962,
+   "text": "#### Native ⟦0⟧ v3 profile",
+   "tokens": [
+    "`lerobot/libero`"
+   ]
+  },
+  {
+   "id": 72,
+   "kind": "para",
+   "start": 15964,
+   "end": 16155,
+   "text": "Revision ⟦0⟧ stores camera features as ⟦1⟧ and\n⟦2⟧. This example evaluates all ten LIBERO Object tasks, launching each task in a fresh process:",
+   "tokens": [
+    "`a1aaacb7f6cd6ee5fb43120f673cebb0cfea7dd4`",
+    "`image`",
+    "`image2`"
+   ]
+  },
+  {
+   "id": 73,
+   "kind": "para",
+   "start": 17954,
+   "end": 18010,
+   "text": "Run all ten task IDs for each suite with these horizons:",
+   "tokens": []
+  },
+  {
+   "id": 74,
+   "kind": "para",
+   "start": 18277,
+   "end": 18459,
+   "text": "Set ⟦0⟧ and ⟦1⟧ for each row. This gives 500 episodes per suite and 2,000 episodes overall, while\nthe loop's fresh process per task matches the measured RNG-reset topology.",
+   "tokens": [
+    "`suite`",
+    "`horizon`"
+   ]
+  },
+  {
+   "id": 75,
+   "kind": "heading",
+   "start": 18461,
+   "end": 18474,
+   "text": "## References",
+   "tokens": []
+  },
+  {
+   "id": 76,
+   "kind": "list",
+   "start": 18476,
+   "end": 18531,
+   "text": "- [EVO1 repository](⟦0⟧)",
+   "tokens": [
+    "https://github.com/MINT-SJTU/Evo-1"
+   ]
+  },
+  {
+   "id": 77,
+   "kind": "list",
+   "start": 18532,
+   "end": 18601,
+   "text": "- [InternVL3-1B-hf](⟦0⟧)",
+   "tokens": [
+    "https://huggingface.co/OpenGVLab/InternVL3-1B-hf"
+   ]
+  },
+  {
+   "id": 78,
+   "kind": "heading",
+   "start": 18603,
+   "end": 18613,
+   "text": "## License",
+   "tokens": []
+  },
+  {
+   "id": 79,
+   "kind": "para",
+   "start": 18615,
+   "end": 18788,
+   "text": "This LeRobot integration follows the Apache 2.0 License used by LeRobot. Check the upstream EVO1 and InternVL3 model pages for the licenses of released checkpoints and data.",
+   "tokens": []
+  }
+ ]
+}

@@ -1,0 +1,980 @@
+{
+ "file": "third_party_robots.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1960,
+   "text": "# Third-Party Robots & Teleoperators",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1962,
+   "end": 2428,
+   "text": "The LeRobot ecosystem extends far beyond its officially supported hardware. Thanks to LeRobot's plugin architecture, the community has built integrations for a wide range of robot arms and teleoperation devices — from industrial manipulators to affordable hobbyist platforms, VR headsets, haptic devices, and full arm-plus-teleoperator kits. This page showcases community-maintained integrations you can use for teleoperation, data collection, and policy deployment.",
+   "tokens": []
+  },
+  {
+   "id": 2,
+   "kind": "quote",
+   "start": 2430,
+   "end": 2607,
+   "text": "> [!IMPORTANT]\n> These projects are developed and maintained by third parties. Please refer to each repository for installation instructions, hardware requirements, and support.",
+   "tokens": []
+  },
+  {
+   "id": 3,
+   "kind": "para",
+   "start": 2609,
+   "end": 2906,
+   "text": "Drop-in plugins are auto-discovered by package name: LeRobot imports any installed package prefixed with ⟦0⟧ or ⟦1⟧. Once installed, reference the ⟦2⟧ the plugin registers (see its README — it may differ from the package name) directly from any LeRobot command:",
+   "tokens": [
+    "`lerobot_robot_`",
+    "`lerobot_teleoperator_`",
+    "`type`"
+   ]
+  },
+  {
+   "id": 4,
+   "kind": "quote",
+   "start": 3147,
+   "end": 3330,
+   "text": "> [!TIP]\n> ⚠️ marks projects that are forks/extensions of LeRobot. They may require custom setup rather than working with an unmodified install. All other entries are drop-in plugins.",
+   "tokens": []
+  },
+  {
+   "id": 5,
+   "kind": "heading",
+   "start": 3332,
+   "end": 3366,
+   "text": "## Industrial & Collaborative Arms",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "para",
+   "start": 3544,
+   "end": 3637,
+   "text": "  ⟦0⟧\n    ⟦1⟧⟦2⟧Project⟦3⟧⟦4⟧Description⟦5⟧⟦6⟧",
+   "tokens": [
+    "<thead style=\"border:0\">",
+    "<tr style=\"border:0\">",
+    "<th>",
+    "</th>",
+    "<th>",
+    "</th>",
+    "</tr>"
+   ]
+  },
+  {
+   "id": 7,
+   "kind": "para",
+   "start": 3659,
+   "end": 3897,
+   "text": "    ⟦0⟧\n      ⟦1⟧⟦2⟧lerobot-robot-xarm⟦3⟧⟦4⟧\n      ⟦5⟧Plugin for the xArm collaborative arm series from ⟦6⟧UFACTORY⟦7⟧.⟦8⟧",
+   "tokens": [
+    "<tr style=\"border:0\">",
+    "<td>",
+    "<a href=\"https://github.com/SpesRobotics/lerobot-robot-xarm\">",
+    "</a>",
+    "</td>",
+    "<td>",
+    "<a href=\"https://www.ufactory.cc/\">",
+    "</a>",
+    "</td>"
+   ]
+  },
+  {
+   "id": 8,
+   "kind": "para",
+   "start": 3908,
+   "end": 4130,
+   "text": "    ⟦0⟧\n      ⟦1⟧⟦2⟧lerobot_lebai⟦3⟧⟦4⟧\n      ⟦5⟧Plugin for the six-axis collaborative arms from ⟦6⟧Lebai⟦7⟧.⟦8⟧",
+   "tokens": [
+    "<tr style=\"border:0\">",
+    "<td>",
+    "<a href=\"https://github.com/lebai-robotics/lerobot_lebai\">",
+    "</a>",
+    "</td>",
+    "<td>",
+    "<a href=\"https://lebai.ltd/en/\">",
+    "</a>",
+    "</td>"
+   ]
+  },
+  {
+   "id": 9,
+   "kind": "para",
+   "start": 4141,
+   "end": 4437,
+   "text": "    ⟦0⟧\n      ⟦1⟧⟦2⟧LeFranX⟦3⟧ ⚠️⟦4⟧\n      ⟦5⟧LeRobot extension for the ⟦6⟧Franka⟦7⟧ research arm, paired with the ⟦8⟧RobotEra XHand⟦9⟧ hand for VR teleoperation.⟦10⟧",
+   "tokens": [
+    "<tr style=\"border:0\">",
+    "<td>",
+    "<a href=\"https://github.com/wengmister/LeFranX\">",
+    "</a>",
+    "</td>",
+    "<td>",
+    "<a href=\"https://franka.de/\">",
+    "</a>",
+    "<a href=\"https://www.robotera.com/\">",
+    "</a>",
+    "</td>"
+   ]
+  },
+  {
+   "id": 10,
+   "kind": "heading",
+   "start": 4469,
+   "end": 4495,
+   "text": "#### Universal Robots UR5e",
+   "tokens": []
+  },
+  {
+   "id": 11,
+   "kind": "para",
+   "start": 4673,
+   "end": 4766,
+   "text": "  ⟦0⟧\n    ⟦1⟧⟦2⟧Project⟦3⟧⟦4⟧Description⟦5⟧⟦6⟧",
+   "tokens": [
+    "<thead style=\"border:0\">",
+    "<tr style=\"border:0\">",
+    "<th>",
+    "</th>",
+    "<th>",
+    "</th>",
+    "</tr>"
+   ]
+  },
+  {
+   "id": 12,
+   "kind": "para",
+   "start": 4788,
+   "end": 5050,
+   "text": "    ⟦0⟧\n      ⟦1⟧⟦2⟧UR5e-LeRobot⟦3⟧ ⚠️⟦4⟧\n      ⟦5⟧LeRobot extension for the ⟦6⟧Universal Robots UR5e⟦7⟧, with single-arm and bimanual support.⟦8⟧",
+   "tokens": [
+    "<tr style=\"border:0\">",
+    "<td>",
+    "<a href=\"https://github.com/yechen056/UR5e-LeRobot\">",
+    "</a>",
+    "</td>",
+    "<td>",
+    "<a href=\"https://www.universal-robots.com/\">",
+    "</a>",
+    "</td>"
+   ]
+  },
+  {
+   "id": 13,
+   "kind": "para",
+   "start": 5061,
+   "end": 5358,
+   "text": "    ⟦0⟧\n      ⟦1⟧⟦2⟧lerobot_ur5e_auto⟦3⟧ ⚠️⟦4⟧\n      ⟦5⟧LeRobot extension for a mobile ⟦6⟧Universal Robots UR5e⟦7⟧, adding automated recording at scale with minimal supervision.⟦8⟧",
+   "tokens": [
+    "<tr style=\"border:0\">",
+    "<td>",
+    "<a href=\"https://github.com/scy-v/lerobot_ur5e_auto\">",
+    "</a>",
+    "</td>",
+    "<td>",
+    "<a href=\"https://www.universal-robots.com/\">",
+    "</a>",
+    "</td>"
+   ]
+  },
+  {
+   "id": 14,
+   "kind": "para",
+   "start": 5369,
+   "end": 5664,
+   "text": "    ⟦0⟧\n      ⟦1⟧⟦2⟧lerobot_robot_ur5e⟦3⟧⟦4⟧\n      ⟦5⟧Plugin for the ⟦6⟧Universal Robots UR5e⟦7⟧ with a ⟦8⟧Robotiq⟦9⟧ gripper, over RTDE control.⟦10⟧",
+   "tokens": [
+    "<tr style=\"border:0\">",
+    "<td>",
+    "<a href=\"https://github.com/F-Fer/lerobot_ur5e_gello\">",
+    "</a>",
+    "</td>",
+    "<td>",
+    "<a href=\"https://www.universal-robots.com/\">",
+    "</a>",
+    "<a href=\"https://robotiq.com/\">",
+    "</a>",
+    "</td>"
+   ]
+  },
+  {
+   "id": 15,
+   "kind": "heading",
+   "start": 5696,
+   "end": 5723,
+   "text": "## Research & Learning Arms",
+   "tokens": []
+  },
+  {
+   "id": 16,
+   "kind": "para",
+   "start": 5901,
+   "end": 5994,
+   "text": "  ⟦0⟧\n    ⟦1⟧⟦2⟧Project⟦3⟧⟦4⟧Description⟦5⟧⟦6⟧",
+   "tokens": [
+    "<thead style=\"border:0\">",
+    "<tr style=\"border:0\">",
+    "<th>",
+    "</th>",
+    "<th>",
+    "</th>",
+    "</tr>"
+   ]
+  },
+  {
+   "id": 17,
+   "kind": "para",
+   "start": 6016,
+   "end": 6265,
+   "text": "    ⟦0⟧\n      ⟦1⟧⟦2⟧lerobot_trossen⟦3⟧⟦4⟧\n      ⟦5⟧Plugin for the WidowX and ALOHA-style arms from ⟦6⟧Trossen Robotics⟦7⟧.⟦8⟧",
+   "tokens": [
+    "<tr style=\"border:0\">",
+    "<td>",
+    "<a href=\"https://github.com/TrossenRobotics/lerobot_trossen\">",
+    "</a>",
+    "</td>",
+    "<td>",
+    "<a href=\"https://www.trossenrobotics.com/\">",
+    "</a>",
+    "</td>"
+   ]
+  },
+  {
+   "id": 18,
+   "kind": "heading",
+   "start": 6297,
+   "end": 6314,
+   "text": "#### AgileX Piper",
+   "tokens": []
+  },
+  {
+   "id": 19,
+   "kind": "para",
+   "start": 6492,
+   "end": 6585,
+   "text": "  ⟦0⟧\n    ⟦1⟧⟦2⟧Project⟦3⟧⟦4⟧Description⟦5⟧⟦6⟧",
+   "tokens": [
+    "<thead style=\"border:0\">",
+    "<tr style=\"border:0\">",
+    "<th>",
+    "</th>",
+    "<th>",
+    "</th>",
+    "</tr>"
+   ]
+  },
+  {
+   "id": 20,
+   "kind": "para",
+   "start": 6607,
+   "end": 6849,
+   "text": "    ⟦0⟧\n      ⟦1⟧⟦2⟧lerobot_robot_piper (AgRobotics Research)⟦3⟧⟦4⟧\n      ⟦5⟧Plugin for the ⟦6⟧AgileX Piper⟦7⟧ arm.⟦8⟧",
+   "tokens": [
+    "<tr style=\"border:0\">",
+    "<td>",
+    "<a href=\"https://github.com/AgRoboticsResearch/lerobot_robot_piper\">",
+    "</a>",
+    "</td>",
+    "<td>",
+    "<a href=\"https://global.agilex.ai/\">",
+    "</a>",
+    "</td>"
+   ]
+  },
+  {
+   "id": 21,
+   "kind": "para",
+   "start": 6860,
+   "end": 7151,
+   "text": "    ⟦0⟧\n      ⟦1⟧⟦2⟧lerobot_robot_piper (WeGo Robotics)⟦3⟧⟦4⟧\n      ⟦5⟧Plugin for the ⟦6⟧AgileX Piper⟦7⟧ arm, with multi-arm teleoperation, safety limits, and GUI tools.⟦8⟧",
+   "tokens": [
+    "<tr style=\"border:0\">",
+    "<td>",
+    "<a href=\"https://github.com/WeGo-Robotics/lerobot_robot_piper\">",
+    "</a>",
+    "</td>",
+    "<td>",
+    "<a href=\"https://global.agilex.ai/\">",
+    "</a>",
+    "</td>"
+   ]
+  },
+  {
+   "id": 22,
+   "kind": "heading",
+   "start": 7183,
+   "end": 7212,
+   "text": "## Affordable & Hobbyist Arms",
+   "tokens": []
+  },
+  {
+   "id": 23,
+   "kind": "para",
+   "start": 7390,
+   "end": 7483,
+   "text": "  ⟦0⟧\n    ⟦1⟧⟦2⟧Project⟦3⟧⟦4⟧Description⟦5⟧⟦6⟧",
+   "tokens": [
+    "<thead style=\"border:0\">",
+    "<tr style=\"border:0\">",
+    "<th>",
+    "</th>",
+    "<th>",
+    "</th>",
+    "</tr>"
+   ]
+  },
+  {
+   "id": 24,
+   "kind": "para",
+   "start": 7505,
+   "end": 7791,
+   "text": "    ⟦0⟧\n      ⟦1⟧⟦2⟧fashionstar-lerobot-robot-cello⟦3⟧⟦4⟧\n      ⟦5⟧Plugin for the StarAI Cello 6+1 degrees of freedom robot arm from ⟦6⟧FashionStar⟦7⟧.⟦8⟧",
+   "tokens": [
+    "<tr style=\"border:0\">",
+    "<td>",
+    "<a href=\"https://github.com/servodevelop/fashionstar-lerobot-robot-cello\">",
+    "</a>",
+    "</td>",
+    "<td>",
+    "<a href=\"https://fashionstar.com.hk/\">",
+    "</a>",
+    "</td>"
+   ]
+  },
+  {
+   "id": 25,
+   "kind": "para",
+   "start": 7802,
+   "end": 8096,
+   "text": "    ⟦0⟧\n      ⟦1⟧⟦2⟧fashionstar-lerobot-robot-viola⟦3⟧⟦4⟧\n      ⟦5⟧Plugin for the compact StarAI Viola 6+1 degrees of freedom robot arm from ⟦6⟧FashionStar⟦7⟧.⟦8⟧",
+   "tokens": [
+    "<tr style=\"border:0\">",
+    "<td>",
+    "<a href=\"https://github.com/servodevelop/fashionstar-lerobot-robot-viola\">",
+    "</a>",
+    "</td>",
+    "<td>",
+    "<a href=\"https://fashionstar.com.hk/\">",
+    "</a>",
+    "</td>"
+   ]
+  },
+  {
+   "id": 26,
+   "kind": "heading",
+   "start": 8128,
+   "end": 8163,
+   "text": "## Service, Mobile & Utility Robots",
+   "tokens": []
+  },
+  {
+   "id": 27,
+   "kind": "para",
+   "start": 8341,
+   "end": 8434,
+   "text": "  ⟦0⟧\n    ⟦1⟧⟦2⟧Project⟦3⟧⟦4⟧Description⟦5⟧⟦6⟧",
+   "tokens": [
+    "<thead style=\"border:0\">",
+    "<tr style=\"border:0\">",
+    "<th>",
+    "</th>",
+    "<th>",
+    "</th>",
+    "</tr>"
+   ]
+  },
+  {
+   "id": 28,
+   "kind": "para",
+   "start": 8456,
+   "end": 8702,
+   "text": "    ⟦0⟧\n      ⟦1⟧⟦2⟧lerobot-robot-ugo-pro⟦3⟧⟦4⟧\n      ⟦5⟧Plugin for the ugo Pro dual-arm service robot from ⟦6⟧ugo⟦7⟧.⟦8⟧",
+   "tokens": [
+    "<tr style=\"border:0\">",
+    "<td>",
+    "<a href=\"https://github.com/ugo-plus/lerobot-robot-ugo-pro\">",
+    "</a>",
+    "</td>",
+    "<td>",
+    "<a href=\"https://ugo.plus/products/ugo-pro/\">",
+    "</a>",
+    "</td>"
+   ]
+  },
+  {
+   "id": 29,
+   "kind": "para",
+   "start": 8713,
+   "end": 8995,
+   "text": "    ⟦0⟧\n      ⟦1⟧⟦2⟧lerobot_robot_lekiwi_pincopen⟦3⟧⟦4⟧\n      ⟦5⟧Plugin for a LeKiwi mobile manipulator with a ⟦6⟧PincOpen⟦7⟧ gripper.⟦8⟧",
+   "tokens": [
+    "<tr style=\"border:0\">",
+    "<td>",
+    "<a href=\"https://github.com/zuoxingdong/lerobot_robot_lekiwi_pincopen\">",
+    "</a>",
+    "</td>",
+    "<td>",
+    "<a href=\"https://github.com/pollen-robotics/PincOpen\">",
+    "</a>",
+    "</td>"
+   ]
+  },
+  {
+   "id": 30,
+   "kind": "para",
+   "start": 9006,
+   "end": 9228,
+   "text": "    ⟦0⟧\n      ⟦1⟧⟦2⟧lerobot-robot-dummy⟦3⟧⟦4⟧\n      ⟦5⟧Plugin simulating a robot for recording without hardware. Useful for debugging !⟦6⟧",
+   "tokens": [
+    "<tr style=\"border:0\">",
+    "<td>",
+    "<a href=\"https://github.com/KillingJacky/lerobot-robot-dummy\">",
+    "</a>",
+    "</td>",
+    "<td>",
+    "</td>"
+   ]
+  },
+  {
+   "id": 31,
+   "kind": "heading",
+   "start": 9260,
+   "end": 9276,
+   "text": "## Teleoperators",
+   "tokens": []
+  },
+  {
+   "id": 32,
+   "kind": "heading",
+   "start": 9278,
+   "end": 9305,
+   "text": "### VR & Motion Controllers",
+   "tokens": []
+  },
+  {
+   "id": 33,
+   "kind": "para",
+   "start": 9483,
+   "end": 9576,
+   "text": "  ⟦0⟧\n    ⟦1⟧⟦2⟧Project⟦3⟧⟦4⟧Description⟦5⟧⟦6⟧",
+   "tokens": [
+    "<thead style=\"border:0\">",
+    "<tr style=\"border:0\">",
+    "<th>",
+    "</th>",
+    "<th>",
+    "</th>",
+    "</tr>"
+   ]
+  },
+  {
+   "id": 34,
+   "kind": "para",
+   "start": 9598,
+   "end": 9969,
+   "text": "    ⟦0⟧\n      ⟦1⟧⟦2⟧lerobot-teleoperator-teleop⟦3⟧⟦4⟧\n      ⟦5⟧Plugin turning a phone or VR headset into a teleoperator via ⟦6⟧WebXR⟦7⟧, wrapping the open-source ⟦8⟧⟦9⟧⟦10⟧ library.⟦11⟧",
+   "tokens": [
+    "<tr style=\"border:0\">",
+    "<td>",
+    "<a href=\"https://github.com/SpesRobotics/lerobot-teleoperator-teleop\">",
+    "</a>",
+    "</td>",
+    "<td>",
+    "<a href=\"https://immersiveweb.dev\">",
+    "</a>",
+    "<a href=\"https://github.com/SpesRobotics/teleop\">",
+    "<code>teleop</code>",
+    "</a>",
+    "</td>"
+   ]
+  },
+  {
+   "id": 35,
+   "kind": "para",
+   "start": 9980,
+   "end": 10262,
+   "text": "    ⟦0⟧\n      ⟦1⟧⟦2⟧lerobot-teleoperator-spacemouse⟦3⟧⟦4⟧\n      ⟦5⟧Plugin for the ⟦6⟧3Dconnexion SpaceMouse⟦7⟧, with inverse kinematics for SO-ARMS robots.⟦8⟧",
+   "tokens": [
+    "<tr style=\"border:0\">",
+    "<td>",
+    "<a href=\"https://github.com/Jas000n/lerobot-teleoperator-spacemouse\">",
+    "</a>",
+    "</td>",
+    "<td>",
+    "<a href=\"https://3dconnexion.com/\">",
+    "</a>",
+    "</td>"
+   ]
+  },
+  {
+   "id": 36,
+   "kind": "para",
+   "start": 10273,
+   "end": 10561,
+   "text": "    ⟦0⟧\n      ⟦1⟧⟦2⟧vr-teleop-kit⟦3⟧⟦4⟧\n      ⟦5⟧Plugin teleoperating arms from a ⟦6⟧Meta Quest⟦7⟧ (WebXR), relying on URDF descriptions for inverse kinematics.⟦8⟧",
+   "tokens": [
+    "<tr style=\"border:0\">",
+    "<td>",
+    "<a href=\"https://github.com/Dream-Machines-Robotics/vr-teleop-kit\">",
+    "</a>",
+    "</td>",
+    "<td>",
+    "<a href=\"https://www.meta.com/quest/\">",
+    "</a>",
+    "</td>"
+   ]
+  },
+  {
+   "id": 37,
+   "kind": "para",
+   "start": 10572,
+   "end": 10925,
+   "text": "    ⟦0⟧\n      ⟦1⟧⟦2⟧lerobot-teleoperator-pico4⟦3⟧⟦4⟧\n      ⟦5⟧Plugin for the ⟦6⟧PICO 4⟦7⟧ VR headset, with a companion controller-free ⟦8⟧hand-tracking variant⟦9⟧.⟦10⟧",
+   "tokens": [
+    "<tr style=\"border:0\">",
+    "<td>",
+    "<a href=\"https://github.com/xensedyl/lerobot-teleoperator-pico4\">",
+    "</a>",
+    "</td>",
+    "<td>",
+    "<a href=\"https://www.picoxr.com/\">",
+    "</a>",
+    "<a href=\"https://github.com/xensedyl/lerobot-teleoperator-pico4-hand\">",
+    "</a>",
+    "</td>"
+   ]
+  },
+  {
+   "id": 38,
+   "kind": "heading",
+   "start": 10957,
+   "end": 10972,
+   "text": "### Leader Arms",
+   "tokens": []
+  },
+  {
+   "id": 39,
+   "kind": "para",
+   "start": 11150,
+   "end": 11243,
+   "text": "  ⟦0⟧\n    ⟦1⟧⟦2⟧Project⟦3⟧⟦4⟧Description⟦5⟧⟦6⟧",
+   "tokens": [
+    "<thead style=\"border:0\">",
+    "<tr style=\"border:0\">",
+    "<th>",
+    "</th>",
+    "<th>",
+    "</th>",
+    "</tr>"
+   ]
+  },
+  {
+   "id": 40,
+   "kind": "para",
+   "start": 11265,
+   "end": 11515,
+   "text": "    ⟦0⟧\n      ⟦1⟧⟦2⟧lerobot_teleoperator_gello⟦3⟧⟦4⟧\n      ⟦5⟧Plugin for the 7 degrees of freedom ⟦6⟧GELLO⟦7⟧ teleoperator.⟦8⟧",
+   "tokens": [
+    "<tr style=\"border:0\">",
+    "<td>",
+    "<a href=\"https://github.com/F-Fer/lerobot_ur5e_gello\">",
+    "</a>",
+    "</td>",
+    "<td>",
+    "<a href=\"https://wuphilipp.github.io/gello_site/\">",
+    "</a>",
+    "</td>"
+   ]
+  },
+  {
+   "id": 41,
+   "kind": "para",
+   "start": 11526,
+   "end": 11811,
+   "text": "    ⟦0⟧\n      ⟦1⟧⟦2⟧lerobot_teleoperator_yamactiveleader⟦3⟧⟦4⟧\n      ⟦5⟧Plugin for the active YAM teleoperator from ⟦6⟧I2RT⟦7⟧, a bilateral force-feedback arm.⟦8⟧",
+   "tokens": [
+    "<tr style=\"border:0\">",
+    "<td>",
+    "<a href=\"https://github.com/uynitsuj/lerobot_teleoperator_yamactiveleader\">",
+    "</a>",
+    "</td>",
+    "<td>",
+    "<a href=\"https://i2rt.com/\">",
+    "</a>",
+    "</td>"
+   ]
+  },
+  {
+   "id": 42,
+   "kind": "para",
+   "start": 11822,
+   "end": 12083,
+   "text": "    ⟦0⟧\n      ⟦1⟧⟦2⟧lerobot_teleoperator_omy⟦3⟧⟦4⟧\n      ⟦5⟧Plugin for the OMY-L100 6 degrees of freedom teleoperator from ⟦6⟧ROBOTIS⟦7⟧.⟦8⟧",
+   "tokens": [
+    "<tr style=\"border:0\">",
+    "<td>",
+    "<a href=\"https://github.com/charlie8612/lerobot_teleoperator_omy\">",
+    "</a>",
+    "</td>",
+    "<td>",
+    "<a href=\"https://www.robotis.com/\">",
+    "</a>",
+    "</td>"
+   ]
+  },
+  {
+   "id": 43,
+   "kind": "para",
+   "start": 12094,
+   "end": 12428,
+   "text": "    ⟦0⟧\n      ⟦1⟧⟦2⟧lerobot-teleoperator-pipermate⟦3⟧⟦4⟧\n      ⟦5⟧Plugin for the PiperMate teleoperator (⟦6⟧FashionStar⟦7⟧ UART servos), driving the ⟦8⟧AgileX Piper⟦9⟧ arm.⟦10⟧",
+   "tokens": [
+    "<tr style=\"border:0\">",
+    "<td>",
+    "<a href=\"https://pypi.org/project/lerobot-teleoperator-pipermate/\">",
+    "</a>",
+    "</td>",
+    "<td>",
+    "<a href=\"https://fashionstar.com.hk/\">",
+    "</a>",
+    "<a href=\"https://global.agilex.ai/\">",
+    "</a>",
+    "</td>"
+   ]
+  },
+  {
+   "id": 44,
+   "kind": "heading",
+   "start": 12460,
+   "end": 12478,
+   "text": "### Haptic Devices",
+   "tokens": []
+  },
+  {
+   "id": 45,
+   "kind": "para",
+   "start": 12656,
+   "end": 12749,
+   "text": "  ⟦0⟧\n    ⟦1⟧⟦2⟧Project⟦3⟧⟦4⟧Description⟦5⟧⟦6⟧",
+   "tokens": [
+    "<thead style=\"border:0\">",
+    "<tr style=\"border:0\">",
+    "<th>",
+    "</th>",
+    "<th>",
+    "</th>",
+    "</tr>"
+   ]
+  },
+  {
+   "id": 46,
+   "kind": "para",
+   "start": 12771,
+   "end": 13047,
+   "text": "    ⟦0⟧\n      ⟦1⟧⟦2⟧lerobot_teleoperator_inverse3⟦3⟧⟦4⟧\n      ⟦5⟧Plugin for the ⟦6⟧Haply Inverse3⟦7⟧ haptic device, adding force-feedback teleoperation.⟦8⟧",
+   "tokens": [
+    "<tr style=\"border:0\">",
+    "<td>",
+    "<a href=\"https://github.com/chohh7391/lerobot_teleoperator_inverse3\">",
+    "</a>",
+    "</td>",
+    "<td>",
+    "<a href=\"https://www.haply.co/\">",
+    "</a>",
+    "</td>"
+   ]
+  },
+  {
+   "id": 47,
+   "kind": "para",
+   "start": 13058,
+   "end": 13347,
+   "text": "    ⟦0⟧\n      ⟦1⟧⟦2⟧lerobot_teleoperator_omega7⟦3⟧⟦4⟧\n      ⟦5⟧Plugin for the ⟦6⟧Force Dimension omega.7⟦7⟧ haptic device, adding force-feedback teleoperation.⟦8⟧",
+   "tokens": [
+    "<tr style=\"border:0\">",
+    "<td>",
+    "<a href=\"https://github.com/hzhz112/lerobot_teleoperator_omega7\">",
+    "</a>",
+    "</td>",
+    "<td>",
+    "<a href=\"https://www.forcedimension.com/\">",
+    "</a>",
+    "</td>"
+   ]
+  },
+  {
+   "id": 48,
+   "kind": "heading",
+   "start": 13379,
+   "end": 13401,
+   "text": "### Networked & Remote",
+   "tokens": []
+  },
+  {
+   "id": 49,
+   "kind": "para",
+   "start": 13579,
+   "end": 13672,
+   "text": "  ⟦0⟧\n    ⟦1⟧⟦2⟧Project⟦3⟧⟦4⟧Description⟦5⟧⟦6⟧",
+   "tokens": [
+    "<thead style=\"border:0\">",
+    "<tr style=\"border:0\">",
+    "<th>",
+    "</th>",
+    "<th>",
+    "</th>",
+    "</tr>"
+   ]
+  },
+  {
+   "id": 50,
+   "kind": "para",
+   "start": 13694,
+   "end": 13972,
+   "text": "    ⟦0⟧\n      ⟦1⟧⟦2⟧lerobot-teleoperator-livekit⟦3⟧⟦4⟧\n      ⟦5⟧Plugin receiving teleoperation commands over a ⟦6⟧LiveKit⟦7⟧ Portal (WebRTC) for remote control.⟦8⟧",
+   "tokens": [
+    "<tr style=\"border:0\">",
+    "<td>",
+    "<a href=\"https://pypi.org/project/lerobot-teleoperator-livekit/\">",
+    "</a>",
+    "</td>",
+    "<td>",
+    "<a href=\"https://livekit.io/\">",
+    "</a>",
+    "</td>"
+   ]
+  },
+  {
+   "id": 51,
+   "kind": "heading",
+   "start": 14004,
+   "end": 14039,
+   "text": "## Full Kits (Robot + Teleoperator)",
+   "tokens": []
+  },
+  {
+   "id": 52,
+   "kind": "para",
+   "start": 14217,
+   "end": 14310,
+   "text": "  ⟦0⟧\n    ⟦1⟧⟦2⟧Project⟦3⟧⟦4⟧Description⟦5⟧⟦6⟧",
+   "tokens": [
+    "<thead style=\"border:0\">",
+    "<tr style=\"border:0\">",
+    "<th>",
+    "</th>",
+    "<th>",
+    "</th>",
+    "</tr>"
+   ]
+  },
+  {
+   "id": 53,
+   "kind": "para",
+   "start": 14332,
+   "end": 14750,
+   "text": "    ⟦0⟧\n      ⟦1⟧⟦2⟧lerobot-arx5⟦3⟧⟦4⟧\n      ⟦5⟧Plugin for the ⟦6⟧ARX5⟦7⟧ arm: ⟦8⟧⟦9⟧⟦10⟧ robot arm with its ⟦11⟧⟦12⟧⟦13⟧ teleoperator arm.⟦14⟧",
+   "tokens": [
+    "<tr style=\"border:0\">",
+    "<td>",
+    "<a href=\"https://github.com/villekuosmanen/lerobot-arx5\">",
+    "</a>",
+    "</td>",
+    "<td>",
+    "<a href=\"https://www.arx-x.com/\">",
+    "</a>",
+    "<a href=\"https://pypi.org/project/lerobot-robot-arx5/\">",
+    "<code>lerobot-arx5</code>",
+    "</a>",
+    "<a href=\"https://pypi.org/project/lerobot-teleoperator-arx5/\">",
+    "<code>lerobot-teleoperator-arx5</code>",
+    "</a>",
+    "</td>"
+   ]
+  },
+  {
+   "id": 54,
+   "kind": "para",
+   "start": 14761,
+   "end": 15070,
+   "text": "    ⟦0⟧\n      ⟦1⟧⟦2⟧Nextis-AIRA-3D⟦3⟧⟦4⟧\n      ⟦5⟧Plugin for the 7 degrees of freedom arm from ⟦6⟧Nextis⟦7⟧: robot arm ⟦8⟧ and teleoperator arm ⟦9⟧.⟦10⟧",
+   "tokens": [
+    "<tr style=\"border:0\">",
+    "<td>",
+    "<a href=\"https://github.com/robertorobotics/Nextis-AIRA-3D\">",
+    "</a>",
+    "</td>",
+    "<td>",
+    "<a href=\"https://www.nextis.tech\">",
+    "</a>",
+    "<code>aira_follower</code>",
+    "<code>aira_leader</code>",
+    "</td>"
+   ]
+  },
+  {
+   "id": 55,
+   "kind": "para",
+   "start": 15081,
+   "end": 15356,
+   "text": "    ⟦0⟧\n      ⟦1⟧⟦2⟧lerobot_yam⟦3⟧⟦4⟧\n      ⟦5⟧Plugin suite for the YAM arm from ⟦6⟧I2RT⟦7⟧: robot arm ⟦8⟧ and teleoperator arm ⟦9⟧.⟦10⟧",
+   "tokens": [
+    "<tr style=\"border:0\">",
+    "<td>",
+    "<a href=\"https://github.com/pravsels/lerobot_yam\">",
+    "</a>",
+    "</td>",
+    "<td>",
+    "<a href=\"https://i2rt.com/\">",
+    "</a>",
+    "<code>yam_follower</code>",
+    "<code>yam_leader</code>",
+    "</td>"
+   ]
+  },
+  {
+   "id": 56,
+   "kind": "para",
+   "start": 15367,
+   "end": 15654,
+   "text": "    ⟦0⟧\n      ⟦1⟧⟦2⟧trlc-dk1⟦3⟧⟦4⟧\n      ⟦5⟧Plugin for the development kit from ⟦6⟧The Robot Learning Company⟦7⟧: single and bimanual arms follower/teleoperator types.⟦8⟧",
+   "tokens": [
+    "<tr style=\"border:0\">",
+    "<td>",
+    "<a href=\"https://github.com/robot-learning-co/trlc-dk1\">",
+    "</a>",
+    "</td>",
+    "<td>",
+    "<a href=\"https://www.robot-learning.co/\">",
+    "</a>",
+    "</td>"
+   ]
+  },
+  {
+   "id": 57,
+   "kind": "para",
+   "start": 15665,
+   "end": 15976,
+   "text": "    ⟦0⟧\n      ⟦1⟧⟦2⟧hex_lerobot_drivers⟦3⟧⟦4⟧\n      ⟦5⟧Plugin suite for ⟦6⟧HEXFELLOW⟦7⟧ devices: robots, teleoperators, and cameras (see ⟦8⟧Cameras &amp; Sensors⟦9⟧).⟦10⟧",
+   "tokens": [
+    "<tr style=\"border:0\">",
+    "<td>",
+    "<a href=\"https://github.com/hexfellow/hex_lerobot_drivers\">",
+    "</a>",
+    "</td>",
+    "<td>",
+    "<a href=\"https://hexfellow.com/\">",
+    "</a>",
+    "<a href=\"./third_party_sensors\">",
+    "</a>",
+    "</td>"
+   ]
+  },
+  {
+   "id": 58,
+   "kind": "para",
+   "start": 15987,
+   "end": 16446,
+   "text": "    ⟦0⟧\n      ⟦1⟧⟦2⟧lerobot-robot-nexarm-follower⟦3⟧⟦4⟧\n      ⟦5⟧Plugin for the NexArm from ⟦6⟧Hiwonder⟦7⟧: the ⟦8⟧robot arm⟦9⟧ and its matching ⟦10⟧teleoperator arm⟦11⟧.⟦12⟧",
+   "tokens": [
+    "<tr style=\"border:0\">",
+    "<td>",
+    "<a href=\"https://github.com/Hiwonder-official/lerobot-robot-nexarm-follower\">",
+    "</a>",
+    "</td>",
+    "<td>",
+    "<a href=\"https://www.hiwonder.com/\">",
+    "</a>",
+    "<a href=\"https://github.com/Hiwonder-official/lerobot-robot-nexarm-follower\">",
+    "</a>",
+    "<a href=\"https://github.com/Hiwonder-official/lerobot-teleoperator-nexarm-leader\">",
+    "</a>",
+    "</td>"
+   ]
+  },
+  {
+   "id": 59,
+   "kind": "heading",
+   "start": 16478,
+   "end": 16494,
+   "text": "## ROS 2 Bridges",
+   "tokens": []
+  },
+  {
+   "id": 60,
+   "kind": "para",
+   "start": 16672,
+   "end": 16765,
+   "text": "  ⟦0⟧\n    ⟦1⟧⟦2⟧Project⟦3⟧⟦4⟧Description⟦5⟧⟦6⟧",
+   "tokens": [
+    "<thead style=\"border:0\">",
+    "<tr style=\"border:0\">",
+    "<th>",
+    "</th>",
+    "<th>",
+    "</th>",
+    "</tr>"
+   ]
+  },
+  {
+   "id": 61,
+   "kind": "para",
+   "start": 16787,
+   "end": 16973,
+   "text": "    ⟦0⟧\n      ⟦1⟧⟦2⟧leros2⟦3⟧⟦4⟧\n      ⟦5⟧Plugin bridging ROS 2 topics and actions to LeRobot robots and teleoperators.⟦6⟧",
+   "tokens": [
+    "<tr style=\"border:0\">",
+    "<td>",
+    "<a href=\"https://github.com/ngres/leros2\">",
+    "</a>",
+    "</td>",
+    "<td>",
+    "</td>"
+   ]
+  },
+  {
+   "id": 62,
+   "kind": "para",
+   "start": 16984,
+   "end": 17235,
+   "text": "    ⟦0⟧\n      ⟦1⟧⟦2⟧lerobot_robot_ros2_zenoh⟦3⟧⟦4⟧\n      ⟦5⟧Plugin bridging ROS 2 robots to LeRobot over ⟦6⟧Zenoh⟦7⟧ pub/sub transport.⟦8⟧",
+   "tokens": [
+    "<tr style=\"border:0\">",
+    "<td>",
+    "<a href=\"https://github.com/ROBOTIS-GIT/lerobot_robot_ros2_zenoh\">",
+    "</a>",
+    "</td>",
+    "<td>",
+    "<a href=\"https://zenoh.io\">",
+    "</a>",
+    "</td>"
+   ]
+  },
+  {
+   "id": 63,
+   "kind": "heading",
+   "start": 17267,
+   "end": 17282,
+   "text": "## Contributing",
+   "tokens": []
+  },
+  {
+   "id": 64,
+   "kind": "para",
+   "start": 17284,
+   "end": 17536,
+   "text": "Built your own LeRobot hardware integration? The plugin system makes it straightforward to add new robots and teleoperators — check out the [Bring Your Own Hardware](⟦0⟧) guide to get started, and share your project with the community!",
+   "tokens": [
+    "./integrate_hardware"
+   ]
+  }
+ ]
+}

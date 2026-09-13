@@ -1,0 +1,57 @@
+{
+ "file": "api/envs.mdx",
+ "units": [
+  {
+   "id": 0,
+   "zh": "# 环境"
+  },
+  {
+   "id": 1,
+   "zh": "simulation environment 通过 ⟦0⟧ 配置，并由 ⟦1⟧ 构建。每个子类\n声明其 ⟦2⟧ 以及如何构造向量化环境。"
+  },
+  {
+   "id": 2,
+   "zh": "使用已发布的环境，请参见 [Hub 中的环境](⟦0⟧)；\n贡献新 benchmark，请参见[添加新 benchmark](⟦1⟧)。"
+  },
+  {
+   "id": 3,
+   "zh": "## EnvConfig ⟦0⟧"
+  },
+  {
+   "id": 4,
+   "zh": "⟦0⟧\n创建 {suite: ⟦1⟧}。"
+  },
+  {
+   "id": 5,
+   "zh": "默认：通过 gym.make() 创建单任务环境。多任务 benchmark 会覆盖此行为。\nAsyncVectorEnv 是 n_envs > 1 时的默认选择；n_envs=1 时自动降级为 Sync。"
+  },
+  {
+   "id": 6,
+   "zh": "⟦0⟧\n返回此环境的（预处理器、后处理器）。默认为恒等。"
+  },
+  {
+   "id": 7,
+   "zh": "## make_env ⟦0⟧"
+  },
+  {
+   "id": 8,
+   "zh": "⟦0⟧- **cfg**（EnvConfig | str）-- 描述要在本地构建的环境的 ⟦1⟧ 对象，\n  或 Hugging Face Hub 仓库标识符（例如 ⟦2⟧）。在后一种情况下，\n  仓库必须包含一个 Python 文件（通常为 ⟦3⟧）。\n- **n_envs**（int，可选）-- 要返回的并行环境数量。默认为 1。\n- **use_async_envs**（bool，可选）-- 是否返回 AsyncVectorEnv 或 SyncVectorEnv。默认为\n  False。\n- **hub_cache_dir**（str | None）-- 已下载 Hub 文件的可选缓存路径。\n- **trust_remote_code**（bool）-- **明确同意**执行来自 Hub 的远程代码。\n  默认 False —— 必须设置为 True 才能导入/执行 hub 的 ⟦4⟧。⟦5⟧⟦6⟧⟦7⟧ 从套件名称到带索引的向量化环境的映射。"
+  },
+  {
+   "id": 9,
+   "zh": "- 对于多任务 benchmark（例如 LIBERO）：每个套件一个条目，每个 task_id 一个向量化环境。"
+  },
+  {
+   "id": 10,
+   "zh": "- 对于单任务环境：一个 task_id=0 的单一套件条目（cfg.type）。⟦0⟧⟦1⟧- ⟦2⟧ -- 如果 n_envs < 1"
+  },
+  {
+   "id": 11,
+   "zh": "- ⟦0⟧ -- 当请求的环境包未安装时 ⟦1⟧⟦2⟧⟦3⟧\n根据配置或 Hub 引用创建一个 gym 向量环境。"
+  },
+  {
+   "id": 12,
+   "zh": "## make_env_config ⟦0⟧"
+  }
+ ]
+}

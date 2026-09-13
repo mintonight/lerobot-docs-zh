@@ -1,0 +1,721 @@
+{
+ "file": "eo1.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1930,
+   "text": "# EO-1",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1932,
+   "end": 2106,
+   "text": "EO-1 is a **Vision-Language-Action policy for robot control**. The LeRobot implementation integrates EO-1 with the standard LeRobot training, evaluation, processor interface.",
+   "tokens": []
+  },
+  {
+   "id": 2,
+   "kind": "heading",
+   "start": 2108,
+   "end": 2125,
+   "text": "## Model Overview",
+   "tokens": []
+  },
+  {
+   "id": 3,
+   "kind": "para",
+   "start": 2127,
+   "end": 2497,
+   "text": "EO-1 uses a Qwen2.5-VL backbone for vision-language understanding and adds a continuous flow-matching action head for robot control. The policy formats each robot-control sample as a multimodal conversation: camera images are passed to Qwen2.5-VL, the robot state is represented with EO-1 state tokens, and the future action chunk is represented with EO-1 action tokens.",
+   "tokens": []
+  },
+  {
+   "id": 4,
+   "kind": "para",
+   "start": 2668,
+   "end": 2905,
+   "text": "During training, EO-1 learns to denoise continuous action chunks at the action-token positions. During inference, it samples an action chunk, returns continuous actions, and executes ⟦0⟧ from the chunk before sampling again.",
+   "tokens": [
+    "`n_action_steps`"
+   ]
+  },
+  {
+   "id": 5,
+   "kind": "heading",
+   "start": 2907,
+   "end": 2946,
+   "text": "### What the LeRobot Integration Covers",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "list",
+   "start": 2948,
+   "end": 3006,
+   "text": "- Standard ⟦0⟧ configuration through LeRobot",
+   "tokens": [
+    "`policy.type=eo1`"
+   ]
+  },
+  {
+   "id": 7,
+   "kind": "list",
+   "start": 3007,
+   "end": 3074,
+   "text": "- Qwen2.5-VL image and text preprocessing through policy processors",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "list",
+   "start": 3075,
+   "end": 3119,
+   "text": "- Continuous flow-matching action prediction",
+   "tokens": []
+  },
+  {
+   "id": 9,
+   "kind": "list",
+   "start": 3120,
+   "end": 3170,
+   "text": "- Checkpoint save/load through LeRobot policy APIs",
+   "tokens": []
+  },
+  {
+   "id": 10,
+   "kind": "list",
+   "start": 3171,
+   "end": 3237,
+   "text": "- Training with ⟦0⟧ and evaluation with ⟦1⟧",
+   "tokens": [
+    "`lerobot-train`",
+    "`lerobot-eval`"
+   ]
+  },
+  {
+   "id": 11,
+   "kind": "para",
+   "start": 3239,
+   "end": 3416,
+   "text": "The broader EO-1 project also includes interleaved vision-text-action pretraining and multimodal reasoning workflows. This page focuses on the LeRobot robot-control policy path.",
+   "tokens": []
+  },
+  {
+   "id": 12,
+   "kind": "heading",
+   "start": 3418,
+   "end": 3446,
+   "text": "## Installation Requirements",
+   "tokens": []
+  },
+  {
+   "id": 13,
+   "kind": "list",
+   "start": 3448,
+   "end": 3521,
+   "text": "1. Install LeRobot by following the [Installation Guide](⟦0⟧).",
+   "tokens": [
+    "./installation"
+   ]
+  },
+  {
+   "id": 14,
+   "kind": "list",
+   "start": 3522,
+   "end": 3562,
+   "text": "2. Install EO-1 dependencies by running:",
+   "tokens": []
+  },
+  {
+   "id": 15,
+   "kind": "list",
+   "start": 3610,
+   "end": 3693,
+   "text": "3. If you want to train or evaluate on LIBERO, install the LIBERO dependencies too:",
+   "tokens": []
+  },
+  {
+   "id": 16,
+   "kind": "para",
+   "start": 3748,
+   "end": 3989,
+   "text": "EO-1 can use the standard PyTorch scaled-dot-product attention backend through ⟦0⟧. If your environment has a compatible ⟦1⟧ installation, you can request ⟦2⟧.",
+   "tokens": [
+    "`policy.attn_implementation=sdpa`",
+    "`flash_attn`",
+    "`policy.attn_implementation=flash_attention_2`"
+   ]
+  },
+  {
+   "id": 17,
+   "kind": "heading",
+   "start": 3991,
+   "end": 4011,
+   "text": "## Data Requirements",
+   "tokens": []
+  },
+  {
+   "id": 18,
+   "kind": "para",
+   "start": 4013,
+   "end": 4049,
+   "text": "EO-1 expects a LeRobot dataset with:",
+   "tokens": []
+  },
+  {
+   "id": 19,
+   "kind": "list",
+   "start": 4051,
+   "end": 4124,
+   "text": "- At least one visual observation, for example ⟦0⟧",
+   "tokens": [
+    "`observation.images.image`"
+   ]
+  },
+  {
+   "id": 20,
+   "kind": "list",
+   "start": 4158,
+   "end": 4220,
+   "text": "- A language task instruction through the dataset ⟦0⟧ field",
+   "tokens": [
+    "`task`"
+   ]
+  },
+  {
+   "id": 21,
+   "kind": "para",
+   "start": 4222,
+   "end": 4364,
+   "text": "If your dataset uses different observation names, use ⟦0⟧ to align them with the names expected by your training or evaluation setup.",
+   "tokens": [
+    "`rename_map`"
+   ]
+  },
+  {
+   "id": 22,
+   "kind": "heading",
+   "start": 4366,
+   "end": 4374,
+   "text": "## Usage",
+   "tokens": []
+  },
+  {
+   "id": 23,
+   "kind": "para",
+   "start": 4376,
+   "end": 4443,
+   "text": "To use EO-1 in a LeRobot configuration, specify the policy type as:",
+   "tokens": []
+  },
+  {
+   "id": 24,
+   "kind": "para",
+   "start": 4476,
+   "end": 4577,
+   "text": "Use the converted release checkpoint to start from EO-1's interleaved\nvision-text-action pretraining:",
+   "tokens": []
+  },
+  {
+   "id": 25,
+   "kind": "para",
+   "start": 4623,
+   "end": 5045,
+   "text": "⟦0⟧ is a native LeRobot conversion of\n[⟦1⟧](⟦2⟧).\nIt preserves the released Qwen vision-language weights and the trained\nflow-matching action head. Its action chunk size is 16, matching the upstream\ncheckpoint. To initialize only from the original Qwen backbone instead, omit\n⟦3⟧ and set ⟦4⟧.",
+   "tokens": [
+    "`lerobot/eo1-base`",
+    "`IPEC-COMMUNITY/EO-1-3B`",
+    "https://huggingface.co/IPEC-COMMUNITY/EO-1-3B",
+    "`policy.path`",
+    "`policy.vlm_base=Qwen/Qwen2.5-VL-3B-Instruct`"
+   ]
+  },
+  {
+   "id": 26,
+   "kind": "para",
+   "start": 5047,
+   "end": 5107,
+   "text": "Load another fine-tuned LeRobot-format EO-1 checkpoint with:",
+   "tokens": []
+  },
+  {
+   "id": 27,
+   "kind": "heading",
+   "start": 5165,
+   "end": 5208,
+   "text": "### Text generation and interactive control",
+   "tokens": []
+  },
+  {
+   "id": 28,
+   "kind": "para",
+   "start": 5210,
+   "end": 5362,
+   "text": "EO-1 exposes the Qwen backbone through the shared policy text contract. Runtime\nadds ⟦0⟧ and ⟦1⟧, then runs the normal EO-1 input processor:",
+   "tokens": [
+    "`query_kind`",
+    "`text`"
+   ]
+  },
+  {
+   "id": 29,
+   "kind": "para",
+   "start": 5579,
+   "end": 5821,
+   "text": "⟦0⟧ preserves the caller's question. ⟦1⟧ applies the recipe stored\nin the EO-1 policy config. EO-1 inherits ⟦2⟧ and\noverrides ⟦3⟧ and ⟦4⟧; no separate VLM is loaded.",
+   "tokens": [
+    "`vqa`",
+    "`next_subtask`",
+    "`generate_text(processed_batch)`",
+    "`supports_text_generation`",
+    "`generate_text`"
+   ]
+  },
+  {
+   "id": 30,
+   "kind": "para",
+   "start": 5823,
+   "end": 5946,
+   "text": "With the interactive language runtime, EO-1 can generate a subtask and rebuild\nits action prompt from that current subtask:",
+   "tokens": []
+  },
+  {
+   "id": 31,
+   "kind": "para",
+   "start": 6101,
+   "end": 6182,
+   "text": "After ⟦0⟧, use ⟦1⟧, ⟦2⟧, or\n⟦3⟧.",
+   "tokens": [
+    "`/start`",
+    "`/vqa <question>`",
+    "`/autosteer <goal>`",
+    "`/subtask <text>`"
+   ]
+  },
+  {
+   "id": 32,
+   "kind": "heading",
+   "start": 6184,
+   "end": 6195,
+   "text": "## Training",
+   "tokens": []
+  },
+  {
+   "id": 33,
+   "kind": "heading",
+   "start": 6197,
+   "end": 6225,
+   "text": "### Training Command Example",
+   "tokens": []
+  },
+  {
+   "id": 34,
+   "kind": "heading",
+   "start": 6573,
+   "end": 6608,
+   "text": "### Train with language annotations",
+   "tokens": []
+  },
+  {
+   "id": 35,
+   "kind": "para",
+   "start": 6610,
+   "end": 6811,
+   "text": "⟦0⟧ includes a recipe to train from LeRobot's optional\nlanguage columns. The built-in joint recipe supervises a selected assistant\nresponse and its continuous action chunk in the same sequence:",
+   "tokens": [
+    "`EO1Config`"
+   ]
+  },
+  {
+   "id": 36,
+   "kind": "para",
+   "start": 7056,
+   "end": 7417,
+   "text": "Targeted assistant turns receive next-token cross-entropy, while ⟦0⟧\nrecipe streams receive flow-action supervision. A row may receive either\nobjective or both. User prompts, images, state tokens, action tokens, and\npadding are excluded from text loss. Set ⟦1⟧ to disable recipe rendering and use the original\naction-only training path.",
+   "tokens": [
+    "`low_level`",
+    "`policy.recipe=null`"
+   ]
+  },
+  {
+   "id": 37,
+   "kind": "para",
+   "start": 7419,
+   "end": 8031,
+   "text": "See [Language columns and recipes](⟦0⟧) for the annotation\nschema and recipe structure. ⟦1⟧ may point to an explicit external\nYAML override; LeRobot does not provide shared default recipe files.\nThe default system prompt is part of EO1's recipe and can be replaced by a custom\nsystem turn. Rendered inputs without a system turn, including VQA prompts,\nremain without one. The action-only path without rendered messages keeps the\ndefault system prompt. ⟦2⟧ adds images and state/action tokens\nto the rendered messages before Qwen formatting and tokenization.",
+   "tokens": [
+    "./language_and_recipes",
+    "`recipe_path`",
+    "`EO1PrepareModelMessagesStep`"
+   ]
+  },
+  {
+   "id": 38,
+   "kind": "heading",
+   "start": 8033,
+   "end": 8060,
+   "text": "### Key Training Parameters",
+   "tokens": []
+  },
+  {
+   "id": 39,
+   "kind": "table",
+   "start": 8062,
+   "end": 8210,
+   "text": "| Parameter                              | Default                       | Description                                                             |",
+   "tokens": []
+  },
+  {
+   "id": 40,
+   "kind": "table",
+   "start": 8360,
+   "end": 8508,
+   "text": "| ⟦0⟧                          | ⟦1⟧            | Released EO-1 weights converted to native LeRobot format                |",
+   "tokens": [
+    "`policy.path`",
+    "`lerobot/eo1-base`"
+   ]
+  },
+  {
+   "id": 41,
+   "kind": "table",
+   "start": 8509,
+   "end": 8657,
+   "text": "| ⟦0⟧                      | ⟦1⟧ | Qwen processor/backbone used only when training without ⟦2⟧   |",
+   "tokens": [
+    "`policy.vlm_base`",
+    "`Qwen/Qwen2.5-VL-3B-Instruct`",
+    "`policy.path`"
+   ]
+  },
+  {
+   "id": 42,
+   "kind": "table",
+   "start": 8658,
+   "end": 8806,
+   "text": "| ⟦0⟧                         | ⟦1⟧                        | Backbone dtype request: ⟦2⟧, ⟦3⟧, or ⟦4⟧                |",
+   "tokens": [
+    "`policy.dtype`",
+    "`auto`",
+    "`auto`",
+    "`bfloat16`",
+    "`float32`"
+   ]
+  },
+  {
+   "id": 43,
+   "kind": "table",
+   "start": 8807,
+   "end": 8955,
+   "text": "| ⟦0⟧           | ⟦1⟧                        | Optional Qwen attention backend, such as ⟦2⟧                         |",
+   "tokens": [
+    "`policy.attn_implementation`",
+    "`None`",
+    "`sdpa`"
+   ]
+  },
+  {
+   "id": 44,
+   "kind": "table",
+   "start": 8956,
+   "end": 9104,
+   "text": "| ⟦0⟧        | ⟦1⟧                       | Reduces memory usage during training                                    |",
+   "tokens": [
+    "`policy.gradient_checkpointing`",
+    "`false`"
+   ]
+  },
+  {
+   "id": 45,
+   "kind": "table",
+   "start": 9105,
+   "end": 9253,
+   "text": "| ⟦0⟧                    | ⟦1⟧                           | Number of future actions predicted per chunk                            |",
+   "tokens": [
+    "`policy.chunk_size`",
+    "`8`"
+   ]
+  },
+  {
+   "id": 46,
+   "kind": "table",
+   "start": 9254,
+   "end": 9402,
+   "text": "| ⟦0⟧                | ⟦1⟧                           | Number of actions consumed from a sampled chunk                         |",
+   "tokens": [
+    "`policy.n_action_steps`",
+    "`8`"
+   ]
+  },
+  {
+   "id": 47,
+   "kind": "table",
+   "start": 9403,
+   "end": 9551,
+   "text": "| ⟦0⟧             | ⟦1⟧                          | Number of flow-matching denoising steps used during sampling            |",
+   "tokens": [
+    "`policy.num_denoise_steps`",
+    "`10`"
+   ]
+  },
+  {
+   "id": 48,
+   "kind": "table",
+   "start": 9552,
+   "end": 9700,
+   "text": "| ⟦0⟧                 | ⟦1⟧                          | State padding dimension                                                 |",
+   "tokens": [
+    "`policy.max_state_dim`",
+    "`32`"
+   ]
+  },
+  {
+   "id": 49,
+   "kind": "table",
+   "start": 9701,
+   "end": 9849,
+   "text": "| ⟦0⟧                | ⟦1⟧                          | Action padding dimension                                                |",
+   "tokens": [
+    "`policy.max_action_dim`",
+    "`32`"
+   ]
+  },
+  {
+   "id": 50,
+   "kind": "table",
+   "start": 9850,
+   "end": 9998,
+   "text": "| ⟦0⟧           | ⟦1⟧                        | Keeps the flow head in fp32 even when the backbone uses mixed precision |",
+   "tokens": [
+    "`policy.force_fp32_autocast`",
+    "`true`"
+   ]
+  },
+  {
+   "id": 51,
+   "kind": "table",
+   "start": 9999,
+   "end": 10147,
+   "text": "| ⟦0⟧ | ⟦1⟧                        | Controls whether padded action dimensions are supervised                |",
+   "tokens": [
+    "`policy.supervise_padding_action_dims`",
+    "`true`"
+   ]
+  },
+  {
+   "id": 52,
+   "kind": "table",
+   "start": 10148,
+   "end": 10296,
+   "text": "| ⟦0⟧     | ⟦1⟧                        | Controls whether padded future action rows are supervised               |",
+   "tokens": [
+    "`policy.supervise_padding_actions`",
+    "`true`"
+   ]
+  },
+  {
+   "id": 53,
+   "kind": "table",
+   "start": 10297,
+   "end": 10445,
+   "text": "| ⟦0⟧                   | ⟦1⟧                        | Enables recipe-driven text and per-sample action supervision            |",
+   "tokens": [
+    "`policy.recipe_path`",
+    "`None`"
+   ]
+  },
+  {
+   "id": 54,
+   "kind": "table",
+   "start": 10446,
+   "end": 10594,
+   "text": "| ⟦0⟧              | ⟦1⟧                        | Weight for supervised assistant-token cross-entropy                     |",
+   "tokens": [
+    "`policy.text_loss_weight`",
+    "`0.01`"
+   ]
+  },
+  {
+   "id": 55,
+   "kind": "table",
+   "start": 10595,
+   "end": 10743,
+   "text": "| ⟦0⟧              | ⟦1⟧                         | Weight for continuous flow-action loss                                  |",
+   "tokens": [
+    "`policy.flow_loss_weight`",
+    "`1.0`"
+   ]
+  },
+  {
+   "id": 56,
+   "kind": "table",
+   "start": 10744,
+   "end": 10892,
+   "text": "| ⟦0⟧          | ⟦1⟧                        | Maximum joint vision-language-action sequence length                    |",
+   "tokens": [
+    "`policy.tokenizer_max_length`",
+    "`1000`"
+   ]
+  },
+  {
+   "id": 57,
+   "kind": "heading",
+   "start": 10894,
+   "end": 10907,
+   "text": "## Evaluation",
+   "tokens": []
+  },
+  {
+   "id": 58,
+   "kind": "para",
+   "start": 10909,
+   "end": 10996,
+   "text": "EO-1 can be evaluated through ⟦0⟧ once you have a LeRobot-format checkpoint:",
+   "tokens": [
+    "`lerobot-eval`"
+   ]
+  },
+  {
+   "id": 59,
+   "kind": "para",
+   "start": 11171,
+   "end": 11281,
+   "text": "For datasets or environments whose camera names differ from the checkpoint configuration, pass a ⟦0⟧:",
+   "tokens": [
+    "`rename_map`"
+   ]
+  },
+  {
+   "id": 60,
+   "kind": "heading",
+   "start": 11489,
+   "end": 11511,
+   "text": "## Configuration Notes",
+   "tokens": []
+  },
+  {
+   "id": 61,
+   "kind": "heading",
+   "start": 11513,
+   "end": 11533,
+   "text": "### Image Processing",
+   "tokens": []
+  },
+  {
+   "id": 62,
+   "kind": "para",
+   "start": 11535,
+   "end": 11728,
+   "text": "EO-1 uses the Qwen2.5-VL processor. The ⟦0⟧ and ⟦1⟧ settings control the image resizing bounds before the visual tokens are passed into the backbone.",
+   "tokens": [
+    "`policy.image_min_pixels`",
+    "`policy.image_max_pixels`"
+   ]
+  },
+  {
+   "id": 63,
+   "kind": "heading",
+   "start": 11730,
+   "end": 11761,
+   "text": "### State and Action Dimensions",
+   "tokens": []
+  },
+  {
+   "id": 64,
+   "kind": "para",
+   "start": 11763,
+   "end": 11983,
+   "text": "The policy pads state and action vectors to ⟦0⟧ and ⟦1⟧ before the EO-1 flow head. Predictions are cropped back to the original action dimension before being returned by the policy.",
+   "tokens": [
+    "`policy.max_state_dim`",
+    "`policy.max_action_dim`"
+   ]
+  },
+  {
+   "id": 65,
+   "kind": "heading",
+   "start": 11985,
+   "end": 12006,
+   "text": "### Attention Backend",
+   "tokens": []
+  },
+  {
+   "id": 66,
+   "kind": "para",
+   "start": 12008,
+   "end": 12165,
+   "text": "Use ⟦0⟧ for a portable setup. Use ⟦1⟧ only when ⟦2⟧ is installed and compatible with your environment.",
+   "tokens": [
+    "`policy.attn_implementation=sdpa`",
+    "`flash_attention_2`",
+    "`flash_attn`"
+   ]
+  },
+  {
+   "id": 67,
+   "kind": "heading",
+   "start": 12167,
+   "end": 12180,
+   "text": "## References",
+   "tokens": []
+  },
+  {
+   "id": 68,
+   "kind": "list",
+   "start": 12182,
+   "end": 12234,
+   "text": "- [EO-1 project](⟦0⟧)",
+   "tokens": [
+    "https://github.com/EO-Robotics/EO1"
+   ]
+  },
+  {
+   "id": 69,
+   "kind": "list",
+   "start": 12235,
+   "end": 12283,
+   "text": "- [EO-1 paper](⟦0⟧)",
+   "tokens": [
+    "https://arxiv.org/abs/2508.21112"
+   ]
+  },
+  {
+   "id": 70,
+   "kind": "list",
+   "start": 12284,
+   "end": 12362,
+   "text": "- [Qwen2.5-VL-3B-Instruct](⟦0⟧)",
+   "tokens": [
+    "https://huggingface.co/Qwen/Qwen2.5-VL-3B-Instruct"
+   ]
+  },
+  {
+   "id": 71,
+   "kind": "heading",
+   "start": 12364,
+   "end": 12375,
+   "text": "## Citation",
+   "tokens": []
+  },
+  {
+   "id": 72,
+   "kind": "heading",
+   "start": 12811,
+   "end": 12821,
+   "text": "## License",
+   "tokens": []
+  },
+  {
+   "id": 73,
+   "kind": "para",
+   "start": 12823,
+   "end": 13003,
+   "text": "This LeRobot integration follows the **Apache 2.0 License** used by LeRobot. Check the upstream EO-1 model and dataset pages for the licenses of released EO-1 checkpoints and data.",
+   "tokens": []
+  }
+ ]
+}

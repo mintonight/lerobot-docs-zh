@@ -1,0 +1,533 @@
+{
+ "file": "robomme.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1933,
+   "text": "# RoboMME",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1935,
+   "end": 2181,
+   "text": "[RoboMME](⟦0⟧) is a memory-augmented manipulation benchmark built on ManiSkill (SAPIEN). It evaluates a robot's ability to retain and use information across an episode — counting, object permanence, reference, and imitation.",
+   "tokens": [
+    "https://robomme.github.io"
+   ]
+  },
+  {
+   "id": 2,
+   "kind": "list",
+   "start": 2183,
+   "end": 2226,
+   "text": "- **16 tasks** across 4 memory-skill suites",
+   "tokens": []
+  },
+  {
+   "id": 3,
+   "kind": "list",
+   "start": 2227,
+   "end": 2285,
+   "text": "- **1,600 training demos** (100 per task, 50 val, 50 test)",
+   "tokens": []
+  },
+  {
+   "id": 4,
+   "kind": "list",
+   "start": 2286,
+   "end": 2407,
+   "text": "- **Dataset**: [⟦0⟧](⟦1⟧) — LeRobot v3.0, 768K frames at 10 fps",
+   "tokens": [
+    "`lerobot/robomme`",
+    "https://huggingface.co/datasets/lerobot/robomme"
+   ]
+  },
+  {
+   "id": 5,
+   "kind": "list",
+   "start": 2408,
+   "end": 2466,
+   "text": "- **Simulator**: ManiSkill / SAPIEN, Panda arm, Linux only",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "heading",
+   "start": 2593,
+   "end": 2601,
+   "text": "## Tasks",
+   "tokens": []
+  },
+  {
+   "id": 7,
+   "kind": "table",
+   "start": 2603,
+   "end": 2704,
+   "text": "| Suite                             | Tasks                                                         |",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "table",
+   "start": 2807,
+   "end": 2908,
+   "text": "| **Counting** (temporal memory)    | BinFill, PickXtimes, SwingXtimes, StopCube                    |",
+   "tokens": []
+  },
+  {
+   "id": 9,
+   "kind": "table",
+   "start": 2909,
+   "end": 3010,
+   "text": "| **Permanence** (spatial memory)   | VideoUnmask, VideoUnmaskSwap, ButtonUnmask, ButtonUnmaskSwap  |",
+   "tokens": []
+  },
+  {
+   "id": 10,
+   "kind": "table",
+   "start": 3011,
+   "end": 3112,
+   "text": "| **Reference** (object memory)     | PickHighlight, VideoRepick, VideoPlaceButton, VideoPlaceOrder |",
+   "tokens": []
+  },
+  {
+   "id": 11,
+   "kind": "table",
+   "start": 3113,
+   "end": 3214,
+   "text": "| **Imitation** (procedural memory) | MoveCube, InsertPeg, PatternLock, RouteStick                  |",
+   "tokens": []
+  },
+  {
+   "id": 12,
+   "kind": "heading",
+   "start": 3216,
+   "end": 3231,
+   "text": "## Installation",
+   "tokens": []
+  },
+  {
+   "id": 13,
+   "kind": "quote",
+   "start": 3233,
+   "end": 3358,
+   "text": "> RoboMME requires **Linux** (ManiSkill/SAPIEN uses Vulkan rendering). Docker is recommended to isolate dependency conflicts.",
+   "tokens": []
+  },
+  {
+   "id": 14,
+   "kind": "heading",
+   "start": 3360,
+   "end": 3378,
+   "text": "### Native (Linux)",
+   "tokens": []
+  },
+  {
+   "id": 15,
+   "kind": "quote",
+   "start": 3564,
+   "end": 3854,
+   "text": "> **Dependency note**: ⟦0⟧ (pulled by ⟦1⟧) pins ⟦2⟧ and ⟦3⟧, which conflict with lerobot's base ⟦4⟧. That's why ⟦5⟧ is not a pyproject extra — use the override install above, or the Docker approach below to avoid conflicts entirely.",
+   "tokens": [
+    "`mani-skill`",
+    "`robomme`",
+    "`gymnasium==0.29.1`",
+    "`numpy<2.0.0`",
+    "`numpy>=2.0.0`",
+    "`robomme`"
+   ]
+  },
+  {
+   "id": 16,
+   "kind": "heading",
+   "start": 3856,
+   "end": 3880,
+   "text": "### Docker (recommended)",
+   "tokens": []
+  },
+  {
+   "id": 17,
+   "kind": "para",
+   "start": 4034,
+   "end": 4239,
+   "text": "The benchmark Dockerfile extends the published ⟦0⟧ image, then overrides ⟦1⟧ and ⟦2⟧. Both versions are runtime-safe for lerobot's actual API usage.",
+   "tokens": [
+    "`huggingface/lerobot-gpu:latest`",
+    "`gymnasium==0.29.1`",
+    "`numpy==1.26.4`"
+   ]
+  },
+  {
+   "id": 18,
+   "kind": "heading",
+   "start": 4241,
+   "end": 4262,
+   "text": "## Running Evaluation",
+   "tokens": []
+  },
+  {
+   "id": 19,
+   "kind": "heading",
+   "start": 4264,
+   "end": 4305,
+   "text": "### Default (single task, single episode)",
+   "tokens": []
+  },
+  {
+   "id": 20,
+   "kind": "heading",
+   "start": 4533,
+   "end": 4558,
+   "text": "### Multi-task evaluation",
+   "tokens": []
+  },
+  {
+   "id": 21,
+   "kind": "para",
+   "start": 4560,
+   "end": 4745,
+   "text": "Evaluate multiple tasks in one run by comma-separating task names. Use ⟦0⟧ to control which episodes are evaluated per task. Recommended: 50 episodes per task for the test split.",
+   "tokens": [
+    "`task_ids`"
+   ]
+  },
+  {
+   "id": 22,
+   "kind": "heading",
+   "start": 5028,
+   "end": 5070,
+   "text": "### Key CLI options for ⟦0⟧",
+   "tokens": [
+    "`env.type=robomme`"
+   ]
+  },
+  {
+   "id": 23,
+   "kind": "table",
+   "start": 5072,
+   "end": 5165,
+   "text": "| Option               | Default       | Description                                        |",
+   "tokens": []
+  },
+  {
+   "id": 24,
+   "kind": "table",
+   "start": 5260,
+   "end": 5353,
+   "text": "| ⟦0⟧           | ⟦1⟧  | Any of the 16 task names above (comma-separated)   |",
+   "tokens": [
+    "`env.task`",
+    "`PickXtimes`"
+   ]
+  },
+  {
+   "id": 25,
+   "kind": "table",
+   "start": 5354,
+   "end": 5447,
+   "text": "| ⟦0⟧  | ⟦1⟧        | ⟦2⟧, ⟦3⟧, or ⟦4⟧                          |",
+   "tokens": [
+    "`env.dataset_split`",
+    "`test`",
+    "`train`",
+    "`val`",
+    "`test`"
+   ]
+  },
+  {
+   "id": 26,
+   "kind": "table",
+   "start": 5448,
+   "end": 5541,
+   "text": "| ⟦0⟧   | ⟦1⟧ | ⟦2⟧ (8-D) or ⟦3⟧ (7-D)             |",
+   "tokens": [
+    "`env.action_space`",
+    "`joint_angle`",
+    "`joint_angle`",
+    "`ee_pose`"
+   ]
+  },
+  {
+   "id": 27,
+   "kind": "table",
+   "start": 5542,
+   "end": 5635,
+   "text": "| ⟦0⟧ | ⟦1⟧         | Max steps per episode                              |",
+   "tokens": [
+    "`env.episode_length`",
+    "`300`"
+   ]
+  },
+  {
+   "id": 28,
+   "kind": "table",
+   "start": 5636,
+   "end": 5729,
+   "text": "| ⟦0⟧       | ⟦1⟧        | List of episode indices to evaluate (null = ⟦2⟧) |",
+   "tokens": [
+    "`env.task_ids`",
+    "`null`",
+    "`[0]`"
+   ]
+  },
+  {
+   "id": 29,
+   "kind": "heading",
+   "start": 5731,
+   "end": 5741,
+   "text": "## Dataset",
+   "tokens": []
+  },
+  {
+   "id": 30,
+   "kind": "para",
+   "start": 5743,
+   "end": 5881,
+   "text": "The dataset [⟦0⟧](⟦1⟧) is in **LeRobot v3.0 format** and can be loaded directly:",
+   "tokens": [
+    "`lerobot/robomme`",
+    "https://huggingface.co/datasets/lerobot/robomme"
+   ]
+  },
+  {
+   "id": 31,
+   "kind": "heading",
+   "start": 6003,
+   "end": 6023,
+   "text": "### Dataset features",
+   "tokens": []
+  },
+  {
+   "id": 32,
+   "kind": "table",
+   "start": 6025,
+   "end": 6097,
+   "text": "| Feature            | Shape         | Description                     |",
+   "tokens": []
+  },
+  {
+   "id": 33,
+   "kind": "table",
+   "start": 6171,
+   "end": 6243,
+   "text": "| ⟦0⟧            | (256, 256, 3) | Front camera RGB                |",
+   "tokens": [
+    "`image`"
+   ]
+  },
+  {
+   "id": 34,
+   "kind": "table",
+   "start": 6244,
+   "end": 6316,
+   "text": "| ⟦0⟧      | (256, 256, 3) | Wrist camera RGB                |",
+   "tokens": [
+    "`wrist_image`"
+   ]
+  },
+  {
+   "id": 35,
+   "kind": "table",
+   "start": 6317,
+   "end": 6389,
+   "text": "| ⟦0⟧          | (8,)          | Joint angles + gripper          |",
+   "tokens": [
+    "`actions`"
+   ]
+  },
+  {
+   "id": 36,
+   "kind": "table",
+   "start": 6390,
+   "end": 6462,
+   "text": "| ⟦0⟧            | (8,)          | Joint positions + gripper state |",
+   "tokens": [
+    "`state`"
+   ]
+  },
+  {
+   "id": 37,
+   "kind": "table",
+   "start": 6463,
+   "end": 6535,
+   "text": "| ⟦0⟧   | str           | High-level language annotation  |",
+   "tokens": [
+    "`simple_subgoal`"
+   ]
+  },
+  {
+   "id": 38,
+   "kind": "table",
+   "start": 6536,
+   "end": 6608,
+   "text": "| ⟦0⟧ | str           | Grounded language annotation    |",
+   "tokens": [
+    "`grounded_subgoal`"
+   ]
+  },
+  {
+   "id": 39,
+   "kind": "table",
+   "start": 6609,
+   "end": 6681,
+   "text": "| ⟦0⟧    | int           | Episode ID                      |",
+   "tokens": [
+    "`episode_index`"
+   ]
+  },
+  {
+   "id": 40,
+   "kind": "table",
+   "start": 6682,
+   "end": 6754,
+   "text": "| ⟦0⟧      | int           | Frame within episode            |",
+   "tokens": [
+    "`frame_index`"
+   ]
+  },
+  {
+   "id": 41,
+   "kind": "heading",
+   "start": 6756,
+   "end": 6792,
+   "text": "### Feature key alignment (training)",
+   "tokens": []
+  },
+  {
+   "id": 42,
+   "kind": "para",
+   "start": 6794,
+   "end": 7164,
+   "text": "The env wrapper exposes its cameras under ⟦0⟧, named by ⟦1⟧ and ⟦2⟧ (⟦3⟧ and ⟦4⟧ by default). The ⟦5⟧ in ⟦6⟧ maps these to ⟦7⟧ and ⟦8⟧ for the policy. State is exposed as ⟦9⟧ and maps to ⟦10⟧.",
+   "tokens": [
+    "`pixels/<camera_name>`",
+    "`RoboMMEEnv.front_camera_name`",
+    "`RoboMMEEnv.wrist_camera_name`",
+    "`camera1`",
+    "`camera2`",
+    "`features_map`",
+    "`RoboMMEEnv`",
+    "`observation.images.camera1`",
+    "`observation.images.camera2`",
+    "`agent_pos`",
+    "`observation.state`"
+   ]
+  },
+  {
+   "id": 43,
+   "kind": "para",
+   "start": 7166,
+   "end": 7266,
+   "text": "The dataset's raw columns do not match those policy keys, so pass a ⟦0⟧ when fine-tuning:",
+   "tokens": [
+    "`--rename_map`"
+   ]
+  },
+  {
+   "id": 44,
+   "kind": "para",
+   "start": 7432,
+   "end": 7605,
+   "text": "Override ⟦0⟧ / ⟦1⟧ if you train against different key names, so evaluation observations match the keys the policy was trained on.",
+   "tokens": [
+    "`--env.front_camera_name`",
+    "`--env.wrist_camera_name`"
+   ]
+  },
+  {
+   "id": 45,
+   "kind": "heading",
+   "start": 7607,
+   "end": 7623,
+   "text": "## Action Spaces",
+   "tokens": []
+  },
+  {
+   "id": 46,
+   "kind": "table",
+   "start": 7625,
+   "end": 7708,
+   "text": "| Type          | Dim | Description                                               |",
+   "tokens": []
+  },
+  {
+   "id": 47,
+   "kind": "table",
+   "start": 7793,
+   "end": 7876,
+   "text": "| ⟦0⟧ | 8   | 7 joint angles + 1 gripper (−1 closed, +1 open, absolute) |",
+   "tokens": [
+    "`joint_angle`"
+   ]
+  },
+  {
+   "id": 48,
+   "kind": "table",
+   "start": 7877,
+   "end": 7960,
+   "text": "| ⟦0⟧     | 7   | xyz + roll/pitch/yaw + gripper                            |",
+   "tokens": [
+    "`ee_pose`"
+   ]
+  },
+  {
+   "id": 49,
+   "kind": "para",
+   "start": 7962,
+   "end": 8045,
+   "text": "Set via ⟦0⟧ (default) or ⟦1⟧.",
+   "tokens": [
+    "`--env.action_space=joint_angle`",
+    "`--env.action_space=ee_pose`"
+   ]
+  },
+  {
+   "id": 50,
+   "kind": "heading",
+   "start": 8047,
+   "end": 8064,
+   "text": "## Platform Notes",
+   "tokens": []
+  },
+  {
+   "id": 51,
+   "kind": "list",
+   "start": 8066,
+   "end": 8154,
+   "text": "- **Linux only**: ManiSkill requires SAPIEN/Vulkan. macOS and Windows are not supported.",
+   "tokens": []
+  },
+  {
+   "id": 52,
+   "kind": "list",
+   "start": 8155,
+   "end": 8244,
+   "text": "- **GPU recommended**: Rendering is CPU-capable but slow; CUDA + Vulkan gives full speed.",
+   "tokens": []
+  },
+  {
+   "id": 53,
+   "kind": "list",
+   "start": 8245,
+   "end": 8348,
+   "text": "- **gymnasium / numpy conflict**: See installation note above. Docker image handles this automatically.",
+   "tokens": []
+  },
+  {
+   "id": 54,
+   "kind": "list",
+   "start": 8349,
+   "end": 8493,
+   "text": "- **ManiSkill fork**: ⟦0⟧ depends on a specific ManiSkill fork (⟦1⟧), pulled in automatically via the ⟦2⟧ package.",
+   "tokens": [
+    "`robomme`",
+    "`YinpeiDai/ManiSkill`",
+    "`robomme`"
+   ]
+  }
+ ]
+}

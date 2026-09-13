@@ -1,0 +1,277 @@
+<script lang="ts">
+import {onMount} from "svelte";
+import Tip from "$lib/Tip.svelte";
+import CopyLLMTxtMenu from "$lib/CopyLLMTxtMenu.svelte";
+import Youtube from "$lib/Youtube.svelte";
+import Docstring from "$lib/Docstring.svelte";
+import CodeBlock from "$lib/CodeBlock.svelte";
+import CodeBlockFw from "$lib/CodeBlockFw.svelte";
+import DocNotebookDropdown from "$lib/DocNotebookDropdown.svelte";
+import CourseFloatingBanner from "$lib/CourseFloatingBanner.svelte";
+import IconCopyLink from "$lib/IconCopyLink.svelte";
+import FrameworkContent from "$lib/FrameworkContent.svelte";
+import Markdown from "$lib/Markdown.svelte";
+import Question from "$lib/Question.svelte";
+import FrameworkSwitchCourse from "$lib/FrameworkSwitchCourse.svelte";
+import InferenceApi from "$lib/InferenceApi.svelte";
+import TokenizersLanguageContent from "$lib/TokenizersLanguageContent.svelte";
+import ExampleCodeBlock from "$lib/ExampleCodeBlock.svelte";
+import Added from "$lib/Added.svelte";
+import Changed from "$lib/Changed.svelte";
+import Deprecated from "$lib/Deprecated.svelte";
+import PipelineIcon from "$lib/PipelineIcon.svelte";
+import PipelineTag from "$lib/PipelineTag.svelte";
+import Heading from "$lib/Heading.svelte";
+import HfOptions from "$lib/HfOptions.svelte";
+import HfOption from "$lib/HfOption.svelte";
+import EditOnGithub from "$lib/EditOnGithub.svelte";
+import InferenceSnippet from "$lib/InferenceSnippet/InferenceSnippet.svelte";
+import MermaidChart from "$lib/MermaidChart.svelte";
+let fw: "pt" | "tf" = "pt";
+onMount(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    fw = urlParams.get("fw") || "pt";
+});
+</script>
+<svelte:head>
+  <meta name="hf:doc:metadata" content={metadata} >
+</svelte:head>
+
+<!--HF DOCBUILD BODY START-->
+
+HF_DOC_BODY_START
+
+<CopyLLMTxtMenu containerStyle="float: right; margin-left: 10px; display: inline-flex; position: relative; z-index: 10;"></CopyLLMTxtMenu>
+
+# action representation
+
+本指南介绍 LeRobot 中机器人 action 可以表示的不同方式、它们之间的相互关系，以及各自适用的场景。
+
+## 关节空间与 end-effector 空间
+
+在讨论 action representation 之前，先了解一下 action 可能存在的两个坐标空间会有所帮助。
+
+### 关节空间
+
+关节空间 action 直接指定每个电机的目标位置。对于带 gripper 的 6 自由度机械臂，关节空间 action 可能如下所示：
+
+```
+action = [shoulder_pan: 45.0, shoulder_lift: -20.0, elbow: -30.0, wrist_pitch: 10.0, wrist_roll: 0.0, wrist_yaw: 5.0, gripper: 0.8]
+```
+
+关节空间是 LeRobot 中的默认方式。它简单、不需要运动学模型，并且直接映射到电机命令。大多数入门级设置（SO-100、Koch）都使用关节空间 action。
+
+### end-effector（EE）空间
+
+end-effector 空间 action 以笛卡尔坐标指定机器人工具尖端（gripper）的目标位置和方向：
+
+```
+action = [x: 0.25, y: -0.10, z: 0.15, wx: 0.0, wy: 0.0, wz: 0.1, gripper: 0.8]
+```
+
+对于拾取-放置等任务，EE 空间更直观，因为它直接描述了 gripper 应该移动到的位置，但它需要运动学模型（URDF）在 EE 姿态和关节角度之间进行转换。
+
+### 在空间之间转换
+
+LeRobot 提供处理器步骤，使用正运动学和逆运动学在关节空间与 EE 空间之间进行转换。这些构建在 `RobotKinematics` 之上，后者会加载你的机器人的 URDF 模型。
+
+```python
+from lerobot.model.kinematics import RobotKinematics
+from lerobot.robots.so_follower.robot_kinematic_processor import (
+    ForwardKinematicsJointsToEE,
+    InverseKinematicsEEToJoints,
+)
+
+kinematics = RobotKinematics(
+    urdf_path="./SO101/so101_new_calib.urdf",
+    target_frame_name="gripper_frame_link",
+    joint_names=["shoulder", "elbow", "wrist_pitch", "wrist_roll", "wrist_yaw"],
+)
+
+# Joints → EE (for observations: "where is my gripper?")
+fk_step = ForwardKinematicsJointsToEE(kinematics=kinematics, motor_names=[...])
+
+# EE → Joints (for actions: "move my gripper here")
+ik_step = InverseKinematicsEEToJoints(kinematics=kinematics, motor_names=[...])
+```
+
+查看 [`examples/so100_to_so100_EE/`](https://github.com/huggingface/lerobot/tree/main/examples/so100_to_so100_EE) 了解在 SO-100 机械臂上使用 EE 空间 action 录制、回放和评估的完整示例。
+
+## 绝对、相对和增量 action
+
+无论你在关节空间还是 EE 空间中工作，action 值都可以用三种不同的方式表达。术语遵循 [UMI（Chi 等人，2024）](https://arxiv.org/abs/2402.10329)。
+
+### absolute action（LeRobot 默认）
+
+每个 action 直接指定目标位置。
+
+**示例**（关节空间，4 个 action 组成的 action chunk）：
+
+```
+current_state = [45.0, -30.0, 10.0]
+
+action_chunk = [
+    [46.0, -29.0, 11.0],   # go to 46, -29, 11
+    [47.5, -27.0, 12.0],   # go to 47.5, -27, 12
+    [49.0, -25.0, 13.5],   # go to 49, -25, 13.5
+    [50.0, -24.0, 15.0],   # go to 50, -24, 15
+]
+```
+
+每个值都是机器人坐标系中的目标位置。简单直接，但需要一致的全局坐标系。这是 LeRobot 中的默认方式。
+
+### relative action（OpenPI / pi0 使用）
+
+action chunk 中的每个 action 都是相对于**预测时刻的当前 state**的偏移。action chunk 中的所有 action 共享同一个参考点：
+
+```
+current_state = [45.0, -30.0, 10.0]
+
+relative_chunk = [
+    [1.0,  1.0, 1.0],   # +1 from current → target 46, -29, 11
+    [2.5,  3.0, 2.0],   # +2.5 from current → target 47.5, -27, 12
+    [4.0,  5.0, 3.5],   # +4 from current → target 49, -25, 13.5
+    [5.0,  6.0, 5.0],   # +5 from current → target 50, -24, 15
+]
+```
+
+转换非常简单：`relative = absolute - current_state`。恢复 absolute action：`absolute = relative + current_state`。
+
+**为什么要使用 relative action？** 模型学习预测以零为中心的偏移，这更容易归一化，并带来更稳定的训练。由于每个 action chunk 都引用相同的当前 state，因此跨 action chunk 不会累积误差。
+
+### 增量 action（连续差值）
+
+每个 action 都是相对于**前一个 action**的偏移（第一步相对于当前 state）：
+
+```
+current_state = [45.0, -30.0, 10.0]
+
+delta_chunk = [
+    [1.0,  1.0, 1.0],   # current → 46, -29, 11
+    [1.5,  2.0, 1.0],   # previous action → 47.5, -27, 12
+    [1.5,  2.0, 1.5],   # previous action → 49, -25, 13.5
+    [1.0,  1.0, 1.5],   # previous action → 50, -24, 15
+]
+```
+
+在这里，每一步都相对于前一步。要恢复绝对位置，你必须将所有之前的增量求和，这意味着误差会随时间累积。UMI 正因为这个原因明确反对这种表示方式。
+
+### 可视化对比
+
+下图（基于 [UMI，Chi 等人，2024](https://arxiv.org/abs/2402.10329) 中的图）说明了关键区别。使用**相对轨迹**时，action chunk 中的每个 action 都指向同一个原点（当前 state），因此新的 inference 步骤可以干净地重置参考。使用**增量**时，每个 action 都依赖前一个 action，因此误差会累积。**绝对**action 需要一致的全局坐标系。
+
+<img
+  src="https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/lerobot/action_representations_umi.png"
+  alt="Relative Trajectory as Action Representation (UMI, Chi et al., 2024)"
+  width="85%"
+/>
+
+## 在 LeRobot 中使用 relative action
+
+LeRobot 提供 `RelativeActionsProcessorStep` 在处理器流水线中实现 absolute action 与 relative action 之间的转换。这就是 pi0、pi0.5 和 pi0_fast 支持 relative action 的方式。
+
+> **注意：** 所有 pi 模型（pi0、pi0.5、pi0*fast）在归一化\_之前*应用相对转换（`relative → normalize`），因此归一化器始终看到增量（相对）值。这意味着使用 `use_relative_actions=true` 训练时，它们全部都需要**relative action 统计**。在 pi0_fast 中，`RelativeActionsProcessorStep` 只修改 action——state observation 不变——因此 `NormalizerProcessorStep` 仍然在 state tokenizer 之前运行，tokenizer 继续按预期收到归一化后的 state。
+
+### 工作原理
+
+在**训练**（预处理）期间，action 在模型看到它们之前会从绝对转换为相对：
+
+```
+raw absolute action → RelativeActionsProcessorStep → normalize → model
+```
+
+在**inference**（后处理）期间，模型预测在发送给机器人之前会被转换回 absolute action：
+
+```
+model output → unnormalize → AbsoluteActionsProcessorStep → robot
+```
+
+`AbsoluteActionsProcessorStep` 从其配对的 `RelativeActionsProcessorStep` 读取缓存的当前 state，因此两者必须连接在一起（由 policy 工厂自动处理）。
+
+### 为 pi 系列启用 relative action（pi0、pi0.5、pi0_fast）
+
+**第 1 步**：为你的 dataset 预计算 relative action 统计：
+
+```bash
+lerobot-edit-dataset \
+    --repo_id your_dataset \
+    --operation.type recompute_stats \
+    --operation.relative_action true \
+    --operation.chunk_size 50 \
+    --operation.relative_exclude_joints "['gripper']"
+```
+
+**第 2 步**：启用 relative action 进行训练：
+
+```bash
+lerobot-train \
+    --dataset.repo_id=your_dataset \
+    --policy.type=pi0 \
+    --policy.use_relative_actions=true \
+    --policy.relative_exclude_joints='["gripper"]'
+```
+
+`relative_exclude_joints` 参数指定应保持在绝对空间的关节。例如，gripper 命令通常是二值的（打开/关闭），不会从相对编码中获益。
+
+### 将 relative action 与 RTC 结合
+
+[RTC](https://arxiv.org/abs/2506.07339) 以高频运行 policy inference，并在 action 被预测时立即发送给机器人，而不是等待完整的 action chunk。relative action 与 RTC 完全兼容：由于相对模式下的每个 action chunk 都引用**相同的**当前 state（在 inference 开始时捕获），因此即使机器人已经移动，action chunk 中的每个预测 action 仍然是有效的偏移。无需特殊处理——`RelativeActionsProcessorStep` 每次 inference 调用缓存一次 state，`AbsoluteActionsProcessorStep` 将其应用于流式输出的每个 action。
+
+### 将 relative action 与 EE 空间结合
+
+relative action 在关节空间和 EE 空间中都可使用。例如，如果你的 dataset 存储 EE action，相对编码会将它们转换为相对于当前 EE 姿态的偏移：
+
+```
+current_ee_state = [x: 0.25, y: -0.10, z: 0.15, gripper: 0.8]
+
+absolute_ee_chunk = [
+    [0.26, -0.09, 0.16, 0.8],
+    [0.28, -0.07, 0.18, 0.8],
+]
+
+relative_ee_chunk = [
+    [0.01,  0.01, 0.01, 0.0],   # offset from current EE pose
+    [0.03,  0.03, 0.03, 0.0],   # offset from current EE pose
+]
+```
+
+## 处理流水线摘要
+
+下面是不同处理器如何组合。每个箭头是一个处理器步骤，它们可以在 `RobotProcessorPipeline` 或 `PolicyProcessorPipeline` 中链接起来：
+
+```
+                    ┌─────────────────────────────────────────┐
+   Action Space     │   Joint Space  ←──IK──→  EE Space      │
+                    │   ForwardKinematicsJointsToEE           │
+                    │   InverseKinematicsEEToJoints           │
+                    └─────────────────────────────────────────┘
+
+                    ┌─────────────────────────────────────────┐
+   Representation   │   Absolute  ←────→  Relative            │
+                    │   RelativeActionsProcessorStep (pre)    │
+                    │   AbsoluteActionsProcessorStep (post)   │
+                    └─────────────────────────────────────────┘
+
+                    ┌─────────────────────────────────────────┐
+   Normalization    │   Raw  ←────→  Normalized               │
+                    │   NormalizerProcessorStep (pre)         │
+                    │   UnnormalizerProcessorStep (post)      │
+                    └─────────────────────────────────────────┘
+```
+
+典型的训练预处理链可能为：`raw absolute joint actions → relative → normalize`。典型的 inference 后处理器为：`unnormalize → absolute → (optionally IK to joints)`。
+
+## 参考
+
+- [通用操作接口（UMI）](https://arxiv.org/abs/2402.10329) - Chi 等人，2024。定义了相对轨迹 action representation，并将其与绝对和增量 action 进行比较。
+- [处理器简介](./introduction_processors) - LeRobot 中处理器流水线的工作原理。
+- [`examples/so100_to_so100_EE/`](https://github.com/huggingface/lerobot/tree/main/examples/so100_to_so100_EE) - 使用 EE 空间 action 录制和评估的完整示例。
+
+
+
+<EditOnGithub source="https://github.com/huggingface/lerobot/blob/main/docs/source/action_representations.mdx" />
+
+<!--HF DOCBUILD BODY END-->
+
+HF_DOC_BODY_END
+

@@ -1,0 +1,573 @@
+{
+ "file": "async.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1948,
+   "text": "# Asynchronous Inference",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1950,
+   "end": 2361,
+   "text": "With our [SmolVLA](⟦0⟧) we introduced a new way to run inference on real-world robots, **decoupling action prediction from action execution**.\nIn this tutorial, we'll show how to use asynchronous inference (_async inference_) using a finetuned version of SmolVLA, and all the policies supported by LeRobot.\n**Try async inference with all the policies** supported by LeRobot!",
+   "tokens": [
+    "https://huggingface.co/papers/2506.01844"
+   ]
+  },
+  {
+   "id": 2,
+   "kind": "para",
+   "start": 2363,
+   "end": 2385,
+   "text": "**What you'll learn:**",
+   "tokens": []
+  },
+  {
+   "id": 3,
+   "kind": "list",
+   "start": 2387,
+   "end": 2488,
+   "text": "1. Why asynchronous inference matters and how it compares to, more traditional, sequential inference.",
+   "tokens": []
+  },
+  {
+   "id": 4,
+   "kind": "list",
+   "start": 2489,
+   "end": 2601,
+   "text": "2. How to spin-up a ⟦0⟧ and connect a ⟦1⟧ from the same machine, and even over the network.",
+   "tokens": [
+    "`PolicyServer`",
+    "`RobotClient`"
+   ]
+  },
+  {
+   "id": 5,
+   "kind": "list",
+   "start": 2602,
+   "end": 2704,
+   "text": "3. How to tune key parameters (⟦0⟧, ⟦1⟧) for your robot and policy.",
+   "tokens": [
+    "`actions_per_chunk`",
+    "`chunk_size_threshold`"
+   ]
+  },
+  {
+   "id": 6,
+   "kind": "para",
+   "start": 2706,
+   "end": 2788,
+   "text": "If you get stuck, hop into our [Discord community](⟦0⟧)!",
+   "tokens": [
+    "https://discord.gg/s3KuuzsPFb"
+   ]
+  },
+  {
+   "id": 7,
+   "kind": "para",
+   "start": 2790,
+   "end": 3165,
+   "text": "In a nutshell: with _async inference_, your robot keeps acting while the policy server is already busy computing the next chunk of actions---eliminating \"wait-for-inference\" lags and unlocking smoother, more reactive behaviours.\nThis is fundamentally different from synchronous inference (sync), where the robot stays idle while the policy computes the next chunk of actions.",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "heading",
+   "start": 3172,
+   "end": 3211,
+   "text": "## Getting started with async inference",
+   "tokens": []
+  },
+  {
+   "id": 9,
+   "kind": "para",
+   "start": 3213,
+   "end": 3440,
+   "text": "You can read more information on asynchronous inference in our [blogpost](⟦0⟧). This guide is designed to help you quickly set up and run asynchronous inference in your environment.",
+   "tokens": [
+    "https://huggingface.co/blog/async-robot-inference"
+   ]
+  },
+  {
+   "id": 10,
+   "kind": "para",
+   "start": 3442,
+   "end": 3555,
+   "text": "First, install ⟦0⟧ with the ⟦1⟧ tag, to install the extra dependencies required to run async inference.",
+   "tokens": [
+    "`lerobot`",
+    "`async`"
+   ]
+  },
+  {
+   "id": 11,
+   "kind": "para",
+   "start": 3597,
+   "end": 3778,
+   "text": "Then, spin up a policy server (in one terminal, or in a separate machine) specifying the host address and port for the client to connect to.\nYou can spin up a policy server running:",
+   "tokens": []
+  },
+  {
+   "id": 12,
+   "kind": "para",
+   "start": 3885,
+   "end": 4172,
+   "text": "This will start a policy server listening on ⟦0⟧ (⟦1⟧, port 8080). At this stage, the policy server is empty, as all information related to which policy to run and with which parameters are specified during the first handshake with the client. Spin up a client with:",
+   "tokens": [
+    "`127.0.0.1:8080`",
+    "`localhost`"
+   ]
+  },
+  {
+   "id": 13,
+   "kind": "para",
+   "start": 5704,
+   "end": 5753,
+   "text": "In summary, you need to specify instructions for:",
+   "tokens": []
+  },
+  {
+   "id": 14,
+   "kind": "list",
+   "start": 5755,
+   "end": 5808,
+   "text": "- ⟦0⟧: the address and port of the policy server",
+   "tokens": [
+    "`SERVER`"
+   ]
+  },
+  {
+   "id": 15,
+   "kind": "list",
+   "start": 5809,
+   "end": 5908,
+   "text": "- ⟦0⟧: the type of robot to connect to, the port to connect to, and the local ⟦1⟧ of the robot",
+   "tokens": [
+    "`ROBOT`",
+    "`id`"
+   ]
+  },
+  {
+   "id": 16,
+   "kind": "list",
+   "start": 5909,
+   "end": 6153,
+   "text": "- ⟦0⟧: the type of policy to run, and the model name/path on server to the checkpoint to run. You also need to specify which device should the sever be using, and how many actions to output at once (capped at the policy max actions value).",
+   "tokens": [
+    "`POLICY`"
+   ]
+  },
+  {
+   "id": 17,
+   "kind": "list",
+   "start": 6154,
+   "end": 6413,
+   "text": "- ⟦0⟧: the threshold for the chunk size before sending a new observation to the server, and the function to aggregate actions on overlapping portions. Optionally, you can also visualize the queue size at runtime, to help you tune the ⟦1⟧ parameters.",
+   "tokens": [
+    "`CLIENT`",
+    "`CLIENT`"
+   ]
+  },
+  {
+   "id": 18,
+   "kind": "para",
+   "start": 6415,
+   "end": 6427,
+   "text": "Importantly,",
+   "tokens": []
+  },
+  {
+   "id": 19,
+   "kind": "list",
+   "start": 6429,
+   "end": 6520,
+   "text": "- ⟦0⟧ and ⟦1⟧ are key parameters to tune for your setup.",
+   "tokens": [
+    "`actions_per_chunk`",
+    "`chunk_size_threshold`"
+   ]
+  },
+  {
+   "id": 20,
+   "kind": "list",
+   "start": 6521,
+   "end": 6810,
+   "text": "- ⟦0⟧ is the function to aggregate actions on overlapping portions. You can either add a new one to a registry of functions, or add your own in ⟦1⟧ (see [here](⟦2⟧))",
+   "tokens": [
+    "`aggregate_fn_name`",
+    "`robot_client.py`",
+    "https://github.com/huggingface/lerobot/blob/main/src/lerobot/async_inference/robot_client.py#L224"
+   ]
+  },
+  {
+   "id": 21,
+   "kind": "list",
+   "start": 6811,
+   "end": 6891,
+   "text": "- ⟦0⟧ is a useful tool to tune the ⟦1⟧ parameters.",
+   "tokens": [
+    "`debug_visualize_queue_size`",
+    "`CLIENT`"
+   ]
+  },
+  {
+   "id": 22,
+   "kind": "heading",
+   "start": 6893,
+   "end": 6950,
+   "text": "## Done! You should see your robot moving around by now 😉",
+   "tokens": []
+  },
+  {
+   "id": 23,
+   "kind": "heading",
+   "start": 6952,
+   "end": 6986,
+   "text": "## Async vs. synchronous inference",
+   "tokens": []
+  },
+  {
+   "id": 24,
+   "kind": "para",
+   "start": 6988,
+   "end": 7414,
+   "text": "Synchronous inference relies on interleaving action chunk prediction and action execution. This inherently results in _idle frames_, frames where the robot awaits idle the policy's output: a new action chunk.\nIn turn, inference is plagued by evident real-time lags, where the robot simply stops acting due to the lack of available actions.\nWith robotics models increasing in size, this problem risks becoming only more severe.",
+   "tokens": []
+  },
+  {
+   "id": 25,
+   "kind": "para",
+   "start": 7586,
+   "end": 7715,
+   "text": "⟦0⟧\n  ⟦1⟧Synchronous inference⟦2⟧ makes the robot idle while the policy is\n  computing the next chunk of actions.",
+   "tokens": [
+    "<p align=\"center\">",
+    "<i>",
+    "</i>"
+   ]
+  },
+  {
+   "id": 26,
+   "kind": "para",
+   "start": 7722,
+   "end": 8196,
+   "text": "To overcome this, we design async inference, a paradigm where action planning and execution are decoupled, resulting in (1) higher adaptability and, most importantly, (2) no idle frames.\nCrucially, with async inference, the next action chunk is computed _before_ the current one is exhausted, resulting in no idleness.\nHigher adaptability is ensured by aggregating the different action chunks on overlapping portions, obtaining an up-to-date plan and a tighter control loop.",
+   "tokens": []
+  },
+  {
+   "id": 27,
+   "kind": "para",
+   "start": 8369,
+   "end": 8518,
+   "text": "⟦0⟧\n  ⟦1⟧Asynchronous inference⟦2⟧ results in no idleness because the next chunk is\n  computed before the current chunk is exhausted.",
+   "tokens": [
+    "<p align=\"center\">",
+    "<i>",
+    "</i>"
+   ]
+  },
+  {
+   "id": 28,
+   "kind": "heading",
+   "start": 8530,
+   "end": 8556,
+   "text": "## Start the Policy Server",
+   "tokens": []
+  },
+  {
+   "id": 29,
+   "kind": "para",
+   "start": 8558,
+   "end": 9067,
+   "text": "Policy servers are wrappers around a ⟦0⟧ interfacing them with observations coming from a robot client.\nPolicy servers are initialized as empty containers which are populated with the requested policy specified in the initial handshake between the robot client and the policy server.\nAs such, spinning up a policy server is as easy as specifying the host address and port. If you're running the policy server on the same machine as the robot client, you can use ⟦1⟧ as the host address.",
+   "tokens": [
+    "`PreTrainedPolicy`",
+    "`localhost`"
+   ]
+  },
+  {
+   "id": 30,
+   "kind": "para",
+   "start": 9577,
+   "end": 9755,
+   "text": "This listens on ⟦0⟧ for an incoming connection from the associated⟦1⟧, which will communicate which policy to run during the first client-server handshake.",
+   "tokens": [
+    "`localhost:8080`",
+    "`RobotClient`"
+   ]
+  },
+  {
+   "id": 31,
+   "kind": "heading",
+   "start": 9762,
+   "end": 9788,
+   "text": "## Launch the Robot Client",
+   "tokens": []
+  },
+  {
+   "id": 32,
+   "kind": "para",
+   "start": 9790,
+   "end": 10127,
+   "text": "⟦0⟧ is a wrapper around a ⟦1⟧ instance, which ⟦2⟧ connects to the (possibly remote) ⟦3⟧.\nThe ⟦4⟧ streams observations to the ⟦5⟧, and receives action chunks obtained running inference on the server (which we assume to have better computational resources than the robot controller).",
+   "tokens": [
+    "`RobotClient`",
+    "`Robot`",
+    "`RobotClient`",
+    "`PolicyServer`",
+    "`RobotClient`",
+    "`PolicyServer`"
+   ]
+  },
+  {
+   "id": 33,
+   "kind": "para",
+   "start": 13661,
+   "end": 13713,
+   "text": "The following two parameters are key in every setup:",
+   "tokens": []
+  },
+  {
+   "id": 34,
+   "kind": "para",
+   "start": 13733,
+   "end": 13822,
+   "text": "    ⟦0⟧\n      ⟦1⟧Hyperparameter⟦2⟧\n      ⟦3⟧Default⟦4⟧\n      ⟦5⟧What it does⟦6⟧",
+   "tokens": [
+    "<tr>",
+    "<th>",
+    "</th>",
+    "<th>",
+    "</th>",
+    "<th>",
+    "</th>"
+   ]
+  },
+  {
+   "id": 35,
+   "kind": "para",
+   "start": 13943,
+   "end": 14029,
+   "text": "      ⟦0⟧\n        How many actions the policy outputs at once. Typical values: 10-50.",
+   "tokens": [
+    "<td>"
+   ]
+  },
+  {
+   "id": 36,
+   "kind": "para",
+   "start": 14145,
+   "end": 14256,
+   "text": "      ⟦0⟧\n        When the queue is ≤ 50% full, the client sends a fresh observation.\n        Value in [0, 1].",
+   "tokens": [
+    "<td>"
+   ]
+  },
+  {
+   "id": 37,
+   "kind": "para",
+   "start": 14300,
+   "end": 14411,
+   "text": "⟦0⟧\n  Different values of ⟦1⟧ and ⟦2⟧ do result\n  in different behaviours.",
+   "tokens": [
+    "<Tip>",
+    "`actions_per_chunk`",
+    "`chunk_size_threshold`"
+   ]
+  },
+  {
+   "id": 38,
+   "kind": "para",
+   "start": 14420,
+   "end": 14801,
+   "text": "On the one hand, increasing the value of ⟦0⟧ will result in reducing the likelihood of ending up with no actions to execute, as more actions will be available when the new chunk is computed.\nHowever, larger values of ⟦1⟧ might also result in less precise actions, due to the compounding errors consequent to predicting actions over longer timespans.",
+   "tokens": [
+    "`actions_per_chunk`",
+    "`actions_per_chunk`"
+   ]
+  },
+  {
+   "id": 39,
+   "kind": "para",
+   "start": 14803,
+   "end": 15504,
+   "text": "On the other hand, increasing the value of ⟦0⟧ will result in sending out to the ⟦1⟧ observations for inference more often, resulting in a larger number of updates action chunks, overlapping on significant portions. This results in high adaptability, in the limit predicting one action chunk for each observation, which is in turn only marginally consumed while a new one is produced.\nThis option does also put more pressure on the inference pipeline, as a consequence of the many requests. Conversely, values of ⟦2⟧ close to 0.0 collapse to the synchronous edge case, whereby new observations are only sent out whenever the current chunk is exhausted.",
+   "tokens": [
+    "`chunk_size_threshold`",
+    "`PolicyServer`",
+    "`chunk_size_threshold`"
+   ]
+  },
+  {
+   "id": 40,
+   "kind": "para",
+   "start": 15506,
+   "end": 15782,
+   "text": "We found the default values of ⟦0⟧ and ⟦1⟧ to work well in the experiments we developed for the [SmolVLA paper](⟦2⟧), but recommend experimenting with different values to find the best fit for your setup.",
+   "tokens": [
+    "`actions_per_chunk`",
+    "`chunk_size_threshold`",
+    "https://huggingface.co/papers/2506.01844"
+   ]
+  },
+  {
+   "id": 41,
+   "kind": "heading",
+   "start": 15784,
+   "end": 15825,
+   "text": "### Tuning async inference for your setup",
+   "tokens": []
+  },
+  {
+   "id": 42,
+   "kind": "list",
+   "start": 15827,
+   "end": 16373,
+   "text": "1. **Choose your computational resources carefully.** [PI0](⟦0⟧) occupies 14GB of memory at inference time, while [SmolVLA](⟦1⟧) requires only ~2GB. You should identify the best computational resource for your use case keeping in mind smaller policies require less computational resources. The combination of policy and device used (CPU-intensive, using MPS, or the number of CUDA cores on a given NVIDIA GPU) directly impacts the average inference latency you should expect.",
+   "tokens": [
+    "https://huggingface.co/lerobot/pi0",
+    "https://huggingface.co/lerobot/smolvla_base"
+   ]
+  },
+  {
+   "id": 43,
+   "kind": "list",
+   "start": 16374,
+   "end": 16739,
+   "text": "2. **Adjust your ⟦0⟧ based on inference latency.** While the server generates a new action chunk, the client is not idle and is stepping through its current action queue. If the two processes happen at fundamentally different speeds, the client might end up with an empty queue. As such, you should reduce your fps if you consistently run out of actions in queue.",
+   "tokens": [
+    "`fps`"
+   ]
+  },
+  {
+   "id": 44,
+   "kind": "list",
+   "start": 16740,
+   "end": 16777,
+   "text": "3. **Adjust ⟦0⟧**.",
+   "tokens": [
+    "`chunk_size_threshold`"
+   ]
+  },
+  {
+   "id": 45,
+   "kind": "list",
+   "start": 16778,
+   "end": 16942,
+   "text": "   - Values closer to ⟦0⟧ result in almost sequential behavior. Values closer to ⟦1⟧ → send observation every step (more bandwidth, relies on good world-model).",
+   "tokens": [
+    "`0.0`",
+    "`1.0`"
+   ]
+  },
+  {
+   "id": 46,
+   "kind": "list",
+   "start": 16943,
+   "end": 17251,
+   "text": "   - We found values around 0.5-0.6 to work well. If you want to tweak this, spin up a ⟦0⟧ setting the ⟦1⟧ to ⟦2⟧. This will plot the action queue size evolution at runtime, and you can use it to find the value of ⟦3⟧ that works best for your setup.",
+   "tokens": [
+    "`RobotClient`",
+    "`--debug_visualize_queue_size`",
+    "`True`",
+    "`chunk_size_threshold`"
+   ]
+  },
+  {
+   "id": 47,
+   "kind": "para",
+   "start": 17444,
+   "end": 17634,
+   "text": "  ⟦0⟧\n    The action queue size is plotted at runtime when the\n    ⟦1⟧ flag is passed, for various levels of\n    ⟦2⟧ (⟦3⟧ in the SmolVLA paper).",
+   "tokens": [
+    "<i>",
+    "`--debug_visualize_queue_size`",
+    "`chunk_size_threshold`",
+    "`g`"
+   ]
+  },
+  {
+   "id": 48,
+   "kind": "heading",
+   "start": 17653,
+   "end": 17666,
+   "text": "## Conclusion",
+   "tokens": []
+  },
+  {
+   "id": 49,
+   "kind": "para",
+   "start": 17668,
+   "end": 18033,
+   "text": "Asynchronous inference represents a significant advancement in real-time robotics control, addressing the fundamental challenge of inference latency that has long plagued robotics applications. Through this tutorial, you've learned how to implement a complete async inference pipeline that eliminates idle frames and enables smoother, more reactive robot behaviors.",
+   "tokens": []
+  },
+  {
+   "id": 50,
+   "kind": "para",
+   "start": 18035,
+   "end": 18053,
+   "text": "**Key Takeaways:**",
+   "tokens": []
+  },
+  {
+   "id": 51,
+   "kind": "list",
+   "start": 18055,
+   "end": 18220,
+   "text": "- **Paradigm Shift**: Async inference decouples action prediction from execution, allowing robots to continue acting while new action chunks are computed in parallel",
+   "tokens": []
+  },
+  {
+   "id": 52,
+   "kind": "list",
+   "start": 18221,
+   "end": 18391,
+   "text": "- **Performance Benefits**: Eliminates \"wait-for-inference\" lags that are inherent in synchronous approaches, becoming increasingly important as policy models grow larger",
+   "tokens": []
+  },
+  {
+   "id": 53,
+   "kind": "list",
+   "start": 18392,
+   "end": 18570,
+   "text": "- **Flexible Architecture**: The server-client design enables distributed computing, where inference can run on powerful remote hardware while maintaining real-time robot control",
+   "tokens": []
+  },
+  {
+   "id": 54,
+   "kind": "list",
+   "start": 18571,
+   "end": 18741,
+   "text": "- **Tunable Parameters**: Success depends on properly configuring ⟦0⟧ and ⟦1⟧ for your specific hardware, policy, and task requirements",
+   "tokens": [
+    "`actions_per_chunk`",
+    "`chunk_size_threshold`"
+   ]
+  },
+  {
+   "id": 55,
+   "kind": "list",
+   "start": 18742,
+   "end": 18882,
+   "text": "- **Universal Compatibility**: Works with all LeRobot-supported policies, from lightweight ACT models to vision-language models like SmolVLA",
+   "tokens": []
+  },
+  {
+   "id": 56,
+   "kind": "para",
+   "start": 18884,
+   "end": 19252,
+   "text": "Start experimenting with the default parameters, monitor your action queue sizes, and iteratively refine your setup to achieve optimal performance for your specific use case.\nIf you want to discuss this further, hop into our [Discord community](⟦0⟧), or open an issue on our [GitHub repository](⟦1⟧).",
+   "tokens": [
+    "https://discord.gg/s3KuuzsPFb",
+    "https://github.com/huggingface/lerobot/issues"
+   ]
+  }
+ ]
+}

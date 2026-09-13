@@ -1,0 +1,210 @@
+<script lang="ts">
+import {onMount} from "svelte";
+import Tip from "$lib/Tip.svelte";
+import CopyLLMTxtMenu from "$lib/CopyLLMTxtMenu.svelte";
+import Youtube from "$lib/Youtube.svelte";
+import Docstring from "$lib/Docstring.svelte";
+import CodeBlock from "$lib/CodeBlock.svelte";
+import CodeBlockFw from "$lib/CodeBlockFw.svelte";
+import DocNotebookDropdown from "$lib/DocNotebookDropdown.svelte";
+import CourseFloatingBanner from "$lib/CourseFloatingBanner.svelte";
+import IconCopyLink from "$lib/IconCopyLink.svelte";
+import FrameworkContent from "$lib/FrameworkContent.svelte";
+import Markdown from "$lib/Markdown.svelte";
+import Question from "$lib/Question.svelte";
+import FrameworkSwitchCourse from "$lib/FrameworkSwitchCourse.svelte";
+import InferenceApi from "$lib/InferenceApi.svelte";
+import TokenizersLanguageContent from "$lib/TokenizersLanguageContent.svelte";
+import ExampleCodeBlock from "$lib/ExampleCodeBlock.svelte";
+import Added from "$lib/Added.svelte";
+import Changed from "$lib/Changed.svelte";
+import Deprecated from "$lib/Deprecated.svelte";
+import PipelineIcon from "$lib/PipelineIcon.svelte";
+import PipelineTag from "$lib/PipelineTag.svelte";
+import Heading from "$lib/Heading.svelte";
+import HfOptions from "$lib/HfOptions.svelte";
+import HfOption from "$lib/HfOption.svelte";
+import EditOnGithub from "$lib/EditOnGithub.svelte";
+import InferenceSnippet from "$lib/InferenceSnippet/InferenceSnippet.svelte";
+import MermaidChart from "$lib/MermaidChart.svelte";
+let fw: "pt" | "tf" = "pt";
+onMount(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    fw = urlParams.get("fw") || "pt";
+});
+</script>
+<svelte:head>
+  <meta name="hf:doc:metadata" content={metadata} >
+</svelte:head>
+
+<!--HF DOCBUILD BODY START-->
+
+HF_DOC_BODY_START
+
+<CopyLLMTxtMenu containerStyle="float: right; margin-left: 10px; display: inline-flex; position: relative; z-index: 10;"></CopyLLMTxtMenu>
+
+# 语言列与配方
+
+大多数 LeRobot dataset 每个 episode 只带一个 `task` 字符串 —— 这对于简短的单指令技能来说足够了，但不足以支撑该领域正在迈向的更长期、多模态的机器人 policy（高层规划、记忆、插话、VQA、工具使用）。为了在不分叉 dataset 格式的情况下支持这些 policy，LeRobot 用两个可选的语言列和一个小小的配方层扩展了 `LeRobotDataset`，后者可即时将这些行转换为聊天式训练样本。
+
+该设计清晰地分为三层：
+
+1. **dataset 中的数据** —— 语言标注与帧一起存储在
+   `data/chunk-*/file-*.parquet` 中，作为两个可选的列（`language_persistent`
+   和 `language_events`）。没有这些列的 dataset 保持其原有
+   行为。
+2. **配方** —— 一个 YAML 文件，声明要绑定哪些标注行，
+   以及如何将它们组织为聊天轮次（`role`、`content`、可选图像、
+   可选工具调用）。配方是纯配置；添加新配方
+   无需编写 Python。
+3. **训练格式** —— 在采样时，`RenderMessagesStep` 会根据
+   逐帧标注解析配方，并输出 HF 风格的 `messages` 以及
+   policy 处理器所消费的 LeRobot 专用附属数据（`message_streams`、`target_message_indices`）。
+
+本页依次介绍每一层。
+
+## 第 1 层 —— dataset 中的语言列
+
+这两个可选的列位于帧数据旁边，存放于
+`data/chunk-*/file-*.parquet` 中：
+
+- `language_persistent`：一组行，在一个 episode 的每一帧上广播，用于保持有效的 state，例如 `subtask`、`plan` 和 `memory`。
+- `language_events`：一组行，仅出现在事件被发出的确切帧上，例如 `interjection`、`vqa` 和语音工具调用。
+
+两个列共享相同的行结构（事件行省略 `timestamp`，因为
+该行所在的帧已经提供了它）：
+
+```text
+role: string
+content: string | null
+style: string | null
+timestamp: float32        # persistent rows only
+camera: string | null     # observation.images.* feature key, view-dependent rows only
+tool_calls: list[Json] | null
+```
+
+`camera` 字段用于标记其 `content` 基于特定相机
+视角的行。视角相关风格（`vqa` 和 `trace`）的行必须将 `camera` 设为
+匹配的 `observation.images.*` 特征键。其他所有风格的行 ——
+包括以关节 / 笛卡尔坐标描述机器人坐标系原语的 `motion` ——
+必须将 `camera` 保持为 `null`。流水线写入器和验证器
+通过 `validate_camera_field(style, camera)` 强制执行这一点。
+
+`meta/tasks.parquet` 仍是任务的规范来源。特殊的 `${task}` 配方绑定始终读取该任务字符串，不依赖于语言标注。
+
+### 架构
+
+语言栈本身有三个内部模块支撑第 1 层：
+
+1. `lerobot.datasets.language` 定义模式、风格注册表和 `column_for_style`。
+2. `lerobot.datasets.language_render` 解析行并渲染消息。
+3. `RenderMessagesStep` 将 dataset 样本转换为 `messages`、`message_streams` 和 `target_message_indices`。
+
+`LeRobotDataset` 保持与配方无关。当存在时，它会传递 `language_persistent` 和 `language_events`，未标注的 dataset 保持其原有行为。
+
+## 第 2 层 —— 配方结构
+
+配方是由 `lerobot.datasets.recipe` 中的 `TrainingRecipe` 和 `MessageTurn` 支持的 YAML 文件。它们
+声明要拉取哪些标注行（通过 `bindings`），以及如何将它们组合
+为聊天轮次（`messages`）。
+
+```yaml
+messages:
+  - { role: user, content: "${task}", stream: high_level }
+  - { role: assistant, content: "${subtask}", stream: low_level, target: true }
+```
+
+配方还可以分支为子配方的加权**混合**。在采样
+时，会依据样本索引确定性地选择恰好一个分支，
+这样不同的帧训练不同的目标（例如记忆更新 vs.
+底层执行 vs. VQA），无需任何 Python 连接代码。
+
+### 时间语义
+
+持久风格在发出后保持有效，直到被替换：
+
+- `active_at(t, style=subtask)`
+- `nth_prev(style=memory, offset=1)`
+- `nth_next(style=subtask, offset=1)`
+
+事件风格仅存在于其确切时间戳上：
+
+- `emitted_at(t, style=interjection)`
+- `emitted_at(t, style=vqa, role=user, camera=observation.images.top)`
+- `emitted_at(t, role=assistant, tool_name=say)`
+
+精确事件匹配没有容差窗口，因此写入器必须使用来自 parquet 数据的帧时间戳为事件行打时间戳。
+
+### 视角相关的解析
+
+对于视角相关的风格（`vqa` 和 `trace`），解析器会获得一个
+与 `role=` 和 `tool_name=` 平行的 `camera=` 过滤器。具有多个
+相机的 dataset 通常会在同一时间戳上为每个相机发出一个 (`vqa`, `user`) + (`vqa`, `assistant`) 对；
+如果没有 `camera=`，这些解析器会看到两个
+匹配并抛出歧义错误。配方通过
+各自的绑定加一个匹配的图像块来消费每个相机，例如
+
+```yaml
+ask_vqa_top:
+  route: vqa
+  bindings:
+    vqa_query: "emitted_at(t, style=vqa, role=user, camera=observation.images.top)"
+    vqa: "emitted_at(t, style=vqa, role=assistant, camera=observation.images.top)"
+  messages:
+    - role: user
+      stream: high_level
+      if_present: vqa_query
+      content:
+        - { type: image, feature: observation.images.top }
+        - { type: text, text: "${vqa_query}" }
+    - {
+        role: assistant,
+        content: "${vqa}",
+        stream: high_level,
+        target: true,
+        if_present: vqa,
+      }
+```
+
+为 dataset 记录的每个相机添加一个这样的子配方。显式的
+`route: vqa` 标记会使匹配的稀疏 VQA 标注优先于
+正常的加权混合选择；组件名称仅起描述作用。
+
+## 第 3 层 —— 训练格式
+
+渲染后的样本使用 HF 风格的聊天消息以及 LeRobot 附属数据：
+
+```python
+sample["messages"]
+sample["message_streams"]
+sample["target_message_indices"]
+```
+
+渲染器不会应用分词器聊天模板。policy 处理器决定如何为其主干网络序列化消息，这使同一 dataset 可用于 SmolVLA、Pi0.5 以及任何期望 OpenAI 风格聊天消息的未来 VLM。
+
+## 混合
+
+混合配方依据样本索引确定性地选择一个加权子配方。
+`recipes/subtask_mem.yaml` 训练紧凑的核心混合 —— 高层子任务预测、底层执行和记忆。`recipes/subtask_mem_vqa_speech.yaml` 是更完整的变体，还加入了 VQA 和语音插话响应。
+
+`recipes/subtask_joint.yaml` demonstration 的是联合序列训练，而非
+加权混合。对于同一样本，其助手子任务通过
+`low_level` 流上的文本交叉熵进行监督，同时 action prediction 保持
+激活，这与 π0.5 论文中的联合设置一致。启用
+`--policy.joint_subtask_conditioning=true` 以在 inference 时使用该子任务条件。
+
+## 优雅缺省
+
+如果两个语言列都缺失、为 `None` 或为空，`RenderMessagesStep` 会在有任务字符串时
+将其用作底层监督，否则保持
+样本不变。对于已标注的样本，如果没有适用的配方分支且没有
+任务回退，渲染会返回 `None`，允许加载器重试另一个样本。
+
+
+
+<EditOnGithub source="https://github.com/huggingface/lerobot/blob/main/docs/source/language_and_recipes.mdx" />
+
+<!--HF DOCBUILD BODY END-->
+
+HF_DOC_BODY_END
+

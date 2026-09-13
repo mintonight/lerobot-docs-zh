@@ -1,0 +1,982 @@
+<script lang="ts">
+import {onMount} from "svelte";
+import Tip from "$lib/Tip.svelte";
+import CopyLLMTxtMenu from "$lib/CopyLLMTxtMenu.svelte";
+import Youtube from "$lib/Youtube.svelte";
+import Docstring from "$lib/Docstring.svelte";
+import CodeBlock from "$lib/CodeBlock.svelte";
+import CodeBlockFw from "$lib/CodeBlockFw.svelte";
+import DocNotebookDropdown from "$lib/DocNotebookDropdown.svelte";
+import CourseFloatingBanner from "$lib/CourseFloatingBanner.svelte";
+import IconCopyLink from "$lib/IconCopyLink.svelte";
+import FrameworkContent from "$lib/FrameworkContent.svelte";
+import Markdown from "$lib/Markdown.svelte";
+import Question from "$lib/Question.svelte";
+import FrameworkSwitchCourse from "$lib/FrameworkSwitchCourse.svelte";
+import InferenceApi from "$lib/InferenceApi.svelte";
+import TokenizersLanguageContent from "$lib/TokenizersLanguageContent.svelte";
+import ExampleCodeBlock from "$lib/ExampleCodeBlock.svelte";
+import Added from "$lib/Added.svelte";
+import Changed from "$lib/Changed.svelte";
+import Deprecated from "$lib/Deprecated.svelte";
+import PipelineIcon from "$lib/PipelineIcon.svelte";
+import PipelineTag from "$lib/PipelineTag.svelte";
+import Heading from "$lib/Heading.svelte";
+import HfOptions from "$lib/HfOptions.svelte";
+import HfOption from "$lib/HfOption.svelte";
+import EditOnGithub from "$lib/EditOnGithub.svelte";
+import InferenceSnippet from "$lib/InferenceSnippet/InferenceSnippet.svelte";
+import MermaidChart from "$lib/MermaidChart.svelte";
+let fw: "pt" | "tf" = "pt";
+onMount(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    fw = urlParams.get("fw") || "pt";
+});
+</script>
+<svelte:head>
+  <meta name="hf:doc:metadata" content={metadata} >
+</svelte:head>
+
+<!--HF DOCBUILD BODY START-->
+
+HF_DOC_BODY_START
+
+<CopyLLMTxtMenu containerStyle="float: right; margin-left: 10px; display: inline-flex; position: relative; z-index: 10;"></CopyLLMTxtMenu>
+
+# 机器人
+
+LeRobot 中的每个机器人都实现了 `Robot` 接口：连接、读取 observation、发送 action、
+断开连接。针对该接口编写 policy 或录制脚本，意味着它无需修改即可适用于任何受支持的
+机械臂。
+
+本页是生成的参考文档。关于接线、calibration 和首次运行的说明，请从
+硬件指南开始——[SO-101](../so101)、[LeKiwi](../lekiwi)、[Hope Jr](../hope_jr)、[Reachy 2](../reachy2)、
+[OpenArm](../openarm)——或查看[机器人模仿学习](../il_robots)了解端到端工作流程。要添加
+你自己的机器人，请参阅[接入你自己的硬件](../integrate_hardware)。
+
+## Robot [[lerobot.robots.Robot]]
+
+抽象基类。子类实现下面的每个方法；这里描述的契约是
+policy 或录制循环可以依赖的。
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.Robot"} anchor={"lerobot.robots.Robot"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/robot.py#L30"} parameters={[{"name": "config", "val": ": RobotConfig"}]}>
+<paramsdesc>- **config_class** (RobotConfig) -- 此机器人预期的配置类。
+- **name** (str) -- 用于标识此机器人类型的唯一机器人名称。</paramsdesc></Docstring>
+
+所有与 LeRobot 兼容的机器人的基础抽象类。
+
+此类提供了用于与物理机器人交互的标准化接口。
+子类必须实现所有抽象方法和属性才能使用。
+
+
+
+
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"connect"} anchor={"lerobot.robots.Robot.connect"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/robot.py#L124"} parameters={[{"name": "calibrate", "val": ": bool = True"}]}>
+<paramsdesc>- **calibrate** (bool) -- 如果为 True，则在连接后，如果机器人未
+  calibration 或需要 calibrate，则自动对其进行 calibration（这取决于硬件）。</paramsdesc></Docstring>
+
+与机器人建立通信。
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"disconnect"} anchor={"lerobot.robots.Robot.disconnect"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/robot.py#L208"} parameters={[]}>
+</Docstring>
+与机器人断开连接并执行任何必要的清理。
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"configure"} anchor={"lerobot.robots.Robot.configure"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/robot.py#L173"} parameters={[]}>
+</Docstring>
+
+对机器人应用任何一次性或运行时配置。
+这可能包括设置电机参数、控制模式或初始 state。
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"calibrate"} anchor={"lerobot.robots.Robot.calibrate"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/robot.py#L141"} parameters={[]}>
+</Docstring>
+
+如适用则 calibrate 机器人。否则，这应为空操作。
+
+此方法应收集任何必要的数据（例如电机偏移量），并相应更新
+:pyattr:`calibration` 字典。
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"get_observation"} anchor={"lerobot.robots.Robot.get_observation"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/robot.py#L181"} parameters={[]}>
+<rettype>RobotObservation</rettype><retdesc> 表示机器人当前感官 state 的扁平字典。其结构
+应与 :pymeth:`observation_features` 匹配。</retdesc></Docstring>
+
+从机器人检索当前 observation。
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"send_action"} anchor={"lerobot.robots.Robot.send_action"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/robot.py#L193"} parameters={[{"name": "action", "val": ": dict"}]}>
+<paramsdesc>- **action** (RobotAction) -- 表示期望 action 的字典。其结构应与
+  :pymeth:`action_features` 匹配。</paramsdesc><rettype>RobotAction</rettype><retdesc> 实际发送给电机、可能被裁剪或修改的 action，例如受
+速度安全限制。</retdesc></Docstring>
+
+向机器人发送 action 命令。
+
+
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"observation_features"} anchor={"lerobot.robots.Robot.observation_features"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/robot.py#L88"} parameters={[]}>
+</Docstring>
+
+描述机器人所产生 observation 的结构和类型的字典。
+其结构（键）应与 :pymeth:`get_observation` 返回的结构匹配。
+该字典的值应为以下之一：
+- 如果值是简单值，则为该值的类型，例如单一本体感受值（关节的位置/速度）用 `float`
+- 如果值是数组类型，则表示形状的元组，例如图像用 `(height, width, channel)`
+
+注意：无论机器人是否已连接，都应能调用此属性。
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"action_features"} anchor={"lerobot.robots.Robot.action_features"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/robot.py#L102"} parameters={[]}>
+</Docstring>
+
+描述机器人所期望 action 的结构和类型的字典。其结构
+（键）应与传递给 :pymeth:`send_action` 的结构匹配。该字典的值
+应为：如果值是简单值，则为该值的类型，例如单一本体感受值
+（关节的目标位置/速度）用 `float`
+
+注意：无论机器人是否已连接，都应能调用此属性。
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"is_connected"} anchor={"lerobot.robots.Robot.is_connected"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/robot.py#L115"} parameters={[]}>
+</Docstring>
+
+机器人当前是否已连接。如果为 `False`，调用 :pymeth:`get_observation` 或
+:pymeth:`send_action` 应抛出错误。
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"is_calibrated"} anchor={"lerobot.robots.Robot.is_calibrated"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/robot.py#L135"} parameters={[]}>
+</Docstring>
+机器人当前是否已 calibration。如不适用，应始终为 `True`
+
+</div></div>
+
+## RobotConfig [[lerobot.robots.RobotConfig]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.RobotConfig"} anchor={"lerobot.robots.RobotConfig"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/config.py#L23"} parameters={[{"name": "id", "val": ": str | None = None"}, {"name": "calibration_dir", "val": ": pathlib.Path | None = None"}]}>
+</Docstring>
+
+
+</div>
+
+## make_robot_from_config [[lerobot.robots.make_robot_from_config]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"lerobot.robots.make_robot_from_config"} anchor={"lerobot.robots.make_robot_from_config"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/utils.py#L27"} parameters={[{"name": "config", "val": ": RobotConfig"}]}>
+</Docstring>
+
+
+</div>
+
+## SO-100 和 SO-101 follower arm [[lerobot.robots.so_follower.SOFollower]]
+
+`SO100Follower` 和 `SO101Follower` 是同一个 `SOFollower` 类的别名；这两款机械臂的区别在于它们的
+配置，而非控制代码。`SO100FollowerConfig` 和 `SO101FollowerConfig` 同样是 `SOFollowerRobotConfig` 的
+别名。
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.so_follower.SOFollower"} anchor={"lerobot.robots.so_follower.SOFollower"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/so_follower/so_follower.py#L37"} parameters={[{"name": "config", "val": ": SOFollowerRobotConfig"}]}>
+</Docstring>
+
+通用 SO follower arm 基类，实现了 SO-100/101/10X 的通用功能。
+设计为通过每种硬件型号的 `config_class` 和 `name` 进行子类化。
+
+
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"connect"} anchor={"lerobot.robots.so_follower.SOFollower.connect"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/so_follower/so_follower.py#L91"} parameters={[{"name": "calibrate", "val": ": bool = True"}]}>
+</Docstring>
+
+我们假设在连接时，机械臂处于静止位置，
+并且可以安全地禁用力矩以运行 calibration。
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"send_action"} anchor={"lerobot.robots.so_follower.SOFollower.send_action"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/so_follower/so_follower.py#L204"} parameters={[{"name": "action", "val": ": dict"}]}>
+<rettype>RobotAction</rettype><retdesc> 发送给电机、可能被裁剪的 action。</retdesc><raises>- ``RobotDeviceNotConnectedError`` -- 如果机器人未连接。</raises><raisederrors>``RobotDeviceNotConnectedError``</raisederrors></Docstring>
+命令机械臂移动到目标关节配置。
+
+relative action 幅度可能会根据配置参数
+`max_relative_target` 进行裁剪。在这种情况下，发送的 action 与原始 action 不同。
+因此，此函数始终返回实际发送的 action。
+
+
+
+
+
+
+
+
+
+
+</div></div>
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.so_follower.SOFollowerRobotConfig"} anchor={"lerobot.robots.so_follower.SOFollowerRobotConfig"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/so_follower/config_so_follower.py#L59"} parameters={[{"name": "port", "val": ": str"}, {"name": "disable_torque_on_disconnect", "val": ": bool = True"}, {"name": "max_relative_target", "val": ": float | dict[str, float] | None = None"}, {"name": "cameras", "val": ": dict = <factory>"}, {"name": "use_degrees", "val": ": bool = True"}, {"name": "position_p_coefficient", "val": ": int = 16"}, {"name": "position_i_coefficient", "val": ": int = 0"}, {"name": "position_d_coefficient", "val": ": int = 32"}, {"name": "num_read_retries", "val": ": int = 2"}, {"name": "id", "val": ": str | None = None"}, {"name": "calibration_dir", "val": ": pathlib.Path | None = None"}]}>
+</Docstring>
+
+
+</div>
+
+## BiSOFollower [[lerobot.robots.bi_so_follower.BiSOFollower]]
+
+两个 SO follower arm 作为一个双臂机器人驱动。
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.bi_so_follower.BiSOFollower"} anchor={"lerobot.robots.bi_so_follower.BiSOFollower"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/bi_so_follower/bi_so_follower.py#L31"} parameters={[{"name": "config", "val": ": BiSOFollowerConfig"}]}>
+</Docstring>
+
+由 TheRobotStudio 设计的[双臂 SO follower arm](https://github.com/TheRobotStudio/SO-ARM100)
+
+
+</div>
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.bi_so_follower.BiSOFollowerConfig"} anchor={"lerobot.robots.bi_so_follower.BiSOFollowerConfig"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/bi_so_follower/config_bi_so_follower.py#L27"} parameters={[{"name": "left_arm_config", "val": ": SOFollowerConfig"}, {"name": "right_arm_config", "val": ": SOFollowerConfig"}, {"name": "cameras", "val": ": dict = <factory>"}, {"name": "id", "val": ": str | None = None"}, {"name": "calibration_dir", "val": ": pathlib.Path | None = None"}]}>
+</Docstring>
+Bi SO Follower 机器人的配置类。
+
+</div>
+
+## KochFollower [[lerobot.robots.koch_follower.KochFollower]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.koch_follower.KochFollower"} anchor={"lerobot.robots.koch_follower.KochFollower"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/koch_follower/koch_follower.py#L37"} parameters={[{"name": "config", "val": ": KochFollowerConfig"}]}>
+</Docstring>
+
+- [Koch v1.0](https://github.com/AlexanderKoch-Koch/low_cost_robot)，包含与不包含腕到肘
+  扩展件，由 [Tau Robotics](https://tau-robotics.com) 的 Alexander Koch 开发
+- [Koch v1.1](https://github.com/jess-moss/koch-v1-1)，由 Jess Moss 开发
+
+
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"connect"} anchor={"lerobot.robots.koch_follower.KochFollower.connect"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/koch_follower/koch_follower.py#L92"} parameters={[{"name": "calibrate", "val": ": bool = True"}]}>
+</Docstring>
+
+我们假设在连接时，机械臂处于静止位置，
+并且可以安全地禁用力矩以运行 calibration。
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"send_action"} anchor={"lerobot.robots.koch_follower.KochFollower.send_action"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/koch_follower/koch_follower.py#L214"} parameters={[{"name": "action", "val": ": dict"}]}>
+<paramsdesc>- **action** (RobotAction) -- 电机的目标位置。</paramsdesc><rettype>RobotAction</rettype><retdesc> 发送给电机、可能被裁剪的 action。</retdesc></Docstring>
+命令机械臂移动到目标关节配置。
+
+relative action 幅度可能会根据配置参数
+`max_relative_target` 进行裁剪。在这种情况下，发送的 action 与原始 action 不同。
+因此，此函数始终返回实际发送的 action。
+
+
+
+
+
+
+
+
+</div></div>
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.koch_follower.KochFollowerConfig"} anchor={"lerobot.robots.koch_follower.KochFollowerConfig"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/koch_follower/config_koch_follower.py#L24"} parameters={[{"name": "port", "val": ": str"}, {"name": "disable_torque_on_disconnect", "val": ": bool = True"}, {"name": "max_relative_target", "val": ": float | dict[str, float] | None = None"}, {"name": "cameras", "val": ": dict = <factory>"}, {"name": "use_degrees", "val": ": bool = False"}, {"name": "id", "val": ": str | None = None"}, {"name": "calibration_dir", "val": ": pathlib.Path | None = None"}]}>
+</Docstring>
+
+
+</div>
+
+## LeKiwi [[lerobot.robots.lekiwi.LeKiwi]]
+
+`LeKiwi` 在机器人本身上运行。`LeKiwiClient` 是主机端代理，它通过网络与其通信
+并呈现相同的 `Robot` 接口。
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.lekiwi.LeKiwi"} anchor={"lerobot.robots.lekiwi.LeKiwi"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/lekiwi/lekiwi.py#L41"} parameters={[{"name": "config", "val": ": LeKiwiConfig"}]}>
+</Docstring>
+
+该机器人包含一个三轮全向移动底座和一个远程 follower arm。
+leader arm 本地连接（在笔记本电脑上），其关节位置被记录，然后
+（在应用安全钳制后）转发给远程 follower arm。
+同时，使用键盘 teleoperation 为轮子生成原始速度命令。
+
+
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"send_action"} anchor={"lerobot.robots.lekiwi.LeKiwi.send_action"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/lekiwi/lekiwi.py#L379"} parameters={[{"name": "action", "val": ": dict"}]}>
+<rettype>RobotAction</rettype><retdesc> 发送给电机、可能被裁剪的 action。</retdesc><raises>- ``RobotDeviceNotConnectedError`` -- 如果机器人未连接。</raises><raisederrors>``RobotDeviceNotConnectedError``</raisederrors></Docstring>
+命令 LeKiwi 移动到目标关节配置。
+
+relative action 幅度可能会根据配置参数
+`max_relative_target` 进行裁剪。在这种情况下，发送的 action 与原始 action 不同。
+因此，此函数始终返回实际发送的 action。
+
+
+
+
+
+
+
+
+
+
+</div></div>
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.lekiwi.LeKiwiConfig"} anchor={"lerobot.robots.lekiwi.LeKiwiConfig"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/lekiwi/config_lekiwi.py#L46"} parameters={[{"name": "port", "val": ": str = '/dev/ttyACM0'"}, {"name": "disable_torque_on_disconnect", "val": ": bool = True"}, {"name": "max_relative_target", "val": ": float | dict[str, float] | None = None"}, {"name": "cameras", "val": ": dict = <factory>"}, {"name": "use_degrees", "val": ": bool = True"}, {"name": "num_read_retries", "val": ": int = 2"}, {"name": "id", "val": ": str | None = None"}, {"name": "calibration_dir", "val": ": pathlib.Path | None = None"}]}>
+</Docstring>
+
+
+</div>
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.lekiwi.LeKiwiClient"} anchor={"lerobot.robots.lekiwi.LeKiwiClient"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/lekiwi/lekiwi_client.py#L33"} parameters={[{"name": "config", "val": ": LeKiwiClientConfig"}]}>
+</Docstring>
+
+
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"connect"} anchor={"lerobot.robots.lekiwi.LeKiwiClient.connect"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/lekiwi/lekiwi_client.py#L122"} parameters={[]}>
+</Docstring>
+与远程移动机器人建立 ZMQ 套接字
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"disconnect"} anchor={"lerobot.robots.lekiwi.LeKiwiClient.disconnect"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/lekiwi/lekiwi_client.py#L339"} parameters={[]}>
+</Docstring>
+清理 ZMQ 通信
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"get_observation"} anchor={"lerobot.robots.lekiwi.LeKiwiClient.get_observation"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/lekiwi/lekiwi_client.py#L259"} parameters={[]}>
+</Docstring>
+
+从远程机器人捕获 observation：当前 follower arm 位置、
+当前轮速（转换为机体坐标系速度：x、y、theta），
+以及一帧相机画面。通过 ZMQ 接收，并转换为机体坐标系速度
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"send_action"} anchor={"lerobot.robots.lekiwi.LeKiwiClient.send_action"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/lekiwi/lekiwi_client.py#L313"} parameters={[{"name": "action", "val": ": dict"}]}>
+<paramsdesc>- **action** (RobotAction) -- 包含电机目标位置的数组。</paramsdesc><rettype>np.ndarray</rettype><retdesc> 发送给电机、可能被裁剪的 action。</retdesc><raises>- ``RobotDeviceNotConnectedError`` -- 如果机器人未连接。</raises><raisederrors>``RobotDeviceNotConnectedError``</raisederrors></Docstring>
+命令 LeKiwi 移动到目标关节配置。转换为电机空间并通过 ZMQ 发送
+
+
+
+
+
+
+
+
+
+
+
+
+</div></div>
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.lekiwi.LeKiwiClientConfig"} anchor={"lerobot.robots.lekiwi.LeKiwiClientConfig"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/lekiwi/config_lekiwi.py#L86"} parameters={[{"name": "remote_ip", "val": ": str"}, {"name": "port_zmq_cmd", "val": ": int = 5555"}, {"name": "port_zmq_observations", "val": ": int = 5556"}, {"name": "teleop_keys", "val": ": dict = <factory>"}, {"name": "cameras", "val": ": dict = <factory>"}, {"name": "polling_timeout_ms", "val": ": int = 15"}, {"name": "connect_timeout_s", "val": ": int = 5"}, {"name": "id", "val": ": str | None = None"}, {"name": "calibration_dir", "val": ": pathlib.Path | None = None"}]}>
+</Docstring>
+
+
+</div>
+
+## OpenArmFollower [[lerobot.robots.openarm_follower.OpenArmFollower]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.openarm_follower.OpenArmFollower"} anchor={"lerobot.robots.openarm_follower.OpenArmFollower"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/openarm_follower/openarm_follower.py#L39"} parameters={[{"name": "config", "val": ": OpenArmFollowerConfig"}]}>
+</Docstring>
+
+OpenArms follower arm 机器人，使用 CAN 总线通信控制带 gripper 的 7 自由度机械臂。
+该机械臂使用 MIT 控制模式下的 Damiao 电机。
+
+
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"calibrate"} anchor={"lerobot.robots.openarm_follower.OpenArmFollower.calibrate"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/openarm_follower/openarm_follower.py#L162"} parameters={[]}>
+</Docstring>
+
+为 OpenArms 机器人运行 calibration 程序。
+
+calibration 程序：
+1. 禁用力矩
+2. 要求用户将机械臂置于下垂位置并闭合 gripper
+3. 将此设置为零位
+4. 记录每个关节的运动范围
+5. 保存 calibration
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"configure"} anchor={"lerobot.robots.openarm_follower.OpenArmFollower.configure"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/openarm_follower/openarm_follower.py#L213"} parameters={[]}>
+</Docstring>
+使用适当的设置配置电机。
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"connect"} anchor={"lerobot.robots.openarm_follower.OpenArmFollower.connect"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/openarm_follower/openarm_follower.py#L128"} parameters={[{"name": "calibrate", "val": ": bool = True"}]}>
+</Docstring>
+
+连接到机器人并可选择进行 calibration。
+
+我们假设在连接时，机械臂处于安全的静止位置，
+并且如果需要，可以安全地禁用力矩以运行 calibration。
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"disconnect"} anchor={"lerobot.robots.openarm_follower.OpenArmFollower.disconnect"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/openarm_follower/openarm_follower.py#L343"} parameters={[]}>
+</Docstring>
+与机器人断开连接。
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"get_observation"} anchor={"lerobot.robots.openarm_follower.OpenArmFollower.get_observation"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/openarm_follower/openarm_follower.py#L224"} parameters={[]}>
+</Docstring>
+
+从机器人获取当前 observation，包括位置、速度和力矩。
+
+在一次 CAN 刷新周期内读取所有电机 state（位置/速度/力矩），
+而不是进行 3 次单独的读取。
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"send_action"} anchor={"lerobot.robots.openarm_follower.OpenArmFollower.send_action"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/openarm_follower/openarm_follower.py#L264"} parameters={[{"name": "action", "val": ": dict"}, {"name": "custom_kp", "val": ": dict[str, float] | None = None"}, {"name": "custom_kd", "val": ": dict[str, float] | None = None"}]}>
+<paramsdesc>- **action** -- 包含电机位置的字典（例如 "joint_1.pos"、"joint_2.pos"）
+- **custom_kp** -- 可选的每个电机自定义 kp 增益（例如 {"joint_1": 120.0, "joint_2": 150.0}）
+- **custom_kd** -- 可选的每个电机自定义 kd 增益（例如 {"joint_1": 1.5, "joint_2": 2.0}）</paramsdesc><retdesc> 实际发送的 action（可能被裁剪）</retdesc></Docstring>
+
+向机器人发送 action 命令。
+
+action 幅度可能会根据安全限制被裁剪。
+
+
+
+
+
+
+</div></div>
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.openarm_follower.OpenArmFollowerConfig"} anchor={"lerobot.robots.openarm_follower.OpenArmFollowerConfig"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/openarm_follower/config_openarm_follower.py#L125"} parameters={[{"name": "port", "val": ": str"}, {"name": "side", "val": ": str | None = None"}, {"name": "can_interface", "val": ": str = 'socketcan'"}, {"name": "use_can_fd", "val": ": bool = True"}, {"name": "can_bitrate", "val": ": int = 1000000"}, {"name": "can_data_bitrate", "val": ": int = 5000000"}, {"name": "disable_torque_on_disconnect", "val": ": bool = True"}, {"name": "use_velocity_and_torque", "val": ": bool = False"}, {"name": "max_relative_target", "val": ": float | dict[str, float] | None = None"}, {"name": "cameras", "val": ": dict = <factory>"}, {"name": "motor_config", "val": ": dict = <factory>"}, {"name": "position_kp", "val": ": list = <factory>"}, {"name": "position_kd", "val": ": list = <factory>"}, {"name": "joint_limits", "val": ": dict = <factory>"}, {"name": "id", "val": ": str | None = None"}, {"name": "calibration_dir", "val": ": pathlib.Path | None = None"}]}>
+</Docstring>
+
+
+</div>
+
+## BiOpenArmFollower [[lerobot.robots.bi_openarm_follower.BiOpenArmFollower]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.bi_openarm_follower.BiOpenArmFollower"} anchor={"lerobot.robots.bi_openarm_follower.BiOpenArmFollower"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/bi_openarm_follower/bi_openarm_follower.py#L31"} parameters={[{"name": "config", "val": ": BiOpenArmFollowerConfig"}]}>
+</Docstring>
+
+双臂 OpenArm follower arm
+
+
+</div>
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.bi_openarm_follower.BiOpenArmFollowerConfig"} anchor={"lerobot.robots.bi_openarm_follower.BiOpenArmFollowerConfig"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/bi_openarm_follower/config_bi_openarm_follower.py#L27"} parameters={[{"name": "id", "val": ": str | None = 'bi_openarm_follower'"}, {"name": "calibration_dir", "val": ": pathlib.Path | None = None"}, {"name": "left_arm_config", "val": ": OpenArmFollowerConfigBase"}, {"name": "right_arm_config", "val": ": OpenArmFollowerConfigBase"}, {"name": "cameras", "val": ": dict = <factory>"}]}>
+</Docstring>
+Bi OpenArm Follower 机器人的配置类。
+
+</div>
+
+## OmxFollower [[lerobot.robots.omx_follower.OmxFollower]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.omx_follower.OmxFollower"} anchor={"lerobot.robots.omx_follower.OmxFollower"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/omx_follower/omx_follower.py#L38"} parameters={[{"name": "config", "val": ": OmxFollowerConfig"}]}>
+</Docstring>
+
+- [OMX](https://github.com/ROBOTIS-GIT/open_manipulator)，
+  扩展件，由 [ROBOTIS](https://ai.robotis.com/) 的 Woojin Wie 和 Junha Cha 开发
+
+
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"connect"} anchor={"lerobot.robots.omx_follower.OmxFollower.connect"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/omx_follower/omx_follower.py#L92"} parameters={[{"name": "calibrate", "val": ": bool = True"}]}>
+</Docstring>
+
+对于出厂已 calibration 的 OMX 机器人：
+- 如果软件包中的默认 calibration 与电机不匹配，则从电机读取并保存
+- 这样就能使用预 calibration 的机器人，无需手动 calibrate
+- 如果不存在 calibration 文件，则使用出厂默认值（homing_offset=0、range_min=0、range_max=4095）
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"send_action"} anchor={"lerobot.robots.omx_follower.OmxFollower.send_action"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/omx_follower/omx_follower.py#L197"} parameters={[{"name": "action", "val": ": dict"}]}>
+<paramsdesc>- **action** (RobotAction) -- 电机的目标位置。</paramsdesc><rettype>RobotAction</rettype><retdesc> 发送给电机、可能被裁剪的 action。</retdesc></Docstring>
+命令机械臂移动到目标关节配置。
+
+relative action 幅度可能会根据配置参数
+`max_relative_target` 进行裁剪。在这种情况下，发送的 action 与原始 action 不同。
+因此，此函数始终返回实际发送的 action。
+
+
+
+
+
+
+
+
+</div></div>
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.omx_follower.OmxFollowerConfig"} anchor={"lerobot.robots.omx_follower.OmxFollowerConfig"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/omx_follower/config_omx_follower.py#L24"} parameters={[{"name": "port", "val": ": str"}, {"name": "disable_torque_on_disconnect", "val": ": bool = True"}, {"name": "max_relative_target", "val": ": float | dict[str, float] | None = None"}, {"name": "cameras", "val": ": dict = <factory>"}, {"name": "use_degrees", "val": ": bool = False"}, {"name": "id", "val": ": str | None = None"}, {"name": "calibration_dir", "val": ": pathlib.Path | None = None"}]}>
+</Docstring>
+
+
+</div>
+
+## Reachy2Robot [[lerobot.robots.reachy2.Reachy2Robot]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.reachy2.Reachy2Robot"} anchor={"lerobot.robots.reachy2.Reachy2Robot"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/reachy2/robot_reachy2.py#L75"} parameters={[{"name": "config", "val": ": Reachy2RobotConfig"}]}>
+</Docstring>
+
+[Reachy 2](https://www.pollen-robotics.com/reachy/)，由 Pollen Robotics 开发。
+
+
+</div>
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.reachy2.Reachy2RobotConfig"} anchor={"lerobot.robots.reachy2.Reachy2RobotConfig"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/reachy2/configuration_reachy2.py#L25"} parameters={[{"name": "max_relative_target", "val": ": float | None = None"}, {"name": "ip_address", "val": ": str | None = 'localhost'"}, {"name": "port", "val": ": int = 50065"}, {"name": "disable_torque_on_disconnect", "val": ": bool = False"}, {"name": "use_external_commands", "val": ": bool = False"}, {"name": "with_mobile_base", "val": ": bool = True"}, {"name": "with_l_arm", "val": ": bool = True"}, {"name": "with_r_arm", "val": ": bool = True"}, {"name": "with_neck", "val": ": bool = True"}, {"name": "with_antennas", "val": ": bool = True"}, {"name": "with_left_teleop_camera", "val": ": bool = False"}, {"name": "with_right_teleop_camera", "val": ": bool = False"}, {"name": "with_torso_camera", "val": ": bool = False"}, {"name": "camera_width", "val": ": int = 640"}, {"name": "camera_height", "val": ": int = 480"}, {"name": "cameras", "val": ": dict = <factory>"}, {"name": "id", "val": ": str | None = None"}, {"name": "calibration_dir", "val": ": pathlib.Path | None = None"}]}>
+</Docstring>
+
+
+</div>
+
+## UnitreeG1 [[lerobot.robots.unitree_g1.UnitreeG1]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.unitree_g1.UnitreeG1"} anchor={"lerobot.robots.unitree_g1.UnitreeG1"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/unitree_g1/unitree_g1.py#L148"} parameters={[{"name": "config", "val": ": UnitreeG1Config"}]}>
+</Docstring>
+
+
+</div>
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.unitree_g1.UnitreeG1Config"} anchor={"lerobot.robots.unitree_g1.UnitreeG1Config"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/unitree_g1/config_unitree_g1.py#L49"} parameters={[{"name": "kp", "val": ": list = <factory>"}, {"name": "kd", "val": ": list = <factory>"}, {"name": "default_positions", "val": ": list = <factory>"}, {"name": "control_dt", "val": ": float = 0.004"}, {"name": "is_simulation", "val": ": bool = True"}, {"name": "robot_ip", "val": ": str = '192.168.123.164'"}, {"name": "cameras", "val": ": dict = <factory>"}, {"name": "gravity_compensation", "val": ": bool = False"}, {"name": "controller", "val": ": str | None = None"}, {"name": "id", "val": ": str | None = None"}, {"name": "calibration_dir", "val": ": pathlib.Path | None = None"}]}>
+</Docstring>
+
+
+</div>
+
+## Hope Jr [[lerobot.robots.hope_jr.HopeJrArm]]
+
+Hope Jr 人形机器人以两个独立的机器人形式呈现：一个臂和一个手。
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.hope_jr.HopeJrArm"} anchor={"lerobot.robots.hope_jr.HopeJrArm"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/hope_jr/hope_jr_arm.py#L37"} parameters={[{"name": "config", "val": ": HopeJrArmConfig"}]}>
+</Docstring>
+
+
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"connect"} anchor={"lerobot.robots.hope_jr.HopeJrArm.connect"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/hope_jr/hope_jr_arm.py#L90"} parameters={[{"name": "calibrate", "val": ": bool = True"}]}>
+</Docstring>
+
+我们假设在连接时，机械臂处于静止位置，
+并且可以安全地禁用力矩以运行 calibration。
+
+
+</div></div>
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.hope_jr.HopeJrArmConfig"} anchor={"lerobot.robots.hope_jr.HopeJrArmConfig"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/hope_jr/config_hope_jr.py#L42"} parameters={[{"name": "port", "val": ": str"}, {"name": "disable_torque_on_disconnect", "val": ": bool = True"}, {"name": "max_relative_target", "val": ": float | dict[str, float] | None = None"}, {"name": "cameras", "val": ": dict = <factory>"}, {"name": "id", "val": ": str | None = None"}, {"name": "calibration_dir", "val": ": pathlib.Path | None = None"}]}>
+</Docstring>
+
+
+</div>
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.hope_jr.HopeJrHand"} anchor={"lerobot.robots.hope_jr.HopeJrHand"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/hope_jr/hope_jr_hand.py#L61"} parameters={[{"name": "config", "val": ": HopeJrHandConfig"}]}>
+</Docstring>
+
+
+</div>
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.hope_jr.HopeJrHandConfig"} anchor={"lerobot.robots.hope_jr.HopeJrHandConfig"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/hope_jr/config_hope_jr.py#L26"} parameters={[{"name": "port", "val": ": str"}, {"name": "side", "val": ": str"}, {"name": "disable_torque_on_disconnect", "val": ": bool = True"}, {"name": "cameras", "val": ": dict = <factory>"}, {"name": "id", "val": ": str | None = None"}, {"name": "calibration_dir", "val": ": pathlib.Path | None = None"}]}>
+</Docstring>
+
+
+</div>
+
+## RebotB601Follower [[lerobot.robots.rebot_b601_follower.RebotB601Follower]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.rebot_b601_follower.RebotB601Follower"} anchor={"lerobot.robots.rebot_b601_follower.RebotB601Follower"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/rebot_b601_follower/rebot_b601_follower.py#L58"} parameters={[{"name": "config", "val": ": RebotB601FollowerRobotConfig"}]}>
+</Docstring>
+Seeed Studio reBot B601-DM follower arm（6 自由度 + gripper，Damiao CAN 电机）。
+
+电机通信由 `motorbridge` 软件包通过 CAN 总线处理，
+可通过 Damiao 串行桥接器或 SocketCAN 适配器接入。
+
+
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"disable_torque"} anchor={"lerobot.robots.rebot_b601_follower.RebotB601Follower.disable_torque"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/rebot_b601_follower/rebot_b601_follower.py#L206"} parameters={[]}>
+</Docstring>
+禁用电机的力矩，以便可以用手移动机械臂（只读调试）。
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"send_action"} anchor={"lerobot.robots.rebot_b601_follower.RebotB601Follower.send_action"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/rebot_b601_follower/rebot_b601_follower.py#L249"} parameters={[{"name": "action", "val": ": dict"}]}>
+</Docstring>
+命令机械臂移动到目标关节配置。
+
+位置以度为单位表示。relative action 幅度可能会
+根据 `max_relative_target` 被裁剪，因此始终返回实际发送的
+action。
+
+
+</div></div>
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.rebot_b601_follower.RebotB601FollowerRobotConfig"} anchor={"lerobot.robots.rebot_b601_follower.RebotB601FollowerRobotConfig"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/rebot_b601_follower/config_rebot_b601_follower.py#L106"} parameters={[{"name": "port", "val": ": str"}, {"name": "can_adapter", "val": ": str = 'damiao'"}, {"name": "dm_serial_baud", "val": ": int = 921600"}, {"name": "disable_torque_on_disconnect", "val": ": bool = True"}, {"name": "max_relative_target", "val": ": float | dict[str, float] | None = None"}, {"name": "cameras", "val": ": dict = <factory>"}, {"name": "motor_can_ids", "val": ": dict = <factory>"}, {"name": "pos_vel_velocity", "val": ": float | list[float] = <factory>"}, {"name": "control_mode", "val": ": str = 'mit'"}, {"name": "mit_kp", "val": ": float | list[float] = <factory>"}, {"name": "mit_kd", "val": ": float | list[float] = <factory>"}, {"name": "gripper_control_mode", "val": ": str = 'force_pos'"}, {"name": "gripper_torque_ratio", "val": ": float = 0.07"}, {"name": "gripper_mit_kp", "val": ": float = 8.0"}, {"name": "gripper_mit_kd", "val": ": float = 0.3"}, {"name": "joint_limits", "val": ": dict = <factory>"}, {"name": "id", "val": ": str | None = None"}, {"name": "calibration_dir", "val": ": pathlib.Path | None = None"}]}>
+</Docstring>
+reBot B601-DM follower arm 机器人注册的配置。
+
+</div>
+
+## BiRebotB601Follower [[lerobot.robots.bi_rebot_b601_follower.BiRebotB601Follower]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.bi_rebot_b601_follower.BiRebotB601Follower"} anchor={"lerobot.robots.bi_rebot_b601_follower.BiRebotB601Follower"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/bi_rebot_b601_follower/bi_rebot_b601_follower.py#L31"} parameters={[{"name": "config", "val": ": BiRebotB601FollowerConfig"}]}>
+</Docstring>
+双臂 Seeed Studio reBot B601-DM follower arm。
+
+组合两个单臂 `RebotB601Follower` 实例。每个臂的 observation 和
+action 键都带有 `left_` / `right_` 前缀命名空间。
+
+
+</div>
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.bi_rebot_b601_follower.BiRebotB601FollowerConfig"} anchor={"lerobot.robots.bi_rebot_b601_follower.BiRebotB601FollowerConfig"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/bi_rebot_b601_follower/config_bi_rebot_b601_follower.py#L27"} parameters={[{"name": "left_arm_config", "val": ": RebotB601FollowerConfig"}, {"name": "right_arm_config", "val": ": RebotB601FollowerConfig"}, {"name": "cameras", "val": ": dict = <factory>"}, {"name": "id", "val": ": str | None = None"}, {"name": "calibration_dir", "val": ": pathlib.Path | None = None"}]}>
+</Docstring>
+双臂 reBot B601-DM follower arm 机器人的配置类。
+
+</div>
+
+## EarthRoverMiniPlus [[lerobot.robots.earthrover_mini_plus.EarthRoverMiniPlus]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.earthrover_mini_plus.EarthRoverMiniPlus"} anchor={"lerobot.robots.earthrover_mini_plus.EarthRoverMiniPlus"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/earthrover_mini_plus/robot_earthrover_mini_plus.py#L72"} parameters={[{"name": "config", "val": ": EarthRoverMiniPlusConfig"}]}>
+<paramsdesc>- **config** -- 机器人配置
+- **sdk_base_url** -- Frodobots SDK 服务器的基础 URL，取自
+  `config.sdk_url`（默认：http://localhost:8000）</paramsdesc></Docstring>
+
+通过 Frodobots SDK HTTP API 控制的 EarthRover Mini Plus 机器人。
+
+该机器人通过 Frodobots SDK 使用基于云的控制，而非直接的
+硬件连接。相机通过 Agora 云经 WebRTC 传输，控制
+命令通过 HTTP POST 请求发送。
+
+该机器人支持：
+- 通过 SDK HTTP 端点访问的双相机（前和后）
+- 线速度和角速度控制
+- 电池和方向遥测
+
+
+
+
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"calibrate"} anchor={"lerobot.robots.earthrover_mini_plus.EarthRoverMiniPlus.calibrate"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/earthrover_mini_plus/robot_earthrover_mini_plus.py#L152"} parameters={[]}>
+</Docstring>
+基于 SDK 的机器人无需 calibration。
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"configure"} anchor={"lerobot.robots.earthrover_mini_plus.EarthRoverMiniPlus.configure"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/earthrover_mini_plus/robot_earthrover_mini_plus.py#L165"} parameters={[]}>
+</Docstring>
+配置机器人（对基于 SDK 的机器人为空操作）。
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"connect"} anchor={"lerobot.robots.earthrover_mini_plus.EarthRoverMiniPlus.connect"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/earthrover_mini_plus/robot_earthrover_mini_plus.py#L123"} parameters={[{"name": "calibrate", "val": ": bool = True"}]}>
+<paramsdesc>- **calibrate** -- 不用于基于 SDK 的机器人（为 API 兼容性而保留）</paramsdesc><raises>- ``DeviceAlreadyConnectedError`` -- 如果机器人已连接
+- ``DeviceNotConnectedError`` -- 如果无法连接到 SDK 服务器 </raises><raisederrors>``DeviceAlreadyConnectedError`` or ``DeviceNotConnectedError``</raisederrors></Docstring>
+通过 Frodobots SDK 连接到机器人。
+
+
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"disconnect"} anchor={"lerobot.robots.earthrover_mini_plus.EarthRoverMiniPlus.disconnect"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/earthrover_mini_plus/robot_earthrover_mini_plus.py#L365"} parameters={[]}>
+<raises>- ``DeviceNotConnectedError`` -- 如果机器人未连接 </raises><raisederrors>``DeviceNotConnectedError``</raisederrors></Docstring>
+与机器人断开连接。
+
+停止机器人并关闭与 SDK 的连接。
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"get_observation"} anchor={"lerobot.robots.earthrover_mini_plus.EarthRoverMiniPlus.get_observation"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/earthrover_mini_plus/robot_earthrover_mini_plus.py#L247"} parameters={[]}>
+<rettype>RobotObservation</rettype><retdesc> 包含以下内容的 observation：
+- front：RGB 格式的前相机图像 (480, 640, 3)
+- rear：RGB 格式的后相机图像 (480, 640, 3)
+- speed: float - 当前速度（原始 SDK 值）
+- battery_level: float - 电池电量 (0-100)
+- orientation: float - 机器人方向（以度为单位）
+- gps_latitude: float - GPS 纬度坐标
+- gps_longitude: float - GPS 经度坐标
+- gps_signal: float - GPS 信号强度（百分比）
+- signal_level: float - 网络信号级别 (0-5)
+- vibration: float - 振动传感器读数
+- lamp: float - 灯的 state（0=关，1=开）
+- accelerometer_x/y/z: float - 加速度计各轴（原始 SDK 值）
+- gyroscope_x/y/z: float - 陀螺仪各轴（原始 SDK 值）
+- magnetometer_filtered_x/y/z: float - 磁力计各轴（原始 SDK 值）
+- wheel_rpm_0/1/2/3: float - 轮子转速 </retdesc><raises>- ``DeviceNotConnectedError`` -- 如果机器人未连接 </raises><raisederrors>``DeviceNotConnectedError``</raisederrors></Docstring>
+从 SDK 获取当前机器人 observation。
+
+相机帧从 SDK 端点 /v2/front 和 /v2/rear 检索。
+帧从 base64 解码，并从 BGR 格式转换为 RGB 格式。
+机器人遥测从 /data 端点检索。
+传感器数组（加速度计、陀螺仪、磁力计、转速）各自包含形式为
+[values..., timestamp] 的条目；使用每个数组中最新的读数。
+
+
+
+
+
+
+
+
+
+注意：
+相机帧从 SDK 端点 /v2/front 和 /v2/rear 检索。
+帧从 base64 解码，并从 BGR 格式转换为 RGB 格式。
+机器人遥测从 /data 端点检索。
+所有 SDK 值都被归一化到适合 dataset 记录的范围内。
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"send_action"} anchor={"lerobot.robots.earthrover_mini_plus.EarthRoverMiniPlus.send_action"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/earthrover_mini_plus/robot_earthrover_mini_plus.py#L333"} parameters={[{"name": "action", "val": ": dict"}]}>
+<paramsdesc>- **action** -- 包含以下键的 action 字典：
+  - linear_velocity：目标线速度 (-1 至 1)
+  - angular_velocity：目标角速度 (-1 至 1)</paramsdesc><rettype>RobotAction</rettype><retdesc> 已发送的 action（与 action_features 键匹配）</retdesc><raises>- ``DeviceNotConnectedError`` -- 如果机器人未连接 </raises><raisederrors>``DeviceNotConnectedError``</raisederrors></Docstring>
+通过 SDK 向机器人发送 action。
+
+
+
+
+
+
+
+
+
+
+
+注意：
+action 通过 POST /control 端点发送到 SDK。
+SDK 期望命令在 [-1, 1] 范围内。
+
+
+</div></div>
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.earthrover_mini_plus.EarthRoverMiniPlusConfig"} anchor={"lerobot.robots.earthrover_mini_plus.EarthRoverMiniPlusConfig"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/earthrover_mini_plus/config_earthrover_mini_plus.py#L25"} parameters={[{"name": "sdk_url", "val": ": str = 'http://localhost:8000'"}, {"name": "id", "val": ": str | None = None"}, {"name": "calibration_dir", "val": ": pathlib.Path | None = None"}]}>
+<paramsdesc>- **sdk_url** -- Frodobots SDK 服务器的 URL（默认：http://localhost:8000）</paramsdesc></Docstring>
+使用 Frodobots SDK 的 EarthRover Mini Plus 机器人配置。
+
+该机器人通过 Frodobots SDK HTTP API 使用基于云的控制。
+相机帧通过 SDK HTTP 端点直接访问。
+
+
+
+
+</div>
+
+
+<EditOnGithub source="https://github.com/huggingface/lerobot/blob/main/docs/source/api/robots.mdx" />
+
+<!--HF DOCBUILD BODY END-->
+
+HF_DOC_BODY_END
+

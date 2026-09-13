@@ -1,0 +1,378 @@
+<script lang="ts">
+import {onMount} from "svelte";
+import Tip from "$lib/Tip.svelte";
+import CopyLLMTxtMenu from "$lib/CopyLLMTxtMenu.svelte";
+import Youtube from "$lib/Youtube.svelte";
+import Docstring from "$lib/Docstring.svelte";
+import CodeBlock from "$lib/CodeBlock.svelte";
+import CodeBlockFw from "$lib/CodeBlockFw.svelte";
+import DocNotebookDropdown from "$lib/DocNotebookDropdown.svelte";
+import CourseFloatingBanner from "$lib/CourseFloatingBanner.svelte";
+import IconCopyLink from "$lib/IconCopyLink.svelte";
+import FrameworkContent from "$lib/FrameworkContent.svelte";
+import Markdown from "$lib/Markdown.svelte";
+import Question from "$lib/Question.svelte";
+import FrameworkSwitchCourse from "$lib/FrameworkSwitchCourse.svelte";
+import InferenceApi from "$lib/InferenceApi.svelte";
+import TokenizersLanguageContent from "$lib/TokenizersLanguageContent.svelte";
+import ExampleCodeBlock from "$lib/ExampleCodeBlock.svelte";
+import Added from "$lib/Added.svelte";
+import Changed from "$lib/Changed.svelte";
+import Deprecated from "$lib/Deprecated.svelte";
+import PipelineIcon from "$lib/PipelineIcon.svelte";
+import PipelineTag from "$lib/PipelineTag.svelte";
+import Heading from "$lib/Heading.svelte";
+import HfOptions from "$lib/HfOptions.svelte";
+import HfOption from "$lib/HfOption.svelte";
+import EditOnGithub from "$lib/EditOnGithub.svelte";
+import InferenceSnippet from "$lib/InferenceSnippet/InferenceSnippet.svelte";
+import MermaidChart from "$lib/MermaidChart.svelte";
+let fw: "pt" | "tf" = "pt";
+onMount(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    fw = urlParams.get("fw") || "pt";
+});
+</script>
+<svelte:head>
+  <meta name="hf:doc:metadata" content={metadata} >
+</svelte:head>
+
+<!--HF DOCBUILD BODY START-->
+
+HF_DOC_BODY_START
+
+<CopyLLMTxtMenu containerStyle="float: right; margin-left: 10px; display: inline-flex; position: relative; z-index: 10;"></CopyLLMTxtMenu>
+
+# 使用 dataset 工具
+
+本指南介绍 LeRobot 中可用于修改和编辑现有 dataset 的 dataset 工具实用程序。
+
+## 概述
+
+LeRobot 提供了若干用于操作 dataset 的实用程序：
+
+1. **删除 episode** - 从 dataset 中移除特定 episode
+2. **拆分 dataset** - 将 dataset 划分为多个较小的 dataset
+3. **合并 dataset** - 将多个 dataset 合并为一个。这些 dataset 必须具有相同的特征，并且 episode 按 `repo_ids` 中指定的顺序拼接
+4. **添加特征** - 向 dataset 添加新特征
+5. **移除特征** - 从 dataset 中移除特征
+6. **修改任务** - 更改与 episode 关联的自然语言任务描述
+7. **转换为视频** - 将基于图像的 dataset 转换为视频格式以高效存储（RGB 和深度相机使用单独的编码器编码）
+8. **重新编码视频** - 使用新的编码器设置重新编码现有视频 dataset 的 RGB 和/或深度流
+9. **显示 dataset 信息** - 显示 dataset 信息摘要，例如 episode 数等。
+
+核心实现位于 `lerobot.datasets.dataset_tools`。
+详细说明如何使用工具 API 的示例脚本位于 `examples/dataset/use_dataset_tools.py`。
+
+## 命令行工具：lerobot-edit-dataset
+
+`lerobot-edit-dataset` 是用于编辑 dataset 的命令行脚本。它可用于删除 episode、拆分 dataset、合并 dataset、添加特征、移除特征以及将图像 dataset 转换为视频格式。
+
+运行 `lerobot-edit-dataset --help` 以获取有关每个操作配置的更多信息。
+
+### 用法示例
+
+#### 删除 episode
+
+从 dataset 中移除特定 episode。这对于过滤掉不需要的数据很有用。
+
+```bash
+# Delete episodes 0, 2, and 5 (modifies original dataset)
+lerobot-edit-dataset \
+    --repo_id lerobot/pusht \
+    --operation.type delete_episodes \
+    --operation.episode_indices "[0, 2, 5]"
+
+# Delete episodes and save to a new dataset (preserves original dataset)
+lerobot-edit-dataset \
+    --repo_id lerobot/pusht \
+    --new_repo_id lerobot/pusht_after_deletion \
+    --operation.type delete_episodes \
+    --operation.episode_indices "[0, 2, 5]"
+```
+
+#### 拆分 dataset
+
+将 dataset 划分为多个子集。
+
+```bash
+# Split by fractions (e.g. 60% train, 20% val, 20% test)
+lerobot-edit-dataset \
+    --repo_id lerobot/pusht \
+    --operation.type split \
+    --operation.splits '{"train": 0.6, "val": 0.2, "test": 0.2}'
+
+# Split by specific episode indices
+lerobot-edit-dataset \
+    --repo_id lerobot/pusht \
+    --operation.type split \
+    --operation.splits '{"task1": [0, 1, 2, 3], "task2": [4, 5]}'
+```
+
+拆分名称没有限制，可由用户自行确定。生成的 dataset 保存在仓库 id 下并附加拆分名称，例如 `lerobot/pusht_train`、`lerobot/pusht_task1`、`lerobot/pusht_task2`。
+
+#### 合并 dataset
+
+将多个 dataset 合并为一个 dataset。
+
+```bash
+# Merge train and validation splits back into one dataset
+lerobot-edit-dataset \
+    --repo_id lerobot/pusht_merged \
+    --operation.type merge \
+    --operation.repo_ids "['lerobot/pusht_train', 'lerobot/pusht_val']"
+```
+
+#### 移除特征
+
+从 dataset 中移除特征。
+
+```bash
+# Remove a camera feature
+lerobot-edit-dataset \
+    --repo_id lerobot/pusht \
+    --operation.type remove_feature \
+    --operation.feature_names "['observation.images.top']"
+```
+
+#### 修改任务
+
+更改附加到 episode 上的自然语言任务描述。这对于修复拼写错误、统一措辞或重新标记 episode 很有用。
+
+> [!WARNING]
+> `modify_tasks` 会 **就地** 修改 dataset（更新 `meta/tasks.parquet`、数据文件中的 `task_index` 列、episode 元数据中的 `tasks` 列，以及 `meta/info.json` 中的 `total_tasks`）。此操作会忽略 `--new_repo_id` 和 `--new_root` 参数。
+
+```bash
+# Set a single task for all episodes
+lerobot-edit-dataset \
+    --repo_id lerobot/pusht \
+    --operation.type modify_tasks \
+    --operation.new_task "Pick up the cube and place it"
+
+# Set different tasks for specific episodes
+lerobot-edit-dataset \
+    --repo_id lerobot/pusht \
+    --operation.type modify_tasks \
+    --operation.episode_tasks '{"0": "Task A", "1": "Task B", "2": "Task A"}'
+
+# Replace existing task strings wherever they appear
+lerobot-edit-dataset \
+    --repo_id lerobot/pusht \
+    --operation.type modify_tasks \
+    --operation.task_replacements '{"Pick up the red cube": "Lift the red cube"}'
+
+# Combine modes in a single run
+lerobot-edit-dataset \
+    --repo_id lerobot/pusht \
+    --operation.type modify_tasks \
+    --operation.new_task "Default task" \
+    --operation.task_replacements '{"Pick up the red cube": "Lift the red cube"}' \
+    --operation.episode_tasks '{"5": "Special task for episode 5"}'
+```
+
+**参数：**
+
+- `new_task`：用作未被其他规则覆盖的 episode 默认值的单个任务字符串。
+- `episode_tasks`：从 episode index 到任务字符串的映射。
+- `task_replacements`：从现有任务字符串到其替换值的映射，应用于当前任务匹配某个键的 episode。每个键必须是 dataset 中已存在的任务。
+
+这些模式可以在单次运行中组合使用。对于每个 episode，任务按以下优先级解析：
+
+`episode_tasks` > `task_replacements` > `new_task` > 原始任务
+
+必须至少指定 `new_task`、`episode_tasks` 或 `task_replacements` 之一。最终没有任务的 episode 会引发错误。
+
+#### 转换为视频
+
+将基于图像的 dataset 转换为视频格式，创建一个新的 LeRobotDataset，其中的图像以视频形式存储。这对于减少存储需求和提升数据加载性能很有用。新 dataset 将具有与原始 dataset 完全相同的结构，但图像会按正确的 LeRobot 格式编码为 MP4 视频。
+
+```bash
+# Local-only: Save to a custom output directory (no hub push)
+lerobot-edit-dataset \
+    --repo_id lerobot/pusht_image \
+    --operation.type convert_image_to_video \
+    --operation.output_dir /path/to/output/pusht_video
+
+# Save with new repo_id (local storage)
+lerobot-edit-dataset \
+    --repo_id lerobot/pusht_image \
+    --new_repo_id lerobot/pusht_video \
+    --operation.type convert_image_to_video
+
+# Convert and push to Hugging Face Hub
+lerobot-edit-dataset \
+    --repo_id lerobot/pusht_image \
+    --new_repo_id lerobot/pusht_video \
+    --operation.type convert_image_to_video \
+    --push_to_hub true
+
+# Convert with custom video codec and quality settings
+lerobot-edit-dataset \
+    --repo_id lerobot/pusht_image \
+    --operation.type convert_image_to_video \
+    --operation.output_dir outputs/pusht_video \
+    --operation.rgb_encoder.vcodec libsvtav1 \
+    --operation.rgb_encoder.pix_fmt yuv420p \
+    --operation.rgb_encoder.g 2 \
+    --operation.rgb_encoder.crf 30
+
+# Convert a dataset that includes depth maps, customizing the depth encoder
+lerobot-edit-dataset \
+    --repo_id lerobot/pusht_image \
+    --operation.type convert_image_to_video \
+    --operation.output_dir outputs/pusht_video \
+    --operation.depth_encoder.depth_min 0.01 \
+    --operation.depth_encoder.depth_max 10.0 \
+    --operation.depth_encoder.use_log true
+
+# Convert only specific episodes
+lerobot-edit-dataset \
+    --repo_id lerobot/pusht_image \
+    --operation.type convert_image_to_video \
+    --operation.output_dir outputs/pusht_video \
+    --operation.episode_indices "[0, 1, 2, 5, 10]"
+
+# Convert with multiple workers for parallel processing
+lerobot-edit-dataset \
+    --repo_id lerobot/pusht_image \
+    --operation.type convert_image_to_video \
+    --operation.output_dir outputs/pusht_video \
+    --operation.num_workers 8
+
+# For memory-constrained systems, users can now specify limits:
+lerobot-edit-dataset \
+    --repo_id lerobot/pusht_image \
+    --operation.type convert_to_video \
+    --operation.max_episodes_per_batch 50 \
+    --operation.max_frames_per_batch 10000
+```
+
+**参数：**
+
+- `output_dir`：自定义输出目录（可选 - 默认使用 `new_repo_id` 或 `{repo_id}_video`）
+- `rgb_encoder`：应用于 RGB 相机的视频编码器设置——所有子字段均可通过 `--operation.rgb_encoder.<field>` 访问。详见 [视频编码参数](./video_encoding_parameters)。
+- `depth_encoder`：应用于深度图相机的视频编码器设置（例如来自 Intel RealSense）。除标准编码器字段外，它还暴露深度量化旋钮（`depth_min`、`depth_max`、`shift`、`use_log`），可通过 `--operation.depth_encoder.<field>` 访问。这些量化设置会持久化到 dataset 元数据中，以便在加载时将深度反量化回物理单位。详见 [深度流](./video_encoding_parameters#depth-streams) 部分。
+- `episode_indices`：要转换的特定 episode 列表（默认：所有 episode）
+- `num_workers`：用于处理的并行工作进程数（默认：4）
+
+**注意：** 生成的 dataset 将是一个规范的 LeRobotDataset，所有相机都编码为 `videos/` 目录中的视频，parquet 文件仅包含元数据（无原始图像数据）。深度图相机会被自动检测并路由到 `depth_encoder`，而 RGB 相机使用 `rgb_encoder`。所有 episode、统计信息和任务都会被保留。
+
+#### 重新编码视频
+
+使用不同的编码器设置重新编码现有视频 dataset 的视频，而无需回到原始帧。RGB 视频使用 `rgb_encoder`，深度视频使用 `depth_encoder`。只需提供你想要重新编码的编码器；另一种流类型保持不变。
+
+```bash
+# Re-encode all RGB videos with new settings (saves to lerobot/pusht_reencoded by default)
+lerobot-edit-dataset \
+    --repo_id lerobot/pusht \
+    --operation.type reencode_videos \
+    --operation.rgb_encoder.vcodec h264 \
+    --operation.rgb_encoder.pix_fmt yuv420p \
+    --operation.rgb_encoder.crf 23
+
+# Re-encode both RGB and depth videos in a dataset with depth maps
+lerobot-edit-dataset \
+    --repo_id lerobot/pusht_depth \
+    --operation.type reencode_videos \
+    --operation.rgb_encoder.vcodec h264 \
+    --operation.depth_encoder.crf 50
+```
+
+**参数：**
+
+- `rgb_encoder`：应用于每个 RGB 视频的编码器设置。省略则跳过重新编码 RGB 视频。
+- `depth_encoder`：应用于每个深度视频的编码器设置。省略则跳过重新编码深度视频。
+- `num_workers`：用于处理的并行工作进程数。
+
+> [!NOTE]
+> 重新编码深度视频时，现有的深度量化参数（`depth_min`、`depth_max`、`shift`、`use_log`）和 `is_depth_map` 标志会被 **保留**——重新编码仅改变所存储流的编解码器/质量，不改变加载时深度的反量化方式。
+
+### 显示 dataset 信息
+
+显示 dataset 信息，例如 episode 数、帧数、文件大小等。
+不会对 dataset 做任何更改
+
+```bash
+
+# Show dataset information without feature details
+lerobot-edit-dataset \
+    --repo_id lerobot/pusht_image \
+    --operation.type info \
+
+# Show dataset information with feature details
+lerobot-edit-dataset \
+    --repo_id lerobot/pusht_image \
+    --operation.type info \
+    --operation.show_features true
+
+```
+
+**参数：**
+
+- `parameters`：用于控制是否显示带特征细节的 dataset 信息的标志。（default=false）
+
+### 推送到 Hub
+
+向任何命令添加 `--push_to_hub true` 标志，即可自动将生成的 dataset 上传到 Hugging Face Hub：
+
+```bash
+lerobot-edit-dataset \
+    --repo_id lerobot/pusht \
+    --new_repo_id lerobot/pusht_after_deletion \
+    --operation.type delete_episodes \
+    --operation.episode_indices "[0, 2, 5]" \
+    --push_to_hub true
+```
+
+还有一个用于向 dataset 添加特征的工具，尚未在 `lerobot-edit-dataset` 中涵盖。
+
+# dataset 可视化
+
+## 在线可视化
+
+当你使用 `lerobot` 录制 dataset 时，除非另有指定，它会自动上传到 Hugging Face Hub。要在线查看 dataset，请使用我们的 **LeRobot dataset 可视化器**，地址为：
+https://huggingface.co/spaces/lerobot/visualize_dataset
+
+## 本地可视化
+
+你也可以使用我们的命令行工具在本地可视化 dataset 中的 episode。
+
+**从 Hugging Face Hub：**
+
+```bash
+lerobot-dataset-viz \
+    --repo-id lerobot/pusht \
+    --episode-index 0
+```
+
+对于私有或受限 dataset，请先使用 `hf auth login` 进行认证，或设置 `HF_TOKEN` 环境变量。之后 Hub 客户端会自动发现凭据；无需提供令牌参数。
+
+**从本地文件夹：**
+添加 `--root` 选项并设置 `--mode local`。例如，要在 `./my_local_data_dir/lerobot/pusht` 中搜索：
+
+```bash
+lerobot-dataset-viz \
+    --repo-id lerobot/pusht \
+    --root ./my_local_data_dir \
+    --mode local \
+    --episode-index 0
+```
+
+执行后，该工具会打开 `rerun.io` 并显示所选 episode 的相机流、机器人 state 和 action。
+
+要使用 [Foxglove](https://foxglove.dev) 而不是 Rerun，请安装额外组件 `--display-mode foxglove`。这会启动一个 WebSocket 服务器（将 Foxglove 应用连接到 `ws://127.0.0.1:8765`），将 episode 作为可拖动的时间线提供，你可以播放/暂停和拖动。
+
+如需高级用法——包括可视化存储在远程服务器上的 dataset——请运行：
+
+```bash
+lerobot-dataset-viz --help
+```
+
+
+
+<EditOnGithub source="https://github.com/huggingface/lerobot/blob/main/docs/source/using_dataset_tools.mdx" />
+
+<!--HF DOCBUILD BODY END-->
+
+HF_DOC_BODY_END
+

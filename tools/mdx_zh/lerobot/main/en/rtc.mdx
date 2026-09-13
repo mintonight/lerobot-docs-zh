@@ -1,0 +1,281 @@
+<script lang="ts">
+import {onMount} from "svelte";
+import Tip from "$lib/Tip.svelte";
+import CopyLLMTxtMenu from "$lib/CopyLLMTxtMenu.svelte";
+import Youtube from "$lib/Youtube.svelte";
+import Docstring from "$lib/Docstring.svelte";
+import CodeBlock from "$lib/CodeBlock.svelte";
+import CodeBlockFw from "$lib/CodeBlockFw.svelte";
+import DocNotebookDropdown from "$lib/DocNotebookDropdown.svelte";
+import CourseFloatingBanner from "$lib/CourseFloatingBanner.svelte";
+import IconCopyLink from "$lib/IconCopyLink.svelte";
+import FrameworkContent from "$lib/FrameworkContent.svelte";
+import Markdown from "$lib/Markdown.svelte";
+import Question from "$lib/Question.svelte";
+import FrameworkSwitchCourse from "$lib/FrameworkSwitchCourse.svelte";
+import InferenceApi from "$lib/InferenceApi.svelte";
+import TokenizersLanguageContent from "$lib/TokenizersLanguageContent.svelte";
+import ExampleCodeBlock from "$lib/ExampleCodeBlock.svelte";
+import Added from "$lib/Added.svelte";
+import Changed from "$lib/Changed.svelte";
+import Deprecated from "$lib/Deprecated.svelte";
+import PipelineIcon from "$lib/PipelineIcon.svelte";
+import PipelineTag from "$lib/PipelineTag.svelte";
+import Heading from "$lib/Heading.svelte";
+import HfOptions from "$lib/HfOptions.svelte";
+import HfOption from "$lib/HfOption.svelte";
+import EditOnGithub from "$lib/EditOnGithub.svelte";
+import InferenceSnippet from "$lib/InferenceSnippet/InferenceSnippet.svelte";
+import MermaidChart from "$lib/MermaidChart.svelte";
+let fw: "pt" | "tf" = "pt";
+onMount(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    fw = urlParams.get("fw") || "pt";
+});
+</script>
+<svelte:head>
+  <meta name="hf:doc:metadata" content={metadata} >
+</svelte:head>
+
+<!--HF DOCBUILD BODY START-->
+
+HF_DOC_BODY_START
+
+<CopyLLMTxtMenu containerStyle="float: right; margin-left: 10px; display: inline-flex; position: relative; z-index: 10;"></CopyLLMTxtMenu>
+
+# 实时分块（RTC）
+
+实时分块（RTC）让 [Pi0](./pi0)、[Pi0.5](./pi05) 和 [SmolVLA](./smolvla) 等基于流匹配的大型机器人 policy，即使 inference latency 很高，也能产生平滑、连续且反应灵敏的运动。LeRobot 提供了原始的 inference 时引导模式，并针对兼容的 Pi05 checkpoint，提供训练时 action 条件化与廉价的硬前缀（hard-prefix）inference。
+
+这类 policy 生成的是未来 action chunk（例如每次 50 步），而不是单个 action。
+由于模型很大，生成每个 action chunk 所需的时间比机器人执行它所需的时间更长。
+简单地逐个执行 action chunk 会导致问题，例如停顿、过渡卡顿，或当下一个 action chunk 到达过晚或与先前执行的 action 不一致时 policy 突然改变。
+
+RTC 通过异步生成下一个 action chunk（同时机器人继续执行当前 action chunk），并引导新 action chunk 使其与上一个 action chunk 中已经执行的部分平滑衔接，来解决这一问题。
+
+## RTC 的工作原理（简化版）
+
+RTC 让机器人在移动的同时提前思考。当机器人正在执行一个 action chunk 时，RTC 会提前开始生成下一个 action chunk。
+但由于新 action chunk 就绪时机器人已经移动了一段距离，RTC 必须确保新 action chunk 与机器人当前的 action 仍然平滑衔接。
+
+为此，RTC 将新 action chunk 的开头视为一个图像修复（inpainting）或“填补空缺”问题：
+它会温和地调整新 action chunk 的开头部分，使其与机器人正在进行的运动自然融合。结果是既没有停顿，也没有突然跳跃。
+
+用技术术语来说，RTC 在流匹配去噪过程中加入了一个引导项，迫使新 action chunk 中重叠的时间步与上一个 action chunk 已执行的部分保持接近，通常使用一个软过渡掩码。
+
+## 快速开始
+
+### 安装
+
+RTC 内置在 LeRobot 中。只需安装你需要的 policy 依赖：
+
+```bash
+# For Pi0 or Pi0.5
+pip install -e ".[pi]"
+
+# For SmolVLA
+pip install -e ".[smolvla]"
+```
+
+### 将 RTC 与 Pi0 一起使用
+
+你可以使用 `lerobot-rollout --strategy.type=base --inference.type=rtc` 在真实机器人上进行 RTC 部署。
+下面的代码片段提供了一个简化的伪示例，说明 RTC 如何与 Pi0 在你的流水线中运作：
+
+```python
+from lerobot.policies.pi0 import PI0Policy, PI0Config
+from lerobot.configs import RTCAttentionSchedule
+from lerobot.policies.rtc import RTCConfig, ActionQueue
+
+# Load Pi0 with RTC enabled
+policy_cfg = PI0Config()
+
+# Enable RTC
+policy_cfg.rtc_config = RTCConfig(
+    enabled=True,
+    execution_horizon=10,  # How many steps to blend with previous chunk
+    max_guidance_weight=10.0,  # How strongly to enforce consistency
+    prefix_attention_schedule=RTCAttentionSchedule.EXP,  # Exponential blend
+)
+
+# Load the policy
+policy = PI0Policy.from_pretrained("lerobot/pi0_base", policy_cfg=policy_cfg, device="cuda")
+
+# Now use predict_action_chunk with RTC parameters
+inference_delay = 4  # How many steps of inference latency, this value should be calculated based on the inference latency of the policy
+
+# Initialize the action queue
+action_queue = ActionQueue(policy_cfg.rtc_config)
+
+# Start in a separate thread with the following function
+def get_actions():
+  while True:
+    if should_get_actions:
+
+      prev_actions = action_queue.get_left_over()
+      obs = get_robot_observations(robot)
+
+      # Generate actions WITH RTC
+      actions = policy.predict_action_chunk(
+          obs,
+          inference_delay=inference_delay,
+          prev_chunk_left_over=prev_actions,
+      )
+
+      action_queue.merge(
+          actions, actions, inference_delay
+      )
+
+for step in range(num_steps):
+    action = action_queue.get()
+
+    # Execute the first N actions
+    execute_actions(action)
+```
+
+## 关键参数
+
+`RTCConfig` 有以下可供调优的参数：
+
+**`mode`** 选择 action 前缀条件化方法：
+
+- `guided`（默认）在去噪过程中应用原始的雅可比（Jacobian）引导，适用于普通的流匹配 checkpoint。
+- `trained` 使用逐 action 的流时间步对上一个 action chunk 的前缀进行硬图像修复。它目前需要一个使用 `policy.rtc_training_max_delay > 0` 训练的 Pi05 checkpoint，并避免了引导的反向传播。
+
+对于 trained 模式，`execution_horizon` 与 rollout 后端的
+`inference.queue_threshold` 都必须至少等于 checkpoint 的
+`rtc_training_max_delay`，且 `execution_horizon` 不得超过
+`chunk_size - rtc_training_max_delay`（即 RTC
+论文中的 `d <= s <= H - d` 界限）；rollout 会在连接机器人之前验证这一点。
+
+**`execution_horizon`**：需要与上一个 action chunk 保持一致的步数。值越大，过渡越平滑，但反应性可能越低。
+
+典型值：8-12 步
+
+```python
+RTCConfig(execution_horizon=10)
+```
+
+**`max_guidance_weight`**：对与上一个 action chunk 保持一致的约束强度。这是一个可通过调优来平衡过渡平滑性与 policy 反应性的超参数。对于 10 步流匹配（SmolVLA、Pi0、Pi0.5），10.0 是一个最佳值。
+
+**`prefix_attention_schedule`**：如何在重叠区域内对一致性进行加权。
+
+- `LINEAR`：从 inference_delay 到 execution_horizon 的线性衰减
+- `EXP`：指数衰减（推荐入门使用）
+- `ONES`：在整个 execution_horizon 上施加完整权重
+- `ZEROS`：二值（在 inference_delay 之前为完整权重，之后为零）
+
+**`inference_delay`**：你的系统的 inference latency 步数。该值会传给 `predict_action_chunk()` 而不是配置，因为它可能在运行时变化。
+
+## 离线测试 RTC
+
+在真实机器人上运行之前，先用 dataset 样本测试 RTC，以可视化它的工作方式：
+
+```bash
+python examples/rtc/eval_dataset.py \
+    --policy.path=lerobot/pi0_libero_finetuned \
+    --dataset.repo_id=HuggingFaceVLA/libero \
+    --rtc.execution_horizon=10 \
+    --rtc.max_guidance_weight=10.0 \
+    --device=cuda
+```
+
+在评估兼容的训练时 RTC Pi05
+checkpoint 时，请添加 `--rtc.mode=trained`。不支持的 policy 会拒绝 trained 模式，而不是回退到
+guided RTC。
+
+该脚本会生成去噪过程的可视化结果，将标准生成（左）与 RTC（右）进行对比。在 RTC 图中，你可以看到开头几步（蓝色/紫色线条）是如何被引导以匹配红色真值轨迹（上一个 action chunk 的尾部）的，从而确保 action chunk 之间的平滑过渡。
+
+<p align="center">
+  <img
+    src="https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/lerobot/flow_matching.png"
+    alt="Denoising steps with and without RTC"
+    width="100%"
+  />
+</p>
+
+## 在真实机器人上测试 RTC
+
+```bash
+lerobot-rollout \
+    --strategy.type=base \
+    --policy.path=${HF_USERNAME}/policy_repo_id \
+    --inference.type=rtc \
+    --inference.rtc.mode=guided \
+    --inference.rtc.execution_horizon=10 \
+    --inference.rtc.max_guidance_weight=10.0 \
+    --robot.type=so100_follower \
+    --robot.port=/dev/tty.usbmodem58FA0834591 \
+    --robot.cameras="{ gripper: {type: opencv, index_or_path: 1, width: 640, height: 480, fps: 30}, front: {type: opencv, index_or_path: 0, width: 640, height: 480, fps: 30}}" \
+    --task="Move green small object into the purple platform" \
+    --duration=120 \
+    --device=cuda
+```
+
+对于训练时 RTC Pi05 checkpoint，请将模式改为 `trained`。该
+checkpoint 记录了它支持的最大延迟，rollout 会将测量到的
+延迟与之对比验证：
+
+```bash
+lerobot-rollout \
+    --strategy.type=base \
+    --policy.path=${HF_USERNAME}/pi05_training_rtc \
+    --inference.type=rtc \
+    --inference.rtc.mode=trained \
+    --inference.rtc.execution_horizon=10 \
+    --robot.type=so100_follower \
+    --robot.port=/dev/tty.usbmodem58FA0834591 \
+    --task="Move green small object into the purple platform" \
+    --duration=120 \
+    --device=cuda
+```
+
+## 与 LeRobot 中 async inference 的区别
+
+RTC 和[async inference](./async)都能改善实时机器人控制，但它们解决的是不同的问题。
+
+| 方面 | async inference | RTC |
+| ------------- | -------------------------------------------------------------------------- | --------------------------------------------------- |
+| **问题** | 等待 inference 时出现空闲帧 | action chunk 之间的不连续性 |
+| **解决方案** | 将预测与执行解耦 | 引导新 action chunk 平滑延续自上一个 action chunk |
+| **优势** | 无需等待，action 连续 | 平滑过渡，action 自然 |
+| **适用场景** | async inference 最适合高 inference latency 的大型模型 | 基于流匹配的 policy |
+
+**将两者结合使用**可获得最佳的平滑性和反应性！
+
+## 进阶：调试跟踪
+
+RTC 内置了调试跟踪功能，帮助你了解 inference 期间发生的情况：
+
+```python
+# Enable debug tracking
+policy_cfg.rtc_config.debug = True
+policy_cfg.rtc_config.debug_maxlen = 100
+
+# After inference, access debug data
+debug_data = policy.rtc_processor.get_debug_data()
+
+# Visualize denoising steps, corrections, etc.
+from lerobot.policies.rtc.debug_visualizer import RTCDebugVisualizer
+visualizer = RTCDebugVisualizer()
+# ... create plots
+```
+
+参见 `examples/rtc/eval_dataset.py` 查看离线 RTC 可视化的完整示例。
+
+## 参考资料
+
+- [Smooth-As-Butter Robot Policies](https://alexander-soare.github.io/robotics/2025/08/05/smooth-as-butter-robot-policies.html)——关于真实机器人结果的出色技术讲解
+- [Physical Intelligence - Real-Time Chunking](https://www.physicalintelligence.company/research/real_time_chunking)——原始论文与研究
+- [Kinetix RTC Implementation](https://github.com/Physical-Intelligence/real-time-chunking-kinetix)——来自 Physical Intelligence 的参考实现
+- [Training-Time Action Conditioning](https://arxiv.org/abs/2512.05964)——在训练期间使用干净前缀条件化的高效 RTC
+- [RLDX-1](https://github.com/RLWRLD/RLDX-1)——用于训练时 RTC 集成的 PyTorch 参考实现
+
+
+
+<EditOnGithub source="https://github.com/huggingface/lerobot/blob/main/docs/source/rtc.mdx" />
+
+<!--HF DOCBUILD BODY END-->
+
+HF_DOC_BODY_END
+

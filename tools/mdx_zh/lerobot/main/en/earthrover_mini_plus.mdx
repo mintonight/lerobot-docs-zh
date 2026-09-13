@@ -1,0 +1,292 @@
+<script lang="ts">
+import {onMount} from "svelte";
+import Tip from "$lib/Tip.svelte";
+import CopyLLMTxtMenu from "$lib/CopyLLMTxtMenu.svelte";
+import Youtube from "$lib/Youtube.svelte";
+import Docstring from "$lib/Docstring.svelte";
+import CodeBlock from "$lib/CodeBlock.svelte";
+import CodeBlockFw from "$lib/CodeBlockFw.svelte";
+import DocNotebookDropdown from "$lib/DocNotebookDropdown.svelte";
+import CourseFloatingBanner from "$lib/CourseFloatingBanner.svelte";
+import IconCopyLink from "$lib/IconCopyLink.svelte";
+import FrameworkContent from "$lib/FrameworkContent.svelte";
+import Markdown from "$lib/Markdown.svelte";
+import Question from "$lib/Question.svelte";
+import FrameworkSwitchCourse from "$lib/FrameworkSwitchCourse.svelte";
+import InferenceApi from "$lib/InferenceApi.svelte";
+import TokenizersLanguageContent from "$lib/TokenizersLanguageContent.svelte";
+import ExampleCodeBlock from "$lib/ExampleCodeBlock.svelte";
+import Added from "$lib/Added.svelte";
+import Changed from "$lib/Changed.svelte";
+import Deprecated from "$lib/Deprecated.svelte";
+import PipelineIcon from "$lib/PipelineIcon.svelte";
+import PipelineTag from "$lib/PipelineTag.svelte";
+import Heading from "$lib/Heading.svelte";
+import HfOptions from "$lib/HfOptions.svelte";
+import HfOption from "$lib/HfOption.svelte";
+import EditOnGithub from "$lib/EditOnGithub.svelte";
+import InferenceSnippet from "$lib/InferenceSnippet/InferenceSnippet.svelte";
+import MermaidChart from "$lib/MermaidChart.svelte";
+let fw: "pt" | "tf" = "pt";
+onMount(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    fw = urlParams.get("fw") || "pt";
+});
+</script>
+<svelte:head>
+  <meta name="hf:doc:metadata" content={metadata} >
+</svelte:head>
+
+<!--HF DOCBUILD BODY START-->
+
+HF_DOC_BODY_START
+
+<CopyLLMTxtMenu containerStyle="float: right; margin-left: 10px; display: inline-flex; position: relative; z-index: 10;"></CopyLLMTxtMenu>
+
+# EarthRover Mini Plus
+
+<img
+  src="https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/lerobot/Earth_Rover_Mini_5_240c9adc-4f9e-44b7-982f-5d1dc24af1d8.png.webp"
+  alt="EarthRover Mini Plus"
+  width="70%"
+/>
+
+EarthRover Mini Plus 是一款完全开源的移动机器人，通过 Frodobots SDK 连接云端。这让你能够控制机器人并录制 dataset 以训练 AI 模型。
+
+## 你需要什么
+
+### 硬件
+
+- EarthRover Mini 机器人
+- 装有 Python 3.12 或更高版本的电脑
+- 互联网连接
+
+### 设置 Frodobots SDK
+
+机器人需要在你电脑上运行 [Frodobots SDK](https://github.com/frodobots-org/earth-rovers-sdk)。方法如下：
+
+1. 下载并安装 SDK：
+
+```bash
+git clone https://github.com/frodobots-org/earth-rovers-sdk.git
+cd earth-rovers-sdk
+pip install -r requirements.txt
+```
+
+2. 保存凭据：
+
+用 Frodobots 团队提供的 SDK API 密钥和机器人名称填写你的 .env 变量。
+
+```bash
+SDK_API_TOKEN=your_sdk_api_token_here
+BOT_SLUG=your_bot_slug_here
+CHROME_EXECUTABLE_PATH=/path/to/chrome_or_chromium
+# Default value is MAP_ZOOM_LEVEL=18 https://wiki.openstreetmap.org/wiki/Zoom_levels
+MAP_ZOOM_LEVEL=18
+MISSION_SLUG=your_mission_slug_here
+# Image quality between 0.1 and 1.0 (default: 0.8)
+# Recommended: 0.8 for better performance
+IMAGE_QUALITY=0.8
+# Image format: jpeg, png or webp (default: png)
+# Recommended: jpeg for better performance and lower bandwidth usage
+IMAGE_FORMAT=jpeg
+```
+
+3. 启动 SDK：
+
+```bash
+hypercorn main:app --reload
+```
+
+4. 打开网页浏览器并访问 `http://localhost:8000`，然后点击“Join”
+
+SDK 为你提供：
+
+- 前、后相机的实时视频
+
+> [!IMPORTANT]
+> SDK 必须处于运行状态，你才能使用机器人。
+
+## 安装 LeRobot
+
+按照我们的 [安装指南](./installation) 安装 LeRobot。
+
+在基础安装之外，请安装带硬件依赖的 EarthRover Mini：
+
+```bash
+pip install -e ".[hardware]"
+```
+
+## 工作原理
+
+机器人通过互联网进行通信：
+
+- **移动指令**：通过 SDK 发送
+- **相机视频**：从 SDK 接收
+- **机器人信息**：来自 SDK 的电量、位置、速度
+
+你无需插接任何东西——一切都通过 SDK 工作。
+
+## calibration
+
+无需 calibration！只要 SDK 运行，机器人即可直接使用。
+
+## 控制机器人
+
+你可以像用 WASD 键玩电子游戏一样，通过键盘控制机器人。
+
+### 键盘控制
+
+| 按键 | action                           |
+| --- | -------------------------------- |
+| W   | 向前移动                     |
+| S   | 向后移动                    |
+| A   | 左转（伴随前进运动）        |
+| D   | 右转（伴随前进运动）        |
+| Q   | 原地向左旋转               |
+| E   | 原地向右旋转               |
+| X   | 停止所有运动                |
+| +/= | 提高速度                   |
+| -   | 降低速度                   |
+| ESC | 断开连接                   |
+
+### 速度设置
+
+你可以调整机器人的移动速度：
+
+- **前进/后退速度**：默认为全速（1.0）
+- **转弯速度**：默认为全速（1.0）
+- **速度调整**：使用 +/- 键，每次调整 0.1
+
+### 试试看
+
+在录制数据之前先试驾一下机器人：
+
+```python
+from lerobot.robots.earthrover_mini_plus import EarthRoverMiniPlus, EarthRoverMiniPlusConfig
+from lerobot.teleoperators.keyboard import KeyboardRoverTeleop, KeyboardRoverTeleopConfig
+
+# Initialize robot
+robot_config = EarthRoverMiniPlusConfig()
+robot = EarthRoverMiniPlus(robot_config)
+
+# Initialize teleoperator
+teleop_config = KeyboardRoverTeleopConfig(
+    linear_speed=1.0,
+    angular_speed=1.0,
+    speed_increment=0.1
+)
+teleop = KeyboardRoverTeleop(teleop_config)
+
+# Connect
+robot.connect()
+teleop.connect()
+
+# Teleoperate (use keyboard controls)
+try:
+    while True:
+        action = teleop.get_action()
+        robot.send_action(action)
+except KeyboardInterrupt:
+    pass
+finally:
+    robot.disconnect()
+    teleop.disconnect()
+```
+
+> [!TIP]
+> 如果你使用的是 Mac，可能需要授予“终端”访问键盘的权限以进行 teleoperation。前往“系统偏好设置”>“安全性与隐私”>“输入监控”，并勾选“终端”。
+
+## 录制数据
+
+一旦你能熟练驾驶机器人，就可以开始录制数据来训练 AI 模型。系统会记录：
+
+- **你的操作**：你如何移动机器人（前进、后退、转弯）
+- **机器人看到的内容**：
+  - 两个相机的视频
+  - 机器人的速度和方向
+  - 电量水平和位置
+  - GPS 位置和信号
+  - 其他传感器数据
+- **发生时间**：所有数据的时间戳
+
+### 设置 Hugging Face
+
+我们使用 Hugging Face 在线上存储你的数据。首先，使用 [Hugging Face 设置](https://huggingface.co/settings/tokens) 中的 token 登录：
+
+```bash
+hf auth login --token ${HUGGINGFACE_TOKEN} --add-to-git-credential
+```
+
+保存你的 Hugging Face 用户名：
+
+```bash
+HF_USER=$(hf auth whoami | awk -F': *' 'NR==1 {print $2}')
+echo $HF_USER
+```
+
+### 开始录制
+
+使用标准录制命令：
+
+```bash
+lerobot-record \
+    --robot.type=earthrover_mini_plus \
+    --teleop.type=keyboard_rover \
+    --dataset.repo_id=your_username/dataset_name \
+    --dataset.num_episodes=2 \
+    --dataset.fps=10 \
+    --dataset.single_task="Navigate around obstacles" \
+    --dataset.streaming_encoding=true \
+    --dataset.encoder_threads=2 \
+    --display_data=true
+# Optional: --dataset.rgb_encoder.vcodec=auto
+```
+
+将 `your_username/dataset_name` 替换为你的 Hugging Face 用户名以及你的 dataset 名称。
+
+### 保存的内容
+
+你的 dataset 包含：
+
+**你的 action（2 个特征）**：
+
+- `linear_velocity`：你前进/后退了多少
+- `angular_velocity`：你左转/右转了多少
+
+**机器人 observation（24 个特征）**：
+
+- 前置相机视频
+- 后置相机视频
+- 当前速度
+- 电量水平
+- 朝向
+- GPS（纬度、经度、信号强度）
+- 网络信号强度
+- 振动水平
+- 车灯 state（开/关）
+- 加速度计（x, y, z）
+- 陀螺仪（x, y, z）
+- 磁力计（x, y, z）
+- 车轮转速（4 个车轮）
+
+### 你的数据去向
+
+在你电脑上：`~/.cache/huggingface/lerobot/{repo-id}`
+
+录制完成后，你的数据会自动上传到你的 Hugging Face 页面：
+
+```bash
+echo https://huggingface.co/datasets/${HF_USER}/earthrover-navigation
+```
+
+你的 dataset 将被打上 `LeRobot` 标签，便于社区发现。
+
+
+
+<EditOnGithub source="https://github.com/huggingface/lerobot/blob/main/docs/source/earthrover_mini_plus.mdx" />
+
+<!--HF DOCBUILD BODY END-->
+
+HF_DOC_BODY_END
+

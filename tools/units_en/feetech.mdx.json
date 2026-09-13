@@ -1,0 +1,378 @@
+{
+ "file": "feetech.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1955,
+   "text": "# Feetech Motor Firmware Update",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1957,
+   "end": 2066,
+   "text": "This tutorial guides you through updating the firmware of Feetech motors using the official Feetech software.",
+   "tokens": []
+  },
+  {
+   "id": 2,
+   "kind": "heading",
+   "start": 2068,
+   "end": 2084,
+   "text": "## Prerequisites",
+   "tokens": []
+  },
+  {
+   "id": 3,
+   "kind": "list",
+   "start": 2086,
+   "end": 2153,
+   "text": "- Windows computer (Feetech software is only available for Windows)",
+   "tokens": []
+  },
+  {
+   "id": 4,
+   "kind": "list",
+   "start": 2154,
+   "end": 2183,
+   "text": "- Feetech motor control board",
+   "tokens": []
+  },
+  {
+   "id": 5,
+   "kind": "list",
+   "start": 2184,
+   "end": 2241,
+   "text": "- USB cable to connect the control board to your computer",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "list",
+   "start": 2242,
+   "end": 2289,
+   "text": "- Feetech motors connected to the control board",
+   "tokens": []
+  },
+  {
+   "id": 7,
+   "kind": "heading",
+   "start": 2291,
+   "end": 2327,
+   "text": "## Step 1: Download Feetech Software",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "list",
+   "start": 2329,
+   "end": 2465,
+   "text": "1. Visit the official Feetech software download page: [⟦0⟧](⟦1⟧)",
+   "tokens": [
+    "https://www.feetechrc.com/software.html",
+    "https://www.feetechrc.com/software.html"
+   ]
+  },
+  {
+   "id": 9,
+   "kind": "list",
+   "start": 2466,
+   "end": 2535,
+   "text": "2. Download the latest version of the Feetech debugging software (FD)",
+   "tokens": []
+  },
+  {
+   "id": 10,
+   "kind": "list",
+   "start": 2536,
+   "end": 2584,
+   "text": "3. Install the software on your Windows computer",
+   "tokens": []
+  },
+  {
+   "id": 11,
+   "kind": "heading",
+   "start": 2586,
+   "end": 2611,
+   "text": "## Step 2: Hardware Setup",
+   "tokens": []
+  },
+  {
+   "id": 12,
+   "kind": "list",
+   "start": 2613,
+   "end": 2670,
+   "text": "1. Connect your Feetech motors to the motor control board",
+   "tokens": []
+  },
+  {
+   "id": 13,
+   "kind": "list",
+   "start": 2671,
+   "end": 2744,
+   "text": "2. Connect the motor control board to your Windows computer via USB cable",
+   "tokens": []
+  },
+  {
+   "id": 14,
+   "kind": "list",
+   "start": 2745,
+   "end": 2786,
+   "text": "3. Ensure power is supplied to the motors",
+   "tokens": []
+  },
+  {
+   "id": 15,
+   "kind": "heading",
+   "start": 2788,
+   "end": 2819,
+   "text": "## Step 3: Configure Connection",
+   "tokens": []
+  },
+  {
+   "id": 16,
+   "kind": "list",
+   "start": 2821,
+   "end": 2861,
+   "text": "1. Launch the Feetech debugging software",
+   "tokens": []
+  },
+  {
+   "id": 17,
+   "kind": "list",
+   "start": 2862,
+   "end": 2920,
+   "text": "2. Select the correct COM port from the port dropdown menu",
+   "tokens": []
+  },
+  {
+   "id": 18,
+   "kind": "list",
+   "start": 2921,
+   "end": 3009,
+   "text": "   - If unsure which port to use, check Windows Device Manager under \"Ports (COM & LPT)\"",
+   "tokens": []
+  },
+  {
+   "id": 19,
+   "kind": "list",
+   "start": 3010,
+   "end": 3086,
+   "text": "3. Set the appropriate baud rate (typically 1000000 for most Feetech motors)",
+   "tokens": []
+  },
+  {
+   "id": 20,
+   "kind": "list",
+   "start": 3087,
+   "end": 3152,
+   "text": "4. Click \"Open\" to establish communication with the control board",
+   "tokens": []
+  },
+  {
+   "id": 21,
+   "kind": "heading",
+   "start": 3154,
+   "end": 3180,
+   "text": "## Step 4: Scan for Motors",
+   "tokens": []
+  },
+  {
+   "id": 22,
+   "kind": "list",
+   "start": 3182,
+   "end": 3257,
+   "text": "1. Once connected, click the \"Search\" button to detect all connected motors",
+   "tokens": []
+  },
+  {
+   "id": 23,
+   "kind": "list",
+   "start": 3258,
+   "end": 3332,
+   "text": "2. The software will automatically discover and list all motors on the bus",
+   "tokens": []
+  },
+  {
+   "id": 24,
+   "kind": "list",
+   "start": 3333,
+   "end": 3377,
+   "text": "3. Each motor will appear with its ID number",
+   "tokens": []
+  },
+  {
+   "id": 25,
+   "kind": "heading",
+   "start": 3379,
+   "end": 3405,
+   "text": "## Step 5: Update Firmware",
+   "tokens": []
+  },
+  {
+   "id": 26,
+   "kind": "para",
+   "start": 3407,
+   "end": 3441,
+   "text": "For each motor you want to update:",
+   "tokens": []
+  },
+  {
+   "id": 27,
+   "kind": "list",
+   "start": 3443,
+   "end": 3498,
+   "text": "1. **Select the motor** from the list by clicking on it",
+   "tokens": []
+  },
+  {
+   "id": 28,
+   "kind": "list",
+   "start": 3499,
+   "end": 3528,
+   "text": "2. **Click the Upgrade tab**:",
+   "tokens": []
+  },
+  {
+   "id": 29,
+   "kind": "list",
+   "start": 3529,
+   "end": 3560,
+   "text": "3. **Click the Online button**:",
+   "tokens": []
+  },
+  {
+   "id": 30,
+   "kind": "list",
+   "start": 3561,
+   "end": 3638,
+   "text": "   - If a potential firmware update is found, it will be displayed in the box",
+   "tokens": []
+  },
+  {
+   "id": 31,
+   "kind": "list",
+   "start": 3639,
+   "end": 3671,
+   "text": "4. **Click the Upgrade button**:",
+   "tokens": []
+  },
+  {
+   "id": 32,
+   "kind": "list",
+   "start": 3672,
+   "end": 3714,
+   "text": "   - The update progress will be displayed",
+   "tokens": []
+  },
+  {
+   "id": 33,
+   "kind": "heading",
+   "start": 3716,
+   "end": 3740,
+   "text": "## Step 6: Verify Update",
+   "tokens": []
+  },
+  {
+   "id": 34,
+   "kind": "list",
+   "start": 3742,
+   "end": 3836,
+   "text": "1. After the update completes, the software should automatically refresh the motor information",
+   "tokens": []
+  },
+  {
+   "id": 35,
+   "kind": "list",
+   "start": 3837,
+   "end": 3913,
+   "text": "2. Verify that the firmware version has been updated to the expected version",
+   "tokens": []
+  },
+  {
+   "id": 36,
+   "kind": "heading",
+   "start": 3915,
+   "end": 3933,
+   "text": "## Important Notes",
+   "tokens": []
+  },
+  {
+   "id": 37,
+   "kind": "para",
+   "start": 3935,
+   "end": 4043,
+   "text": "⚠️ **Warning**: Do not disconnect power or USB during firmware updates, it will potentially brick the motor.",
+   "tokens": []
+  },
+  {
+   "id": 38,
+   "kind": "heading",
+   "start": 4045,
+   "end": 4085,
+   "text": "## Bonus: Motor Debugging on Linux/macOS",
+   "tokens": []
+  },
+  {
+   "id": 39,
+   "kind": "para",
+   "start": 4087,
+   "end": 4163,
+   "text": "For debugging purposes only, you can use the open-source Feetech Debug Tool:",
+   "tokens": []
+  },
+  {
+   "id": 40,
+   "kind": "list",
+   "start": 4165,
+   "end": 4286,
+   "text": "- **Repository**: [FT_SCServo_Debug_Qt](⟦0⟧)",
+   "tokens": [
+    "https://github.com/CarolinePascal/FT_SCServo_Debug_Qt/tree/fix/port-search-timer"
+   ]
+  },
+  {
+   "id": 41,
+   "kind": "heading",
+   "start": 4288,
+   "end": 4317,
+   "text": "### Installation Instructions",
+   "tokens": []
+  },
+  {
+   "id": 42,
+   "kind": "para",
+   "start": 4319,
+   "end": 4465,
+   "text": "Follow the instructions in the repository to install the tool, for Ubuntu you can directly install it, for MacOS you need to build it from source.",
+   "tokens": []
+  },
+  {
+   "id": 43,
+   "kind": "para",
+   "start": 4467,
+   "end": 4483,
+   "text": "**Limitations:**",
+   "tokens": []
+  },
+  {
+   "id": 44,
+   "kind": "list",
+   "start": 4485,
+   "end": 4543,
+   "text": "- This tool is for debugging and parameter adjustment only",
+   "tokens": []
+  },
+  {
+   "id": 45,
+   "kind": "list",
+   "start": 4544,
+   "end": 4623,
+   "text": "- Firmware updates must still be done on Windows with official Feetech software",
+   "tokens": []
+  }
+ ]
+}

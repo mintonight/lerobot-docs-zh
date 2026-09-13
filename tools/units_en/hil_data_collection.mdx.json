@@ -1,0 +1,778 @@
+{
+ "file": "hil_data_collection.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1959,
+   "text": "# Human-In-the-Loop Data Collection",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1961,
+   "end": 2312,
+   "text": "Human-In-the-Loop (HIL) data collection lets you improve a trained policy by deploying it on a real robot while a human operator monitors and intervenes when needed. The intervention data (recovery movements and corrections) is recorded alongside autonomous segments, producing a richer training dataset that teaches the policy how to handle failures.",
+   "tokens": []
+  },
+  {
+   "id": 2,
+   "kind": "heading",
+   "start": 2319,
+   "end": 2344,
+   "text": "## Why Human-In-the-Loop?",
+   "tokens": []
+  },
+  {
+   "id": 3,
+   "kind": "para",
+   "start": 2346,
+   "end": 2588,
+   "text": "Standard behavioral cloning trains policies on successful demonstrations only. During deployment, small errors can compound and push the robot into states never seen during training (distribution shift). HIL data collection addresses this by:",
+   "tokens": []
+  },
+  {
+   "id": 4,
+   "kind": "list",
+   "start": 2590,
+   "end": 2636,
+   "text": "- Running the trained policy on the real robot",
+   "tokens": []
+  },
+  {
+   "id": 5,
+   "kind": "list",
+   "start": 2637,
+   "end": 2695,
+   "text": "- Having a human intervene when the robot is about to fail",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "list",
+   "start": 2696,
+   "end": 2760,
+   "text": "- Recording the human's recovery and correction as training data",
+   "tokens": []
+  },
+  {
+   "id": 7,
+   "kind": "list",
+   "start": 2761,
+   "end": 2809,
+   "text": "- Fine-tuning the policy on the combined dataset",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "para",
+   "start": 2811,
+   "end": 2924,
+   "text": "This produces a policy that not only knows how to perform the task, but also how to recover when things go wrong.",
+   "tokens": []
+  },
+  {
+   "id": 9,
+   "kind": "heading",
+   "start": 2931,
+   "end": 2946,
+   "text": "## How It Works",
+   "tokens": []
+  },
+  {
+   "id": 10,
+   "kind": "para",
+   "start": 2948,
+   "end": 3027,
+   "text": "During a HIL session, the human operator follows this loop within each episode:",
+   "tokens": []
+  },
+  {
+   "id": 11,
+   "kind": "list",
+   "start": 3029,
+   "end": 3069,
+   "text": "1. **Watch** the policy run autonomously",
+   "tokens": []
+  },
+  {
+   "id": 12,
+   "kind": "list",
+   "start": 3070,
+   "end": 3137,
+   "text": "2. **Pause** when failure is imminent, the robot holds its position",
+   "tokens": []
+  },
+  {
+   "id": 13,
+   "kind": "list",
+   "start": 3138,
+   "end": 3242,
+   "text": "3. **Take control** and teleoperate the robot back to a good state (recovery), then correct the behavior",
+   "tokens": []
+  },
+  {
+   "id": 14,
+   "kind": "list",
+   "start": 3243,
+   "end": 3319,
+   "text": "4. **Return control to the policy**, the policy resumes autonomous execution",
+   "tokens": []
+  },
+  {
+   "id": 15,
+   "kind": "list",
+   "start": 3320,
+   "end": 3382,
+   "text": "5. Repeat steps 2–4 as many times as needed during the episode",
+   "tokens": []
+  },
+  {
+   "id": 16,
+   "kind": "list",
+   "start": 3383,
+   "end": 3469,
+   "text": "6. **End the episode** when the task is complete, save and move on to the next rollout",
+   "tokens": []
+  },
+  {
+   "id": 17,
+   "kind": "para",
+   "start": 3471,
+   "end": 3937,
+   "text": "Both autonomous and human-controlled segments are recorded. The policy and human can alternate control multiple times within a single episode, and the episode continues from the current state after each handoff (no reset required just because intervention happened). This captures autonomous execution, recovery, and correction in one continuous trajectory. After collection, the combined dataset (original demonstrations + HIL data) is used to fine-tune the policy.",
+   "tokens": []
+  },
+  {
+   "id": 18,
+   "kind": "para",
+   "start": 3939,
+   "end": 4071,
+   "text": "This process can be repeated iteratively: deploy, collect, fine-tune, repeat. Each round targets the current policy's failure modes.",
+   "tokens": []
+  },
+  {
+   "id": 19,
+   "kind": "heading",
+   "start": 4771,
+   "end": 4795,
+   "text": "## Hardware Requirements",
+   "tokens": []
+  },
+  {
+   "id": 20,
+   "kind": "heading",
+   "start": 4797,
+   "end": 4826,
+   "text": "### Teleoperator Requirements",
+   "tokens": []
+  },
+  {
+   "id": 21,
+   "kind": "para",
+   "start": 4828,
+   "end": 4933,
+   "text": "The ⟦0⟧ mode requires **teleoperators with active motors** that can:",
+   "tokens": [
+    "`lerobot-rollout --strategy.type=dagger`"
+   ]
+  },
+  {
+   "id": 22,
+   "kind": "list",
+   "start": 4935,
+   "end": 4975,
+   "text": "- Enable/disable torque programmatically",
+   "tokens": []
+  },
+  {
+   "id": 23,
+   "kind": "list",
+   "start": 4976,
+   "end": 5043,
+   "text": "- Move to target positions (to mirror the robot state when pausing)",
+   "tokens": []
+  },
+  {
+   "id": 24,
+   "kind": "para",
+   "start": 5045,
+   "end": 5074,
+   "text": "**Compatible teleoperators:**",
+   "tokens": []
+  },
+  {
+   "id": 25,
+   "kind": "list",
+   "start": 5076,
+   "end": 5119,
+   "text": "- ⟦0⟧ - Bimanual OpenArm Mini",
+   "tokens": [
+    "`bi_openarm_mini`"
+   ]
+  },
+  {
+   "id": 26,
+   "kind": "list",
+   "start": 5120,
+   "end": 5160,
+   "text": "- ⟦0⟧ - SO100 / SO101 leader arm",
+   "tokens": [
+    "`so_leader`"
+   ]
+  },
+  {
+   "id": 27,
+   "kind": "list",
+   "start": 5161,
+   "end": 5214,
+   "text": "- ⟦0⟧ - Bimanual SO100 / SO101 leader arms",
+   "tokens": [
+    "`bi_so_leader`"
+   ]
+  },
+  {
+   "id": 28,
+   "kind": "quote",
+   "start": 5216,
+   "end": 5397,
+   "text": "> [!IMPORTANT]\n> The provided commands default to ⟦0⟧ + ⟦1⟧.\n> ⟦2⟧ + ⟦3⟧ configs are also registered and can be used via CLI flags.",
+   "tokens": [
+    "`bi_openarm_follower`",
+    "`bi_openarm_mini`",
+    "`so_follower`",
+    "`so_leader`"
+   ]
+  },
+  {
+   "id": 29,
+   "kind": "heading",
+   "start": 5404,
+   "end": 5413,
+   "text": "## Script",
+   "tokens": []
+  },
+  {
+   "id": 30,
+   "kind": "para",
+   "start": 5415,
+   "end": 5554,
+   "text": "Use ⟦0⟧ with ⟦1⟧ for HIL data collection. Select the inference backend with ⟦2⟧:",
+   "tokens": [
+    "`lerobot-rollout`",
+    "`--strategy.type=dagger`",
+    "`--inference.type=sync|rtc`"
+   ]
+  },
+  {
+   "id": 31,
+   "kind": "table",
+   "start": 5556,
+   "end": 5633,
+   "text": "| Mode                     | Flag                   | Models                |",
+   "tokens": []
+  },
+  {
+   "id": 32,
+   "kind": "table",
+   "start": 5712,
+   "end": 5789,
+   "text": "| Standard (default)       | _(no flag needed)_     | ACT, Diffusion Policy |",
+   "tokens": []
+  },
+  {
+   "id": 33,
+   "kind": "table",
+   "start": 5790,
+   "end": 5867,
+   "text": "| Real-Time Chunking (RTC) | ⟦0⟧ | Pi0, Pi0.5, SmolVLA   |",
+   "tokens": [
+    "`--inference.type=rtc`"
+   ]
+  },
+  {
+   "id": 34,
+   "kind": "heading",
+   "start": 5874,
+   "end": 5895,
+   "text": "## Step-by-Step Guide",
+   "tokens": []
+  },
+  {
+   "id": 35,
+   "kind": "heading",
+   "start": 5897,
+   "end": 5932,
+   "text": "### Step 1: Pre-train a Base Policy",
+   "tokens": []
+  },
+  {
+   "id": 36,
+   "kind": "para",
+   "start": 5934,
+   "end": 5986,
+   "text": "First, train a policy on your demonstration dataset:",
+   "tokens": []
+  },
+  {
+   "id": 37,
+   "kind": "heading",
+   "start": 6198,
+   "end": 6226,
+   "text": "### Step 2: Collect HIL Data",
+   "tokens": []
+  },
+  {
+   "id": 38,
+   "kind": "para",
+   "start": 6228,
+   "end": 6275,
+   "text": "**Standard inference (ACT, Diffusion Policy):**",
+   "tokens": []
+  },
+  {
+   "id": 39,
+   "kind": "para",
+   "start": 7240,
+   "end": 7482,
+   "text": "With ⟦0⟧, the robot receives ⟦1⟧ interpolated commands per policy action (control runs at ⟦2⟧ Hz) while policy inference and dataset recording stay at ⟦3⟧, so the recorded dataset matches its declared FPS.",
+   "tokens": [
+    "`--interpolation_multiplier=N`",
+    "`N`",
+    "`fps × N`",
+    "`--fps`"
+   ]
+  },
+  {
+   "id": 40,
+   "kind": "para",
+   "start": 7484,
+   "end": 7536,
+   "text": "**With RTC for large models (Pi0, Pi0.5, SmolVLA):**",
+   "tokens": []
+  },
+  {
+   "id": 41,
+   "kind": "para",
+   "start": 7538,
+   "end": 7610,
+   "text": "For models with high inference latency, enable RTC for smooth execution:",
+   "tokens": []
+  },
+  {
+   "id": 42,
+   "kind": "para",
+   "start": 8750,
+   "end": 8776,
+   "text": "**Controls (Conceptual):**",
+   "tokens": []
+  },
+  {
+   "id": 43,
+   "kind": "para",
+   "start": 8778,
+   "end": 8803,
+   "text": "The interaction model is:",
+   "tokens": []
+  },
+  {
+   "id": 44,
+   "kind": "list",
+   "start": 8805,
+   "end": 8857,
+   "text": "- **Pause input**: pause autonomous policy execution",
+   "tokens": []
+  },
+  {
+   "id": 45,
+   "kind": "list",
+   "start": 8858,
+   "end": 8947,
+   "text": "- **Takeover input**: transfer control to the human operator and record intervention data",
+   "tokens": []
+  },
+  {
+   "id": 46,
+   "kind": "list",
+   "start": 8948,
+   "end": 9039,
+   "text": "- **Return-to-policy input**: hand control back to the policy and continue the same episode",
+   "tokens": []
+  },
+  {
+   "id": 47,
+   "kind": "list",
+   "start": 9040,
+   "end": 9105,
+   "text": "- **Episode control inputs**: save/re-record/stop/reset as needed",
+   "tokens": []
+  },
+  {
+   "id": 48,
+   "kind": "para",
+   "start": 9107,
+   "end": 9282,
+   "text": "Exact key/pedal bindings can differ across scripts and hardware integrations. Use each script's printed controls as the source of truth for the concrete mapping on your setup.",
+   "tokens": []
+  },
+  {
+   "id": 49,
+   "kind": "para",
+   "start": 9284,
+   "end": 9305,
+   "text": "**The HIL Protocol:**",
+   "tokens": []
+  },
+  {
+   "id": 50,
+   "kind": "list",
+   "start": 9307,
+   "end": 9365,
+   "text": "1. Watch the policy run autonomously (teleop is idle/free)",
+   "tokens": []
+  },
+  {
+   "id": 51,
+   "kind": "list",
+   "start": 9366,
+   "end": 9427,
+   "text": "2. When you see imminent failure, trigger the **pause input**",
+   "tokens": []
+  },
+  {
+   "id": 52,
+   "kind": "list",
+   "start": 9428,
+   "end": 9445,
+   "text": "   - Policy stops",
+   "tokens": []
+  },
+  {
+   "id": 53,
+   "kind": "list",
+   "start": 9446,
+   "end": 9510,
+   "text": "   - Teleoperator moves to match robot position (torque enabled)",
+   "tokens": []
+  },
+  {
+   "id": 54,
+   "kind": "list",
+   "start": 9511,
+   "end": 9547,
+   "text": "   - No frames recorded during pause",
+   "tokens": []
+  },
+  {
+   "id": 55,
+   "kind": "list",
+   "start": 9548,
+   "end": 9597,
+   "text": "3. Trigger the **takeover input** to take control",
+   "tokens": []
+  },
+  {
+   "id": 56,
+   "kind": "list",
+   "start": 9598,
+   "end": 9645,
+   "text": "   - Teleoperator torque disabled, free to move",
+   "tokens": []
+  },
+  {
+   "id": 57,
+   "kind": "list",
+   "start": 9646,
+   "end": 9707,
+   "text": "   - **Recovery**: Teleoperate the robot back to a good state",
+   "tokens": []
+  },
+  {
+   "id": 58,
+   "kind": "list",
+   "start": 9708,
+   "end": 9749,
+   "text": "   - **Correction**: Correct the behavior",
+   "tokens": []
+  },
+  {
+   "id": 59,
+   "kind": "list",
+   "start": 9750,
+   "end": 9781,
+   "text": "   - All movements are recorded",
+   "tokens": []
+  },
+  {
+   "id": 60,
+   "kind": "list",
+   "start": 9782,
+   "end": 9823,
+   "text": "4. Trigger the **return-to-policy input**",
+   "tokens": []
+  },
+  {
+   "id": 61,
+   "kind": "list",
+   "start": 9824,
+   "end": 9887,
+   "text": "   - Policy resumes autonomous execution from the current state",
+   "tokens": []
+  },
+  {
+   "id": 62,
+   "kind": "list",
+   "start": 9888,
+   "end": 9947,
+   "text": "   - You can intervene again at any time (repeat steps 2–4)",
+   "tokens": []
+  },
+  {
+   "id": 63,
+   "kind": "list",
+   "start": 9948,
+   "end": 10036,
+   "text": "5. End and save the episode when the task is complete (or episode time limit is reached)",
+   "tokens": []
+  },
+  {
+   "id": 64,
+   "kind": "list",
+   "start": 10037,
+   "end": 10130,
+   "text": "6. **Reset**: Teleop moves to robot position, you can move the robot to the starting position",
+   "tokens": []
+  },
+  {
+   "id": 65,
+   "kind": "list",
+   "start": 10131,
+   "end": 10156,
+   "text": "7. Start the next episode",
+   "tokens": []
+  },
+  {
+   "id": 66,
+   "kind": "para",
+   "start": 10158,
+   "end": 10187,
+   "text": "**Foot Pedal Setup (Linux):**",
+   "tokens": []
+  },
+  {
+   "id": 67,
+   "kind": "para",
+   "start": 10189,
+   "end": 10252,
+   "text": "If using a USB foot pedal (PCsensor FootSwitch), ensure access:",
+   "tokens": []
+  },
+  {
+   "id": 68,
+   "kind": "heading",
+   "start": 10345,
+   "end": 10377,
+   "text": "### Step 3: Fine-tune the Policy",
+   "tokens": []
+  },
+  {
+   "id": 69,
+   "kind": "para",
+   "start": 10379,
+   "end": 10466,
+   "text": "Fine-tune on the **combined** dataset (⟦0⟧ + ⟦1⟧ merged together):",
+   "tokens": [
+    "`demo-dataset`",
+    "`hil-dataset`"
+   ]
+  },
+  {
+   "id": 70,
+   "kind": "para",
+   "start": 10741,
+   "end": 10836,
+   "text": "Then deploy the fine-tuned policy and repeat from Step 2 to target its remaining failure modes.",
+   "tokens": []
+  },
+  {
+   "id": 71,
+   "kind": "heading",
+   "start": 10843,
+   "end": 10879,
+   "text": "## Tips for Effective HIL Collection",
+   "tokens": []
+  },
+  {
+   "id": 72,
+   "kind": "heading",
+   "start": 10881,
+   "end": 10902,
+   "text": "### When to Intervene",
+   "tokens": []
+  },
+  {
+   "id": 73,
+   "kind": "para",
+   "start": 10904,
+   "end": 10927,
+   "text": "Intervene when you see:",
+   "tokens": []
+  },
+  {
+   "id": 74,
+   "kind": "list",
+   "start": 10929,
+   "end": 10974,
+   "text": "- Robot about to make an irreversible mistake",
+   "tokens": []
+  },
+  {
+   "id": 75,
+   "kind": "list",
+   "start": 10975,
+   "end": 11023,
+   "text": "- Robot hesitating or showing uncertain behavior",
+   "tokens": []
+  },
+  {
+   "id": 76,
+   "kind": "list",
+   "start": 11024,
+   "end": 11070,
+   "text": "- Robot deviating from the expected trajectory",
+   "tokens": []
+  },
+  {
+   "id": 77,
+   "kind": "heading",
+   "start": 11072,
+   "end": 11120,
+   "text": "### Recovery: Teleoperating Back to a Good State",
+   "tokens": []
+  },
+  {
+   "id": 78,
+   "kind": "para",
+   "start": 11122,
+   "end": 11183,
+   "text": "During recovery, teleoperate the robot back to a state where:",
+   "tokens": []
+  },
+  {
+   "id": 79,
+   "kind": "list",
+   "start": 11185,
+   "end": 11244,
+   "text": "- The robot is in a familiar, in-distribution configuration",
+   "tokens": []
+  },
+  {
+   "id": 80,
+   "kind": "list",
+   "start": 11245,
+   "end": 11289,
+   "text": "- The current subtask can still be completed",
+   "tokens": []
+  },
+  {
+   "id": 81,
+   "kind": "list",
+   "start": 11290,
+   "end": 11351,
+   "text": "- The recovery trajectory itself is informative training data",
+   "tokens": []
+  },
+  {
+   "id": 82,
+   "kind": "heading",
+   "start": 11353,
+   "end": 11379,
+   "text": "### Quality of Corrections",
+   "tokens": []
+  },
+  {
+   "id": 83,
+   "kind": "para",
+   "start": 11381,
+   "end": 11399,
+   "text": "During correction:",
+   "tokens": []
+  },
+  {
+   "id": 84,
+   "kind": "list",
+   "start": 11401,
+   "end": 11444,
+   "text": "- Provide **confident, clean** trajectories",
+   "tokens": []
+  },
+  {
+   "id": 85,
+   "kind": "list",
+   "start": 11445,
+   "end": 11481,
+   "text": "- Complete the current subtask fully",
+   "tokens": []
+  },
+  {
+   "id": 86,
+   "kind": "list",
+   "start": 11482,
+   "end": 11530,
+   "text": "- Don't overcorrect or add unnecessary movements",
+   "tokens": []
+  },
+  {
+   "id": 87,
+   "kind": "heading",
+   "start": 11537,
+   "end": 11552,
+   "text": "## Related Work",
+   "tokens": []
+  },
+  {
+   "id": 88,
+   "kind": "para",
+   "start": 11554,
+   "end": 11640,
+   "text": "This HIL data collection approach builds on ideas from interactive imitation learning:",
+   "tokens": []
+  },
+  {
+   "id": 89,
+   "kind": "list",
+   "start": 11642,
+   "end": 11929,
+   "text": "- **DAgger** (Ross et al., 2011) introduced the core idea: instead of only training on expert demonstrations, query the expert for corrections on states the _learner_ visits. This breaks the compounding-error cycle of standard behavioral cloning by iteratively collecting on-policy data.",
+   "tokens": []
+  },
+  {
+   "id": 90,
+   "kind": "list",
+   "start": 11931,
+   "end": 12232,
+   "text": "- **HG-DAgger** (Kelly et al., 2019) made this practical for robotics: a human expert monitors the robot and only intervenes when needed, rather than labeling every state. The gating between autonomous and human control is exactly the pause → takeover → return-to-policy loop used in the scripts here.",
+   "tokens": []
+  },
+  {
+   "id": 91,
+   "kind": "list",
+   "start": 12234,
+   "end": 12550,
+   "text": "- **RaC** (Hu et al., 2025) scales this loop to long-horizon tasks by explicitly decomposing interventions into **recovery** (teleoperating back to a good state) and **correction** (demonstrating the right behavior from there). This decomposition is the protocol followed by the DAgger strategy in ⟦0⟧.",
+   "tokens": [
+    "`lerobot-rollout`"
+   ]
+  },
+  {
+   "id": 92,
+   "kind": "list",
+   "start": 12552,
+   "end": 12832,
+   "text": "- **π0.6/RECAP** (Physical Intelligence, 2025) applies the same iterative collect-and-finetune loop at scale with VLA models, showing that even large pretrained policies benefit substantially from targeted human corrections on their own failure modes. π0.6 is trained using RECAP.",
+   "tokens": []
+  }
+ ]
+}

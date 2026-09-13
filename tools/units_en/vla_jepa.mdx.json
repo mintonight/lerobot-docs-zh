@@ -1,0 +1,898 @@
+{
+ "file": "vla_jepa.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1934,
+   "text": "# VLA-JEPA",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1936,
+   "end": 2139,
+   "text": "This is the LeRobot port of **VLA-JEPA**, a Vision-Language-Action model that combines a Qwen3-VL language backbone with a self-supervised video world model (V-JEPA2) and a flow-matching DiT action head.",
+   "tokens": []
+  },
+  {
+   "id": 2,
+   "kind": "heading",
+   "start": 2146,
+   "end": 2170,
+   "text": "## Architecture Overview",
+   "tokens": []
+  },
+  {
+   "id": 3,
+   "kind": "para",
+   "start": 2172,
+   "end": 2207,
+   "text": "VLA-JEPA has three main components:",
+   "tokens": []
+  },
+  {
+   "id": 4,
+   "kind": "table",
+   "start": 2209,
+   "end": 2330,
+   "text": "| Component               | Module                            | Role                                                    |",
+   "tokens": []
+  },
+  {
+   "id": 5,
+   "kind": "table",
+   "start": 2453,
+   "end": 2574,
+   "text": "| **Qwen3-VL backbone**   | ⟦0⟧                | Fuses images + language instruction into context tokens |",
+   "tokens": [
+    "`Qwen3VLInterface`"
+   ]
+  },
+  {
+   "id": 6,
+   "kind": "table",
+   "start": 2575,
+   "end": 2696,
+   "text": "| **DiT-B action head**   | ⟦0⟧               | Flow-matching diffusion over the action chunk           |",
+   "tokens": [
+    "`VLAJEPAActionHead`"
+   ]
+  },
+  {
+   "id": 7,
+   "kind": "table",
+   "start": 2697,
+   "end": 2818,
+   "text": "| **V-JEPA2 world model** | ⟦0⟧ | Self-supervised video prediction loss (training only)   |",
+   "tokens": [
+    "`ActionConditionedVideoPredictor`"
+   ]
+  },
+  {
+   "id": 8,
+   "kind": "heading",
+   "start": 2820,
+   "end": 2833,
+   "text": "### Data flow",
+   "tokens": []
+  },
+  {
+   "id": 9,
+   "kind": "para",
+   "start": 2835,
+   "end": 2848,
+   "text": "**Training:**",
+   "tokens": []
+  },
+  {
+   "id": 10,
+   "kind": "list",
+   "start": 2850,
+   "end": 2945,
+   "text": "1. A video clip of ⟦0⟧ frames is encoded by V-JEPA2 into per-frame patch tokens.",
+   "tokens": [
+    "`num_video_frames`"
+   ]
+  },
+  {
+   "id": 11,
+   "kind": "list",
+   "start": 2946,
+   "end": 3151,
+   "text": "2. The Qwen3-VL backbone processes multi-view images + the task instruction and produces a sequence of context tokens that includes special action tokens (for world model conditioning) and embodied tokens.",
+   "tokens": []
+  },
+  {
+   "id": 12,
+   "kind": "list",
+   "start": 3152,
+   "end": 3287,
+   "text": "3. The action head receives those context tokens as cross-attention keys/values and predicts a denoised action chunk via flow matching.",
+   "tokens": []
+  },
+  {
+   "id": 13,
+   "kind": "list",
+   "start": 3288,
+   "end": 3471,
+   "text": "4. The world model predictor uses the action tokens extracted from Qwen to predict future V-JEPA2 frame embeddings; a regression loss on those predictions is added to the action loss.",
+   "tokens": []
+  },
+  {
+   "id": 14,
+   "kind": "para",
+   "start": 3473,
+   "end": 3574,
+   "text": "**Inference:**\nOnly Qwen + the action head are used. The world model is not needed at inference time.",
+   "tokens": []
+  },
+  {
+   "id": 15,
+   "kind": "heading",
+   "start": 3576,
+   "end": 3599,
+   "text": "### Action head details",
+   "tokens": []
+  },
+  {
+   "id": 16,
+   "kind": "para",
+   "start": 3601,
+   "end": 3643,
+   "text": "Available presets via ⟦0⟧:",
+   "tokens": [
+    "`action_model_type`"
+   ]
+  },
+  {
+   "id": 17,
+   "kind": "table",
+   "start": 3645,
+   "end": 3675,
+   "text": "| Preset  | Heads | Head dim |",
+   "tokens": []
+  },
+  {
+   "id": 18,
+   "kind": "para",
+   "start": 3770,
+   "end": 3927,
+   "text": "The preset only sets the attention geometry, and each entry can be overridden by\n⟦0⟧ / ⟦1⟧. Two widths follow from it:",
+   "tokens": [
+    "`action_num_heads`",
+    "`action_attention_head_dim`"
+   ]
+  },
+  {
+   "id": 19,
+   "kind": "list",
+   "start": 3929,
+   "end": 4032,
+   "text": "- the DiT's **internal** width is ⟦0⟧ (768 for ⟦1⟧), derived rather than configured;",
+   "tokens": [
+    "`heads x head_dim`",
+    "`DiT-B`"
+   ]
+  },
+  {
+   "id": 20,
+   "kind": "list",
+   "start": 4033,
+   "end": 4164,
+   "text": "- the DiT's **output** width, and the width of the action-decoder and state-encoder MLPs, is\n  ⟦0⟧ (default 1024).",
+   "tokens": [
+    "`action_hidden_size`"
+   ]
+  },
+  {
+   "id": 21,
+   "kind": "para",
+   "start": 4166,
+   "end": 4252,
+   "text": "So ⟦0⟧ runs a 768-wide transformer that projects to 1024. The two are independent.",
+   "tokens": [
+    "`DiT-B`"
+   ]
+  },
+  {
+   "id": 22,
+   "kind": "heading",
+   "start": 4254,
+   "end": 4277,
+   "text": "### World model details",
+   "tokens": []
+  },
+  {
+   "id": 23,
+   "kind": "para",
+   "start": 4279,
+   "end": 4373,
+   "text": "The video predictor is a ViT-style transformer (⟦0⟧) that takes:",
+   "tokens": [
+    "`ActionConditionedVideoPredictor`"
+   ]
+  },
+  {
+   "id": 24,
+   "kind": "list",
+   "start": 4375,
+   "end": 4454,
+   "text": "- **Frame tokens**: V-JEPA2 patch embeddings projected to ⟦0⟧",
+   "tokens": [
+    "`predictor_embed_dim`"
+   ]
+  },
+  {
+   "id": 25,
+   "kind": "list",
+   "start": 4455,
+   "end": 4539,
+   "text": "- **Action tokens**: Qwen action token embeddings projected to ⟦0⟧",
+   "tokens": [
+    "`predictor_embed_dim`"
+   ]
+  },
+  {
+   "id": 26,
+   "kind": "para",
+   "start": 4541,
+   "end": 4769,
+   "text": "It uses block-causal attention so each temporal step can attend to all previous steps. The predictor's input ⟦0⟧ equals ⟦1⟧ (e.g. 2 views × 1024 = 2048 for the pretrained checkpoints).",
+   "tokens": [
+    "`embed_dim`",
+    "`num_views × video_encoder_hidden_size`"
+   ]
+  },
+  {
+   "id": 27,
+   "kind": "heading",
+   "start": 4776,
+   "end": 4801,
+   "text": "## Pretrained Checkpoints",
+   "tokens": []
+  },
+  {
+   "id": 28,
+   "kind": "para",
+   "start": 4803,
+   "end": 5023,
+   "text": "Three checkpoints are available directly inside the LeRobot org here: [⟦0⟧](⟦1⟧), converted from [ginwind/VLA-JEPA](⟦2⟧):",
+   "tokens": [
+    "`lerobot/VLA-JEPA`",
+    "https://huggingface.co/collections/lerobot/vla-jepa",
+    "https://huggingface.co/ginwind/VLA-JEPA"
+   ]
+  },
+  {
+   "id": 29,
+   "kind": "table",
+   "start": 5025,
+   "end": 5131,
+   "text": "| Checkpoint                    | Dataset           | Cameras                 | World model | Action dim |",
+   "tokens": []
+  },
+  {
+   "id": 30,
+   "kind": "table",
+   "start": 5239,
+   "end": 5345,
+   "text": "| ⟦0⟧     | LIBERO-10         | 2 (agentview + wrist)   | Enabled     | 7          |",
+   "tokens": [
+    "`lerobot/VLA-JEPA-LIBERO`"
+   ]
+  },
+  {
+   "id": 31,
+   "kind": "table",
+   "start": 5346,
+   "end": 5452,
+   "text": "| ⟦0⟧   | DROID 1.0.1       | 2 (exterior left views) | Enabled     | 7          |",
+   "tokens": [
+    "`lerobot/VLA-JEPA-Pretrain`"
+   ]
+  },
+  {
+   "id": 32,
+   "kind": "table",
+   "start": 5453,
+   "end": 5559,
+   "text": "| ⟦0⟧ | OXE Bridge / RT-1 | 1 (view duplicated ×2)  | Enabled     | 7          |",
+   "tokens": [
+    "`lerobot/VLA-JEPA-SimplerEnv`"
+   ]
+  },
+  {
+   "id": 33,
+   "kind": "para",
+   "start": 5561,
+   "end": 5634,
+   "text": "All checkpoints use ⟦0⟧ as the language backbone.",
+   "tokens": [
+    "`Qwen/Qwen3-VL-2B-Instruct`"
+   ]
+  },
+  {
+   "id": 34,
+   "kind": "heading",
+   "start": 5641,
+   "end": 5657,
+   "text": "## Configuration",
+   "tokens": []
+  },
+  {
+   "id": 35,
+   "kind": "para",
+   "start": 5659,
+   "end": 5693,
+   "text": "Key parameters in ⟦0⟧:",
+   "tokens": [
+    "`VLAJEPAConfig`"
+   ]
+  },
+  {
+   "id": 36,
+   "kind": "table",
+   "start": 5695,
+   "end": 5996,
+   "text": "| Parameter                    | Default       | Description                                                                                                                                                                                                                                                |",
+   "tokens": []
+  },
+  {
+   "id": 37,
+   "kind": "table",
+   "start": 6299,
+   "end": 6600,
+   "text": "| ⟦0⟧                 | 7             | Number of actions predicted per inference call                                                                                                                                                                                                             |",
+   "tokens": [
+    "`chunk_size`"
+   ]
+  },
+  {
+   "id": 38,
+   "kind": "table",
+   "start": 6601,
+   "end": 6902,
+   "text": "| ⟦0⟧             | 7             | Steps executed from the predicted chunk before re-planning                                                                                                                                                                                                 |",
+   "tokens": [
+    "`n_action_steps`"
+   ]
+  },
+  {
+   "id": 39,
+   "kind": "table",
+   "start": 6903,
+   "end": 7204,
+   "text": "| ⟦0⟧           | 8             | Video clip length fed to the world model                                                                                                                                                                                                                   |",
+   "tokens": [
+    "`num_video_frames`"
+   ]
+  },
+  {
+   "id": 40,
+   "kind": "table",
+   "start": 7205,
+   "end": 7506,
+   "text": "| ⟦0⟧         | ⟦1⟧        | Whether to load and train the V-JEPA2 predictor                                                                                                                                                                                                            |",
+   "tokens": [
+    "`enable_world_model`",
+    "`True`"
+   ]
+  },
+  {
+   "id": 41,
+   "kind": "table",
+   "start": 7507,
+   "end": 7808,
+   "text": "| ⟦0⟧    | 0.1           | Weight of the JEPA prediction loss relative to the action loss                                                                                                                                                                                             |",
+   "tokens": [
+    "`world_model_loss_weight`"
+   ]
+  },
+  {
+   "id": 42,
+   "kind": "table",
+   "start": 7809,
+   "end": 8110,
+   "text": "| ⟦0⟧ | ⟦1⟧       | Encode the world-model context causally (one prefix-only V-JEPA2 pass per context position) so bidirectional attention can't leak future frames into the predictor input. Costs ⟦2⟧ extra encoder calls                                            |",
+   "tokens": [
+    "`causal_world_model_context`",
+    "`False`",
+    "`t_enc_ctx`"
+   ]
+  },
+  {
+   "id": 43,
+   "kind": "table",
+   "start": 8111,
+   "end": 8412,
+   "text": "| ⟦0⟧    | 4             | Euler integration steps for action denoising                                                                                                                                                                                                               |",
+   "tokens": [
+    "`num_inference_timesteps`"
+   ]
+  },
+  {
+   "id": 44,
+   "kind": "table",
+   "start": 8413,
+   "end": 8714,
+   "text": "| ⟦0⟧                | ⟦1⟧       | Freeze the Qwen3-VL backbone and only train the action head                                                                                                                                                                                                |",
+   "tokens": [
+    "`freeze_qwen`",
+    "`False`"
+   ]
+  },
+  {
+   "id": 45,
+   "kind": "table",
+   "start": 8715,
+   "end": 9016,
+   "text": "| ⟦0⟧             | ⟦1⟧        | Key prefixes allowed to be randomly re-initialised on load (for cross-embodiment transfer, see [Fine-tuning on a different embodiment](⟦2⟧))                                                                            |",
+   "tokens": [
+    "`reinit_modules`",
+    "`None`",
+    "#fine-tuning-on-a-different-embodiment"
+   ]
+  },
+  {
+   "id": 46,
+   "kind": "table",
+   "start": 9017,
+   "end": 9318,
+   "text": "| ⟦0⟧           | ⟦1⟧        | ⟦2⟧ every camera frame is resized to before the Qwen3-VL vision tower. ⟦3⟧ keeps the native resolution, and Qwen3-VL's patch count grows with it, so a 720x1280 camera can exhaust GPU memory. The published checkpoints use ⟦4⟧ |",
+   "tokens": [
+    "`resize_images_to`",
+    "`None`",
+    "`(height, width)`",
+    "`None`",
+    "`[224, 224]`"
+   ]
+  },
+  {
+   "id": 47,
+   "kind": "table",
+   "start": 9319,
+   "end": 9620,
+   "text": "| ⟦0⟧                | 6             | Index of the gripper dimension in the action vector. Ignored when ⟦1⟧ matches a dataset action name                                                                                                                                      |",
+   "tokens": [
+    "`gripper_dim`",
+    "`gripper_joint_names`"
+   ]
+  },
+  {
+   "id": 48,
+   "kind": "table",
+   "start": 9621,
+   "end": 9922,
+   "text": "| ⟦0⟧        | ⟦1⟧ | Action-dimension names identifying the gripper; the matched index wins over ⟦2⟧                                                                                                                                                                  |",
+   "tokens": [
+    "`gripper_joint_names`",
+    "`[\"gripper\"]`",
+    "`gripper_dim`"
+   ]
+  },
+  {
+   "id": 49,
+   "kind": "table",
+   "start": 9923,
+   "end": 10224,
+   "text": "| ⟦0⟧          | 0.5           | Threshold used by ⟦1⟧ and ⟦2⟧. Note ⟦3⟧ runs _after_ unnormalization, so this is compared against the gripper's physical value                                                                          |",
+   "tokens": [
+    "`gripper_threshold`",
+    "`pre_snap_gripper_action`",
+    "`binarize_gripper_action`",
+    "`binarize`"
+   ]
+  },
+  {
+   "id": 50,
+   "kind": "table",
+   "start": 10225,
+   "end": 10526,
+   "text": "| ⟦0⟧    | ⟦1⟧       | Snap the gripper dim to ⟦2⟧ before unnormalization. LIBERO-specific, see below                                                                                                                                                                          |",
+   "tokens": [
+    "`pre_snap_gripper_action`",
+    "`False`",
+    "{0, 1}"
+   ]
+  },
+  {
+   "id": 51,
+   "kind": "table",
+   "start": 10527,
+   "end": 10828,
+   "text": "| ⟦0⟧    | ⟦1⟧       | Binarize the gripper dim to ⟦2⟧ after unnormalization. LIBERO-specific, see below                                                                                                                                                                      |",
+   "tokens": [
+    "`binarize_gripper_action`",
+    "`False`",
+    "{-1, 1}"
+   ]
+  },
+  {
+   "id": 52,
+   "kind": "table",
+   "start": 10829,
+   "end": 11130,
+   "text": "| ⟦0⟧    | ⟦1⟧        | Clip normalized actions to [-1, 1] before unnormalizing. Only applied when ⟦2⟧ uses ⟦3⟧; ignored (with a warning) under ⟦4⟧, where it would truncate at 1 sigma                                                                          |",
+   "tokens": [
+    "`clip_normalized_actions`",
+    "`True`",
+    "`ACTION`",
+    "`MIN_MAX`",
+    "`MEAN_STD`"
+   ]
+  },
+  {
+   "id": 53,
+   "kind": "table",
+   "start": 11131,
+   "end": 11432,
+   "text": "| ⟦0⟧      | ⟦1⟧        | Camera views the world-model predictor is built for. Baked into checkpoint shapes. ⟦2⟧ falls back to ⟦3⟧, which is what the published checkpoints encode                                                                                |",
+   "tokens": [
+    "`world_model_num_views`",
+    "`None`",
+    "`None`",
+    "`jepa_tubelet_size`"
+   ]
+  },
+  {
+   "id": 54,
+   "kind": "para",
+   "start": 11456,
+   "end": 12164,
+   "text": "⟦0⟧ and ⟦1⟧ are a port of the starVLA LIBERO eval\nloop and are only correct for LIBERO's action convention. ⟦2⟧ writes ⟦3⟧ into\n_normalized_ space, the unnormalizer maps those to the midpoint and the max, and ⟦4⟧ then\ncompares that **physical** value against ⟦5⟧ (0.5). For a gripper measured in\ndegrees, mm or [0, 100], both values land above the threshold and the commanded gripper becomes a\nconstant. They default to ⟦6⟧ for that reason; enable them only for LIBERO-style setups, and\nset ⟦7⟧ in the gripper's own units if you do. The processor factory warns when the\ndataset stats show the range cannot work.",
+   "tokens": [
+    "`pre_snap_gripper_action`",
+    "`binarize_gripper_action`",
+    "`pre_snap`",
+    "{0, 1}",
+    "`binarize`",
+    "`gripper_threshold`",
+    "`False`",
+    "`gripper_threshold`"
+   ]
+  },
+  {
+   "id": 55,
+   "kind": "heading",
+   "start": 12179,
+   "end": 12190,
+   "text": "## Training",
+   "tokens": []
+  },
+  {
+   "id": 56,
+   "kind": "para",
+   "start": 12192,
+   "end": 12476,
+   "text": "Number of training steps may vary based on dataset size and compute budget. The original paper pretrained for 50k on ssv2 + droid jointly, then additional 30k steps for LIBERO, but fewer steps may still yield good performance when fine-tuning from the provided pretrained checkpoints.",
+   "tokens": []
+  },
+  {
+   "id": 57,
+   "kind": "heading",
+   "start": 12478,
+   "end": 12508,
+   "text": "### Full training from scratch",
+   "tokens": []
+  },
+  {
+   "id": 58,
+   "kind": "heading",
+   "start": 12642,
+   "end": 12686,
+   "text": "### Fine-tuning from a pretrained checkpoint",
+   "tokens": []
+  },
+  {
+   "id": 59,
+   "kind": "para",
+   "start": 12843,
+   "end": 12945,
+   "text": "If you want to freeze the Qwen backbone and only train the action head, set ⟦0⟧:",
+   "tokens": [
+    "`policy.freeze_qwen=True`"
+   ]
+  },
+  {
+   "id": 60,
+   "kind": "heading",
+   "start": 13132,
+   "end": 13173,
+   "text": "### Fine-tuning on a different embodiment",
+   "tokens": []
+  },
+  {
+   "id": 61,
+   "kind": "para",
+   "start": 13175,
+   "end": 13628,
+   "text": "When the target robot has a different action or state dimensionality than the pretrained checkpoint, the input/output projection layers of the action head will have mismatched shapes and cannot be loaded directly. ⟦0⟧ lets you list the key prefixes that are allowed to mismatch — those layers are randomly re-initialised while every other weight is reused from the checkpoint. Any shape mismatch outside the listed prefixes raises an error.",
+   "tokens": [
+    "`reinit_modules`"
+   ]
+  },
+  {
+   "id": 62,
+   "kind": "para",
+   "start": 13630,
+   "end": 13689,
+   "text": "The layers that depend on ⟦0⟧ and ⟦1⟧ are:",
+   "tokens": [
+    "`action_dim`",
+    "`state_dim`"
+   ]
+  },
+  {
+   "id": 63,
+   "kind": "table",
+   "start": 13691,
+   "end": 13774,
+   "text": "| Layer                                     | Key prefix                          |",
+   "tokens": []
+  },
+  {
+   "id": 64,
+   "kind": "table",
+   "start": 13859,
+   "end": 13942,
+   "text": "| Action encoder (action_dim → inner_dim)   | ⟦0⟧ |",
+   "tokens": [
+    "`model.action_model.action_encoder`"
+   ]
+  },
+  {
+   "id": 65,
+   "kind": "table",
+   "start": 13943,
+   "end": 14026,
+   "text": "| Action decoder (hidden_size → action_dim) | ⟦0⟧ |",
+   "tokens": [
+    "`model.action_model.action_decoder`"
+   ]
+  },
+  {
+   "id": 66,
+   "kind": "table",
+   "start": 14027,
+   "end": 14110,
+   "text": "| State encoder (state_dim → inner_dim)     | ⟦0⟧  |",
+   "tokens": [
+    "`model.action_model.state_encoder`"
+   ]
+  },
+  {
+   "id": 67,
+   "kind": "para",
+   "start": 14438,
+   "end": 14535,
+   "text": "If your robot has no proprioceptive state, omit ⟦0⟧ from the list.",
+   "tokens": [
+    "`model.action_model.state_encoder`"
+   ]
+  },
+  {
+   "id": 68,
+   "kind": "heading",
+   "start": 14537,
+   "end": 14571,
+   "text": "### Reproducing the LIBERO results",
+   "tokens": []
+  },
+  {
+   "id": 69,
+   "kind": "para",
+   "start": 14573,
+   "end": 14796,
+   "text": "**Training on LIBERO:**\nstarts the training from the Pretrain checkpoint, trains for 30k steps on the LIBERO dataset.\nOriginal paper mentions training across 8 GPUs with a batch size of 32, meaning global batch size of 256.",
+   "tokens": []
+  },
+  {
+   "id": 70,
+   "kind": "para",
+   "start": 14971,
+   "end": 15022,
+   "text": "**Evaluating the pretrained LIBERO-10 checkpoint:**",
+   "tokens": []
+  },
+  {
+   "id": 71,
+   "kind": "para",
+   "start": 15229,
+   "end": 15264,
+   "text": "To evaluate a subset of tasks only:",
+   "tokens": []
+  },
+  {
+   "id": 72,
+   "kind": "para",
+   "start": 15459,
+   "end": 15480,
+   "text": "**Expected results:**",
+   "tokens": []
+  },
+  {
+   "id": 73,
+   "kind": "table",
+   "start": 15482,
+   "end": 15538,
+   "text": "| Suite          | Episodes | Successes | Success Rate |",
+   "tokens": []
+  },
+  {
+   "id": 74,
+   "kind": "table",
+   "start": 15596,
+   "end": 15652,
+   "text": "| libero_spatial | 100      | 93        | **95.0%**    |",
+   "tokens": []
+  },
+  {
+   "id": 75,
+   "kind": "table",
+   "start": 15653,
+   "end": 15709,
+   "text": "| libero_object  | 100      | 100       | **100.0%**   |",
+   "tokens": []
+  },
+  {
+   "id": 76,
+   "kind": "table",
+   "start": 15710,
+   "end": 15766,
+   "text": "| libero_goal    | 100      | 98        | **98.0%**    |",
+   "tokens": []
+  },
+  {
+   "id": 77,
+   "kind": "table",
+   "start": 15767,
+   "end": 15823,
+   "text": "| libero_10      | 100      | 96        | **93.0%**    |",
+   "tokens": []
+  },
+  {
+   "id": 78,
+   "kind": "table",
+   "start": 15824,
+   "end": 15880,
+   "text": "| **Overall**    | **400**  | **387**   | **96.5%**    |",
+   "tokens": []
+  },
+  {
+   "id": 79,
+   "kind": "heading",
+   "start": 15887,
+   "end": 15948,
+   "text": "## Fine-tuning on datasets with a different number of cameras",
+   "tokens": []
+  },
+  {
+   "id": 80,
+   "kind": "para",
+   "start": 15950,
+   "end": 16070,
+   "text": "The pretrained world model predictor was trained with ⟦0⟧, i.e. two camera views.",
+   "tokens": [
+    "`embed_dim = world_model_num_views × 1024`"
+   ]
+  },
+  {
+   "id": 81,
+   "kind": "para",
+   "start": 16079,
+   "end": 16354,
+   "text": "This view count used to be read from ⟦0⟧, which also names the JEPA encoder's _temporal_ tubelet size. ⟦1⟧ is the field for it now; leaving it at ⟦2⟧ falls back to ⟦3⟧ so the published checkpoints keep loading unchanged.",
+   "tokens": [
+    "`jepa_tubelet_size`",
+    "`world_model_num_views`",
+    "`None`",
+    "`jepa_tubelet_size`"
+   ]
+  },
+  {
+   "id": 82,
+   "kind": "para",
+   "start": 16364,
+   "end": 16432,
+   "text": "**Default behaviour — view padding / trimming (no action required)**",
+   "tokens": []
+  },
+  {
+   "id": 83,
+   "kind": "para",
+   "start": 16434,
+   "end": 16584,
+   "text": "When fine-tuning from ⟦0⟧ the model automatically adjusts the number of views fed to the world model to match ⟦1⟧:",
+   "tokens": [
+    "`VLA-JEPA-Pretrain`",
+    "`world_model_num_views`"
+   ]
+  },
+  {
+   "id": 84,
+   "kind": "list",
+   "start": 16586,
+   "end": 16779,
+   "text": "- **Single-view datasets (e.g. BridgeV2):** the single-view latent is duplicated to produce a two-view world-model input, preserving the JEPA self-supervised signal without any weight mismatch.",
+   "tokens": []
+  },
+  {
+   "id": 85,
+   "kind": "list",
+   "start": 16780,
+   "end": 17040,
+   "text": "- **>2-view datasets (e.g. DROID with 3 views):** all views are passed to the Qwen backbone (for richer context), but only the first ⟦0⟧ views (one wrist + one third-person, following the configured view order) are used for the world model.",
+   "tokens": [
+    "`world_model_num_views`"
+   ]
+  },
+  {
+   "id": 86,
+   "kind": "para",
+   "start": 17042,
+   "end": 17080,
+   "text": "**Option 1 — Disable the world model**",
+   "tokens": []
+  },
+  {
+   "id": 87,
+   "kind": "para",
+   "start": 17082,
+   "end": 17255,
+   "text": "Set ⟦0⟧ to skip the JEPA loss entirely. Only the Qwen backbone and action head are loaded and trained. This is sufficient for good action performance.",
+   "tokens": [
+    "`enable_world_model=False`"
+   ]
+  },
+  {
+   "id": 88,
+   "kind": "para",
+   "start": 17459,
+   "end": 17517,
+   "text": "**Option 2 — Reinitialize the predictor input projection**",
+   "tokens": []
+  },
+  {
+   "id": 89,
+   "kind": "para",
+   "start": 17519,
+   "end": 17863,
+   "text": "If you want to change ⟦0⟧ to a value other than 2, load the checkpoint with ⟦1⟧ and reinitialize ⟦2⟧ for the new ⟦3⟧. All other predictor block weights (attention, MLP, norm, output projection) are camera-count-agnostic and can be reused from the pretrained checkpoint.",
+   "tokens": [
+    "`world_model_num_views`",
+    "`strict=False`",
+    "`model.video_predictor.predictor_embed`",
+    "`embed_dim`"
+   ]
+  },
+  {
+   "id": 90,
+   "kind": "heading",
+   "start": 17870,
+   "end": 17881,
+   "text": "## Citation",
+   "tokens": []
+  },
+  {
+   "id": 91,
+   "kind": "heading",
+   "start": 18375,
+   "end": 18385,
+   "text": "## License",
+   "tokens": []
+  },
+  {
+   "id": 92,
+   "kind": "para",
+   "start": 18387,
+   "end": 18612,
+   "text": "Weights are distributed under the license terms of the original [ginwind/VLA-JEPA](⟦0⟧) repository (**Apache 2.0 License**). The LeRobot integration code follows the **Apache 2.0 License**.",
+   "tokens": [
+    "https://huggingface.co/ginwind/VLA-JEPA"
+   ]
+  }
+ ]
+}

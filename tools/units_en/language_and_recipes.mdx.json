@@ -1,0 +1,395 @@
+{
+ "file": "language_and_recipes.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1954,
+   "text": "# Language columns and recipes",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1956,
+   "end": 2443,
+   "text": "Most LeRobot datasets ship with a single ⟦0⟧ string per episode — fine for\nshort, single-instruction skills, but not enough for the longer-horizon,\nmulti-modal robot policies the field is moving toward (high-level planning,\nmemory, interjections, VQA, tool use). To support those policies without\nforking the dataset format, LeRobot extends ⟦1⟧ with two optional\nlanguage columns and a small recipe layer that turns those rows into\nchat-style training samples on the fly.",
+   "tokens": [
+    "`task`",
+    "`LeRobotDataset`"
+   ]
+  },
+  {
+   "id": 2,
+   "kind": "para",
+   "start": 2445,
+   "end": 2489,
+   "text": "The design splits cleanly into three layers:",
+   "tokens": []
+  },
+  {
+   "id": 3,
+   "kind": "list",
+   "start": 2491,
+   "end": 2736,
+   "text": "1. **Data in the dataset** — language annotations stored next to frames in\n   ⟦0⟧ as two optional columns (⟦1⟧\n   and ⟦2⟧). Datasets without these columns keep their existing\n   behavior.",
+   "tokens": [
+    "`data/chunk-*/file-*.parquet`",
+    "`language_persistent`",
+    "`language_events`"
+   ]
+  },
+  {
+   "id": 4,
+   "kind": "list",
+   "start": 2737,
+   "end": 2976,
+   "text": "2. **Recipe** — a YAML file that declares which annotation rows to bind and\n   how to lay them out as chat turns (⟦0⟧, ⟦1⟧, optional images,\n   optional tool calls). Recipes are pure config; no Python required to add a\n   new one.",
+   "tokens": [
+    "`role`",
+    "`content`"
+   ]
+  },
+  {
+   "id": 5,
+   "kind": "list",
+   "start": 2977,
+   "end": 3240,
+   "text": "3. **Training format** — at sample time, ⟦0⟧ resolves the\n   recipe against the per-frame annotations and emits HF-style ⟦1⟧ plus\n   LeRobot-specific sidecars (⟦2⟧, ⟦3⟧)\n   that policy processors consume.",
+   "tokens": [
+    "`RenderMessagesStep`",
+    "`messages`",
+    "`message_streams`",
+    "`target_message_indices`"
+   ]
+  },
+  {
+   "id": 6,
+   "kind": "para",
+   "start": 3242,
+   "end": 3281,
+   "text": "This page describes each layer in turn.",
+   "tokens": []
+  },
+  {
+   "id": 7,
+   "kind": "heading",
+   "start": 3283,
+   "end": 3327,
+   "text": "## Layer 1 — language columns in the dataset",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "para",
+   "start": 3329,
+   "end": 3411,
+   "text": "The two optional columns live next to frame data in\n⟦0⟧:",
+   "tokens": [
+    "`data/chunk-*/file-*.parquet`"
+   ]
+  },
+  {
+   "id": 9,
+   "kind": "list",
+   "start": 3413,
+   "end": 3567,
+   "text": "- ⟦0⟧: a list of rows broadcast across every frame in an episode for state that remains active, such as ⟦1⟧, ⟦2⟧, and ⟦3⟧.",
+   "tokens": [
+    "`language_persistent`",
+    "`subtask`",
+    "`plan`",
+    "`memory`"
+   ]
+  },
+  {
+   "id": 10,
+   "kind": "list",
+   "start": 3568,
+   "end": 3709,
+   "text": "- ⟦0⟧: a list of rows only on the exact frame where an event was emitted, such as ⟦1⟧, ⟦2⟧, and speech tool calls.",
+   "tokens": [
+    "`language_events`",
+    "`interjection`",
+    "`vqa`"
+   ]
+  },
+  {
+   "id": 11,
+   "kind": "para",
+   "start": 3711,
+   "end": 3833,
+   "text": "Both columns share the same row shape (event rows omit ⟦0⟧ because the\nframe the row sits on already provides it):",
+   "tokens": [
+    "`timestamp`"
+   ]
+  },
+  {
+   "id": 12,
+   "kind": "para",
+   "start": 4071,
+   "end": 4513,
+   "text": "The ⟦0⟧ field tags rows whose ⟦1⟧ is grounded in a specific camera\nview. Rows of view-dependent styles (⟦2⟧ and ⟦3⟧) MUST set ⟦4⟧ to\nthe matching ⟦5⟧ feature key. Rows of every other style —\nincluding ⟦6⟧, which describes robot-frame primitives in joint / Cartesian\nterms — MUST leave ⟦7⟧ as ⟦8⟧. Pipeline writers and the validator\nenforce this via ⟦9⟧.",
+   "tokens": [
+    "`camera`",
+    "`content`",
+    "`vqa`",
+    "`trace`",
+    "`camera`",
+    "`observation.images.*`",
+    "`motion`",
+    "`camera`",
+    "`null`",
+    "`validate_camera_field(style, camera)`"
+   ]
+  },
+  {
+   "id": 13,
+   "kind": "para",
+   "start": 4515,
+   "end": 4690,
+   "text": "⟦0⟧ remains the canonical source for the task. The special ⟦1⟧ recipe binding always reads that task string and does not depend on language annotations.",
+   "tokens": [
+    "`meta/tasks.parquet`",
+    "`${task}`"
+   ]
+  },
+  {
+   "id": 14,
+   "kind": "heading",
+   "start": 4692,
+   "end": 4708,
+   "text": "### Architecture",
+   "tokens": []
+  },
+  {
+   "id": 15,
+   "kind": "para",
+   "start": 4710,
+   "end": 4779,
+   "text": "The language stack itself has three internal modules backing layer 1:",
+   "tokens": []
+  },
+  {
+   "id": 16,
+   "kind": "list",
+   "start": 4781,
+   "end": 4871,
+   "text": "1. ⟦0⟧ defines the schema, style registry, and ⟦1⟧.",
+   "tokens": [
+    "`lerobot.datasets.language`",
+    "`column_for_style`"
+   ]
+  },
+  {
+   "id": 17,
+   "kind": "list",
+   "start": 4872,
+   "end": 4945,
+   "text": "2. ⟦0⟧ resolves rows and renders messages.",
+   "tokens": [
+    "`lerobot.datasets.language_render`"
+   ]
+  },
+  {
+   "id": 18,
+   "kind": "list",
+   "start": 4946,
+   "end": 5057,
+   "text": "3. ⟦0⟧ turns dataset samples into ⟦1⟧, ⟦2⟧, and ⟦3⟧.",
+   "tokens": [
+    "`RenderMessagesStep`",
+    "`messages`",
+    "`message_streams`",
+    "`target_message_indices`"
+   ]
+  },
+  {
+   "id": 19,
+   "kind": "para",
+   "start": 5059,
+   "end": 5229,
+   "text": "⟦0⟧ stays recipe-agnostic. It passes ⟦1⟧ and ⟦2⟧ through when present, and unannotated datasets keep their existing behavior.",
+   "tokens": [
+    "`LeRobotDataset`",
+    "`language_persistent`",
+    "`language_events`"
+   ]
+  },
+  {
+   "id": 20,
+   "kind": "heading",
+   "start": 5231,
+   "end": 5258,
+   "text": "## Layer 2 — recipe anatomy",
+   "tokens": []
+  },
+  {
+   "id": 21,
+   "kind": "para",
+   "start": 5260,
+   "end": 5473,
+   "text": "Recipes are YAML files backed by ⟦0⟧ and ⟦1⟧ from\n⟦2⟧. They\ndeclare which annotation rows to pull (via ⟦3⟧) and how to compose them\ninto chat turns (⟦4⟧).",
+   "tokens": [
+    "`TrainingRecipe`",
+    "`MessageTurn`",
+    "`lerobot.datasets.recipe`",
+    "`bindings`",
+    "`messages`"
+   ]
+  },
+  {
+   "id": 22,
+   "kind": "para",
+   "start": 5637,
+   "end": 5919,
+   "text": "A recipe can also branch into a weighted **blend** of sub-recipes. At sample\ntime, exactly one branch is selected deterministically from the sample index,\nso different frames train different objectives (e.g. memory updates vs.\nlow-level execution vs. VQA) without any Python wiring.",
+   "tokens": []
+  },
+  {
+   "id": 23,
+   "kind": "heading",
+   "start": 5921,
+   "end": 5943,
+   "text": "### Temporal semantics",
+   "tokens": []
+  },
+  {
+   "id": 24,
+   "kind": "para",
+   "start": 5945,
+   "end": 6004,
+   "text": "Persistent styles are active after emission until replaced:",
+   "tokens": []
+  },
+  {
+   "id": 25,
+   "kind": "para",
+   "start": 6114,
+   "end": 6163,
+   "text": "Event styles only exist on their exact timestamp:",
+   "tokens": []
+  },
+  {
+   "id": 26,
+   "kind": "para",
+   "start": 6324,
+   "end": 6447,
+   "text": "Exact event matching has no tolerance window, so writers must stamp event rows with frame timestamps from the parquet data.",
+   "tokens": []
+  },
+  {
+   "id": 27,
+   "kind": "heading",
+   "start": 6449,
+   "end": 6478,
+   "text": "### View-dependent resolution",
+   "tokens": []
+  },
+  {
+   "id": 28,
+   "kind": "para",
+   "start": 6480,
+   "end": 6897,
+   "text": "For view-dependent styles (⟦0⟧ and ⟦1⟧), the resolver gains a\n⟦2⟧ filter parallel to ⟦3⟧ and ⟦4⟧. Datasets with multiple\ncameras typically emit one (⟦5⟧, ⟦6⟧) + (⟦7⟧, ⟦8⟧) pair per\ncamera at the same timestamp; without ⟦9⟧, those resolvers see two\nmatches and raise an ambiguity error. Recipes consume each camera through its\nown binding plus a matching image block, e.g.",
+   "tokens": [
+    "`vqa`",
+    "`trace`",
+    "`camera=`",
+    "`role=`",
+    "`tool_name=`",
+    "`vqa`",
+    "`user`",
+    "`vqa`",
+    "`assistant`",
+    "`camera=`"
+   ]
+  },
+  {
+   "id": 29,
+   "kind": "para",
+   "start": 7463,
+   "end": 7684,
+   "text": "Add one such sub-recipe per camera the dataset records. The explicit\n⟦0⟧ marker makes a matching sparse VQA annotation take precedence\nover normal weighted blend selection; component names are purely descriptive.",
+   "tokens": [
+    "`route: vqa`"
+   ]
+  },
+  {
+   "id": 30,
+   "kind": "heading",
+   "start": 7686,
+   "end": 7714,
+   "text": "## Layer 3 — training format",
+   "tokens": []
+  },
+  {
+   "id": 31,
+   "kind": "para",
+   "start": 7716,
+   "end": 7782,
+   "text": "Rendered samples use HF-style chat messages plus LeRobot sidecars:",
+   "tokens": []
+  },
+  {
+   "id": 32,
+   "kind": "para",
+   "start": 7877,
+   "end": 8125,
+   "text": "The renderer does not apply a tokenizer chat template. Policy processors decide how to serialize the messages for their backbone, which keeps the same dataset usable across SmolVLA, Pi0.5, and any future VLM that expects OpenAI-style chat messages.",
+   "tokens": []
+  },
+  {
+   "id": 33,
+   "kind": "heading",
+   "start": 8127,
+   "end": 8136,
+   "text": "## Blends",
+   "tokens": []
+  },
+  {
+   "id": 34,
+   "kind": "para",
+   "start": 8138,
+   "end": 8460,
+   "text": "Blend recipes select one weighted sub-recipe deterministically from the sample index.\n⟦0⟧ trains the compact core blend — high-level subtask prediction, low-level execution, and memory. ⟦1⟧ is the fuller variant that also adds VQA and spoken interjection responses.",
+   "tokens": [
+    "`recipes/subtask_mem.yaml`",
+    "`recipes/subtask_mem_vqa_speech.yaml`"
+   ]
+  },
+  {
+   "id": 35,
+   "kind": "para",
+   "start": 8462,
+   "end": 8847,
+   "text": "⟦0⟧ demonstrates joint sequence training rather than a\nweighted blend. For the same sample, its assistant subtask is supervised with\ntext cross-entropy on the ⟦1⟧ stream while action prediction remains\nactive, matching the joint setup from the π0.5 paper. Enable\n⟦2⟧ to use that subtask conditioning at inference.",
+   "tokens": [
+    "`recipes/subtask_joint.yaml`",
+    "`low_level`",
+    "`--policy.joint_subtask_conditioning=true`"
+   ]
+  },
+  {
+   "id": 36,
+   "kind": "heading",
+   "start": 8849,
+   "end": 8868,
+   "text": "## Graceful absence",
+   "tokens": []
+  },
+  {
+   "id": 37,
+   "kind": "para",
+   "start": 8870,
+   "end": 9201,
+   "text": "If both language columns are missing, ⟦0⟧, or empty, ⟦1⟧ uses\nthe task string as low-level supervision when available and otherwise leaves the\nsample unchanged. For an annotated sample, if no recipe branch applies and no\ntask fallback exists, rendering returns ⟦2⟧, allowing a loader to retry another sample.",
+   "tokens": [
+    "`None`",
+    "`RenderMessagesStep`",
+    "`None`"
+   ]
+  }
+ ]
+}

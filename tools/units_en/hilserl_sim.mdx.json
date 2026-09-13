@@ -1,0 +1,331 @@
+{
+ "file": "hilserl_sim.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1948,
+   "text": "# Train RL in Simulation",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1950,
+   "end": 2143,
+   "text": "This guide explains how to use the ⟦0⟧ simulation environments as an alternative to real robots when working with the LeRobot framework for Human-In-the-Loop (HIL) reinforcement learning.",
+   "tokens": [
+    "`gym_hil`"
+   ]
+  },
+  {
+   "id": 2,
+   "kind": "para",
+   "start": 2145,
+   "end": 2327,
+   "text": "⟦0⟧ is a package that provides Gymnasium-compatible simulation environments specifically designed for Human-In-the-Loop reinforcement learning. These environments allow you to:",
+   "tokens": [
+    "`gym_hil`"
+   ]
+  },
+  {
+   "id": 3,
+   "kind": "list",
+   "start": 2329,
+   "end": 2411,
+   "text": "- Train policies in simulation to test the RL stack before training on real robots",
+   "tokens": []
+  },
+  {
+   "id": 4,
+   "kind": "list",
+   "start": 2413,
+   "end": 2494,
+   "text": "- Collect demonstrations in sim using external devices like gamepads or keyboards",
+   "tokens": []
+  },
+  {
+   "id": 5,
+   "kind": "list",
+   "start": 2495,
+   "end": 2547,
+   "text": "- Perform human interventions during policy learning",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "para",
+   "start": 2549,
+   "end": 2667,
+   "text": "Currently, the main environment is a Franka Panda robot simulation based on MuJoCo, with tasks like picking up a cube.",
+   "tokens": []
+  },
+  {
+   "id": 7,
+   "kind": "heading",
+   "start": 2669,
+   "end": 2684,
+   "text": "## Installation",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "para",
+   "start": 2686,
+   "end": 2754,
+   "text": "First, install the ⟦0⟧ package within the LeRobot environment:",
+   "tokens": [
+    "`gym_hil`"
+   ]
+  },
+  {
+   "id": 9,
+   "kind": "heading",
+   "start": 2797,
+   "end": 2815,
+   "text": "## What do I need?",
+   "tokens": []
+  },
+  {
+   "id": 10,
+   "kind": "list",
+   "start": 2817,
+   "end": 2861,
+   "text": "- A gamepad or keyboard to control the robot",
+   "tokens": []
+  },
+  {
+   "id": 11,
+   "kind": "list",
+   "start": 2862,
+   "end": 2876,
+   "text": "- A Nvidia GPU",
+   "tokens": []
+  },
+  {
+   "id": 12,
+   "kind": "heading",
+   "start": 2878,
+   "end": 2894,
+   "text": "## Configuration",
+   "tokens": []
+  },
+  {
+   "id": 13,
+   "kind": "para",
+   "start": 2896,
+   "end": 3131,
+   "text": "To use ⟦0⟧ with LeRobot, you need to create a configuration file. An example is provided [here](⟦1⟧). Key configuration sections include:",
+   "tokens": [
+    "`gym_hil`",
+    "https://huggingface.co/datasets/lerobot/config_examples/resolve/main/rl/gym_hil/env_config.json"
+   ]
+  },
+  {
+   "id": 14,
+   "kind": "heading",
+   "start": 3133,
+   "end": 3162,
+   "text": "### Environment Type and Task",
+   "tokens": []
+  },
+  {
+   "id": 15,
+   "kind": "para",
+   "start": 3323,
+   "end": 3339,
+   "text": "Available tasks:",
+   "tokens": []
+  },
+  {
+   "id": 16,
+   "kind": "list",
+   "start": 3341,
+   "end": 3384,
+   "text": "- ⟦0⟧: Basic environment",
+   "tokens": [
+    "`PandaPickCubeBase-v0`"
+   ]
+  },
+  {
+   "id": 17,
+   "kind": "list",
+   "start": 3385,
+   "end": 3434,
+   "text": "- ⟦0⟧: With gamepad control",
+   "tokens": [
+    "`PandaPickCubeGamepad-v0`"
+   ]
+  },
+  {
+   "id": 18,
+   "kind": "list",
+   "start": 3435,
+   "end": 3486,
+   "text": "- ⟦0⟧: With keyboard control",
+   "tokens": [
+    "`PandaPickCubeKeyboard-v0`"
+   ]
+  },
+  {
+   "id": 19,
+   "kind": "heading",
+   "start": 3488,
+   "end": 3515,
+   "text": "### Processor Configuration",
+   "tokens": []
+  },
+  {
+   "id": 20,
+   "kind": "para",
+   "start": 4007,
+   "end": 4028,
+   "text": "Important parameters:",
+   "tokens": []
+  },
+  {
+   "id": 21,
+   "kind": "list",
+   "start": 4030,
+   "end": 4097,
+   "text": "- ⟦0⟧: Penalty for excessive gripper movement",
+   "tokens": [
+    "`gripper.gripper_penalty`"
+   ]
+  },
+  {
+   "id": 22,
+   "kind": "list",
+   "start": 4098,
+   "end": 4156,
+   "text": "- ⟦0⟧: Whether to enable gripper control",
+   "tokens": [
+    "`gripper.use_gripper`"
+   ]
+  },
+  {
+   "id": 23,
+   "kind": "list",
+   "start": 4157,
+   "end": 4260,
+   "text": "- ⟦0⟧: Size of the steps in the x,y,z axes of the end-effector",
+   "tokens": [
+    "`inverse_kinematics.end_effector_step_sizes`"
+   ]
+  },
+  {
+   "id": 24,
+   "kind": "list",
+   "start": 4261,
+   "end": 4325,
+   "text": "- ⟦0⟧: Set to ⟦1⟧ to use a gamepad controller",
+   "tokens": [
+    "`control_mode`",
+    "`\"gamepad\"`"
+   ]
+  },
+  {
+   "id": 25,
+   "kind": "heading",
+   "start": 4327,
+   "end": 4360,
+   "text": "## Running with HIL RL of LeRobot",
+   "tokens": []
+  },
+  {
+   "id": 26,
+   "kind": "heading",
+   "start": 4362,
+   "end": 4377,
+   "text": "### Basic Usage",
+   "tokens": []
+  },
+  {
+   "id": 27,
+   "kind": "para",
+   "start": 4379,
+   "end": 4420,
+   "text": "To run the environment, set mode to null:",
+   "tokens": []
+  },
+  {
+   "id": 28,
+   "kind": "heading",
+   "start": 4511,
+   "end": 4534,
+   "text": "### Recording a Dataset",
+   "tokens": []
+  },
+  {
+   "id": 29,
+   "kind": "para",
+   "start": 4536,
+   "end": 4644,
+   "text": "To collect a dataset, set the mode to ⟦0⟧ whilst defining the repo_id and number of episodes to record:",
+   "tokens": [
+    "`record`"
+   ]
+  },
+  {
+   "id": 30,
+   "kind": "heading",
+   "start": 5067,
+   "end": 5088,
+   "text": "### Training a Policy",
+   "tokens": []
+  },
+  {
+   "id": 31,
+   "kind": "para",
+   "start": 5090,
+   "end": 5298,
+   "text": "To train a policy, checkout the configuration example available [here](⟦0⟧) and run the actor and learner servers:",
+   "tokens": [
+    "https://huggingface.co/datasets/lerobot/config_examples/resolve/main/rl/gym_hil/train_config.json"
+   ]
+  },
+  {
+   "id": 32,
+   "kind": "para",
+   "start": 5385,
+   "end": 5433,
+   "text": "In a different terminal, run the learner server:",
+   "tokens": []
+  },
+  {
+   "id": 33,
+   "kind": "para",
+   "start": 5522,
+   "end": 5693,
+   "text": "The simulation environment provides a safe and repeatable way to develop and test your Human-In-the-Loop reinforcement learning components before deploying to real robots.",
+   "tokens": []
+  },
+  {
+   "id": 34,
+   "kind": "para",
+   "start": 5695,
+   "end": 5739,
+   "text": "Congrats 🎉, you have finished this tutorial!",
+   "tokens": []
+  },
+  {
+   "id": 35,
+   "kind": "quote",
+   "start": 5741,
+   "end": 5861,
+   "text": "> [!TIP]\n> If you have any questions or need help, please reach out on [Discord](⟦0⟧).",
+   "tokens": [
+    "https://discord.com/invite/s3KuuzsPFb"
+   ]
+  },
+  {
+   "id": 36,
+   "kind": "para",
+   "start": 5863,
+   "end": 5878,
+   "text": "Paper citation:",
+   "tokens": []
+  }
+ ]
+}

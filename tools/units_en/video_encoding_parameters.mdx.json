@@ -1,0 +1,831 @@
+{
+ "file": "video_encoding_parameters.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1951,
+   "text": "# Video encoding parameters",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1953,
+   "end": 2255,
+   "text": "When video storage is enabled, LeRobot stores each camera stream as an **MP4** file instead of saving one image file per timestep. Video encoding compresses across time, which usually cuts dataset size and I/O compared to a pile of PNG, while keeping MP4 — a format every player and loader understands.",
+   "tokens": []
+  },
+  {
+   "id": 2,
+   "kind": "para",
+   "start": 2257,
+   "end": 2564,
+   "text": "Encoding frames into an MP4 is a full FFmpeg pipeline: choice of encoder, pixel format, GOP/keyframes, quality vs. speed, and optional extra encoder flags. Most of these knobs are user-tunable through ⟦0⟧, a nested ⟦1⟧ (⟦2⟧) passed through PyAV.",
+   "tokens": [
+    "`rgb_encoder`",
+    "`RGBEncoderConfig`",
+    "`lerobot.configs.video.RGBEncoderConfig`"
+   ]
+  },
+  {
+   "id": 3,
+   "kind": "para",
+   "start": 2566,
+   "end": 2760,
+   "text": "You can set these parameters from the CLI with ⟦0⟧ (e.g. with ⟦1⟧ or ⟦2⟧). The same block applies to every camera video stream in that run.",
+   "tokens": [
+    "`--dataset.rgb_encoder.<field>`",
+    "`lerobot-record`",
+    "`lerobot-rollout`"
+   ]
+  },
+  {
+   "id": 4,
+   "kind": "quote",
+   "start": 2762,
+   "end": 3006,
+   "text": "> [!TIP]\n> Video storage must be on for ⟦0⟧ to have any effect —\n> ⟦1⟧ in Python APIs, or ⟦2⟧ on the CLI (the\n> recording default). With video off, inputs stay as images and ⟦3⟧ is\n> ignored.",
+   "tokens": [
+    "`rgb_encoder`",
+    "`use_videos=True`",
+    "`--dataset.video=true`",
+    "`rgb_encoder`"
+   ]
+  },
+  {
+   "id": 5,
+   "kind": "para",
+   "start": 3008,
+   "end": 3346,
+   "text": "For details on **when** frames are written vs. encoded (streaming vs. post-episode), queues, and other top-level ⟦0⟧ switches, see [Streaming Video Encoding](⟦1⟧). For an encoding-parameter comparison and experiments, see the [video-benchmark Space](⟦2⟧).",
+   "tokens": [
+    "`--dataset.*`",
+    "./streaming_video_encoding",
+    "https://huggingface.co/spaces/lerobot/video-benchmark"
+   ]
+  },
+  {
+   "id": 6,
+   "kind": "heading",
+   "start": 3353,
+   "end": 3363,
+   "text": "## Example",
+   "tokens": []
+  },
+  {
+   "id": 7,
+   "kind": "heading",
+   "start": 4109,
+   "end": 4129,
+   "text": "## Tuning parameters",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "quote",
+   "start": 4131,
+   "end": 4396,
+   "text": "> [!WARNING]\n> The defaults are tuned to balance **compression ratio**, **visual quality**, and **decoding/seek speed** for typical robotics datasets. Changing them can affect both recording (CPU load, frame drops) and training (decoding throughput, image quality).",
+   "tokens": []
+  },
+  {
+   "id": 9,
+   "kind": "quote",
+   "start": 4399,
+   "end": 4541,
+   "text": "> Only override these parameters if you have a specific reason to, and measure the impact on your pipeline before relying on the new settings.",
+   "tokens": []
+  },
+  {
+   "id": 10,
+   "kind": "para",
+   "start": 4543,
+   "end": 4613,
+   "text": "All flags below are prefixed with ⟦0⟧ on the CLI.",
+   "tokens": [
+    "`--dataset.rgb_encoder.`"
+   ]
+  },
+  {
+   "id": 11,
+   "kind": "table",
+   "start": 4615,
+   "end": 4887,
+   "text": "| Parameter       | Type             | Default       | Description                                                                                                                                                                                                             |",
+   "tokens": []
+  },
+  {
+   "id": 12,
+   "kind": "table",
+   "start": 5161,
+   "end": 5433,
+   "text": "| ⟦0⟧        | ⟦1⟧            | ⟦2⟧ | Video codec name. ⟦3⟧ picks the first available hardware encoder from a fixed preference list, falling back to ⟦4⟧.                                                                                        |",
+   "tokens": [
+    "`vcodec`",
+    "`str`",
+    "`\"libsvtav1\"`",
+    "`\"auto\"`",
+    "`libsvtav1`"
+   ]
+  },
+  {
+   "id": 13,
+   "kind": "table",
+   "start": 5434,
+   "end": 5706,
+   "text": "| ⟦0⟧       | ⟦1⟧            | ⟦2⟧   | Output pixel format. Must be supported by the chosen codec in your FFmpeg build.                                                                                                                                        |",
+   "tokens": [
+    "`pix_fmt`",
+    "`str`",
+    "`\"yuv420p\"`"
+   ]
+  },
+  {
+   "id": 14,
+   "kind": "table",
+   "start": 5707,
+   "end": 5979,
+   "text": "| ⟦0⟧             | ⟦1⟧            | ⟦2⟧           | GOP size — a keyframe every ⟦3⟧ frames. Emitted as FFmpeg option ⟦4⟧.                                                                                                                                                   |",
+   "tokens": [
+    "`g`",
+    "`int`",
+    "`2`",
+    "`g`",
+    "`g`"
+   ]
+  },
+  {
+   "id": 15,
+   "kind": "table",
+   "start": 5980,
+   "end": 6252,
+   "text": "| ⟦0⟧           | ⟦1⟧ or ⟦2⟧ | ⟦3⟧          | Abstract quality value, mapped per codec (see the [mapping](⟦4⟧)). Lower → higher quality / larger output where the mapping is monotone. |",
+   "tokens": [
+    "`crf`",
+    "`int`",
+    "`float`",
+    "`30`",
+    "https://github.com/huggingface/lerobot/blob/main/src/lerobot/configs/video.py#L197"
+   ]
+  },
+  {
+   "id": 16,
+   "kind": "table",
+   "start": 6253,
+   "end": 6525,
+   "text": "| ⟦0⟧        | ⟦1⟧ or ⟦2⟧   | ⟦3⟧ \\*       | Encoder speed preset; meaning depends on the codec. ⟦4⟧\\* When unset and ⟦5⟧, LeRobot defaults to ⟦6⟧.                                                                                                |",
+   "tokens": [
+    "`preset`",
+    "`int`",
+    "`str`",
+    "`12`",
+    "<br/>",
+    "`vcodec=libsvtav1`",
+    "`12`"
+   ]
+  },
+  {
+   "id": 17,
+   "kind": "table",
+   "start": 6526,
+   "end": 6798,
+   "text": "| ⟦0⟧   | ⟦1⟧            | ⟦2⟧           | ⟦3⟧: ⟦4⟧, passed via ⟦5⟧. ⟦6⟧⟦7⟧ / ⟦8⟧ (software): if ⟦9⟧, sets ⟦10⟧. ⟦11⟧Other codecs: usually unused.                                                                    |",
+   "tokens": [
+    "`fast_decode`",
+    "`int`",
+    "`0`",
+    "`libsvtav1`",
+    "`0–2`",
+    "`svtav1-params`",
+    "<br/>",
+    "`h264`",
+    "`hevc`",
+    "`>0`",
+    "`tune=fastdecode`",
+    "<br/>"
+   ]
+  },
+  {
+   "id": 18,
+   "kind": "table",
+   "start": 6799,
+   "end": 7071,
+   "text": "| ⟦0⟧ | ⟦1⟧            | ⟦2⟧      | Only ⟦3⟧ is currently implemented for video encoding.                                                                                                                                                              |",
+   "tokens": [
+    "`video_backend`",
+    "`str`",
+    "`\"pyav\"`",
+    "`\"pyav\"`"
+   ]
+  },
+  {
+   "id": 19,
+   "kind": "table",
+   "start": 7072,
+   "end": 7344,
+   "text": "| ⟦0⟧ | ⟦1⟧           | ⟦2⟧          | Extra FFmpeg or codec specific options merged after the structured fields above. Cannot override keys already set by those fields.                                                                                      |",
+   "tokens": [
+    "`extra_options`",
+    "`dict`",
+    "`{}`"
+   ]
+  },
+  {
+   "id": 20,
+   "kind": "heading",
+   "start": 7351,
+   "end": 7367,
+   "text": "## Depth streams",
+   "tokens": []
+  },
+  {
+   "id": 21,
+   "kind": "para",
+   "start": 7369,
+   "end": 7808,
+   "text": "Depth maps (Intel RealSense, Reachy 2) are stored as their **own video streams** alongside the RGB streams. Raw depth (⟦0⟧ millimetres or ⟦1⟧ metres) can't survive an 8-bit codec, so LeRobot **quantizes** each map to a 12-bit code (⟦2⟧) — logarithmically by default, to match the ⟦3⟧ error profile of depth sensors — then packs it into a high-bit-depth pixel format (⟦4⟧) and encodes it with a 12-bit codec.",
+   "tokens": [
+    "`uint16`",
+    "`float32`",
+    "`[0, 4095]`",
+    "`1/depth`",
+    "`gray12le`"
+   ]
+  },
+  {
+   "id": 22,
+   "kind": "para",
+   "start": 8072,
+   "end": 8291,
+   "text": "    ⟦0⟧\n      ⟦1⟧Raw depth⟦2⟧",
+   "tokens": [
+    "<span style=\"display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:2px;background:#DBEAFE;color:#1D4ED8;border-radius:9px;padding:8px 12px;\">",
+    "<span>",
+    "</span>"
+   ]
+  },
+  {
+   "id": 23,
+   "kind": "para",
+   "start": 8292,
+   "end": 8395,
+   "text": "      ⟦0⟧\n        uint16 mm",
+   "tokens": [
+    "<span style=\"font-size:11px;font-weight:400;color:#3B6FD4;white-space:nowrap;\">"
+   ]
+  },
+  {
+   "id": 24,
+   "kind": "para",
+   "start": 8396,
+   "end": 8428,
+   "text": "        ⟦0⟧\n        float32 m",
+   "tokens": [
+    "<br />"
+   ]
+  },
+  {
+   "id": 25,
+   "kind": "para",
+   "start": 8702,
+   "end": 8921,
+   "text": "      ⟦0⟧\n        Record time",
+   "tokens": [
+    "<span style=\"position:absolute;top:-10px;left:12px;background:#fff;padding:0 6px;font-size:11px;font-weight:700;color:#7E22CE;text-transform:uppercase;letter-spacing:0.5px;white-space:nowrap;\">"
+   ]
+  },
+  {
+   "id": 26,
+   "kind": "para",
+   "start": 8936,
+   "end": 9154,
+   "text": "      ⟦0⟧\n        ⟦1⟧Clip⟦2⟧",
+   "tokens": [
+    "<span style=\"display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:2px;background:#F3E8FF;color:#7E22CE;border-radius:9px;padding:8px 12px;\">",
+    "<span>",
+    "</span>"
+   ]
+  },
+  {
+   "id": 27,
+   "kind": "para",
+   "start": 9155,
+   "end": 9267,
+   "text": "        ⟦0⟧\n          to [depth_min,",
+   "tokens": [
+    "<span style=\"font-size:11px;font-weight:400;color:#9061C2;white-space:nowrap;\">"
+   ]
+  },
+  {
+   "id": 28,
+   "kind": "para",
+   "start": 9268,
+   "end": 9305,
+   "text": "          ⟦0⟧\n          depth_max]",
+   "tokens": [
+    "<br />"
+   ]
+  },
+  {
+   "id": 29,
+   "kind": "para",
+   "start": 9443,
+   "end": 9665,
+   "text": "      ⟦0⟧\n        ⟦1⟧Quantize⟦2⟧",
+   "tokens": [
+    "<span style=\"display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:2px;background:#F3E8FF;color:#7E22CE;border-radius:9px;padding:8px 12px;\">",
+    "<span>",
+    "</span>"
+   ]
+  },
+  {
+   "id": 30,
+   "kind": "para",
+   "start": 9666,
+   "end": 9783,
+   "text": "        ⟦0⟧\n          12-bit codes 0–4095",
+   "tokens": [
+    "<span style=\"font-size:11px;font-weight:400;color:#9061C2;white-space:nowrap;\">"
+   ]
+  },
+  {
+   "id": 31,
+   "kind": "para",
+   "start": 9784,
+   "end": 9834,
+   "text": "          ⟦0⟧\n          log (default) or linear",
+   "tokens": [
+    "<br />"
+   ]
+  },
+  {
+   "id": 32,
+   "kind": "para",
+   "start": 9972,
+   "end": 10190,
+   "text": "      ⟦0⟧\n        ⟦1⟧Pack⟦2⟧",
+   "tokens": [
+    "<span style=\"display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:2px;background:#F3E8FF;color:#7E22CE;border-radius:9px;padding:8px 12px;\">",
+    "<span>",
+    "</span>"
+   ]
+  },
+  {
+   "id": 33,
+   "kind": "para",
+   "start": 10191,
+   "end": 10302,
+   "text": "        ⟦0⟧\n          into gray12le",
+   "tokens": [
+    "<span style=\"font-size:11px;font-weight:400;color:#9061C2;white-space:nowrap;\">"
+   ]
+  },
+  {
+   "id": 34,
+   "kind": "para",
+   "start": 10303,
+   "end": 10335,
+   "text": "          ⟦0⟧\n          plane",
+   "tokens": [
+    "<br />"
+   ]
+  },
+  {
+   "id": 35,
+   "kind": "para",
+   "start": 10473,
+   "end": 10693,
+   "text": "      ⟦0⟧\n        ⟦1⟧Encode⟦2⟧",
+   "tokens": [
+    "<span style=\"display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:2px;background:#F3E8FF;color:#7E22CE;border-radius:9px;padding:8px 12px;\">",
+    "<span>",
+    "</span>"
+   ]
+  },
+  {
+   "id": 36,
+   "kind": "para",
+   "start": 10694,
+   "end": 10796,
+   "text": "        ⟦0⟧\n          HEVC",
+   "tokens": [
+    "<span style=\"font-size:11px;font-weight:400;color:#9061C2;white-space:nowrap;\">"
+   ]
+  },
+  {
+   "id": 37,
+   "kind": "para",
+   "start": 10797,
+   "end": 10831,
+   "text": "          ⟦0⟧\n          Main 12",
+   "tokens": [
+    "<br />"
+   ]
+  },
+  {
+   "id": 38,
+   "kind": "para",
+   "start": 10974,
+   "end": 11187,
+   "text": "    ⟦0⟧\n      ⟦1⟧MP4⟦2⟧",
+   "tokens": [
+    "<span style=\"display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:2px;background:#FEF3C7;color:#B45309;border-radius:9px;padding:8px 12px;\">",
+    "<span>",
+    "</span>"
+   ]
+  },
+  {
+   "id": 39,
+   "kind": "para",
+   "start": 11188,
+   "end": 11288,
+   "text": "      ⟦0⟧\n        stored",
+   "tokens": [
+    "<span style=\"font-size:11px;font-weight:400;color:#C77D18;white-space:nowrap;\">"
+   ]
+  },
+  {
+   "id": 40,
+   "kind": "para",
+   "start": 11289,
+   "end": 11318,
+   "text": "        ⟦0⟧\n        stream",
+   "tokens": [
+    "<br />"
+   ]
+  },
+  {
+   "id": 41,
+   "kind": "para",
+   "start": 11591,
+   "end": 11808,
+   "text": "      ⟦0⟧\n        Load time",
+   "tokens": [
+    "<span style=\"position:absolute;top:-10px;left:12px;background:#fff;padding:0 6px;font-size:11px;font-weight:700;color:#047857;text-transform:uppercase;letter-spacing:0.5px;white-space:nowrap;\">"
+   ]
+  },
+  {
+   "id": 42,
+   "kind": "para",
+   "start": 11823,
+   "end": 12047,
+   "text": "      ⟦0⟧\n        ⟦1⟧Dequantize⟦2⟧",
+   "tokens": [
+    "<span style=\"display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:2px;background:#D1FAE5;color:#047857;border-radius:9px;padding:8px 12px;\">",
+    "<span>",
+    "</span>"
+   ]
+  },
+  {
+   "id": 43,
+   "kind": "para",
+   "start": 12048,
+   "end": 12155,
+   "text": "        ⟦0⟧\n          to mm / m",
+   "tokens": [
+    "<span style=\"font-size:11px;font-weight:400;color:#059669;white-space:nowrap;\">"
+   ]
+  },
+  {
+   "id": 44,
+   "kind": "para",
+   "start": 12214,
+   "end": 12458,
+   "text": "Configure the depth pipeline through a parallel **⟦0⟧** block (⟦1⟧). It shares every ⟦2⟧ field (⟦3⟧, ⟦4⟧, ⟦5⟧, …) and adds four quantizer knobs, set via ⟦6⟧:",
+   "tokens": [
+    "`depth_encoder`",
+    "`DepthEncoderConfig`",
+    "`RGBEncoderConfig`",
+    "`vcodec`",
+    "`pix_fmt`",
+    "`crf`",
+    "`--dataset.depth_encoder.<field>`"
+   ]
+  },
+  {
+   "id": 45,
+   "kind": "table",
+   "start": 12672,
+   "end": 12872,
+   "text": "| Parameter       | Type    | Default                         | Description                                                                                                                            |",
+   "tokens": []
+  },
+  {
+   "id": 46,
+   "kind": "table",
+   "start": 13074,
+   "end": 13274,
+   "text": "| ⟦0⟧        | ⟦1⟧   | ⟦2⟧                        | HEVC Main 12 (a 12-bit-capable codec, MP4-compatible).                                                                                 |",
+   "tokens": [
+    "`vcodec`",
+    "`str`",
+    "`\"hevc\"`"
+   ]
+  },
+  {
+   "id": 47,
+   "kind": "table",
+   "start": 13275,
+   "end": 13475,
+   "text": "| ⟦0⟧ | ⟦1⟧  | ⟦2⟧ | **Depth defaults to lossless** (exact round-trip); ⟦3⟧ is ignored. Pass ⟦4⟧ and set ⟦5⟧ for a smaller lossy stream. |",
+   "tokens": [
+    "`extra_options`",
+    "`dict`",
+    "`{\"x265-params\": \"lossless=1\"}`",
+    "`crf`",
+    "`extra_options={}`",
+    "`crf`"
+   ]
+  },
+  {
+   "id": 48,
+   "kind": "table",
+   "start": 13476,
+   "end": 13676,
+   "text": "| ⟦0⟧       | ⟦1⟧   | ⟦2⟧                    | Single-channel 12-bit pixel format used to carry the quantized codes.                                                                  |",
+   "tokens": [
+    "`pix_fmt`",
+    "`str`",
+    "`\"gray12le\"`"
+   ]
+  },
+  {
+   "id": 49,
+   "kind": "table",
+   "start": 13677,
+   "end": 13877,
+   "text": "| ⟦0⟧     | ⟦1⟧ | ⟦2⟧                          | Depth in metres mapped to quantum ⟦3⟧. Values below are clipped on decode.                                                             |",
+   "tokens": [
+    "`depth_min`",
+    "`float`",
+    "`0.01`",
+    "`0`"
+   ]
+  },
+  {
+   "id": 50,
+   "kind": "table",
+   "start": 13878,
+   "end": 14078,
+   "text": "| ⟦0⟧     | ⟦1⟧ | ⟦2⟧                          | Depth in metres mapped to quantum ⟦3⟧. Values above are clipped on decode.                                                          |",
+   "tokens": [
+    "`depth_max`",
+    "`float`",
+    "`10.0`",
+    "`4095`"
+   ]
+  },
+  {
+   "id": 51,
+   "kind": "table",
+   "start": 14079,
+   "end": 14279,
+   "text": "| ⟦0⟧         | ⟦1⟧ | ⟦2⟧                           | Pre-log offset (metres) used in logarithmic quantization for numerical stability near zero. Must satisfy ⟦3⟧.      |",
+   "tokens": [
+    "`shift`",
+    "`float`",
+    "`3.5`",
+    "`depth_min + shift > 0`"
+   ]
+  },
+  {
+   "id": 52,
+   "kind": "table",
+   "start": 14280,
+   "end": 14480,
+   "text": "| ⟦0⟧       | ⟦1⟧  | ⟦2⟧                          | If ⟦3⟧, quantize in log-space (recommended for typical depth sensors). Set to ⟦4⟧ for uniform/linear quantization.              |",
+   "tokens": [
+    "`use_log`",
+    "`bool`",
+    "`True`",
+    "`true`",
+    "`false`"
+   ]
+  },
+  {
+   "id": 53,
+   "kind": "quote",
+   "start": 14482,
+   "end": 14920,
+   "text": "> [!TIP]\n> ⟦0⟧, ⟦1⟧, and ⟦2⟧ are always interpreted in **metres**, regardless of the input depth's unit. Inputs are auto-detected: integer arrays (e.g. ⟦3⟧ millimetres straight from a RealSense) are treated as millimetres, floating arrays as metres.\n> Pick ⟦4⟧ / ⟦5⟧ to bracket the actual working range of your sensor — quanta outside that range saturate, which can crush detail at the boundaries.",
+   "tokens": [
+    "`depth_min`",
+    "`depth_max`",
+    "`shift`",
+    "`uint16`",
+    "`depth_min`",
+    "`depth_max`"
+   ]
+  },
+  {
+   "id": 54,
+   "kind": "para",
+   "start": 14922,
+   "end": 15189,
+   "text": "Depth features are flagged with ⟦0⟧ in ⟦1⟧, and their quantizer settings (⟦2⟧, ⟦3⟧, ⟦4⟧, ⟦5⟧) are persisted — which is what lets depth be **dequantized back to physical units** on load.",
+   "tokens": [
+    "`\"is_depth_map\": true`",
+    "`meta/info.json`",
+    "`video.depth_min`",
+    "`video.depth_max`",
+    "`video.shift`",
+    "`video.use_log`"
+   ]
+  },
+  {
+   "id": 55,
+   "kind": "heading",
+   "start": 15191,
+   "end": 15219,
+   "text": "### Output unit at load time",
+   "tokens": []
+  },
+  {
+   "id": 56,
+   "kind": "para",
+   "start": 15221,
+   "end": 15414,
+   "text": "⟦0⟧ is a **record-time** concern. The unit that depth maps are dequantized to on _load_ (e.g. during training) is set separately by the read-time flag ⟦1⟧:",
+   "tokens": [
+    "`depth_encoder`",
+    "`--dataset.depth_output_unit`"
+   ]
+  },
+  {
+   "id": 57,
+   "kind": "table",
+   "start": 15559,
+   "end": 15695,
+   "text": "| Parameter           | Type  | Default | Description                                                                                  |",
+   "tokens": []
+  },
+  {
+   "id": 58,
+   "kind": "table",
+   "start": 15833,
+   "end": 15969,
+   "text": "| ⟦0⟧ | ⟦1⟧ | ⟦2⟧  | Physical unit depth maps are dequantized to on load: ⟦3⟧ (millimetres) or ⟦4⟧ (metres). |",
+   "tokens": [
+    "`depth_output_unit`",
+    "`str`",
+    "`\"mm\"`",
+    "`\"mm\"`",
+    "`\"m\"`"
+   ]
+  },
+  {
+   "id": 59,
+   "kind": "quote",
+   "start": 15971,
+   "end": 16208,
+   "text": "> [!TIP]\n> This is purely a decode-time presentation choice — it does **not** alter the stored video or its metadata, so the same dataset can be read as ⟦0⟧ or ⟦1⟧ without re-encoding. It has no effect on datasets without depth cameras.",
+   "tokens": [
+    "`mm`",
+    "`m`"
+   ]
+  },
+  {
+   "id": 60,
+   "kind": "heading",
+   "start": 16215,
+   "end": 16249,
+   "text": "## Persistence in dataset metadata",
+   "tokens": []
+  },
+  {
+   "id": 61,
+   "kind": "para",
+   "start": 16251,
+   "end": 16549,
+   "text": "After the first episode of a video stream is encoded, the encoder configuration is **persisted into the dataset metadata** (⟦0⟧) under each video feature, alongside the values probed from the file itself. For a video feature ⟦1⟧, the layout in ⟦2⟧ is:",
+   "tokens": [
+    "`meta/info.json`",
+    "`observation.images.<camera>`",
+    "`info.json`"
+   ]
+  },
+  {
+   "id": 62,
+   "kind": "para",
+   "start": 17146,
+   "end": 17189,
+   "text": "Two sources contribute to the ⟦0⟧ block:",
+   "tokens": [
+    "`info`"
+   ]
+  },
+  {
+   "id": 63,
+   "kind": "table",
+   "start": 17191,
+   "end": 17392,
+   "text": "| Source              | Where it comes from                                   | Fields                                                                                                                  |",
+   "tokens": []
+  },
+  {
+   "id": 64,
+   "kind": "table",
+   "start": 17595,
+   "end": 17796,
+   "text": "| **Stream-derived**  | Read back from the encoded MP4 with PyAV.             | ⟦0⟧, ⟦1⟧, ⟦2⟧, ⟦3⟧, ⟦4⟧, ⟦5⟧, ⟦6⟧, ⟦7⟧ |",
+   "tokens": [
+    "`video.height`",
+    "`video.width`",
+    "`video.codec`",
+    "`video.pix_fmt`",
+    "`video.fps`",
+    "`video.channels`",
+    "`is_depth_map`",
+    "`audio.*`"
+   ]
+  },
+  {
+   "id": 65,
+   "kind": "table",
+   "start": 17797,
+   "end": 17998,
+   "text": "| **Encoder-derived** | Taken from ⟦0⟧ / ⟦1⟧. | ⟦2⟧, ⟦3⟧, ⟦4⟧, ⟦5⟧, ⟦6⟧, ⟦7⟧               |",
+   "tokens": [
+    "`RGBEncoderConfig`",
+    "`DepthEncoderConfig`",
+    "`video.g`",
+    "`video.crf`",
+    "`video.preset`",
+    "`video.fast_decode`",
+    "`video.video_backend`",
+    "`video.extra_options`"
+   ]
+  },
+  {
+   "id": 66,
+   "kind": "quote",
+   "start": 18000,
+   "end": 18315,
+   "text": "> [!IMPORTANT]\n> This block is populated **once**, from the **first** episode. It assumes every\n> episode in the dataset was encoded with the same ⟦0⟧. Changing\n> encoder settings partway through a recording is not supported — the\n> ⟦1⟧ will only reflect the parameters used for the first episode.",
+   "tokens": [
+    "`rgb_encoder`",
+    "`info.json`"
+   ]
+  },
+  {
+   "id": 67,
+   "kind": "heading",
+   "start": 18322,
+   "end": 18341,
+   "text": "## Merging datasets",
+   "tokens": []
+  },
+  {
+   "id": 68,
+   "kind": "para",
+   "start": 18343,
+   "end": 18498,
+   "text": "When aggregating datasets with ⟦0⟧, video files are concatenated as-is (no re-encoding), and encoder fields in ⟦1⟧ are merged per-key:",
+   "tokens": [
+    "`merge_datasets`",
+    "`info.json`"
+   ]
+  },
+  {
+   "id": 69,
+   "kind": "table",
+   "start": 18500,
+   "end": 18763,
+   "text": "| Merge rule         | Fields                                                                             | Behaviour                                                                                                                                                 |",
+   "tokens": []
+  },
+  {
+   "id": 70,
+   "kind": "table",
+   "start": 19028,
+   "end": 19291,
+   "text": "| **Must match**     | ⟦0⟧, ⟦1⟧, ⟦2⟧, ⟦3⟧, ⟦4⟧         | Stream-derived fields must match across sources, otherwise FFmpeg's concat demuxer fails.                                                                 |",
+   "tokens": [
+    "`video.codec`",
+    "`video.pix_fmt`",
+    "`video.height`",
+    "`video.width`",
+    "`video.fps`"
+   ]
+  },
+  {
+   "id": 71,
+   "kind": "table",
+   "start": 19292,
+   "end": 19555,
+   "text": "| **Merged loosely** | ⟦0⟧, ⟦1⟧, ⟦2⟧, ⟦3⟧, ⟦4⟧ | Encoder-tuning fields. If every source agrees, the value is kept; if not, it's set to ⟦5⟧ (or ⟦6⟧ for ⟦7⟧) and a warning is logged. |",
+   "tokens": [
+    "`video.g`",
+    "`video.crf`",
+    "`video.preset`",
+    "`video.fast_decode`",
+    "`video.extra_options`",
+    "`null`",
+    "`{}`",
+    "`video.extra_options`"
+   ]
+  }
+ ]
+}

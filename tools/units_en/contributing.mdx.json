@@ -1,0 +1,298 @@
+{
+ "file": "contributing.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1956,
+   "text": "# How to contribute to 🤗 LeRobot",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1958,
+   "end": 2186,
+   "text": "Everyone is welcome to contribute, and we value everybody's contribution. Code is not the only way to help the community. Answering questions, helping others, reaching out, and improving the documentation are immensely valuable.",
+   "tokens": []
+  },
+  {
+   "id": 2,
+   "kind": "para",
+   "start": 2188,
+   "end": 2431,
+   "text": "Whichever way you choose to contribute, please be mindful to respect our [code of conduct](⟦0⟧) and our [AI policy](⟦1⟧).",
+   "tokens": [
+    "https://github.com/huggingface/lerobot/blob/main/CODE_OF_CONDUCT.md",
+    "https://github.com/huggingface/lerobot/blob/main/AI_POLICY.md"
+   ]
+  },
+  {
+   "id": 3,
+   "kind": "heading",
+   "start": 2433,
+   "end": 2454,
+   "text": "## Ways to Contribute",
+   "tokens": []
+  },
+  {
+   "id": 4,
+   "kind": "para",
+   "start": 2456,
+   "end": 2488,
+   "text": "You can contribute in many ways:",
+   "tokens": []
+  },
+  {
+   "id": 5,
+   "kind": "list",
+   "start": 2490,
+   "end": 2549,
+   "text": "- **Fixing issues:** Resolve bugs or improve existing code.",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "list",
+   "start": 2550,
+   "end": 2591,
+   "text": "- **New features:** Develop new features.",
+   "tokens": []
+  },
+  {
+   "id": 7,
+   "kind": "list",
+   "start": 2592,
+   "end": 2716,
+   "text": "- **Extend:** Implement new models/policies, robots, or simulation environments and upload datasets to the Hugging Face Hub.",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "list",
+   "start": 2717,
+   "end": 2779,
+   "text": "- **Documentation:** Improve examples, guides, and docstrings.",
+   "tokens": []
+  },
+  {
+   "id": 9,
+   "kind": "list",
+   "start": 2780,
+   "end": 2851,
+   "text": "- **Feedback:** Submit tickets related to bugs or desired new features.",
+   "tokens": []
+  },
+  {
+   "id": 10,
+   "kind": "para",
+   "start": 2853,
+   "end": 2945,
+   "text": "If you are unsure where to start, join our [Discord Channel](⟦0⟧).",
+   "tokens": [
+    "https://discord.gg/q8Dzzpym3f"
+   ]
+  },
+  {
+   "id": 11,
+   "kind": "heading",
+   "start": 2947,
+   "end": 2967,
+   "text": "## Development Setup",
+   "tokens": []
+  },
+  {
+   "id": 12,
+   "kind": "para",
+   "start": 2969,
+   "end": 3034,
+   "text": "To contribute code, you need to set up a development environment.",
+   "tokens": []
+  },
+  {
+   "id": 13,
+   "kind": "heading",
+   "start": 3036,
+   "end": 3057,
+   "text": "### 1. Fork and Clone",
+   "tokens": []
+  },
+  {
+   "id": 14,
+   "kind": "para",
+   "start": 3059,
+   "end": 3111,
+   "text": "Fork the repository on GitHub, then clone your fork:",
+   "tokens": []
+  },
+  {
+   "id": 15,
+   "kind": "heading",
+   "start": 3259,
+   "end": 3290,
+   "text": "### 2. Environment Installation",
+   "tokens": []
+  },
+  {
+   "id": 16,
+   "kind": "para",
+   "start": 3292,
+   "end": 3434,
+   "text": "Please follow our [Installation Guide](⟦0⟧) for the environment setup & installation from source.",
+   "tokens": [
+    "https://huggingface.co/docs/lerobot/installation"
+   ]
+  },
+  {
+   "id": 17,
+   "kind": "heading",
+   "start": 3436,
+   "end": 3469,
+   "text": "## Running Tests & Quality Checks",
+   "tokens": []
+  },
+  {
+   "id": 18,
+   "kind": "heading",
+   "start": 3471,
+   "end": 3498,
+   "text": "### Code Style (Pre-commit)",
+   "tokens": []
+  },
+  {
+   "id": 19,
+   "kind": "para",
+   "start": 3500,
+   "end": 3573,
+   "text": "Install ⟦0⟧ hooks to run checks automatically before you commit:",
+   "tokens": [
+    "`pre-commit`"
+   ]
+  },
+  {
+   "id": 20,
+   "kind": "para",
+   "start": 3607,
+   "end": 3643,
+   "text": "To run checks manually on all files:",
+   "tokens": []
+  },
+  {
+   "id": 21,
+   "kind": "heading",
+   "start": 3685,
+   "end": 3699,
+   "text": "### Docstrings",
+   "tokens": []
+  },
+  {
+   "id": 22,
+   "kind": "para",
+   "start": 3701,
+   "end": 3954,
+   "text": "The API reference is generated from the docstrings in ⟦0⟧. If you add or change anything public, follow the [docstring standard](⟦1⟧) — the format is parsed by the renderer and checked in CI.",
+   "tokens": [
+    "`src/lerobot/`",
+    "https://huggingface.co/docs/lerobot/writing_docstrings"
+   ]
+  },
+  {
+   "id": 23,
+   "kind": "heading",
+   "start": 3956,
+   "end": 3973,
+   "text": "### Running Tests",
+   "tokens": []
+  },
+  {
+   "id": 24,
+   "kind": "para",
+   "start": 3975,
+   "end": 4056,
+   "text": "We use ⟦0⟧. First, ensure you have test artifacts by installing **git-lfs**:",
+   "tokens": [
+    "`pytest`"
+   ]
+  },
+  {
+   "id": 25,
+   "kind": "para",
+   "start": 4100,
+   "end": 4155,
+   "text": "Run the full suite (this may require extras installed):",
+   "tokens": []
+  },
+  {
+   "id": 26,
+   "kind": "para",
+   "start": 4189,
+   "end": 4236,
+   "text": "Or run a specific test file during development:",
+   "tokens": []
+  },
+  {
+   "id": 27,
+   "kind": "heading",
+   "start": 4293,
+   "end": 4329,
+   "text": "## Submitting Issues & Pull Requests",
+   "tokens": []
+  },
+  {
+   "id": 28,
+   "kind": "para",
+   "start": 4331,
+   "end": 4382,
+   "text": "Use the templates for required fields and examples.",
+   "tokens": []
+  },
+  {
+   "id": 29,
+   "kind": "list",
+   "start": 4384,
+   "end": 4515,
+   "text": "- **Issues:** Follow the [ticket template](⟦0⟧).",
+   "tokens": [
+    "https://github.com/huggingface/lerobot/blob/main/.github/ISSUE_TEMPLATE/bug-report.yml"
+   ]
+  },
+  {
+   "id": 30,
+   "kind": "list",
+   "start": 4516,
+   "end": 4761,
+   "text": "- **Pull requests:** Rebase on ⟦0⟧, use a descriptive branch (don't work on ⟦1⟧), run ⟦2⟧ and tests locally, and follow the [PR template](⟦3⟧).",
+   "tokens": [
+    "`upstream/main`",
+    "`main`",
+    "`pre-commit`",
+    "https://github.com/huggingface/lerobot/blob/main/.github/PULL_REQUEST_TEMPLATE.md"
+   ]
+  },
+  {
+   "id": 31,
+   "kind": "quote",
+   "start": 4763,
+   "end": 5076,
+   "text": "> [!IMPORTANT]\n> Community Review Policy: To help scale our efforts and foster a collaborative environment, we ask contributors to review at least one other person's open PR before their own receives attention. This shared responsibility multiplies our review capacity and helps everyone's code get merged faster!",
+   "tokens": []
+  },
+  {
+   "id": 32,
+   "kind": "para",
+   "start": 5078,
+   "end": 5198,
+   "text": "Once you have submitted your PR and completed a peer review, a member of the LeRobot team will review your contribution.",
+   "tokens": []
+  },
+  {
+   "id": 33,
+   "kind": "para",
+   "start": 5200,
+   "end": 5238,
+   "text": "Thank you for contributing to LeRobot!",
+   "tokens": []
+  }
+ ]
+}

@@ -1,0 +1,336 @@
+{
+ "file": "robocerebra.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1937,
+   "text": "# RoboCerebra",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1939,
+   "end": 2271,
+   "text": "[RoboCerebra](⟦0⟧) is a long-horizon manipulation benchmark that evaluates **high-level reasoning, planning, and memory** in VLAs. Episodes chain multiple sub-goals with language-grounded intermediate instructions, built on top of LIBERO's simulator stack (MuJoCo + robosuite, Franka Panda 7-DOF).",
+   "tokens": [
+    "https://robocerebra-project.github.io/"
+   ]
+  },
+  {
+   "id": 2,
+   "kind": "list",
+   "start": 2273,
+   "end": 2403,
+   "text": "- Paper: [RoboCerebra: A Large-scale Benchmark for Long-horizon Robotic Manipulation Evaluation](⟦0⟧)",
+   "tokens": [
+    "https://arxiv.org/abs/2506.06677"
+   ]
+  },
+  {
+   "id": 3,
+   "kind": "list",
+   "start": 2404,
+   "end": 2494,
+   "text": "- Project website: [robocerebra-project.github.io](⟦0⟧)",
+   "tokens": [
+    "https://robocerebra-project.github.io/"
+   ]
+  },
+  {
+   "id": 4,
+   "kind": "list",
+   "start": 2495,
+   "end": 2692,
+   "text": "- Dataset: [⟦0⟧](⟦1⟧) — LeRobot v3.0, 6,660 episodes / 571,116 frames at 20 fps, 1,728 language-grounded sub-tasks.",
+   "tokens": [
+    "`lerobot/robocerebra_unified`",
+    "https://huggingface.co/datasets/lerobot/robocerebra_unified"
+   ]
+  },
+  {
+   "id": 5,
+   "kind": "list",
+   "start": 2693,
+   "end": 2797,
+   "text": "- Pretrained policy: [⟦0⟧](⟦1⟧)",
+   "tokens": [
+    "`lerobot/smolvla_robocerebra`",
+    "https://huggingface.co/lerobot/smolvla_robocerebra"
+   ]
+  },
+  {
+   "id": 6,
+   "kind": "heading",
+   "start": 2799,
+   "end": 2817,
+   "text": "## Available tasks",
+   "tokens": []
+  },
+  {
+   "id": 7,
+   "kind": "para",
+   "start": 2819,
+   "end": 2927,
+   "text": "RoboCerebra reuses LIBERO's simulator, so evaluation runs against the LIBERO ⟦0⟧ long-horizon suite:",
+   "tokens": [
+    "`libero_10`"
+   ]
+  },
+  {
+   "id": 8,
+   "kind": "table",
+   "start": 2929,
+   "end": 3028,
+   "text": "| Suite     | CLI name    | Tasks | Description                                                   |",
+   "tokens": []
+  },
+  {
+   "id": 9,
+   "kind": "table",
+   "start": 3129,
+   "end": 3228,
+   "text": "| LIBERO-10 | ⟦0⟧ | 10    | Long-horizon kitchen/living room tasks chaining 3–6 sub-goals |",
+   "tokens": [
+    "`libero_10`"
+   ]
+  },
+  {
+   "id": 10,
+   "kind": "para",
+   "start": 3230,
+   "end": 3412,
+   "text": "Each RoboCerebra episode in the dataset is segmented into multiple sub-tasks with natural-language instructions, which the unified dataset exposes as independent supervision signals.",
+   "tokens": []
+  },
+  {
+   "id": 11,
+   "kind": "heading",
+   "start": 3414,
+   "end": 3429,
+   "text": "## Installation",
+   "tokens": []
+  },
+  {
+   "id": 12,
+   "kind": "para",
+   "start": 3431,
+   "end": 3503,
+   "text": "RoboCerebra piggybacks on LIBERO, so the ⟦0⟧ extra is all you need:",
+   "tokens": [
+    "`libero`"
+   ]
+  },
+  {
+   "id": 13,
+   "kind": "para",
+   "start": 3545,
+   "end": 3656,
+   "text": "⟦0⟧\nRoboCerebra requires Linux (MuJoCo / robosuite). Set the rendering backend before training or evaluation:",
+   "tokens": [
+    "<Tip>"
+   ]
+  },
+  {
+   "id": 14,
+   "kind": "heading",
+   "start": 3737,
+   "end": 3750,
+   "text": "## Evaluation",
+   "tokens": []
+  },
+  {
+   "id": 15,
+   "kind": "para",
+   "start": 3752,
+   "end": 3965,
+   "text": "RoboCerebra eval runs against LIBERO's ⟦0⟧ suite with RoboCerebra's camera naming (⟦1⟧ + ⟦2⟧) and an extra empty-camera slot so a three-view-trained policy receives the expected input layout:",
+   "tokens": [
+    "`libero_10`",
+    "`image`",
+    "`wrist_image`"
+   ]
+  },
+  {
+   "id": 16,
+   "kind": "heading",
+   "start": 4585,
+   "end": 4620,
+   "text": "### Recommended evaluation episodes",
+   "tokens": []
+  },
+  {
+   "id": 17,
+   "kind": "para",
+   "start": 4622,
+   "end": 4770,
+   "text": "**10 episodes per task** across the ⟦0⟧ suite (100 total) for reproducible benchmarking. Matches the protocol used in the RoboCerebra paper.",
+   "tokens": [
+    "`libero_10`"
+   ]
+  },
+  {
+   "id": 18,
+   "kind": "heading",
+   "start": 4772,
+   "end": 4800,
+   "text": "## Policy inputs and outputs",
+   "tokens": []
+  },
+  {
+   "id": 19,
+   "kind": "para",
+   "start": 4802,
+   "end": 4819,
+   "text": "**Observations:**",
+   "tokens": []
+  },
+  {
+   "id": 20,
+   "kind": "list",
+   "start": 4821,
+   "end": 4901,
+   "text": "- ⟦0⟧ — 8-dim proprioceptive state (7 joint positions + gripper)",
+   "tokens": [
+    "`observation.state`"
+   ]
+  },
+  {
+   "id": 21,
+   "kind": "list",
+   "start": 4902,
+   "end": 4969,
+   "text": "- ⟦0⟧ — third-person view, 256×256 HWC uint8",
+   "tokens": [
+    "`observation.images.image`"
+   ]
+  },
+  {
+   "id": 22,
+   "kind": "list",
+   "start": 4970,
+   "end": 5051,
+   "text": "- ⟦0⟧ — wrist-mounted camera view, 256×256 HWC uint8",
+   "tokens": [
+    "`observation.images.wrist_image`"
+   ]
+  },
+  {
+   "id": 23,
+   "kind": "para",
+   "start": 5053,
+   "end": 5065,
+   "text": "**Actions:**",
+   "tokens": []
+  },
+  {
+   "id": 24,
+   "kind": "list",
+   "start": 5067,
+   "end": 5156,
+   "text": "- Continuous control in ⟦0⟧ — end-effector delta (6D) + gripper (1D)",
+   "tokens": [
+    "`Box(-1, 1, shape=(7,))`"
+   ]
+  },
+  {
+   "id": 25,
+   "kind": "heading",
+   "start": 5158,
+   "end": 5169,
+   "text": "## Training",
+   "tokens": []
+  },
+  {
+   "id": 26,
+   "kind": "para",
+   "start": 5171,
+   "end": 5354,
+   "text": "The unified dataset at [⟦0⟧](⟦1⟧) exposes two RGB streams and language-grounded sub-task annotations:",
+   "tokens": [
+    "`lerobot/robocerebra_unified`",
+    "https://huggingface.co/datasets/lerobot/robocerebra_unified"
+   ]
+  },
+  {
+   "id": 27,
+   "kind": "table",
+   "start": 5356,
+   "end": 5431,
+   "text": "| Feature                          | Shape         | Description          |",
+   "tokens": []
+  },
+  {
+   "id": 28,
+   "kind": "table",
+   "start": 5508,
+   "end": 5583,
+   "text": "| ⟦0⟧       | (256, 256, 3) | Third-person view    |",
+   "tokens": [
+    "`observation.images.image`"
+   ]
+  },
+  {
+   "id": 29,
+   "kind": "table",
+   "start": 5584,
+   "end": 5659,
+   "text": "| ⟦0⟧ | (256, 256, 3) | Wrist-mounted camera |",
+   "tokens": [
+    "`observation.images.wrist_image`"
+   ]
+  },
+  {
+   "id": 30,
+   "kind": "table",
+   "start": 5660,
+   "end": 5735,
+   "text": "| ⟦0⟧              | (8,)          | Joint pos + gripper  |",
+   "tokens": [
+    "`observation.state`"
+   ]
+  },
+  {
+   "id": 31,
+   "kind": "table",
+   "start": 5736,
+   "end": 5811,
+   "text": "| ⟦0⟧                         | (7,)          | EEF delta + gripper  |",
+   "tokens": [
+    "`action`"
+   ]
+  },
+  {
+   "id": 32,
+   "kind": "para",
+   "start": 5813,
+   "end": 5844,
+   "text": "Fine-tune a SmolVLA base on it:",
+   "tokens": []
+  },
+  {
+   "id": 33,
+   "kind": "heading",
+   "start": 6054,
+   "end": 6086,
+   "text": "## Reproducing published results",
+   "tokens": []
+  },
+  {
+   "id": 34,
+   "kind": "para",
+   "start": 6088,
+   "end": 6417,
+   "text": "The released checkpoint [⟦0⟧](⟦1⟧) was trained on ⟦2⟧ and evaluated with the command in the [Evaluation](⟦3⟧) section. CI runs the same command with ⟦4⟧ as a smoke test on every PR touching the benchmark.",
+   "tokens": [
+    "`lerobot/smolvla_robocerebra`",
+    "https://huggingface.co/lerobot/smolvla_robocerebra",
+    "`lerobot/robocerebra_unified`",
+    "#evaluation",
+    "`--eval.n_episodes=1`"
+   ]
+  }
+ ]
+}

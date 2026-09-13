@@ -1,0 +1,341 @@
+<script lang="ts">
+import {onMount} from "svelte";
+import Tip from "$lib/Tip.svelte";
+import CopyLLMTxtMenu from "$lib/CopyLLMTxtMenu.svelte";
+import Youtube from "$lib/Youtube.svelte";
+import Docstring from "$lib/Docstring.svelte";
+import CodeBlock from "$lib/CodeBlock.svelte";
+import CodeBlockFw from "$lib/CodeBlockFw.svelte";
+import DocNotebookDropdown from "$lib/DocNotebookDropdown.svelte";
+import CourseFloatingBanner from "$lib/CourseFloatingBanner.svelte";
+import IconCopyLink from "$lib/IconCopyLink.svelte";
+import FrameworkContent from "$lib/FrameworkContent.svelte";
+import Markdown from "$lib/Markdown.svelte";
+import Question from "$lib/Question.svelte";
+import FrameworkSwitchCourse from "$lib/FrameworkSwitchCourse.svelte";
+import InferenceApi from "$lib/InferenceApi.svelte";
+import TokenizersLanguageContent from "$lib/TokenizersLanguageContent.svelte";
+import ExampleCodeBlock from "$lib/ExampleCodeBlock.svelte";
+import Added from "$lib/Added.svelte";
+import Changed from "$lib/Changed.svelte";
+import Deprecated from "$lib/Deprecated.svelte";
+import PipelineIcon from "$lib/PipelineIcon.svelte";
+import PipelineTag from "$lib/PipelineTag.svelte";
+import Heading from "$lib/Heading.svelte";
+import HfOptions from "$lib/HfOptions.svelte";
+import HfOption from "$lib/HfOption.svelte";
+import EditOnGithub from "$lib/EditOnGithub.svelte";
+import InferenceSnippet from "$lib/InferenceSnippet/InferenceSnippet.svelte";
+import MermaidChart from "$lib/MermaidChart.svelte";
+let fw: "pt" | "tf" = "pt";
+onMount(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    fw = urlParams.get("fw") || "pt";
+});
+</script>
+<svelte:head>
+  <meta name="hf:doc:metadata" content={metadata} >
+</svelte:head>
+
+<!--HF DOCBUILD BODY START-->
+
+HF_DOC_BODY_START
+
+<CopyLLMTxtMenu containerStyle="float: right; margin-left: 10px; display: inline-flex; position: relative; z-index: 10;"></CopyLLMTxtMenu>
+
+# 编写 docstring
+
+LeRobot 的 API 参考直接由 `src/lerobot/` 中的 docstring 生成。docstring 不是
+注释——它是该对象对外发布的文档，下面的格式就是渲染器和
+CI 检查所解析的内容。
+
+本页就是契约。如果你要在 `src/lerobot/` 中新增或修改任何公共内容，请遵循它。
+
+> [!IMPORTANT]
+> **没有文档的公共方法就是不可见的方法。** `[[autodoc]]` 会静默跳过没有
+> docstring 的成员——没有警告，没有错误，只是不会出现在渲染的页面上。覆盖率和
+> API 参考完整性是同一个问题。
+
+## 一个示例中的格式
+
+Google 分段标题，Hugging Face 类型格式。两者都要，而不是二选一。
+
+````python
+def send_action(self, action: RobotAction, rate_hz: float = 30.0) -> RobotAction:
+    """Command the robot to move to a target joint configuration.
+
+    Values are clipped by the configured maximum relative target before reaching the motors, so the
+    returned action may differ from the requested one.
+
+    Args:
+        action (`dict[str, float]`):
+            Target values keyed by motor name, e.g. `{"shoulder_pan.pos": 0.0}`. Keys must match the
+            robot's action features.
+        rate_hz (`float`, *optional*, defaults to `30.0`):
+            Control loop frequency.
+
+    Returns:
+        `dict[str, float]`: The action actually written to the motors after safety clipping.
+
+    Raises:
+        DeviceNotConnectedError: If the robot has not been connected.
+
+    Example:
+        ```python
+        >>> from lerobot.robots.so_follower import SO101Follower, SO101FollowerConfig
+        >>> robot = SO101Follower(SO101FollowerConfig(port="/dev/ttyACM0"))  # doctest: +SKIP
+        >>> robot.connect()  # doctest: +SKIP
+        >>> robot.send_action({"shoulder_pan.pos": 0.0})  # doctest: +SKIP
+        ```
+    """
+````
+
+本页示例中的交叉引用已被省略——有关
+它们的语法以及为什么不能在代码块内显示，请参阅 [交叉引用](#cross-references)。
+
+## 规则
+
+### 分段
+
+`Args:` · `Returns:` · `Raises:` · `Yields:` · `Example:` · `Note:`
+
+按这个顺序。没有其他分段标题。首先是一行摘要，然后是可选的自由格式
+描述，最后是各分段。
+
+### `Args:` 行由机器解析
+
+```
+name (`type`, *optional*, defaults to `X`):
+    Description, indented on its own line.
+```
+
+`*optional*, defaults to` 子句会由
+`make check-docstrings` **对照真实签名默认值进行检查**。它不是装饰性的——如果你写出的默认值与代码不一致，CI
+就会失败。对于必需参数，请完全省略该子句：
+
+```python
+    Args:
+        port (`str`):
+            Serial port the arm is connected to, e.g. `/dev/ttyACM0`.
+        max_relative_target (`float | dict[str, float]`, *optional*):
+            Caps the magnitude of the relative positional target vector. `None` disables clipping.
+        use_degrees (`bool`, *optional*, defaults to `True`):
+            Keep `True` for backward compatibility with existing policies and datasets.
+```
+
+类型放在反引号中。当默认值为 `None` 或没有其他
+值得复述的内容时，使用不带 `defaults to` 的 `*optional*`。
+
+### `Returns:` 类型优先
+
+一个缩进的行，类型在前，然后是冒号，再是描述：
+
+```python
+    Returns:
+        `dict[str, float]`: The action actually written to the motors after safety clipping.
+```
+
+`Yields:` 采用相同的格式。
+
+### 使用 `**Attributes**:`，绝不使用 `Attributes:`
+
+doc-builder 会将裸的 `Attributes:` 解析为 **`Parameters:` 的同义词**，因此你的属性会被渲染
+为构造函数参数。这是静默且错误的。每当属性与构造函数
+参数不同时，请使用带 `--` 分隔符的加粗形式：
+
+```python
+class Robot(abc.ABC):
+    """The base abstract class for all LeRobot-compatible robots.
+
+    **Attributes**:
+        - **config_class** (`type[RobotConfig]`) -- The expected configuration class for this robot.
+        - **name** (`str`) -- The unique robot name used to identify this robot type.
+    """
+```
+
+注意是 `--`，而不是 `:`。
+
+### 交叉引用
+
+使用 doc-builder 的方括号语法：由方括号包住的、用反引号引用的路径。**Sphinx 角色（`:pymeth:`、
+`:pyattr:`）不受支持**，会在页面上渲染为字面文本。
+
+| 想要的结果 | 写法 |
+| ---------------------------- | ----------------------------------- |
+| 主包中的类 | &#91;`Robot`&#93; |
+| 方法，显示完整路径 | &#91;`Robot.connect`&#93; |
+| 方法，仅显示名称 | &#91;`~Robot.connect`&#93; |
+| 嵌套路径 | &#91;`~robots.Robot.connect`&#93; |
+| 其他 HF 库中的对象 | &#91;`~accelerate.Accelerator`&#93; |
+
+`~` 只从 **链接文本** 中移除路径；链接仍然解析到完整路径。
+
+> [!NOTE]
+> doc-builder 会在页面中的任何地方解析这种语法——包括在带围栏的代码块内部。这就是
+> 本页的 docstring 示例使用普通散文而不是交叉引用的原因：包含
+> 交叉引用的代码块会渲染出解析后的链接，而不是你需要输入的语法。在你自己的 docstring 中，请自由使用
+> 交叉引用；此限制只影响_关于_该语法的文档。
+
+### 提示框
+
+使用 GitHub 风格的引用块：
+
+```markdown
+> [!TIP]
+> Call this once at startup — it takes about two seconds.
+
+> [!WARNING]
+> Torque is disabled on disconnect. The arm will drop if it is holding a load.
+```
+
+按照 doc-builder，`<Tip>` 组件是旧式的；不要再添加新的。
+
+### 示例必须带围栏
+
+示例位于带围栏的 ` ```python ` 块内，其中包含 `>>> `。围栏使其渲染
+为代码块，也是 doctest 预处理器的正则表达式所查找的内容：
+
+````python
+    Example:
+        ```python
+        >>> from lerobot.robots.so_follower import SO101FollowerConfig
+        >>> cfg = SO101FollowerConfig(port="/dev/ttyACM0")
+        >>> cfg.use_degrees
+        True
+        ```
+````
+
+> [!WARNING]
+> 不带围栏的 `>>>` 仍会被收集——doctest 会在 docstring 中的任何位置找到提示符。你失去的是
+> 渲染效果，因此它会在页面上显示为一大段文字。每个示例都需要围栏。
+
+每个示例要么在 CI 中执行，要么带有 `# doctest: +SKIP`。任何涉及硬件、GPU 或
+从 Hub 下载的内容都会加上 `+SKIP`：
+
+````python
+    Example:
+        ```python
+        >>> robot.connect()  # doctest: +SKIP
+        >>> policy = ACTPolicy.from_pretrained("lerobot/act_aloha_sim_transfer_cube_human")  # doctest: +SKIP
+        ```
+````
+
+将包含可运行示例的文件添加到 `utils/documentation_tests.txt`。
+
+将示例放在模块的三到五个真正的入口点上。放在琐碎访问器上的示例是噪音。
+
+## 你会经常遇到的三种模式
+
+### 配置 dataclass
+
+配置字段历来都是通过每个字段上方的 `#` 注释来记录的。**doc-builder 看不到
+内联注释**——这样的类渲染时会列出每个字段，却没有一条描述。请将它们移入
+类 docstring 上的 `Args:` 块：
+
+```python
+@dataclass
+class SOFollowerConfig:
+    """Configuration for SO-family follower arms.
+
+    Args:
+        port (`str`):
+            Serial port the arm is connected to, e.g. `/dev/ttyACM0`.
+        max_relative_target (`float | dict[str, float]`, *optional*):
+            Caps the magnitude of the relative positional target vector. A scalar applies to all motors;
+            a dict maps motor name to a per-motor cap. `None` disables clipping.
+        use_degrees (`bool`, *optional*, defaults to `True`):
+            Keep `True` for backward compatibility with existing policies and datasets.
+    """
+
+    port: str
+    max_relative_target: float | dict[str, float] | None = None
+    use_degrees: bool = True
+```
+
+> [!IMPORTANT]
+> **doc-builder 不会从基类继承 docstring。** LeRobot 的已注册配置类
+> 通常是薄的多继承垫片：
+>
+> ```python
+> @RobotConfig.register_subclass("so101_follower")
+> @dataclass
+> class SOFollowerRobotConfig(RobotConfig, SOFollowerConfig):
+>     pass
+> ```
+>
+> 该类的**所有**字段——包括它继承的字段——渲染时都没有任何描述，无论
+> 基类记录得多么好。`Args:` 块必须位于 `[[autodoc]]` 所命名的具体类上，
+> 并且还必须覆盖继承的字段。
+
+### 先有基类，再有具体子类
+
+抽象基类承载规范的契约。子类只记录与基类不同的部分——端口语义、
+calibration 特性、电机布局、支持的特征键。不要将基类契约复制到每个子类中。
+
+`Robot`、`Teleoperator`、`Camera`、`MotorsBus`、`ProcessorStep` 和 `PreTrainedPolicy` 都遵循这种
+形式。
+
+### 模块级别名
+
+一些公共名称是别名，而不是独立的类：
+
+```python
+SO100FollowerConfig = SOFollowerRobotConfig
+SO101FollowerConfig = SOFollowerRobotConfig
+```
+
+`[[autodoc]]` 会解析别名并渲染出**规范**的类名，因此 `## SO101FollowerConfig`
+标题会在正文中显示 `class lerobot.robots.so_follower.SOFollowerRobotConfig`。请只给规范类写一次文档，
+并在页面正文中提到别名，而不是为每个别名单独分配一个
+autodoc 块。
+
+## 不该记录什么
+
+- **私有成员。**任何以 `_` 开头的内容都不属于公共 API。
+- **用散文复述类型注解。** `port (` str `): A string.` 没有增加任何信息。说明它的用途。
+- **供应商提供的上游代码。** `src/lerobot/policies/molmoact2/molmoact2_hf_model/` 是从
+  `transformers` 引入的，已经带有上游风格的 docstring。不要动它——重新排版只会在
+  下次同步时产生冲突。它被排除在 API 参考和 docstring 检查之外。
+
+## 如何强制执行
+
+| 检查项 | 它捕获的问题 |
+| ------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `make check-docstrings` | 与签名不匹配的 `Args:` 条目；已记录但与真实默认值不一致的默认值 |
+| `make doctest` | 不再运行的示例 |
+| `make check-doctest-list` | `utils/documentation_tests.txt` 中过期或未排序的条目 |
+| `ruff`（`D` 规则）| Google 约定的风格违规 |
+| `interrogate` | docstring 覆盖率低于当前阈值 |
+| doc-builder | 指向不存在对象的 `[[autodoc]]` 路径——这会破坏文档构建 |
+
+在打开 PR 之前，请一起运行它们：
+
+```bash
+make check-docstrings && make doctest && pre-commit run --all-files
+```
+
+然后渲染页面并实际查看它：
+
+```bash
+doc-builder build lerobot docs/source/ --build_dir /tmp/doc-build
+```
+
+## 检查清单
+
+- [ ] 你接触的每个公共成员都有 docstring。
+- [ ] 每个 `Args:` 条目都与签名匹配，包括 `*optional*, defaults to` 子句。
+- [ ] `Returns:` 在一个缩进的行上类型优先。
+- [ ] 不要使用裸的 `Attributes:`——使用带 `--` 分隔符的 `**Attributes**:`。
+- [ ] 不要使用 Sphinx 角色——交叉引用使用 &#91;`~module.Class.method`&#93;。
+- [ ] 示例位于带围栏的 ` ```python ` 块内，并且要么在 CI 中运行，要么带有 `# doctest: +SKIP`。
+- [ ] 配置 dataclass 字段位于具体类上的 `Args:` 块中，而不是 `#` 注释中。
+- [ ] 已人工查看渲染后的页面。
+
+
+
+<EditOnGithub source="https://github.com/huggingface/lerobot/blob/main/docs/source/writing_docstrings.mdx" />
+
+<!--HF DOCBUILD BODY END-->
+
+HF_DOC_BODY_END
+

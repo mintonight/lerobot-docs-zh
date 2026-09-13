@@ -1,0 +1,92 @@
+<script lang="ts">
+import {onMount} from "svelte";
+import Tip from "$lib/Tip.svelte";
+import CopyLLMTxtMenu from "$lib/CopyLLMTxtMenu.svelte";
+import Youtube from "$lib/Youtube.svelte";
+import Docstring from "$lib/Docstring.svelte";
+import CodeBlock from "$lib/CodeBlock.svelte";
+import CodeBlockFw from "$lib/CodeBlockFw.svelte";
+import DocNotebookDropdown from "$lib/DocNotebookDropdown.svelte";
+import CourseFloatingBanner from "$lib/CourseFloatingBanner.svelte";
+import IconCopyLink from "$lib/IconCopyLink.svelte";
+import FrameworkContent from "$lib/FrameworkContent.svelte";
+import Markdown from "$lib/Markdown.svelte";
+import Question from "$lib/Question.svelte";
+import FrameworkSwitchCourse from "$lib/FrameworkSwitchCourse.svelte";
+import InferenceApi from "$lib/InferenceApi.svelte";
+import TokenizersLanguageContent from "$lib/TokenizersLanguageContent.svelte";
+import ExampleCodeBlock from "$lib/ExampleCodeBlock.svelte";
+import Added from "$lib/Added.svelte";
+import Changed from "$lib/Changed.svelte";
+import Deprecated from "$lib/Deprecated.svelte";
+import PipelineIcon from "$lib/PipelineIcon.svelte";
+import PipelineTag from "$lib/PipelineTag.svelte";
+import Heading from "$lib/Heading.svelte";
+import HfOptions from "$lib/HfOptions.svelte";
+import HfOption from "$lib/HfOption.svelte";
+import EditOnGithub from "$lib/EditOnGithub.svelte";
+import InferenceSnippet from "$lib/InferenceSnippet/InferenceSnippet.svelte";
+import MermaidChart from "$lib/MermaidChart.svelte";
+let fw: "pt" | "tf" = "pt";
+onMount(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    fw = urlParams.get("fw") || "pt";
+});
+</script>
+<svelte:head>
+  <meta name="hf:doc:metadata" content={metadata} >
+</svelte:head>
+
+<!--HF DOCBUILD BODY START-->
+
+HF_DOC_BODY_START
+
+<CopyLLMTxtMenu containerStyle="float: right; margin-left: 10px; display: inline-flex; position: relative; z-index: 10;"></CopyLLMTxtMenu>
+
+# 实时分块（RTC）
+
+本模块包含 **实时分块（RTC）** 的 LeRobot 实现，这是一种面向基于流匹配的 policy 的 inference 时技术。
+
+**注意**：RTC 本身不是一种 policy，而是一种 inference 增强，可与基于流匹配的 policy 配合使用，包括 [π₀](../pi0/)、[π₀.₅](../pi05/) 和 [SmolVLA](../smolvla/)。
+
+---
+
+## 引用
+
+如果你在工作中使用实时分块，请引用：
+
+```bibtex
+@misc{openpi2024,
+  author       = {Physical Intelligence Lab},
+  title        = {OpenPI: PyTorch Implementation of π0 and π0.5 Policies},
+  year         = {2024},
+  publisher    = {GitHub},
+  howpublished = {\url{https://github.com/Physical-Intelligence/openpi}},
+  license      = {Apache-2.0}
+}
+
+@misc{black2025realtimeexecutionactionchunking,
+      title={Real-Time Execution of Action Chunking Flow Policies},
+      author={Kevin Black and Manuel Y. Galliker and Sergey Levine},
+      year={2025},
+      eprint={2506.07339},
+      archivePrefix={arXiv},
+      primaryClass={cs.RO},
+      url={https://arxiv.org/abs/2506.07339},
+}
+```
+
+---
+
+## 许可证
+
+本实现遵循 **Apache 2.0 许可证**，与 LeRobot 项目保持一致。
+
+
+
+<EditOnGithub source="https://github.com/huggingface/lerobot/blob/main/docs/source/policy_rtc_README.mdx" />
+
+<!--HF DOCBUILD BODY END-->
+
+HF_DOC_BODY_END
+

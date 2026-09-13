@@ -1,0 +1,231 @@
+<script lang="ts">
+import {onMount} from "svelte";
+import Tip from "$lib/Tip.svelte";
+import CopyLLMTxtMenu from "$lib/CopyLLMTxtMenu.svelte";
+import Youtube from "$lib/Youtube.svelte";
+import Docstring from "$lib/Docstring.svelte";
+import CodeBlock from "$lib/CodeBlock.svelte";
+import CodeBlockFw from "$lib/CodeBlockFw.svelte";
+import DocNotebookDropdown from "$lib/DocNotebookDropdown.svelte";
+import CourseFloatingBanner from "$lib/CourseFloatingBanner.svelte";
+import IconCopyLink from "$lib/IconCopyLink.svelte";
+import FrameworkContent from "$lib/FrameworkContent.svelte";
+import Markdown from "$lib/Markdown.svelte";
+import Question from "$lib/Question.svelte";
+import FrameworkSwitchCourse from "$lib/FrameworkSwitchCourse.svelte";
+import InferenceApi from "$lib/InferenceApi.svelte";
+import TokenizersLanguageContent from "$lib/TokenizersLanguageContent.svelte";
+import ExampleCodeBlock from "$lib/ExampleCodeBlock.svelte";
+import Added from "$lib/Added.svelte";
+import Changed from "$lib/Changed.svelte";
+import Deprecated from "$lib/Deprecated.svelte";
+import PipelineIcon from "$lib/PipelineIcon.svelte";
+import PipelineTag from "$lib/PipelineTag.svelte";
+import Heading from "$lib/Heading.svelte";
+import HfOptions from "$lib/HfOptions.svelte";
+import HfOption from "$lib/HfOption.svelte";
+import EditOnGithub from "$lib/EditOnGithub.svelte";
+import InferenceSnippet from "$lib/InferenceSnippet/InferenceSnippet.svelte";
+import MermaidChart from "$lib/MermaidChart.svelte";
+let fw: "pt" | "tf" = "pt";
+onMount(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    fw = urlParams.get("fw") || "pt";
+});
+</script>
+<svelte:head>
+  <meta name="hf:doc:metadata" content={metadata} >
+</svelte:head>
+
+<!--HF DOCBUILD BODY START-->
+
+HF_DOC_BODY_START
+
+<CopyLLMTxtMenu containerStyle="float: right; margin-left: 10px; display: inline-flex; position: relative; z-index: 10;"></CopyLLMTxtMenu>
+
+# 速查表
+
+所有 LeRobot 命令汇集在一处。如果你忘记了某个命令的用法，或者想了解一个新命令，都可以在这里找到。
+
+> [!WARNING]
+> 对于下面列出的所有命令，请记得将端口/名称/ID 改为你自己的值！
+
+> [!TIP]
+> 查看所有命令并为你的特定设置完成配置的另一个好方法是使用这个 [Jupyter Notebook](https://github.com/huggingface/lerobot/blob/main/examples/notebooks/quickstart.ipynb)。
+
+### 设置与安装
+
+有关安装，请查看 [LeRobot Installation](https://huggingface.co/docs/lerobot/main/en/installation)。
+
+### 实用工具
+
+###### 查找端口
+
+使用此工具来识别你的机器人连接到了哪些串口。按照终端中的说明操作：你将被要求拔下 USB 线并按下 Enter。然后脚本会检测并打印该机器人的正确串口。
+
+```bash
+lerobot-find-port
+```
+
+###### 查找相机
+
+快速查找相机索引并验证其输出。此命令会将相机信息打印到终端，并将从每个检测到的相机保存测试帧到 `lerobot/outputs/captured_images`
+
+```bash
+lerobot-find-cameras
+```
+
+### calibration
+
+大多数情况下，你只需要为每个机器人和 teleoperator 执行一次 calibration。在执行 calibration 之前，请确保所有关节大致处于中间位置。
+
+```bash
+lerobot-calibrate \
+    --robot.type=so101_follower \
+    --robot.port=/dev/ttyACM0 \
+    --robot.id=my_follower_arm
+```
+
+请确保稍后在运行其他脚本时使用 calibration 时用过的相同 ID。LeRobot 就是这样找到 calibration 文件的。
+
+### teleoperation
+
+使用两个相机进行 teleoperation，并使用 Rerun 显示数据。
+
+```bash
+lerobot-teleoperate \
+    --robot.type=so101_follower \
+    --robot.port=/dev/ttyACM0 \
+    --robot.id=my_follower_arm \
+    --robot.cameras="{ top: {type: opencv, index_or_path: 1, width: 640, height: 480, fps: 30}, wrist: {type: opencv, index_or_path: 0, width: 640, height: 480, fps: 30} }" \
+    --teleop.type=so101_leader \
+    --teleop.port=/dev/ttyACM1 \
+    --teleop.id=my_leader_arm \
+    --display_data=true
+```
+
+### 录制 dataset
+
+dataset 会自动上传到服务器并保存在 repo_id 下，请确保你已通过 CLI 登录到你的 HF 账户：
+`hf auth login`
+
+你可以从 [https://huggingface.co/settings/tokens](https://huggingface.co/settings/tokens) 获取 token。
+
+```bash
+lerobot-record \
+    --robot.type=so101_follower \
+    --robot.port=/dev/ttyACM0 \
+    --robot.id=my_follower_arm \
+    --robot.cameras="{ top: {type: opencv, index_or_path: 1, width: 640, height: 480, fps: 30}, wrist: {type: opencv, index_or_path: 0, width: 640, height: 480, fps: 30} }" \
+    --teleop.type=so101_leader \
+    --teleop.port=/dev/ttyACM1 \
+    --teleop.id=my_leader_arm \
+    --dataset.repo_id=${HF_USER}/so101_dataset_test \
+    --dataset.num_episodes=30 \
+    --dataset.single_task="put the red brick in a bowl" \
+    --dataset.streaming_encoding=true \
+    --display_data=true
+```
+
+在采集 dataset 时，你可以用键盘控制该过程：
+使用键盘快捷键控制数据录制流程：
+
+- 按下**右箭头（`→`）**：保存 episode 并进入下一个。
+- 按下**左箭头（`←`）**：删除当前 episode 并重试。
+- 按下**Escape（`ESC`）**：停止、编码视频并上传。
+
+### 录制深度
+
+当你设置 `use_depth: true` 时，Intel RealSense 相机（`type: intelrealsense`）会记录深度流。深度被量化为 12 位编码，并作为独立的视频存储。
+
+```bash
+lerobot-record \
+    ... \
+    --robot.cameras="{ head: {type: intelrealsense, serial_number_or_name: \"0123456789\", width: 640, height: 480, fps: 30, use_depth: true} }" \
+    --dataset.repo_id=${HF_USER}/so101_depth_test \
+    --dataset.single_task="put the red brick in a bowl" \
+    --dataset.depth_encoder.depth_min=0.01 \
+    --dataset.depth_encoder.depth_max=10.0 \
+    --dataset.depth_encoder.shift=0.0 \
+    --dataset.depth_encoder.use_log=true
+```
+
+### 视频编码参数
+
+RGB 和深度流通过 `--dataset.rgb_encoder.*` 和 `--dataset.depth_encoder.*` 键独立编码。
+
+```bash
+lerobot-record \
+    ... \
+    --dataset.rgb_encoder.vcodec=h264 \
+    --dataset.rgb_encoder.pix_fmt=yuv420p \
+    --dataset.rgb_encoder.crf=23 \
+    --dataset.depth_encoder.vcodec=hevc \
+    --dataset.depth_encoder.extra_options='{"x265-params": "lossless=1"}'
+```
+
+### 训练
+
+根据你的硬件，训练 policy 可能需要几个小时。以下就是训练简单 `ACT` policy 的方法：
+
+```bash
+lerobot-train \
+    --dataset.repo_id=${HF_USER}/so101_dataset_test \
+    --policy.type=act \
+    --output_dir=outputs/train/act_so101_test \
+    --job_name=act_so101_test \
+    --policy.device=cuda \
+    --wandb.enable=true \
+    --policy.repo_id=${HF_USER}/policy_test \
+    --steps=20000
+```
+
+- policy 类型：`act`、`diffusion`、`smolvla`、`pi05`
+- 设备：`cuda`（NVIDIA）、`mps`（Apple Silicon）、`cpu`
+
+如果你想 fine-tune 特定的模型，可以提供模型的路径。在这种情况下，路径已足够，可以省略类型。
+
+```bash
+lerobot-train \
+    --dataset.repo_id=${HF_USER}/so101_dataset_test \
+    --policy.path=username/the_policy_to_finetune \
+    --policy.device=cuda \
+    --policy.repo_id=${HF_USER}/policy_test \
+    --output_dir=outputs/train/act_so101_test \
+    --steps=20000
+```
+
+没有本地 GPU？任选一个命令加上 `--job.target=<flavor>`（例如 `a10g-small`），`lerobot-train` 就会在 [Hugging Face Jobs](https://huggingface.co/docs/hub/jobs) 上运行它——它会为你上传仅本地存在的 dataset 并推送训练好的模型。使用 `hf jobs hardware` 列出可用的规格（flavor）。
+
+要恢复训练，将 `--config_path` 指向一个 checkpoint 并添加 `--resume=true`。它接受本地路径或 Hub 仓库 ID（会获取最新的 checkpoint），并通过添加 `--job.target=<flavor>` 在本地或作业上工作：
+
+```bash
+lerobot-train --config_path=${HF_USER}/policy_test --resume=true --job.target=a10g-small
+```
+
+### inference
+
+inference 是指在机器人上运行训练好的 policy/模型。为此我们使用 `lerobot-rollout`。你需要提供 policy 的路径。它可以是本地路径，也可以是 Hugging Face 上的路径，例如 “lerobot/folding_latest”。你的相机配置需要与采集 dataset 时使用的配置一致。Duration 以秒为单位，如果未指定，它将永远运行。
+
+> [!TIP]
+> 如果你使用的是旧版 V0.5.1 而不是 `lerobot-rollout`，则需要使用 `lerobot-record`。更多信息请点击[此处](https://huggingface.co/docs/lerobot/v0.5.1/en/il_robots#run-inference-and-evaluate-your-policy)。
+
+```bash
+lerobot-rollout \
+    --strategy.type=base \
+    --policy.path=${HF_USER}/my_policy \
+    --robot.type=so101_follower \
+    --robot.port=/dev/ttyACM1 \
+    --robot.cameras="{ up: {type: opencv, index_or_path: /dev/video1, width: 640, height: 480, fps: 30}, side: {type: opencv, index_or_path: /dev/video5, width: 640, height: 480, fps: 30}}" \
+    --task="Put lego brick into the transparent box" \
+    --duration=60
+```
+
+
+
+<EditOnGithub source="https://github.com/huggingface/lerobot/blob/main/docs/source/cheat-sheet.mdx" />
+
+<!--HF DOCBUILD BODY END-->
+
+HF_DOC_BODY_END
+

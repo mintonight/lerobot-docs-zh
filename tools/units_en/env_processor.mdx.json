@@ -1,0 +1,480 @@
+{
+ "file": "env_processor.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1948,
+   "text": "# Environment Processors",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1950,
+   "end": 2269,
+   "text": "Environment processors are a critical layer in LeRobot's data processing architecture that handle **environment-specific** transformations, separate from policy-specific processing. This separation of concerns enables cleaner code, better modularity, and easier experimentation with different environments and policies.",
+   "tokens": []
+  },
+  {
+   "id": 2,
+   "kind": "heading",
+   "start": 2271,
+   "end": 2301,
+   "text": "## Why Environment Processors?",
+   "tokens": []
+  },
+  {
+   "id": 3,
+   "kind": "para",
+   "start": 2303,
+   "end": 2587,
+   "text": "When working with different robot environments (LIBERO, MetaWorld, Aloha, etc.), each environment often has unique data formats, coordinate systems, and conventions that need standardization **before** policy processing. Without environment processors, these transformations would be:",
+   "tokens": []
+  },
+  {
+   "id": 4,
+   "kind": "list",
+   "start": 2589,
+   "end": 2698,
+   "text": "1. **Hardcoded in environment code** - Making it difficult to experiment with different state representations",
+   "tokens": []
+  },
+  {
+   "id": 5,
+   "kind": "list",
+   "start": 2699,
+   "end": 2795,
+   "text": "2. **Duplicated across policies** - Each policy would need to handle environment-specific quirks",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "list",
+   "start": 2796,
+   "end": 2889,
+   "text": "3. **Mixed with policy logic** - Violating separation of concerns and making debugging harder",
+   "tokens": []
+  },
+  {
+   "id": 7,
+   "kind": "para",
+   "start": 2891,
+   "end": 3026,
+   "text": "Environment processors solve this by providing a **dedicated processing layer** between raw environment observations and policy inputs.",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "heading",
+   "start": 3028,
+   "end": 3054,
+   "text": "## The Processing Pipeline",
+   "tokens": []
+  },
+  {
+   "id": 9,
+   "kind": "para",
+   "start": 3056,
+   "end": 3137,
+   "text": "Here's how data flows through the complete processing pipeline during evaluation:",
+   "tokens": []
+  },
+  {
+   "id": 10,
+   "kind": "heading",
+   "start": 4435,
+   "end": 4450,
+   "text": "## The Benefits",
+   "tokens": []
+  },
+  {
+   "id": 11,
+   "kind": "heading",
+   "start": 4452,
+   "end": 4485,
+   "text": "### 1. **Separation of Concerns**",
+   "tokens": []
+  },
+  {
+   "id": 12,
+   "kind": "para",
+   "start": 4487,
+   "end": 4668,
+   "text": "Environment processors handle transformations specific to the **environment's data format**, while policy processors handle transformations specific to the **model's requirements**.",
+   "tokens": []
+  },
+  {
+   "id": 13,
+   "kind": "heading",
+   "start": 5292,
+   "end": 5330,
+   "text": "### 2. **Flexibility and Reusability**",
+   "tokens": []
+  },
+  {
+   "id": 14,
+   "kind": "para",
+   "start": 5332,
+   "end": 5464,
+   "text": "The same policy can work with different environment processors, and the same environment processor can work with different policies:",
+   "tokens": []
+  },
+  {
+   "id": 15,
+   "kind": "heading",
+   "start": 5988,
+   "end": 6021,
+   "text": "### 3. **Easier Experimentation**",
+   "tokens": []
+  },
+  {
+   "id": 16,
+   "kind": "para",
+   "start": 6023,
+   "end": 6107,
+   "text": "Want to try different state representations for LIBERO? Just create a new processor:",
+   "tokens": []
+  },
+  {
+   "id": 17,
+   "kind": "heading",
+   "start": 7300,
+   "end": 7335,
+   "text": "### 4. **Cleaner Environment Code**",
+   "tokens": []
+  },
+  {
+   "id": 18,
+   "kind": "para",
+   "start": 7337,
+   "end": 7436,
+   "text": "Environments expose **all available data** without needing to know what downstream models will use:",
+   "tokens": []
+  },
+  {
+   "id": 19,
+   "kind": "heading",
+   "start": 7867,
+   "end": 7898,
+   "text": "## Using Environment Processors",
+   "tokens": []
+  },
+  {
+   "id": 20,
+   "kind": "heading",
+   "start": 7900,
+   "end": 7920,
+   "text": "### Factory Function",
+   "tokens": []
+  },
+  {
+   "id": 21,
+   "kind": "para",
+   "start": 7922,
+   "end": 8034,
+   "text": "The ⟦0⟧ function follows the same pattern as ⟦1⟧ for policies:",
+   "tokens": [
+    "`make_env_pre_post_processors`",
+    "`make_pre_post_processors`"
+   ]
+  },
+  {
+   "id": 22,
+   "kind": "heading",
+   "start": 8533,
+   "end": 8572,
+   "text": "### Implementation in ⟦0⟧",
+   "tokens": [
+    "`envs/factory.py`"
+   ]
+  },
+  {
+   "id": 23,
+   "kind": "heading",
+   "start": 9723,
+   "end": 9752,
+   "text": "### Integration in Evaluation",
+   "tokens": []
+  },
+  {
+   "id": 24,
+   "kind": "para",
+   "start": 9754,
+   "end": 9840,
+   "text": "In ⟦0⟧, the environment processors are created once and used throughout:",
+   "tokens": [
+    "`lerobot_eval.py`"
+   ]
+  },
+  {
+   "id": 25,
+   "kind": "heading",
+   "start": 10802,
+   "end": 10842,
+   "text": "## Example: LIBERO Environment Processor",
+   "tokens": []
+  },
+  {
+   "id": 26,
+   "kind": "para",
+   "start": 10844,
+   "end": 10918,
+   "text": "The ⟦0⟧ demonstrates a real-world environment processor:",
+   "tokens": [
+    "`LiberoProcessorStep`"
+   ]
+  },
+  {
+   "id": 27,
+   "kind": "heading",
+   "start": 12645,
+   "end": 12675,
+   "text": "### Why These Transformations?",
+   "tokens": []
+  },
+  {
+   "id": 28,
+   "kind": "list",
+   "start": 12677,
+   "end": 12887,
+   "text": "1. **Image Rotation**: The HuggingFaceVLA/libero dataset has images rotated 180° from the raw LIBERO simulator. The processor handles this convention mismatch so policies trained on the dataset work seamlessly.",
+   "tokens": []
+  },
+  {
+   "id": 29,
+   "kind": "list",
+   "start": 12889,
+   "end": 13083,
+   "text": "2. **State Flattening**: The raw LIBERO environment exposes nested dictionaries with all available state information (position, quaternion, velocity, matrix representation, etc.). The processor:",
+   "tokens": []
+  },
+  {
+   "id": 30,
+   "kind": "list",
+   "start": 13084,
+   "end": 13141,
+   "text": "   - Selects the relevant components (pos, quat, gripper)",
+   "tokens": []
+  },
+  {
+   "id": 31,
+   "kind": "list",
+   "start": 13142,
+   "end": 13209,
+   "text": "   - Converts quaternion to axis-angle (more suitable for learning)",
+   "tokens": []
+  },
+  {
+   "id": 32,
+   "kind": "list",
+   "start": 13210,
+   "end": 13266,
+   "text": "   - Flattens to a single 8D vector that policies expect",
+   "tokens": []
+  },
+  {
+   "id": 33,
+   "kind": "list",
+   "start": 13268,
+   "end": 13538,
+   "text": "3. **Flexibility**: The environment still exposes **all** raw data. If you want to try different state representations (e.g., including velocities, using matrix representation instead of axis-angle), you can create a new processor without modifying the environment code.",
+   "tokens": []
+  },
+  {
+   "id": 34,
+   "kind": "heading",
+   "start": 13540,
+   "end": 13593,
+   "text": "## Adding Environment Processors for New Environments",
+   "tokens": []
+  },
+  {
+   "id": 35,
+   "kind": "para",
+   "start": 13595,
+   "end": 13647,
+   "text": "To add environment processors for a new environment:",
+   "tokens": []
+  },
+  {
+   "id": 36,
+   "kind": "heading",
+   "start": 13649,
+   "end": 13681,
+   "text": "### 1. Create the Processor Step",
+   "tokens": []
+  },
+  {
+   "id": 37,
+   "kind": "heading",
+   "start": 14296,
+   "end": 14335,
+   "text": "### 2. Update Your ⟦0⟧ Subclass",
+   "tokens": [
+    "`EnvConfig`"
+   ]
+  },
+  {
+   "id": 38,
+   "kind": "heading",
+   "start": 14893,
+   "end": 14917,
+   "text": "### 3. Use in Evaluation",
+   "tokens": []
+  },
+  {
+   "id": 39,
+   "kind": "para",
+   "start": 14919,
+   "end": 15005,
+   "text": "No changes needed! The evaluation script automatically uses the appropriate processor:",
+   "tokens": []
+  },
+  {
+   "id": 40,
+   "kind": "heading",
+   "start": 15162,
+   "end": 15199,
+   "text": "## Future: Environment Postprocessors",
+   "tokens": []
+  },
+  {
+   "id": 41,
+   "kind": "para",
+   "start": 15201,
+   "end": 15295,
+   "text": "Currently, postprocessors are identity (no-op) for all environments. Future use cases include:",
+   "tokens": []
+  },
+  {
+   "id": 42,
+   "kind": "heading",
+   "start": 15297,
+   "end": 15329,
+   "text": "### Action Space Transformations",
+   "tokens": []
+  },
+  {
+   "id": 43,
+   "kind": "heading",
+   "start": 15916,
+   "end": 15949,
+   "text": "### Coordinate System Conversions",
+   "tokens": []
+  },
+  {
+   "id": 44,
+   "kind": "heading",
+   "start": 16388,
+   "end": 16405,
+   "text": "## Best Practices",
+   "tokens": []
+  },
+  {
+   "id": 45,
+   "kind": "list",
+   "start": 16407,
+   "end": 16560,
+   "text": "1. **Keep environment processors simple**: They should only handle environment-specific data format issues, not complex learning-related transformations.",
+   "tokens": []
+  },
+  {
+   "id": 46,
+   "kind": "list",
+   "start": 16562,
+   "end": 16703,
+   "text": "2. **Use policy processors for model requirements**: Normalization, batching, device placement, and tokenization belong in policy processors.",
+   "tokens": []
+  },
+  {
+   "id": 47,
+   "kind": "list",
+   "start": 16705,
+   "end": 16831,
+   "text": "3. **Expose all data from environments**: Let processors decide what to use rather than hardcoding choices in the environment.",
+   "tokens": []
+  },
+  {
+   "id": 48,
+   "kind": "list",
+   "start": 16833,
+   "end": 16979,
+   "text": "4. **Document conventions**: Clearly document any coordinate system conventions, camera orientations, or data formats that your processor handles.",
+   "tokens": []
+  },
+  {
+   "id": 49,
+   "kind": "list",
+   "start": 16981,
+   "end": 17096,
+   "text": "5. **Test independently**: Environment processors should be testable without loading full policies or environments.",
+   "tokens": []
+  },
+  {
+   "id": 50,
+   "kind": "heading",
+   "start": 17098,
+   "end": 17108,
+   "text": "## Summary",
+   "tokens": []
+  },
+  {
+   "id": 51,
+   "kind": "para",
+   "start": 17110,
+   "end": 17272,
+   "text": "Environment processors provide a **clean separation** between environment-specific data transformations and policy-specific model requirements. This architecture:",
+   "tokens": []
+  },
+  {
+   "id": 52,
+   "kind": "list",
+   "start": 17274,
+   "end": 17343,
+   "text": "- ✅ Enables easy experimentation with different state representations",
+   "tokens": []
+  },
+  {
+   "id": 53,
+   "kind": "list",
+   "start": 17344,
+   "end": 17412,
+   "text": "- ✅ Allows policies to work seamlessly across different environments",
+   "tokens": []
+  },
+  {
+   "id": 54,
+   "kind": "list",
+   "start": 17413,
+   "end": 17480,
+   "text": "- ✅ Keeps environment code focused on simulation/hardware interface",
+   "tokens": []
+  },
+  {
+   "id": 55,
+   "kind": "list",
+   "start": 17481,
+   "end": 17543,
+   "text": "- ✅ Makes processor pipelines more maintainable and debuggable",
+   "tokens": []
+  },
+  {
+   "id": 56,
+   "kind": "list",
+   "start": 17544,
+   "end": 17591,
+   "text": "- ✅ Follows the single responsibility principle",
+   "tokens": []
+  },
+  {
+   "id": 57,
+   "kind": "para",
+   "start": 17593,
+   "end": 17760,
+   "text": "The key insight: **Environments define data formats, processors standardize them, policies consume standardized data.** Each layer has a clear, focused responsibility.",
+   "tokens": []
+  }
+ ]
+}

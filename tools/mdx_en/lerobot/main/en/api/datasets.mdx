@@ -1,0 +1,632 @@
+<script lang="ts">
+import {onMount} from "svelte";
+import Tip from "$lib/Tip.svelte";
+import CopyLLMTxtMenu from "$lib/CopyLLMTxtMenu.svelte";
+import Youtube from "$lib/Youtube.svelte";
+import Docstring from "$lib/Docstring.svelte";
+import CodeBlock from "$lib/CodeBlock.svelte";
+import CodeBlockFw from "$lib/CodeBlockFw.svelte";
+import DocNotebookDropdown from "$lib/DocNotebookDropdown.svelte";
+import CourseFloatingBanner from "$lib/CourseFloatingBanner.svelte";
+import IconCopyLink from "$lib/IconCopyLink.svelte";
+import FrameworkContent from "$lib/FrameworkContent.svelte";
+import Markdown from "$lib/Markdown.svelte";
+import Question from "$lib/Question.svelte";
+import FrameworkSwitchCourse from "$lib/FrameworkSwitchCourse.svelte";
+import InferenceApi from "$lib/InferenceApi.svelte";
+import TokenizersLanguageContent from "$lib/TokenizersLanguageContent.svelte";
+import ExampleCodeBlock from "$lib/ExampleCodeBlock.svelte";
+import Added from "$lib/Added.svelte";
+import Changed from "$lib/Changed.svelte";
+import Deprecated from "$lib/Deprecated.svelte";
+import PipelineIcon from "$lib/PipelineIcon.svelte";
+import PipelineTag from "$lib/PipelineTag.svelte";
+import Heading from "$lib/Heading.svelte";
+import HfOptions from "$lib/HfOptions.svelte";
+import HfOption from "$lib/HfOption.svelte";
+import EditOnGithub from "$lib/EditOnGithub.svelte";
+import InferenceSnippet from "$lib/InferenceSnippet/InferenceSnippet.svelte";
+import MermaidChart from "$lib/MermaidChart.svelte";
+let fw: "pt" | "tf" = "pt";
+onMount(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    fw = urlParams.get("fw") || "pt";
+});
+</script>
+<svelte:head>
+  <meta name="hf:doc:metadata" content={metadata} >
+</svelte:head>
+
+<!--HF DOCBUILD BODY START-->
+
+HF_DOC_BODY_START
+
+<CopyLLMTxtMenu containerStyle="float: right; margin-left: 10px; display: inline-flex; position: relative; z-index: 10;"></CopyLLMTxtMenu>
+
+# Datasets
+
+`LeRobotDataset` is the format every LeRobot script reads and writes. It is episode-aware, decodes video
+observations on the fly, and round-trips to the Hugging Face Hub.
+
+See [Using LeRobotDataset](../lerobot-dataset-v3) for the format and the common operations,
+[Porting Large Datasets](../porting_datasets_v3) for migration, and [Tools](../tools) for the CLI.
+
+## LeRobotDataset[[lerobot.datasets.LeRobotDataset]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.datasets.LeRobotDataset"} anchor={"lerobot.datasets.LeRobotDataset"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/lerobot_dataset.py#L52"} parameters={[{"name": "repo_id", "val": ": str"}, {"name": "root", "val": ": str | pathlib.Path | None = None"}, {"name": "episodes", "val": ": list[int] | None = None"}, {"name": "episode_filter", "val": ": collections.abc.Callable[[dict], bool] | None = None"}, {"name": "image_transforms", "val": ": collections.abc.Callable | None = None"}, {"name": "delta_timestamps", "val": ": dict[str, list[float]] | None = None"}, {"name": "tolerance_s", "val": ": float = 0.0001"}, {"name": "revision", "val": ": str | None = None"}, {"name": "force_cache_sync", "val": ": bool = False"}, {"name": "download_videos", "val": ": bool = True"}, {"name": "video_backend", "val": ": str | None = None"}, {"name": "return_uint8", "val": ": bool = False"}, {"name": "depth_output_unit", "val": ": str = 'mm'"}, {"name": "batch_encoding_size", "val": ": int = 1"}, {"name": "rgb_encoder", "val": ": lerobot.configs.video.RGBEncoderConfig | None = None"}, {"name": "depth_encoder", "val": ": lerobot.configs.video.DepthEncoderConfig | None = None"}, {"name": "encoder_threads", "val": ": int | None = None"}, {"name": "streaming_encoding", "val": ": bool = False"}, {"name": "encoder_queue_maxsize", "val": ": int = 30"}, {"name": "repo_type", "val": ": str = 'dataset'"}, {"name": "token", "val": ": str | bool | None = None"}]}>
+</Docstring>
+
+
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"add_frame"} anchor={"lerobot.datasets.LeRobotDataset.add_frame"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/lerobot_dataset.py#L475"} parameters={[{"name": "frame", "val": ": dict"}]}>
+<paramsdesc>- **frame** -- Dict mapping feature names to their values for this frame.
+  Must include a `'task'` key. Torch tensors are converted to numpy.</paramsdesc><raises>- `RuntimeError` -- If the dataset is read-only (no writer).</raises><raisederrors>`RuntimeError`</raisederrors></Docstring>
+Add a single frame to the current episode buffer.
+
+Delegates to `DatasetWriter.add_frame`. The dataset must be in
+write mode (created via `create` or `resume`).
+
+
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"clear_episode_buffer"} anchor={"lerobot.datasets.LeRobotDataset.clear_episode_buffer"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/lerobot_dataset.py#L509"} parameters={[{"name": "delete_images", "val": ": bool = True"}]}>
+<paramsdesc>- **delete_images** -- If `True`, also remove temporary image files written
+  to disk for the current episode.</paramsdesc><raises>- `RuntimeError` -- If the dataset is read-only (no writer).</raises><raisederrors>`RuntimeError`</raisederrors></Docstring>
+Discard the current episode buffer without saving.
+
+Delegates to `DatasetWriter.clear_episode_buffer`. Useful for
+discarding a failed or interrupted recording episode.
+
+
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"clear_image_transforms"} anchor={"lerobot.datasets.LeRobotDataset.clear_image_transforms"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/lerobot_dataset.py#L611"} parameters={[]}>
+</Docstring>
+Remove the transform applied to visual observations.
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"create"} anchor={"lerobot.datasets.LeRobotDataset.create"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/lerobot_dataset.py#L741"} parameters={[{"name": "repo_id", "val": ": str"}, {"name": "fps", "val": ": int"}, {"name": "features", "val": ": dict"}, {"name": "root", "val": ": str | pathlib.Path | None = None"}, {"name": "robot_type", "val": ": str | None = None"}, {"name": "use_videos", "val": ": bool = True"}, {"name": "tolerance_s", "val": ": float = 0.0001"}, {"name": "image_writer_processes", "val": ": int = 0"}, {"name": "image_writer_threads", "val": ": int = 0"}, {"name": "video_backend", "val": ": str | None = None"}, {"name": "batch_encoding_size", "val": ": int = 1"}, {"name": "rgb_encoder", "val": ": lerobot.configs.video.RGBEncoderConfig | None = None"}, {"name": "depth_encoder", "val": ": lerobot.configs.video.DepthEncoderConfig | None = None"}, {"name": "metadata_buffer_size", "val": ": int = 10"}, {"name": "streaming_encoding", "val": ": bool = False"}, {"name": "encoder_queue_maxsize", "val": ": int = 30"}, {"name": "encoder_threads", "val": ": int | None = None"}, {"name": "video_files_size_in_mb", "val": ": int | None = None"}, {"name": "data_files_size_in_mb", "val": ": int | None = None"}]}>
+<paramsdesc>- **repo_id** -- Repository identifier, typically `'&amp;lcub;hf_user}/&amp;lcub;dataset_name}'`.
+- **fps** -- Frames per second used during data collection.
+- **features** -- Feature specification dict mapping feature names to their
+  type/shape metadata.
+- **root** -- Local directory for dataset storage. Defaults to
+  `$HF_LEROBOT_HOME/&amp;lcub;repo_id}`.
+- **robot_type** -- Optional robot type string stored in metadata.
+- **use_videos** -- If `True`, visual modalities are stored as MP4 videos.
+  If `False`, they are stored as images.
+- **tolerance_s** -- Timestamp synchronization tolerance in seconds.
+- **image_writer_processes** -- Number of subprocesses for async image
+  writing. `0` means use threads only.
+- **image_writer_threads** -- Number of threads for async image writing.
+- **video_backend** -- Video decoding backend (used when reading back).
+- **batch_encoding_size** -- Number of episodes to accumulate before
+  batch-encoding videos. `1` means encode immediately.
+- **rgb_encoder** -- Video encoder settings for cameras (codec, quality, etc.).
+  When `None`, `rgb_encoder_defaults()` is used.
+- **depth_encoder** -- Video encoder settings for depth cameras (codec, quality, etc.).
+  When `None`, `depth_encoder_defaults()` is used.
+- **encoder_threads** -- Number of encoder threads (global). `None`
+  lets the codec decide.
+- **metadata_buffer_size** -- Number of episode metadata records to buffer
+  before flushing to parquet.
+- **streaming_encoding** -- If `True`, encode video frames in real-time
+  during capture instead of writing images first.
+- **encoder_queue_maxsize** -- Max buffered frames per camera when using
+  streaming encoding.</paramsdesc><retdesc>A new `LeRobotDataset` in write mode.</retdesc></Docstring>
+Create a new LeRobotDataset from scratch for recording data.
+
+Returns a write-mode dataset with an active `DatasetWriter`. Use
+`add_frame` / `save_episode` to populate it, then
+`finalize` when done.
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"finalize"} anchor={"lerobot.datasets.LeRobotDataset.finalize"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/lerobot_dataset.py#L532"} parameters={[]}>
+</Docstring>
+Flush all pending work and close writers.
+
+Must be called after data collection/conversion, otherwise footer metadata
+won't be written to the parquet files and the dataset will be invalid.
+
+Idempotent — safe to call multiple times.  DatasetWriter.__del__ acts as a
+safety net if this is never called explicitly.
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"get_raw_item"} anchor={"lerobot.datasets.LeRobotDataset.get_raw_item"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/lerobot_dataset.py#L587"} parameters={[{"name": "idx", "val": ""}]}>
+</Docstring>
+Get a raw frame without image transforms applied.
+
+Unlike `__getitem__`, this returns the raw HF dataset row at the given
+index with no delta-timestamp expansion, video decoding, or image transforms.
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"has_pending_frames"} anchor={"lerobot.datasets.LeRobotDataset.has_pending_frames"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/lerobot_dataset.py#L525"} parameters={[]}>
+</Docstring>
+Check if there are unsaved frames in the episode buffer.
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"push_to_hub"} anchor={"lerobot.datasets.LeRobotDataset.push_to_hub"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/lerobot_dataset.py#L619"} parameters={[{"name": "branch", "val": ": str | None = None"}, {"name": "tags", "val": ": list | None = None"}, {"name": "license", "val": ": str | None = 'apache-2.0'"}, {"name": "tag_version", "val": ": bool = True"}, {"name": "push_videos", "val": ": bool = True"}, {"name": "private", "val": ": bool | None = None"}, {"name": "allow_patterns", "val": ": list[str] | str | None = None"}, {"name": "upload_large_folder", "val": ": bool = False"}, {"name": "**card_kwargs", "val": ""}]}>
+<paramsdesc>- **branch** -- Optional branch to push to. Created from the current
+  revision if it does not exist.
+- **tags** -- Optional list of tags for the dataset card.
+- **license** -- License identifier for the dataset card.
+- **tag_version** -- If `True`, create a Git tag for the current codebase
+  version.
+- **push_videos** -- If `False`, skip uploading the `videos/` directory.
+- **private** -- If `True`, create a private repository. If `None`
+  (default), defer to the org default on the Hub (only affects orgs).
+- **allow_patterns** -- Glob pattern(s) restricting which files to upload.
+- **upload_large_folder** -- If `True`, use `upload_large_folder` instead
+  of `upload_folder` for very large datasets.
+- ****card_kwargs** -- Additional keyword arguments forwarded to dataset card
+  creation.</paramsdesc></Docstring>
+Upload the dataset to the Hugging Face Hub.
+
+Creates the repository if it does not exist, uploads all dataset files
+(optionally excluding videos), generates a dataset card, and tags the
+revision with the current codebase version.
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"resume"} anchor={"lerobot.datasets.LeRobotDataset.resume"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/lerobot_dataset.py#L855"} parameters={[{"name": "repo_id", "val": ": str"}, {"name": "root", "val": ": str | pathlib.Path | None = None"}, {"name": "tolerance_s", "val": ": float = 0.0001"}, {"name": "revision", "val": ": str | None = None"}, {"name": "force_cache_sync", "val": ": bool = False"}, {"name": "video_backend", "val": ": str | None = None"}, {"name": "batch_encoding_size", "val": ": int = 1"}, {"name": "rgb_encoder", "val": ": lerobot.configs.video.RGBEncoderConfig | None = None"}, {"name": "depth_encoder", "val": ": lerobot.configs.video.DepthEncoderConfig | None = None"}, {"name": "encoder_threads", "val": ": int | None = None"}, {"name": "image_writer_processes", "val": ": int = 0"}, {"name": "image_writer_threads", "val": ": int = 0"}, {"name": "streaming_encoding", "val": ": bool = False"}, {"name": "encoder_queue_maxsize", "val": ": int = 30"}, {"name": "token", "val": ": str | bool | None = None"}]}>
+<paramsdesc>- **repo_id** -- Repository identifier of the existing dataset.
+- **root** -- Local directory of the dataset. When provided, Hub downloads
+  are materialized directly into this directory. When omitted,
+  Hub downloads use a revision-safe snapshot cache under
+  `$HF_LEROBOT_HOME/hub`.
+- **tolerance_s** -- Timestamp synchronization tolerance in seconds.
+- **revision** -- Git revision (branch, tag, or commit hash). Defaults to
+  current codebase version tag.
+- **force_cache_sync** -- If `True`, re-download metadata from the Hub even
+  if a local cache exists.
+- **video_backend** -- Video decoding backend for reading back data.
+- **batch_encoding_size** -- Number of episodes to accumulate before
+  batch-encoding videos.
+- **rgb_encoder** -- Video encoder settings for cameras (codec, quality, etc.).
+  When `None`, `rgb_encoder_defaults()` is used.
+- **depth_encoder** -- Video encoder settings for depth cameras (codec, quality, etc.).
+  When `None`, `depth_encoder_defaults()` is used.
+- **encoder_threads** -- Number of encoder threads (global). `None`
+  lets the codec decide.
+- **image_writer_processes** -- Subprocesses for async image writing.
+- **image_writer_threads** -- Threads for async image writing.
+- **streaming_encoding** -- If `True`, encode video in real-time during
+  capture.
+- **encoder_queue_maxsize** -- Max buffered frames per camera for streaming.
+- **token** -- Authentication token used if metadata must be downloaded
+  from the Hub. The token is not retained on the dataset instance.</paramsdesc><retdesc>A `LeRobotDataset` in write mode, ready to append episodes.</retdesc></Docstring>
+Resume recording on an existing dataset.
+
+Loads metadata from an existing dataset (local or Hub) and creates a
+`DatasetWriter` for appending new episodes. The underlying HF
+dataset is not loaded until `finalize` is called and data is
+subsequently read.
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"save_episode"} anchor={"lerobot.datasets.LeRobotDataset.save_episode"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/lerobot_dataset.py#L491"} parameters={[{"name": "episode_data", "val": ": dict | None = None"}, {"name": "parallel_encoding", "val": ": bool = True"}]}>
+<paramsdesc>- **episode_data** -- Optional pre-built episode dict. If `None`, uses the
+  internal episode buffer populated by `add_frame`.
+- **parallel_encoding** -- If `True` and multiple cameras exist, encode
+  videos in parallel using a process pool.</paramsdesc><raises>- `RuntimeError` -- If the dataset is read-only (no writer).</raises><raisederrors>`RuntimeError`</raisederrors></Docstring>
+Save the current episode buffer to disk.
+
+Delegates to `DatasetWriter.save_episode`. Encodes videos, writes
+parquet data, and updates metadata. The episode buffer is reset afterward.
+
+
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"select_columns"} anchor={"lerobot.datasets.LeRobotDataset.select_columns"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/lerobot_dataset.py#L579"} parameters={[{"name": "column_names", "val": ": str | list[str]"}]}>
+</Docstring>
+Select specific columns from the underlying dataset.
+
+Useful for extracting action sequences during replay without loading all features.
+Returns a `datasets.Dataset` containing only the requested columns.
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"set_image_transforms"} anchor={"lerobot.datasets.LeRobotDataset.set_image_transforms"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/lerobot_dataset.py#L606"} parameters={[{"name": "image_transforms", "val": ": collections.abc.Callable | None"}]}>
+</Docstring>
+Replace the transform applied to visual observations.
+
+</div></div>
+
+## LeRobotDatasetMetadata[[lerobot.datasets.LeRobotDatasetMetadata]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.datasets.LeRobotDatasetMetadata"} anchor={"lerobot.datasets.LeRobotDatasetMetadata"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/dataset_metadata.py#L64"} parameters={[{"name": "repo_id", "val": ": str"}, {"name": "root", "val": ": str | pathlib.Path | None = None"}, {"name": "revision", "val": ": str | None = None"}, {"name": "force_cache_sync", "val": ": bool = False"}, {"name": "metadata_buffer_size", "val": ": int = 10"}, {"name": "repo_type", "val": ": typing.Literal['dataset', 'bucket'] = 'dataset'"}, {"name": "token", "val": ": str | bool | None = None"}]}>
+</Docstring>
+Metadata container for a LeRobot dataset.
+
+Manages the `info.json`, `stats.json`, `tasks.parquet`, and
+`episodes/` parquet files that describe a dataset's structure, content,
+and statistics.
+
+
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"create"} anchor={"lerobot.datasets.LeRobotDatasetMetadata.create"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/dataset_metadata.py#L787"} parameters={[{"name": "repo_id", "val": ": str"}, {"name": "fps", "val": ": int"}, {"name": "features", "val": ": dict"}, {"name": "robot_type", "val": ": str | None = None"}, {"name": "root", "val": ": str | pathlib.Path | None = None"}, {"name": "use_videos", "val": ": bool = True"}, {"name": "metadata_buffer_size", "val": ": int = 10"}, {"name": "chunks_size", "val": ": int | None = None"}, {"name": "data_files_size_in_mb", "val": ": int | None = None"}, {"name": "video_files_size_in_mb", "val": ": int | None = None"}]}>
+<paramsdesc>- **repo_id** -- Repository identifier (e.g. `'user/my_dataset'`).
+- **fps** -- Frames per second used during data collection.
+- **features** -- Feature specification dict mapping feature names to their
+  type/shape metadata.
+- **robot_type** -- Optional robot type string stored in metadata.
+- **root** -- Local directory for the dataset. Defaults to
+  `$HF_LEROBOT_HOME/&amp;lcub;repo_id}`. Must not already exist.
+- **use_videos** -- If `True`, visual modalities are encoded as MP4 videos.
+- **metadata_buffer_size** -- Number of episode metadata records to buffer
+  before flushing to parquet.
+- **chunks_size** -- Max number of files per chunk directory. `None` uses
+  the default.
+- **data_files_size_in_mb** -- Max parquet file size in MB. `None` uses the
+  default.
+- **video_files_size_in_mb** -- Max video file size in MB. `None` uses the
+  default.</paramsdesc><retdesc>A new `LeRobotDatasetMetadata` instance.</retdesc></Docstring>
+Create metadata for a new LeRobot dataset from scratch.
+
+Initializes the `info.json` file on disk with the provided feature
+schema and dataset settings. No episode data is written yet.
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"ensure_readable"} anchor={"lerobot.datasets.LeRobotDatasetMetadata.ensure_readable"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/dataset_metadata.py#L222"} parameters={[]}>
+</Docstring>
+Guarantee metadata is fully loaded for read operations.
+
+Idempotent — when metadata is already in memory this is a single
+`is None` check.  Call this before transitioning from write to
+read mode on the same instance.
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"filter_episodes"} anchor={"lerobot.datasets.LeRobotDatasetMetadata.filter_episodes"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/dataset_metadata.py#L232"} parameters={[{"name": "predicate", "val": ": Callable"}, {"name": "candidates", "val": ": list[int] | None = None"}]}>
+<paramsdesc>- **predicate** -- Predicate over per-episode metadata rows used to select episodes.
+- **candidates** -- Optional list of episode indices to restrict evaluation to.</paramsdesc><retdesc>List of sorted episode indices that satisfy the predicate.</retdesc></Docstring>
+Filter episodes whose metadata satisfies a given predicate.
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"finalize"} anchor={"lerobot.datasets.LeRobotDatasetMetadata.finalize"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/dataset_metadata.py#L199"} parameters={[]}>
+</Docstring>
+Flush metadata buffer and close the parquet writer.
+
+Idempotent — safe to call multiple times.
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"get_chunk_settings"} anchor={"lerobot.datasets.LeRobotDatasetMetadata.get_chunk_settings"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/dataset_metadata.py#L764"} parameters={[]}>
+<retdesc>Dict containing chunks_size, data_files_size_in_mb, and video_files_size_in_mb.</retdesc></Docstring>
+Get current chunk and file size settings.
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"get_data_file_path"} anchor={"lerobot.datasets.LeRobotDatasetMetadata.get_data_file_path"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/dataset_metadata.py#L311"} parameters={[{"name": "ep_index", "val": ": int"}]}>
+<paramsdesc>- **ep_index** -- Zero-based episode index.</paramsdesc><retdesc>Path to the parquet file containing this episode's data.</retdesc><raises>- `IndexError` -- If `ep_index` is out of range.</raises><raisederrors>`IndexError`</raisederrors></Docstring>
+Return the relative parquet file path for the given episode index.
+
+
+
+
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"get_task_index"} anchor={"lerobot.datasets.LeRobotDatasetMetadata.get_task_index"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/dataset_metadata.py#L528"} parameters={[{"name": "task", "val": ": str"}]}>
+</Docstring>
+
+Given a task in natural language, returns its task_index if the task already exists in the dataset,
+otherwise return None.
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"get_video_file_path"} anchor={"lerobot.datasets.LeRobotDatasetMetadata.get_video_file_path"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/dataset_metadata.py#L335"} parameters={[{"name": "ep_index", "val": ": int"}, {"name": "vid_key", "val": ": str"}]}>
+<paramsdesc>- **ep_index** -- Zero-based episode index.
+- **vid_key** -- Feature key identifying the video stream
+  (e.g. `'observation.images.laptop'`).</paramsdesc><retdesc>Path to the video file containing this episode's frames.</retdesc><raises>- `IndexError` -- If `ep_index` is out of range.</raises><raisederrors>`IndexError`</raisederrors></Docstring>
+Return the relative video file path for the given episode and video key.
+
+
+
+
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"rescale_depth_stats"} anchor={"lerobot.datasets.LeRobotDatasetMetadata.rescale_depth_stats"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/dataset_metadata.py#L411"} parameters={[{"name": "output_unit", "val": ": str"}]}>
+</Docstring>
+Rescale depth feature stats in place from their recorded unit to `output_unit`.
+
+Depth stats are stored in the unit the frames were recorded in
+(`features[key]["info"]["depth_unit"]`), while frames are returned in
+`output_unit` on read. This converts the unit-bearing stat entries so
+stats match the frames consumers see.
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"save_episode"} anchor={"lerobot.datasets.LeRobotDatasetMetadata.save_episode"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/dataset_metadata.py#L638"} parameters={[{"name": "episode_index", "val": ": int"}, {"name": "episode_length", "val": ": int"}, {"name": "episode_tasks", "val": ": list"}, {"name": "episode_stats", "val": ": dict"}, {"name": "episode_metadata", "val": ": dict"}]}>
+<paramsdesc>- **episode_index** -- Zero-based index of the episode being saved.
+- **episode_length** -- Number of frames in this episode.
+- **episode_tasks** -- List of task descriptions for this episode.
+- **episode_stats** -- Per-feature statistics for this episode.
+- **episode_metadata** -- Additional metadata (chunk/file indices, frame
+  ranges, video timestamps, etc.).</paramsdesc></Docstring>
+Persist episode metadata, update dataset info, and aggregate stats.
+
+Writes the episode's metadata to the buffered parquet writer, increments
+the total episode/frame counters in `info.json`, and merges the
+episode's statistics into the running dataset statistics.
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"save_episode_tasks"} anchor={"lerobot.datasets.LeRobotDatasetMetadata.save_episode_tasks"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/dataset_metadata.py#L538"} parameters={[{"name": "tasks", "val": ": list"}]}>
+<paramsdesc>- **tasks** -- List of unique task descriptions in natural language.</paramsdesc><raises>- `ValueError` -- If `tasks` contains duplicates.</raises><raisederrors>`ValueError`</raisederrors></Docstring>
+Register tasks for the current episode and persist to disk.
+
+New tasks that do not already exist in the dataset are assigned
+sequential task indices and appended to the tasks parquet file.
+
+
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"update_chunk_settings"} anchor={"lerobot.datasets.LeRobotDatasetMetadata.update_chunk_settings"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/dataset_metadata.py#L729"} parameters={[{"name": "chunks_size", "val": ": int | None = None"}, {"name": "data_files_size_in_mb", "val": ": int | None = None"}, {"name": "video_files_size_in_mb", "val": ": int | None = None"}]}>
+<paramsdesc>- **chunks_size** -- Maximum number of files per chunk directory. If None, keeps current value.
+- **data_files_size_in_mb** -- Maximum size for data parquet files in MB. If None, keeps current value.
+- **video_files_size_in_mb** -- Maximum size for video files in MB. If None, keeps current value.</paramsdesc></Docstring>
+Update chunk and file size settings after dataset creation.
+
+This allows users to customize storage organization without modifying the constructor.
+These settings control how episodes are chunked and how large files can grow before
+creating new ones.
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"update_video_info"} anchor={"lerobot.datasets.LeRobotDatasetMetadata.update_video_info"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/dataset_metadata.py#L680"} parameters={[{"name": "video_key", "val": ": str | None = None"}, {"name": "video_encoder", "val": ": lerobot.configs.video.VideoEncoderConfig | None = None"}, {"name": "preserve_keys", "val": ": collections.abc.Iterable[str] | None = None"}]}>
+<paramsdesc>- **video_key** -- If provided, only update this video key. Otherwise update
+  all video keys in the dataset.
+- **video_encoder** -- Encoder configuration used to produce the
+  videos. When provided, its fields are recorded as
+  `video.&amp;lt;field>` entries alongside the stream-derived
+  `video.*` entries (see `get_video_info`).
+- **preserve_keys** -- Keys whose existing values are kept instead of being
+  recomputed. `None` (default) recomputes every key.</paramsdesc></Docstring>
+Populate or refresh per-feature video info in `info.json`.
+
+Warning: this function writes info from first episode videos, implicitly assuming that all videos have
+been encoded the same way. Also, this means it assumes the first episode exists.
+
+Always re-probes the videos and overwrites existing info for every recomputed
+key. `preserve_keys` lists keys whose existing values must be kept (e.g.
+data-intrinsic entries like `is_depth_map` and depth quantization params)
+instead of being recomputed.
+
+
+
+
+</div></div>
+
+## MultiLeRobotDataset[[lerobot.datasets.MultiLeRobotDataset]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.datasets.MultiLeRobotDataset"} anchor={"lerobot.datasets.MultiLeRobotDataset"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/multi_dataset.py#L34"} parameters={[{"name": "repo_ids", "val": ": list"}, {"name": "root", "val": ": str | pathlib.Path | None = None"}, {"name": "episodes", "val": ": dict | None = None"}, {"name": "image_transforms", "val": ": collections.abc.Callable | None = None"}, {"name": "delta_timestamps", "val": ": dict[str, list[float]] | None = None"}, {"name": "tolerances_s", "val": ": dict | None = None"}, {"name": "download_videos", "val": ": bool = True"}, {"name": "video_backend", "val": ": str | None = None"}, {"name": "token", "val": ": str | bool | None = None"}]}>
+</Docstring>
+A dataset consisting of multiple underlying `LeRobotDataset`s.
+
+The underlying `LeRobotDataset`s are effectively concatenated, and this class adopts much of the API
+structure of `LeRobotDataset`.
+
+
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"clear_image_transforms"} anchor={"lerobot.datasets.MultiLeRobotDataset.clear_image_transforms"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/multi_dataset.py#L111"} parameters={[]}>
+</Docstring>
+Remove the transform from this dataset and its children.
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"set_image_transforms"} anchor={"lerobot.datasets.MultiLeRobotDataset.set_image_transforms"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/multi_dataset.py#L103"} parameters={[{"name": "image_transforms", "val": ": collections.abc.Callable | None"}]}>
+</Docstring>
+Replace the transform for this dataset and its children.
+
+</div></div>
+
+## StreamingLeRobotDataset[[lerobot.datasets.StreamingLeRobotDataset]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.datasets.StreamingLeRobotDataset"} anchor={"lerobot.datasets.StreamingLeRobotDataset"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/streaming_dataset.py#L208"} parameters={[{"name": "repo_id", "val": ": str"}, {"name": "root", "val": ": str | pathlib.Path | None = None"}, {"name": "episodes", "val": ": list[int] | None = None"}, {"name": "image_transforms", "val": ": collections.abc.Callable | None = None"}, {"name": "delta_timestamps", "val": ": dict[list[float]] | None = None"}, {"name": "tolerance_s", "val": ": float = 0.0001"}, {"name": "revision", "val": ": str | None = None"}, {"name": "force_cache_sync", "val": ": bool = False"}, {"name": "streaming", "val": ": bool = True"}, {"name": "buffer_size", "val": ": int = 1000"}, {"name": "max_num_shards", "val": ": int = 16"}, {"name": "seed", "val": ": int = 42"}, {"name": "rng", "val": ": numpy.random._generator.Generator | None = None"}, {"name": "shuffle", "val": ": bool = True"}, {"name": "return_uint8", "val": ": bool = False"}, {"name": "depth_output_unit", "val": ": str = 'mm'"}, {"name": "repo_type", "val": ": typing.Literal['dataset', 'bucket'] = 'dataset'"}, {"name": "token", "val": ": str | bool | None = None"}]}>
+</Docstring>
+LeRobotDataset with streaming capabilities.
+
+This class extends LeRobotDataset to add streaming functionality, allowing data to be streamed
+rather than loaded entirely into memory. This is especially useful for large datasets that may
+not fit in memory or when you want to quickly explore a dataset without downloading it completely.
+
+The key innovation is using a Backtrackable iterator that maintains a bounded buffer of recent
+items, allowing us to access previous frames for delta timestamps without loading the entire
+dataset into memory.
+
+Example:
+<ExampleCodeBlock anchor="lerobot.datasets.StreamingLeRobotDataset.example">
+
+Basic usage:
+```python
+from lerobot.common.datasets.streaming_dataset import StreamingLeRobotDataset
+
+# Create a streaming dataset with delta timestamps
+delta_timestamps = {
+    "observation.image": [-1.0, -0.5, 0.0],  # 1 sec ago, 0.5 sec ago, current
+    "action": [0.0, 0.1, 0.2],  # current, 0.1 sec future, 0.2 sec future
+}
+
+dataset = StreamingLeRobotDataset(
+    repo_id="your-dataset-repo-id",
+    delta_timestamps=delta_timestamps,
+    streaming=True,
+    buffer_size=1000,
+)
+
+# Iterate over the dataset
+for i, item in enumerate(dataset):
+    print(f"Sample {i}: Episode {item['episode_index']} Frame {item['frame_index']}")
+    # item will contain stacked frames according to delta_timestamps
+    if i >= 10:
+        break
+```
+
+</ExampleCodeBlock>
+
+
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"make_frame"} anchor={"lerobot.datasets.StreamingLeRobotDataset.make_frame"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/streaming_dataset.py#L525"} parameters={[{"name": "dataset_iterator", "val": ": Backtrackable"}]}>
+</Docstring>
+Makes a frame starting from a dataset iterator
+
+</div></div>
+
+<!--HF DOCBUILD BODY END-->
+
+HF_DOC_BODY_END
+

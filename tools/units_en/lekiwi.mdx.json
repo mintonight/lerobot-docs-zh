@@ -1,0 +1,889 @@
+{
+ "file": "lekiwi.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1932,
+   "text": "# LeKiwi",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 2085,
+   "end": 2156,
+   "text": "In the steps below, we explain how to assemble the LeKiwi mobile robot.",
+   "tokens": []
+  },
+  {
+   "id": 2,
+   "kind": "heading",
+   "start": 2158,
+   "end": 2177,
+   "text": "## Source the parts",
+   "tokens": []
+  },
+  {
+   "id": 3,
+   "kind": "para",
+   "start": 2179,
+   "end": 2441,
+   "text": "Follow this [README](⟦0⟧). It contains the bill of materials, with a link to source the parts, as well as the instructions to 3D print the parts.\nAnd advise if it's your first time printing or if you don't own a 3D printer.",
+   "tokens": [
+    "https://github.com/SIGRobotics-UIUC/LeKiwi"
+   ]
+  },
+  {
+   "id": 4,
+   "kind": "heading",
+   "start": 2443,
+   "end": 2460,
+   "text": "### Wired version",
+   "tokens": []
+  },
+  {
+   "id": 5,
+   "kind": "para",
+   "start": 2462,
+   "end": 2697,
+   "text": "If you have the **wired** LeKiwi version, you can skip the installation of the Raspberry Pi and setting up SSH. You can also run all commands directly on your PC for both the LeKiwi scripts and the leader arm scripts for teleoperating.",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "heading",
+   "start": 2699,
+   "end": 2724,
+   "text": "## Install software on Pi",
+   "tokens": []
+  },
+  {
+   "id": 7,
+   "kind": "para",
+   "start": 2726,
+   "end": 2944,
+   "text": "Now we have to set up the remote PC that will run on the LeKiwi Robot. This is normally a Raspberry Pi, but can be any PC that can run on 5V and has enough usb ports (2 or more) for the cameras and motor control board.",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "heading",
+   "start": 2946,
+   "end": 2960,
+   "text": "### Install OS",
+   "tokens": []
+  },
+  {
+   "id": 9,
+   "kind": "para",
+   "start": 2962,
+   "end": 3224,
+   "text": "For setting up the Raspberry Pi and its SD-card see: [Setup PI](⟦0⟧). Here is explained how to download the [Imager](⟦1⟧) to install Raspberry Pi OS or Ubuntu.",
+   "tokens": [
+    "https://www.raspberrypi.com/documentation/computers/getting-started.html",
+    "https://www.raspberrypi.com/software/"
+   ]
+  },
+  {
+   "id": 10,
+   "kind": "heading",
+   "start": 3226,
+   "end": 3239,
+   "text": "### Setup SSH",
+   "tokens": []
+  },
+  {
+   "id": 11,
+   "kind": "para",
+   "start": 3241,
+   "end": 3847,
+   "text": "After setting up your Pi, you should enable and set up [SSH](⟦0⟧) (Secure Shell Protocol) so you can log in to the Pi from your laptop without requiring a screen, keyboard, and mouse on the Pi. A great tutorial on how to do this can be found [here](⟦1⟧). Logging into your Pi can be done in your Command Prompt (cmd) or, if you use VSCode you can use [this](⟦2⟧) extension.",
+   "tokens": [
+    "https://www.raspberrypi.com/news/coding-on-raspberry-pi-remotely-with-visual-studio-code/",
+    "https://www.raspberrypi.com/documentation/computers/remote-access.html#ssh",
+    "https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-ssh"
+   ]
+  },
+  {
+   "id": 12,
+   "kind": "heading",
+   "start": 3849,
+   "end": 3876,
+   "text": "### Install LeRobot on Pi 🤗",
+   "tokens": []
+  },
+  {
+   "id": 13,
+   "kind": "para",
+   "start": 3878,
+   "end": 3961,
+   "text": "On your Raspberry Pi install LeRobot using our [Installation Guide](⟦0⟧)",
+   "tokens": [
+    "./installation"
+   ]
+  },
+  {
+   "id": 14,
+   "kind": "para",
+   "start": 3963,
+   "end": 4054,
+   "text": "In addition to these instructions, you need to install the Feetech SDK & ZeroMQ on your Pi:",
+   "tokens": []
+  },
+  {
+   "id": 15,
+   "kind": "heading",
+   "start": 4096,
+   "end": 4122,
+   "text": "## Install LeRobot locally",
+   "tokens": []
+  },
+  {
+   "id": 16,
+   "kind": "para",
+   "start": 4124,
+   "end": 4276,
+   "text": "If you already have installed LeRobot on your laptop/pc you can skip this step; otherwise, please follow along as we do the same steps we did on the Pi.",
+   "tokens": []
+  },
+  {
+   "id": 17,
+   "kind": "para",
+   "start": 4278,
+   "end": 4325,
+   "text": "Follow our [Installation Guide](⟦0⟧)",
+   "tokens": [
+    "./installation"
+   ]
+  },
+  {
+   "id": 18,
+   "kind": "para",
+   "start": 4327,
+   "end": 4425,
+   "text": "In addition to these instructions, you need to install the Feetech SDK & ZeroMQ on your laptop/pc:",
+   "tokens": []
+  },
+  {
+   "id": 19,
+   "kind": "para",
+   "start": 4467,
+   "end": 4717,
+   "text": "Great 🤗! You are now done installing LeRobot, and we can begin assembling the SO100/SO101 arms and the mobile base 🤖.\nEvery time you now want to use LeRobot, you can go to the ⟦0⟧ folder where we installed LeRobot and run one of the commands.",
+   "tokens": [
+    "`~/lerobot`"
+   ]
+  },
+  {
+   "id": 20,
+   "kind": "heading",
+   "start": 4719,
+   "end": 4755,
+   "text": "# Step-by-Step Assembly Instructions",
+   "tokens": []
+  },
+  {
+   "id": 21,
+   "kind": "para",
+   "start": 4757,
+   "end": 4970,
+   "text": "First, we will assemble the two SO100/SO101 arms. One to attach to the mobile base and one for teleoperation. Then we will assemble the mobile base. The instructions for assembling can be found on these two pages:",
+   "tokens": []
+  },
+  {
+   "id": 22,
+   "kind": "list",
+   "start": 4972,
+   "end": 5034,
+   "text": "- [Assemble SO101](⟦0⟧)",
+   "tokens": [
+    "./so101#step-by-step-assembly-instructions"
+   ]
+  },
+  {
+   "id": 23,
+   "kind": "list",
+   "start": 5035,
+   "end": 5120,
+   "text": "- [Assemble LeKiwi](⟦0⟧)",
+   "tokens": [
+    "https://github.com/SIGRobotics-UIUC/LeKiwi/blob/main/Assembly.md"
+   ]
+  },
+  {
+   "id": 24,
+   "kind": "heading",
+   "start": 5122,
+   "end": 5172,
+   "text": "### Find the USB ports associated with motor board",
+   "tokens": []
+  },
+  {
+   "id": 25,
+   "kind": "para",
+   "start": 5174,
+   "end": 5235,
+   "text": "To find the port for each bus servo adapter, run this script:",
+   "tokens": []
+  },
+  {
+   "id": 26,
+   "kind": "para",
+   "start": 5314,
+   "end": 5329,
+   "text": "Example output:",
+   "tokens": []
+  },
+  {
+   "id": 27,
+   "kind": "para",
+   "start": 5645,
+   "end": 5729,
+   "text": "Where the found port is: ⟦0⟧ corresponding to your board.",
+   "tokens": [
+    "`/dev/tty.usbmodem575E0032081`"
+   ]
+  },
+  {
+   "id": 28,
+   "kind": "para",
+   "start": 5766,
+   "end": 5834,
+   "text": "On Linux, you might need to give access to the USB ports by running:",
+   "tokens": []
+  },
+  {
+   "id": 29,
+   "kind": "para",
+   "start": 5905,
+   "end": 5920,
+   "text": "Example output:",
+   "tokens": []
+  },
+  {
+   "id": 30,
+   "kind": "para",
+   "start": 6204,
+   "end": 6272,
+   "text": "Where the found port is: ⟦0⟧ corresponding to your board.",
+   "tokens": [
+    "`/dev/ttyACM0`"
+   ]
+  },
+  {
+   "id": 31,
+   "kind": "heading",
+   "start": 6300,
+   "end": 6320,
+   "text": "### Configure motors",
+   "tokens": []
+  },
+  {
+   "id": 32,
+   "kind": "para",
+   "start": 6322,
+   "end": 6761,
+   "text": "The instructions for configuring the motors can be found in the SO101 [docs](⟦0⟧). Besides the ids for the arm motors, we also need to set the motor ids for the mobile base. These need to be in a specific order to work. Below an image of the motor ids and motor mounting positions for the mobile base. Note that we only use one Motor Control board on LeKiwi. This means the motor ids for the wheels are 7, 8 and 9.",
+   "tokens": [
+    "./so101#configure-the-motors"
+   ]
+  },
+  {
+   "id": 33,
+   "kind": "para",
+   "start": 6763,
+   "end": 6905,
+   "text": "You can run this command to setup motors for LeKiwi. It will first setup the motors for arm (id 6..1) and then setup motors for wheels (9,8,7)",
+   "tokens": []
+  },
+  {
+   "id": 34,
+   "kind": "heading",
+   "start": 7259,
+   "end": 7289,
+   "text": "### Troubleshoot communication",
+   "tokens": []
+  },
+  {
+   "id": 35,
+   "kind": "para",
+   "start": 7291,
+   "end": 7402,
+   "text": "If you are having trouble connecting to the Mobile SO100, follow these steps to diagnose and resolve the issue.",
+   "tokens": []
+  },
+  {
+   "id": 36,
+   "kind": "heading",
+   "start": 7404,
+   "end": 7443,
+   "text": "#### 1. Verify IP Address Configuration",
+   "tokens": []
+  },
+  {
+   "id": 37,
+   "kind": "para",
+   "start": 7445,
+   "end": 7596,
+   "text": "Make sure that the correct IP for the Pi is used in the commands or in your code. To check the Raspberry Pi's IP address, run (on the Pi command line):",
+   "tokens": []
+  },
+  {
+   "id": 38,
+   "kind": "heading",
+   "start": 7623,
+   "end": 7670,
+   "text": "#### 2. Check if Pi is reachable from laptop/pc",
+   "tokens": []
+  },
+  {
+   "id": 39,
+   "kind": "para",
+   "start": 7672,
+   "end": 7718,
+   "text": "Try pinging the Raspberry Pi from your laptop:",
+   "tokens": []
+  },
+  {
+   "id": 40,
+   "kind": "para",
+   "start": 7759,
+   "end": 7777,
+   "text": "If the ping fails:",
+   "tokens": []
+  },
+  {
+   "id": 41,
+   "kind": "list",
+   "start": 7779,
+   "end": 7843,
+   "text": "- Ensure the Pi is powered on and connected to the same network.",
+   "tokens": []
+  },
+  {
+   "id": 42,
+   "kind": "list",
+   "start": 7844,
+   "end": 7880,
+   "text": "- Check if SSH is enabled on the Pi.",
+   "tokens": []
+  },
+  {
+   "id": 43,
+   "kind": "heading",
+   "start": 7882,
+   "end": 7908,
+   "text": "#### 3. Try SSH connection",
+   "tokens": []
+  },
+  {
+   "id": 44,
+   "kind": "para",
+   "start": 7910,
+   "end": 7980,
+   "text": "If you can't SSH into the Pi, it might not be properly connected. Use:",
+   "tokens": []
+  },
+  {
+   "id": 45,
+   "kind": "para",
+   "start": 8040,
+   "end": 8070,
+   "text": "If you get a connection error:",
+   "tokens": []
+  },
+  {
+   "id": 46,
+   "kind": "list",
+   "start": 8072,
+   "end": 8117,
+   "text": "- Ensure SSH is enabled on the Pi by running:",
+   "tokens": []
+  },
+  {
+   "id": 47,
+   "kind": "para",
+   "start": 8154,
+   "end": 8219,
+   "text": "  Then navigate to: **Interfacing Options -> SSH** and enable it.",
+   "tokens": []
+  },
+  {
+   "id": 48,
+   "kind": "heading",
+   "start": 8221,
+   "end": 8236,
+   "text": "### Calibration",
+   "tokens": []
+  },
+  {
+   "id": 49,
+   "kind": "para",
+   "start": 8238,
+   "end": 8463,
+   "text": "Now we have to calibrate the leader arm and the follower arm. The wheel motors don't have to be calibrated.\nThe calibration process is very important because it allows a neural network trained on one robot to work on another.",
+   "tokens": []
+  },
+  {
+   "id": 50,
+   "kind": "heading",
+   "start": 8465,
+   "end": 8508,
+   "text": "### Calibrate follower arm (on mobile base)",
+   "tokens": []
+  },
+  {
+   "id": 51,
+   "kind": "para",
+   "start": 8510,
+   "end": 8668,
+   "text": "Make sure the arm is connected to the Raspberry Pi and run this script or API example (on the Raspberry Pi via SSH) to launch calibration of the follower arm:",
+   "tokens": []
+  },
+  {
+   "id": 52,
+   "kind": "para",
+   "start": 8794,
+   "end": 9267,
+   "text": "We unified the calibration method for most robots, thus, the calibration steps for this SO100 arm are the same as the steps for the Koch and SO101. First, we have to move the robot to the position where each joint is in the middle of its range, then we press ⟦0⟧. Secondly, we move all joints through their full range of motion. A video of this same process for the SO101 as reference can be found [here](⟦1⟧).",
+   "tokens": [
+    "`Enter`",
+    "https://huggingface.co/docs/lerobot/en/so101#calibration-video"
+   ]
+  },
+  {
+   "id": 53,
+   "kind": "heading",
+   "start": 9269,
+   "end": 9286,
+   "text": "### Wired version",
+   "tokens": []
+  },
+  {
+   "id": 54,
+   "kind": "para",
+   "start": 9288,
+   "end": 9369,
+   "text": "If you have the **wired** LeKiwi version, please run all commands on your laptop.",
+   "tokens": []
+  },
+  {
+   "id": 55,
+   "kind": "heading",
+   "start": 9371,
+   "end": 9395,
+   "text": "### Calibrate leader arm",
+   "tokens": []
+  },
+  {
+   "id": 56,
+   "kind": "para",
+   "start": 9397,
+   "end": 9525,
+   "text": "Then, to calibrate the leader arm (which is attached to the laptop/pc). Run the following command of API example on your laptop:",
+   "tokens": []
+  },
+  {
+   "id": 57,
+   "kind": "heading",
+   "start": 10223,
+   "end": 10244,
+   "text": "## Teleoperate LeKiwi",
+   "tokens": []
+  },
+  {
+   "id": 58,
+   "kind": "quote",
+   "start": 10246,
+   "end": 10462,
+   "text": "> [!TIP]\n> If you're using a Mac, you might need to give Terminal permission to access your keyboard for teleoperation. Go to System Preferences > Security & Privacy > Input Monitoring and check the box for Terminal.",
+   "tokens": []
+  },
+  {
+   "id": 59,
+   "kind": "para",
+   "start": 10464,
+   "end": 10558,
+   "text": "To teleoperate, SSH into your Raspberry Pi, and run ⟦0⟧ and this command:",
+   "tokens": [
+    "`conda activate lerobot`"
+   ]
+  },
+  {
+   "id": 60,
+   "kind": "para",
+   "start": 10644,
+   "end": 10813,
+   "text": "Then on your laptop, also run ⟦0⟧ and run the API example, make sure you set the correct ⟦1⟧ and ⟦2⟧ in ⟦3⟧.",
+   "tokens": [
+    "`conda activate lerobot`",
+    "`remote_ip`",
+    "`port`",
+    "`examples/lekiwi/teleoperate.py`"
+   ]
+  },
+  {
+   "id": 61,
+   "kind": "para",
+   "start": 10866,
+   "end": 11296,
+   "text": "You should see on your laptop something like this: ⟦0⟧ Now you can move the leader arm and use the keyboard (w,a,s,d) to drive forward, left, backwards, right. And use (z,x) to turn left or turn right. You can use (r,f) to increase and decrease the speed of the mobile robot. There are three speed modes, see the table below:",
+   "tokens": [
+    "`[INFO] Connected to remote robot at tcp://172.17.133.91:5555 and video stream at tcp://172.17.133.91:5556.`"
+   ]
+  },
+  {
+   "id": 62,
+   "kind": "table",
+   "start": 11298,
+   "end": 11358,
+   "text": "| Speed Mode | Linear Speed (m/s) | Rotation Speed (deg/s) |",
+   "tokens": []
+  },
+  {
+   "id": 63,
+   "kind": "table",
+   "start": 11420,
+   "end": 11480,
+   "text": "| Fast       | 0.4                | 90                     |",
+   "tokens": []
+  },
+  {
+   "id": 64,
+   "kind": "table",
+   "start": 11481,
+   "end": 11541,
+   "text": "| Medium     | 0.25               | 60                     |",
+   "tokens": []
+  },
+  {
+   "id": 65,
+   "kind": "table",
+   "start": 11542,
+   "end": 11602,
+   "text": "| Slow       | 0.1                | 30                     |",
+   "tokens": []
+  },
+  {
+   "id": 66,
+   "kind": "table",
+   "start": 11604,
+   "end": 11628,
+   "text": "| Key | Action         |",
+   "tokens": []
+  },
+  {
+   "id": 67,
+   "kind": "table",
+   "start": 11654,
+   "end": 11678,
+   "text": "| W   | Move forward   |",
+   "tokens": []
+  },
+  {
+   "id": 68,
+   "kind": "table",
+   "start": 11679,
+   "end": 11703,
+   "text": "| A   | Move left      |",
+   "tokens": []
+  },
+  {
+   "id": 69,
+   "kind": "table",
+   "start": 11704,
+   "end": 11728,
+   "text": "| S   | Move backward  |",
+   "tokens": []
+  },
+  {
+   "id": 70,
+   "kind": "table",
+   "start": 11729,
+   "end": 11753,
+   "text": "| D   | Move right     |",
+   "tokens": []
+  },
+  {
+   "id": 71,
+   "kind": "table",
+   "start": 11754,
+   "end": 11778,
+   "text": "| Z   | Turn left      |",
+   "tokens": []
+  },
+  {
+   "id": 72,
+   "kind": "table",
+   "start": 11779,
+   "end": 11803,
+   "text": "| X   | Turn right     |",
+   "tokens": []
+  },
+  {
+   "id": 73,
+   "kind": "table",
+   "start": 11804,
+   "end": 11828,
+   "text": "| R   | Increase speed |",
+   "tokens": []
+  },
+  {
+   "id": 74,
+   "kind": "table",
+   "start": 11829,
+   "end": 11853,
+   "text": "| F   | Decrease speed |",
+   "tokens": []
+  },
+  {
+   "id": 75,
+   "kind": "quote",
+   "start": 11855,
+   "end": 12063,
+   "text": "> [!TIP]\n> If you use a different keyboard, you can change the keys for each command in the [⟦0⟧](⟦1⟧).",
+   "tokens": [
+    "`LeKiwiClientConfig`",
+    "https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/lekiwi/config_lekiwi.py"
+   ]
+  },
+  {
+   "id": 76,
+   "kind": "heading",
+   "start": 12065,
+   "end": 12082,
+   "text": "### Wired version",
+   "tokens": []
+  },
+  {
+   "id": 77,
+   "kind": "para",
+   "start": 12084,
+   "end": 12165,
+   "text": "If you have the **wired** LeKiwi version, please run all commands on your laptop.",
+   "tokens": []
+  },
+  {
+   "id": 78,
+   "kind": "heading",
+   "start": 12167,
+   "end": 12186,
+   "text": "## Record a dataset",
+   "tokens": []
+  },
+  {
+   "id": 79,
+   "kind": "para",
+   "start": 12188,
+   "end": 12263,
+   "text": "Once you're familiar with teleoperation, you can record your first dataset.",
+   "tokens": []
+  },
+  {
+   "id": 80,
+   "kind": "para",
+   "start": 12265,
+   "end": 12535,
+   "text": "We use the Hugging Face hub features for uploading your dataset. If you haven't previously used the Hub, make sure you can login via the cli using a write-access token, this token can be generated from the [Hugging Face settings](⟦0⟧).",
+   "tokens": [
+    "https://huggingface.co/settings/tokens"
+   ]
+  },
+  {
+   "id": 81,
+   "kind": "para",
+   "start": 12537,
+   "end": 12587,
+   "text": "Add your token to the CLI by running this command:",
+   "tokens": []
+  },
+  {
+   "id": 82,
+   "kind": "para",
+   "start": 12669,
+   "end": 12728,
+   "text": "Then store your Hugging Face repository name in a variable:",
+   "tokens": []
+  },
+  {
+   "id": 83,
+   "kind": "para",
+   "start": 12816,
+   "end": 13127,
+   "text": "Now you can record a dataset. To record episodes and upload your dataset to the hub, execute this API example tailored for LeKiwi. Make sure to first adapt the ⟦0⟧, ⟦1⟧, ⟦2⟧ and ⟦3⟧ in the script. If you would like to run the script for longer you can increase ⟦4⟧.",
+   "tokens": [
+    "`remote_ip`",
+    "`repo_id`",
+    "`port`",
+    "`task`",
+    "`NB_CYCLES_CLIENT_CONNECTION`"
+   ]
+  },
+  {
+   "id": 84,
+   "kind": "heading",
+   "start": 13175,
+   "end": 13194,
+   "text": "#### Dataset upload",
+   "tokens": []
+  },
+  {
+   "id": 85,
+   "kind": "para",
+   "start": 13196,
+   "end": 13460,
+   "text": "Locally, your dataset is stored in this folder: ⟦0⟧. At the end of data recording, your dataset will be uploaded on your Hugging Face page (e.g. ⟦1⟧) that you can obtain by running:",
+   "tokens": [
+    "`~/.cache/huggingface/lerobot/{repo-id}`",
+    "https://huggingface.co/datasets/cadene/so101_test"
+   ]
+  },
+  {
+   "id": 86,
+   "kind": "para",
+   "start": 13534,
+   "end": 13699,
+   "text": "Your dataset will be automatically tagged with ⟦0⟧ for the community to find it easily, and you can also add custom tags (in this case ⟦1⟧ for example).",
+   "tokens": [
+    "`LeRobot`",
+    "`tutorial`"
+   ]
+  },
+  {
+   "id": 87,
+   "kind": "para",
+   "start": 13701,
+   "end": 13833,
+   "text": "You can look for other LeRobot datasets on the hub by searching for ⟦0⟧ [tags](⟦1⟧).",
+   "tokens": [
+    "`LeRobot`",
+    "https://huggingface.co/datasets?other=LeRobot"
+   ]
+  },
+  {
+   "id": 88,
+   "kind": "heading",
+   "start": 13835,
+   "end": 13863,
+   "text": "#### Tips for gathering data",
+   "tokens": []
+  },
+  {
+   "id": 89,
+   "kind": "para",
+   "start": 13865,
+   "end": 14392,
+   "text": "Once you're comfortable with data recording, you can create a larger dataset for training. A good starting task is grasping an object at different locations and placing it in a bin. We suggest recording at least 50 episodes, with 10 episodes per location. Keep the cameras fixed and maintain consistent grasping behavior throughout the recordings. Also make sure the object you are manipulating is visible on the camera's. A good rule of thumb is you should be able to do the task yourself by only looking at the camera images.",
+   "tokens": []
+  },
+  {
+   "id": 90,
+   "kind": "para",
+   "start": 14394,
+   "end": 14665,
+   "text": "In the following sections, you’ll train your neural network. After achieving reliable grasping performance, you can start introducing more variations during data collection, such as additional grasp locations, different grasping techniques, and altering camera positions.",
+   "tokens": []
+  },
+  {
+   "id": 91,
+   "kind": "para",
+   "start": 14667,
+   "end": 14742,
+   "text": "Avoid adding too much variation too quickly, as it may hinder your results.",
+   "tokens": []
+  },
+  {
+   "id": 92,
+   "kind": "para",
+   "start": 14744,
+   "end": 14942,
+   "text": "If you want to dive deeper into this important topic, you can check out the [blog post](⟦0⟧) we wrote on what makes a good dataset.",
+   "tokens": [
+    "https://huggingface.co/blog/lerobot-datasets#what-makes-a-good-dataset"
+   ]
+  },
+  {
+   "id": 93,
+   "kind": "heading",
+   "start": 14944,
+   "end": 14965,
+   "text": "#### Troubleshooting:",
+   "tokens": []
+  },
+  {
+   "id": 94,
+   "kind": "list",
+   "start": 14967,
+   "end": 15591,
+   "text": "- On Linux, the recording control-flow keys (arrow keys, Escape) work on X11, Wayland, and headless/SSH sessions as long as you run the recording from an interactive terminal (keep it focused) — no ⟦0⟧ setup is needed; the letter equivalents ⟦1⟧ / ⟦2⟧ / ⟦3⟧ also work. Note that **keyboard teleoperation of the LeKiwi base** is different: it relies on a global key backend and therefore works only on an X11 session, a Windows desktop, or macOS with Accessibility/Input Monitoring granted — not on Wayland or headless machines. See [pynput limitations](⟦4⟧).",
+   "tokens": [
+    "`$DISPLAY`",
+    "`n`",
+    "`r`",
+    "`q`",
+    "https://pynput.readthedocs.io/en/latest/limitations.html#linux"
+   ]
+  },
+  {
+   "id": 95,
+   "kind": "heading",
+   "start": 15593,
+   "end": 15613,
+   "text": "## Replay an episode",
+   "tokens": []
+  },
+  {
+   "id": 96,
+   "kind": "para",
+   "start": 15615,
+   "end": 15739,
+   "text": "To replay an episode run the API example below, make sure to change ⟦0⟧, ⟦1⟧, LeRobotDatasetId and episode index.",
+   "tokens": [
+    "`remote_ip`",
+    "`port`"
+   ]
+  },
+  {
+   "id": 97,
+   "kind": "para",
+   "start": 15787,
+   "end": 15959,
+   "text": "Congrats 🎉, your robot is all set to learn a task on its own. Start training it by the training part of this tutorial: [Getting started with real-world robots](⟦0⟧)",
+   "tokens": [
+    "./il_robots"
+   ]
+  },
+  {
+   "id": 98,
+   "kind": "heading",
+   "start": 15961,
+   "end": 15984,
+   "text": "## Evaluate your policy",
+   "tokens": []
+  },
+  {
+   "id": 99,
+   "kind": "para",
+   "start": 15986,
+   "end": 16093,
+   "text": "To evaluate your policy run the ⟦0⟧ API example, make sure to change ⟦1⟧, ⟦2⟧, model..",
+   "tokens": [
+    "`evaluate.py`",
+    "`remote_ip`",
+    "`port`"
+   ]
+  },
+  {
+   "id": 100,
+   "kind": "quote",
+   "start": 16143,
+   "end": 16263,
+   "text": "> [!TIP]\n> If you have any questions or need help, please reach out on [Discord](⟦0⟧).",
+   "tokens": [
+    "https://discord.com/invite/s3KuuzsPFb"
+   ]
+  }
+ ]
+}

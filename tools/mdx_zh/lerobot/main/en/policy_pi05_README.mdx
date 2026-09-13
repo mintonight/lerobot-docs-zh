@@ -1,0 +1,159 @@
+<script lang="ts">
+import {onMount} from "svelte";
+import Tip from "$lib/Tip.svelte";
+import CopyLLMTxtMenu from "$lib/CopyLLMTxtMenu.svelte";
+import Youtube from "$lib/Youtube.svelte";
+import Docstring from "$lib/Docstring.svelte";
+import CodeBlock from "$lib/CodeBlock.svelte";
+import CodeBlockFw from "$lib/CodeBlockFw.svelte";
+import DocNotebookDropdown from "$lib/DocNotebookDropdown.svelte";
+import CourseFloatingBanner from "$lib/CourseFloatingBanner.svelte";
+import IconCopyLink from "$lib/IconCopyLink.svelte";
+import FrameworkContent from "$lib/FrameworkContent.svelte";
+import Markdown from "$lib/Markdown.svelte";
+import Question from "$lib/Question.svelte";
+import FrameworkSwitchCourse from "$lib/FrameworkSwitchCourse.svelte";
+import InferenceApi from "$lib/InferenceApi.svelte";
+import TokenizersLanguageContent from "$lib/TokenizersLanguageContent.svelte";
+import ExampleCodeBlock from "$lib/ExampleCodeBlock.svelte";
+import Added from "$lib/Added.svelte";
+import Changed from "$lib/Changed.svelte";
+import Deprecated from "$lib/Deprecated.svelte";
+import PipelineIcon from "$lib/PipelineIcon.svelte";
+import PipelineTag from "$lib/PipelineTag.svelte";
+import Heading from "$lib/Heading.svelte";
+import HfOptions from "$lib/HfOptions.svelte";
+import HfOption from "$lib/HfOption.svelte";
+import EditOnGithub from "$lib/EditOnGithub.svelte";
+import InferenceSnippet from "$lib/InferenceSnippet/InferenceSnippet.svelte";
+import MermaidChart from "$lib/MermaidChart.svelte";
+let fw: "pt" | "tf" = "pt";
+onMount(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    fw = urlParams.get("fw") || "pt";
+});
+</script>
+<svelte:head>
+  <meta name="hf:doc:metadata" content={metadata} >
+</svelte:head>
+
+<!--HF DOCBUILD BODY START-->
+
+HF_DOC_BODY_START
+
+<CopyLLMTxtMenu containerStyle="float: right; margin-left: 10px; display: inline-flex; position: relative; z-index: 10;"></CopyLLMTxtMenu>
+
+# π₀.₅（pi05）
+
+本仓库包含 **π₀.₅** 的 Hugging Face 移植版本，改编自 Physical Intelligence 的 [OpenPI](https://github.com/Physical-Intelligence/openpi)。
+它被设计为一个**具备开放世界泛化能力的视觉-语言-action 模型**。
+
+---
+
+## 模型概览
+
+| 特性              | π₀                                                     | π₀.₅                                      |
+| -------------------- | ------------------------------------------------------ | ----------------------------------------- |
+| 时间条件    | 通过 `action_time_mlp_*` 将时间与 action 拼接 | 使用 `time_mlp_*` 进行 AdaRMS 条件化 |
+| AdaRMS               | 不使用                                               | 用于 action expert                     |
+| 分词器长度     | 48 个 token                                              | 200 个 token                                |
+| 离散 state 输入 | False（使用 `state_proj` 层）                        | True                                      |
+| 参数量      | 更高（包含 state 嵌入）                      | 更低（无 state 嵌入）                |
+
+---
+
+## relative action
+
+π₀.₅ 支持使用**relative action**进行训练，此时模型学习的是相对于当前机器人 state 的偏移量，而非绝对关节位置。这与 OpenPI 中的 relative action 变换（`DeltaActions`）一致，并且可以提升性能。
+
+### 工作原理
+
+1. **在预处理期间**，absolute action 被转换为相对偏移量：
+   `relative = action - state`（针对选定的关节）。
+2. 使用根据相对分布计算出的统计量对 relative action 进行归一化。
+3. **在后处理期间**，预测的 relative action 被转换回 absolute action：
+   `absolute = relative + state`。
+
+在 `relative_exclude_joints` 中列出的关节（例如 gripper）保持绝对。
+
+### 配置
+
+| 参数                 | 类型        | 默认值       | 说明                                                      |
+| ------------------------- | ----------- | ------------- | ---------------------------------------------------------------- |
+| `use_relative_actions`    | `bool`      | `False`       | 启用 relative action 训练                                  |
+| `relative_exclude_joints` | `list[str]` | `["gripper"]` | 保持绝对的关节名称（按子串匹配）              |
+| `action_feature_names`    | `list[str]` | `None`        | 运行时由 `make_policy` 从 dataset 元数据自动填充 |
+
+### 训练示例
+
+```bash
+python -m lerobot.scripts.lerobot_train \
+  --policy.type=pi05 \
+  --dataset.repo_id=your_org/your_dataset \
+  --policy.use_relative_actions=true \
+  --policy.relative_exclude_joints='["gripper"]'
+```
+
+当 `use_relative_actions=true` 时，训练脚本会自动：
+
+- 从 dataset 计算 relative action 统计量（采样的 action chunk 级 relative action）
+- 用相对统计量替换标准 action 统计量以进行归一化
+- 在分布式训练中将这些统计量广播到所有进程
+
+---
+
+## policy 权重的 EMA
+
+OpenPI 在训练期间维护权重的指数移动平均（默认 `ema_decay=0.99`），并保留 EMA 副本用于 inference。要使用 LeRobot 训练器复现这一点，需启用 EMA 影子权重并设置恒定衰减：
+
+```bash
+python -m lerobot.scripts.lerobot_train \
+  --policy.type=pi05 \
+  --dataset.repo_id=your_org/your_dataset \
+  --ema.enable=true \
+  --ema.decay=0.99
+```
+
+此时 checkpoint 会在 `pretrained_model_ema/` 中包含一份可直接加载的 EMA 权重副本，与实时权重并列。注意，影子权重是参数在 GPU 上的完整额外副本。与 OpenPI（在其 LoRA 配置中禁用 EMA）一样，EMA 不支持与 PEFT 适配器一起使用。
+
+---
+
+## 引用
+
+如果你使用这项工作，请同时引用 **OpenPI** 和 π₀.₅ 论文：
+
+```bibtex
+@misc{openpi2024,
+  author       = {Physical Intelligence Lab},
+  title        = {OpenPI: PyTorch Implementation of π0 and π0.5 Policies},
+  year         = {2024},
+  publisher    = {GitHub},
+  howpublished = {\url{https://github.com/Physical-Intelligence/openpi}},
+  license      = {Apache-2.0}
+}
+
+@misc{intelligence2025pi05visionlanguageactionmodelopenworld,
+  title        = {π₀.₅: a Vision-Language-Action Model with Open-World Generalization},
+  author       = {Physical Intelligence and Kevin Black and Noah Brown and James Darpinian and Karan Dhabalia and Danny Driess and Adnan Esmail and Michael Equi and Chelsea Finn and Niccolo Fusai and Manuel Y. Galliker and Dibya Ghosh and Lachy Groom and Karol Hausman and Brian Ichter and Szymon Jakubczak and Tim Jones and Liyiming Ke and Devin LeBlanc and Sergey Levine and Adrian Li-Bell and Mohith Mothukuri and Suraj Nair and Karl Pertsch and Allen Z. Ren and Lucy Xiaoyang Shi and Laura Smith and Jost Tobias Springenberg and Kyle Stachowicz and James Tanner and Quan Vuong and Homer Walke and Anna Walling and Haohuan Wang and Lili Yu and Ury Zhilinsky},
+  year         = {2025},
+  eprint       = {2504.16054},
+  archivePrefix= {arXiv},
+  primaryClass = {cs.LG},
+  url          = {https://arxiv.org/abs/2504.16054},
+}
+```
+
+---
+
+## 许可证
+
+本移植版本遵循 **Apache 2.0 许可证**，与原始 [OpenPI 仓库](https://github.com/Physical-Intelligence/openpi)保持一致。
+
+
+
+<EditOnGithub source="https://github.com/huggingface/lerobot/blob/main/docs/source/policy_pi05_README.mdx" />
+
+<!--HF DOCBUILD BODY END-->
+
+HF_DOC_BODY_END
+

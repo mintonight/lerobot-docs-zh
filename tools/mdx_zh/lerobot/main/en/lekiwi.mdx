@@ -1,0 +1,397 @@
+<script lang="ts">
+import {onMount} from "svelte";
+import Tip from "$lib/Tip.svelte";
+import CopyLLMTxtMenu from "$lib/CopyLLMTxtMenu.svelte";
+import Youtube from "$lib/Youtube.svelte";
+import Docstring from "$lib/Docstring.svelte";
+import CodeBlock from "$lib/CodeBlock.svelte";
+import CodeBlockFw from "$lib/CodeBlockFw.svelte";
+import DocNotebookDropdown from "$lib/DocNotebookDropdown.svelte";
+import CourseFloatingBanner from "$lib/CourseFloatingBanner.svelte";
+import IconCopyLink from "$lib/IconCopyLink.svelte";
+import FrameworkContent from "$lib/FrameworkContent.svelte";
+import Markdown from "$lib/Markdown.svelte";
+import Question from "$lib/Question.svelte";
+import FrameworkSwitchCourse from "$lib/FrameworkSwitchCourse.svelte";
+import InferenceApi from "$lib/InferenceApi.svelte";
+import TokenizersLanguageContent from "$lib/TokenizersLanguageContent.svelte";
+import ExampleCodeBlock from "$lib/ExampleCodeBlock.svelte";
+import Added from "$lib/Added.svelte";
+import Changed from "$lib/Changed.svelte";
+import Deprecated from "$lib/Deprecated.svelte";
+import PipelineIcon from "$lib/PipelineIcon.svelte";
+import PipelineTag from "$lib/PipelineTag.svelte";
+import Heading from "$lib/Heading.svelte";
+import HfOptions from "$lib/HfOptions.svelte";
+import HfOption from "$lib/HfOption.svelte";
+import EditOnGithub from "$lib/EditOnGithub.svelte";
+import InferenceSnippet from "$lib/InferenceSnippet/InferenceSnippet.svelte";
+import MermaidChart from "$lib/MermaidChart.svelte";
+let fw: "pt" | "tf" = "pt";
+onMount(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    fw = urlParams.get("fw") || "pt";
+});
+</script>
+<svelte:head>
+  <meta name="hf:doc:metadata" content={metadata} >
+</svelte:head>
+
+<!--HF DOCBUILD BODY START-->
+
+HF_DOC_BODY_START
+
+<CopyLLMTxtMenu containerStyle="float: right; margin-left: 10px; display: inline-flex; position: relative; z-index: 10;"></CopyLLMTxtMenu>
+
+# LeKiwi
+
+<img
+  src="https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/lerobot/1740517739083.jpeg"
+  alt="LeKiwi"
+  width="70%"
+/>
+
+在以下步骤中，我们将说明如何组装 LeKiwi 移动机器人。
+
+## 采购零件
+
+请遵循此 [README](https://github.com/SIGRobotics-UIUC/LeKiwi)。其中包含物料清单（附有采购零件的链接）以及 3D 打印零件的说明。
+如果你第一次进行打印或没有 3D 打印机，它会提供建议。
+
+### 有线版本
+
+如果你使用的是**有线** LeKiwi 版本，可以跳过 Raspberry Pi 的安装和 SSH 设置。你也可以直接在 PC 上运行所有命令，包括 LeKiwi 脚本和用于 teleoperation 的 leader arm 脚本。
+
+## 在 Pi 上安装软件
+
+现在我们必须设置将在 LeKiwi 机器人上运行的远程 PC。这通常是一台 Raspberry Pi，但也可以是任何能在 5V 下运行、并有足够 USB 端口（2 个或更多）连接相机和电机控制板的 PC。
+
+### 安装操作系统
+
+有关设置 Raspberry Pi 及其 SD 卡的信息，请参阅：[设置 Pi](https://www.raspberrypi.com/documentation/computers/getting-started.html)。这里说明了如何下载 [Imager](https://www.raspberrypi.com/software/) 以安装 Raspberry Pi OS 或 Ubuntu。
+
+### 设置 SSH
+
+设置好 Pi 后，你应该启用并设置 [SSH](https://www.raspberrypi.com/news/coding-on-raspberry-pi-remotely-with-visual-studio-code/)（Secure Shell 协议），这样你就可以从笔记本电脑登录 Pi，而无需在 Pi 上配备屏幕、键盘和鼠标。关于如何操作的优秀教程可以在[这里](https://www.raspberrypi.com/documentation/computers/remote-access.html#ssh)找到。登录 Pi 可以在命令提示符 (cmd) 中完成；如果你使用 VSCode，也可以使用[此](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-ssh)扩展。
+
+### 在 Pi 上安装 LeRobot 🤗
+
+在你的 Raspberry Pi 上，使用我们的[安装指南](./installation)安装 LeRobot
+
+除了这些说明之外，你还需要在 Pi 上安装 Feetech SDK 和 ZeroMQ：
+
+```bash
+pip install -e ".[lekiwi]"
+```
+
+## 在本地安装 LeRobot
+
+如果你已经在笔记本电脑/PC 上安装了 LeRobot，可以跳过此步骤；否则，请按照我们在 Pi 上所执行的相同步骤进行操作。
+
+遵循我们的[安装指南](./installation)
+
+除了这些说明之外，你还需要在笔记本电脑/PC 上安装 Feetech SDK 和 ZeroMQ：
+
+```bash
+pip install -e ".[lekiwi]"
+```
+
+太好了 🤗！你现在已完成 LeRobot 的安装，我们可以开始组装 SO100/SO101 机械臂和移动底座了 🤖。
+以后每次想要使用 LeRobot 时，你可以进入我们安装 LeRobot 的 `~/lerobot` 文件夹并运行其中一条命令。
+
+# 分步组装说明
+
+首先，我们将组装两个 SO100/SO101 机械臂。一个安装在移动底座上，另一个用于 teleoperation。然后我们将组装移动底座。组装说明可以在以下两个页面上找到：
+
+- [组装 SO101](./so101#step-by-step-assembly-instructions)
+- [组装 LeKiwi](https://github.com/SIGRobotics-UIUC/LeKiwi/blob/main/Assembly.md)
+
+### 查找与电机板关联的 USB 端口
+
+要查找每个总线舵机适配器的端口，请运行此脚本：
+
+```bash
+lerobot-find-port
+```
+
+<hfoptions id="example">
+<hfoption id="Mac">
+
+示例输出：
+
+```
+Finding all available ports for the MotorBus.
+['/dev/tty.usbmodem575E0032081']
+Remove the USB cable from your MotorsBus and press Enter when done.
+
+[...Disconnect corresponding leader or follower arm and press Enter...]
+
+The port of this MotorsBus is /dev/tty.usbmodem575E0032081
+Reconnect the USB cable.
+```
+
+找到的端口为：`/dev/tty.usbmodem575E0032081`，对应你的板子。
+
+</hfoption>
+<hfoption id="Linux">
+
+在 Linux 上，你可能需要通过运行以下命令来授予 USB 端口访问权限：
+
+```bash
+sudo chmod 666 /dev/ttyACM0
+sudo chmod 666 /dev/ttyACM1
+```
+
+示例输出：
+
+```
+Finding all available ports for the MotorBus.
+['/dev/ttyACM0']
+Remove the usb cable from your MotorsBus and press Enter when done.
+
+[...Disconnect corresponding leader or follower arm and press Enter...]
+
+The port of this MotorsBus is /dev/ttyACM0
+Reconnect the USB cable.
+```
+
+找到的端口为：`/dev/ttyACM0`，对应你的板子。
+
+</hfoption>
+</hfoptions>
+
+### 配置电机
+
+配置电机的说明可以在 SO101 [文档](./so101#configure-the-motors)中找到。除了机械臂电机的 id 外，我们还需要设置移动底座电机的 id。这些 id 需要按特定顺序才能正常工作。下面是移动底座电机 id 和电机安装位置的图片。请注意，我们在 LeKiwi 上只使用一个电机控制板。这意味着轮子的电机 id 为 7、8 和 9。
+
+你可以运行此命令为 LeKiwi 设置电机。它将首先设置机械臂的电机（id 6..1），然后设置轮子的电机 (9,8,7)
+
+```bash
+lerobot-setup-motors \
+    --robot.type=lekiwi \
+    --robot.port=/dev/tty.usbmodem58760431551 # <- paste here the port found at previous step
+```
+
+<img src="https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/lerobot/motor_ids.webp" alt="Motor ID's for mobile robot" title="Motor ID's for mobile robot" width="60%">
+
+### 排查通信问题
+
+如果你在连接 Mobile SO100 时遇到问题，请按照以下步骤诊断并解决问题。
+
+#### 1. 验证 IP 地址配置
+
+确保在命令或代码中使用了正确的 Pi IP。要检查 Raspberry Pi 的 IP 地址，请（在 Pi 命令行上）运行：
+
+```bash
+hostname -I
+```
+
+#### 2. 检查是否可以从笔记本电脑/PC 访问 Pi
+
+尝试从你的笔记本电脑 ping Raspberry Pi：
+
+```bach
+ping <your_pi_ip_address>
+```
+
+如果 ping 失败：
+
+- 确保 Pi 已开机并连接到同一网络。
+- 检查 Pi 上是否已启用 SSH。
+
+#### 3. 尝试 SSH 连接
+
+如果你无法 SSH 登录 Pi，它可能没有正确连接。请使用：
+
+```bash
+ssh <your_pi_user_name>@<your_pi_ip_address>
+```
+
+如果你遇到连接错误：
+
+- 通过运行以下命令确保 Pi 上已启用 SSH：
+  ```bash
+  sudo raspi-config
+  ```
+  然后导航到：**Interfacing Options -> SSH** 并启用它。
+
+### calibration
+
+现在我们必须 calibrate leader arm 和 follower arm。轮子电机无需 calibration。
+calibration 过程非常重要，因为它能让在一个机器人上训练的神经网络在另一个机器人上工作。
+
+### calibrate follower arm（在移动底座上）
+
+确保机械臂已连接到 Raspberry Pi，并（通过 SSH 在 Raspberry Pi 上）运行此脚本或 API 示例以启动 follower arm 的 calibration：
+
+```bash
+lerobot-calibrate \
+    --robot.type=lekiwi \
+    --robot.id=my_awesome_kiwi # <- Give the robot a unique name
+```
+
+我们统一了大多数机器人的 calibration 方法，因此，此 SO100 机械臂的 calibration 步骤与 Koch 和 SO101 的步骤相同。首先，我们必须将机器人移动到每个关节都处于其行程中间的位置，然后按下 `Enter`。其次，我们让所有关节完成其完整的运动范围。作为参考，SO101 执行此相同过程的视频可以在[这里](https://huggingface.co/docs/lerobot/en/so101#calibration-video)找到。
+
+### 有线版本
+
+如果你使用的是**有线** LeKiwi 版本，请在你的笔记本电脑上运行所有命令。
+
+### calibrate leader arm
+
+然后，calibrate leader arm（它连接到笔记本电脑/PC）。在你的笔记本电脑上运行以下命令或 API 示例：
+
+<hfoptions id="calibrate_leader">
+<hfoption id="Command">
+
+```bash
+lerobot-calibrate \
+    --teleop.type=so100_leader \
+    --teleop.port=/dev/tty.usbmodem58760431551 \ # <- The port of your robot
+    --teleop.id=my_awesome_leader_arm # <- Give the robot a unique name
+```
+
+</hfoption>
+<hfoption id="API example">
+
+<!-- prettier-ignore-start -->
+```python
+from lerobot.teleoperators.so_leader import SO100LeaderConfig, SO100Leader
+
+config = SO100LeaderConfig(
+    port="/dev/tty.usbmodem58760431551",
+    id="my_awesome_leader_arm",
+)
+
+leader = SO100Leader(config)
+leader.connect(calibrate=False)
+leader.calibrate()
+leader.disconnect()
+```
+<!-- prettier-ignore-end -->
+
+</hfoption>
+</hfoptions>
+
+## teleoperation LeKiwi
+
+> [!TIP]
+> 如果你使用的是 Mac，可能需要授予终端访问键盘的权限以进行 teleoperation。前往“系统偏好设置 > 安全性与隐私 > 输入监控”，并勾选终端对应的复选框。
+
+要进行 teleoperation，请 SSH 登录你的 Raspberry Pi，运行 `conda activate lerobot` 和此命令：
+
+```bash
+python -m lerobot.robots.lekiwi.lekiwi_host --robot.id=my_awesome_kiwi
+```
+
+然后在你的笔记本电脑上，同样运行 `conda activate lerobot` 并运行该 API 示例，确保在 `examples/lekiwi/teleoperate.py` 中设置了正确的 `remote_ip` 和 `port`。
+
+```bash
+python examples/lekiwi/teleoperate.py
+```
+
+你的笔记本电脑上应该会看到类似这样的内容：`[INFO] Connected to remote robot at tcp://172.17.133.91:5555 and video stream at tcp://172.17.133.91:5556.` 现在你可以移动 leader arm，并使用键盘 (w,a,s,d) 向前、向左、向后、向右驱动。使用 (z,x) 左转或右转。你可以使用 (r,f) 加快和减慢移动机器人的速度。共有三种速度模式，见下表：
+
+| 速度模式 | 线速度 (m/s) | 旋转速度 (deg/s) |
+| ---------- | ------------------ | ---------------------- |
+| 快       | 0.4                | 90                     |
+| 中     | 0.25               | 60                     |
+| 慢       | 0.1                | 30                     |
+
+| 按键 | action         |
+| --- | -------------- |
+| W   | 前进   |
+| A   | 左移      |
+| S   | 后退  |
+| D   | 右移     |
+| Z   | 左转      |
+| X   | 右转     |
+| R   | 加快速度 |
+| F   | 减慢速度 |
+
+> [!TIP]
+> 如果你使用不同的键盘，可以在 [`LeKiwiClientConfig`](https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/lekiwi/config_lekiwi.py) 中更改每条命令的按键。
+
+### 有线版本
+
+如果你使用的是**有线** LeKiwi 版本，请在你的笔记本电脑上运行所有命令。
+
+## 录制 dataset
+
+一旦你熟悉了 teleoperation，就可以录制你的第一个 dataset。
+
+我们使用 Hugging Face Hub 功能上传你的 dataset。如果你之前没有使用过 Hub，请确保能通过 CLI 使用具有写入权限的 token 登录，此 token 可以从 [Hugging Face 设置](https://huggingface.co/settings/tokens)生成。
+
+通过运行此命令将你的 token 添加到 CLI：
+
+```bash
+hf auth login --token ${HUGGINGFACE_TOKEN} --add-to-git-credential
+```
+
+然后将你的 Hugging Face 仓库名称存储在一个变量中：
+
+```bash
+HF_USER=$(hf auth whoami | awk -F': *' 'NR==1 {print $2}')
+echo $HF_USER
+```
+
+现在你可以录制 dataset 了。要录制 episode 并将 dataset 上传到 Hub，请执行这个为 LeKiwi 量身定制的 API 示例。请确保先调整脚本中的 `remote_ip`、`repo_id`、`port` 和 `task`。如果你想运行脚本更长时间，可以增大 `NB_CYCLES_CLIENT_CONNECTION`。
+
+```bash
+python examples/lekiwi/record.py
+```
+
+#### dataset 上传
+
+在本地，你的 dataset 存储在此文件夹中：`~/.cache/huggingface/lerobot/{repo-id}`。数据录制结束时，你的 dataset 将上传到你的 Hugging Face 页面（例如 https://huggingface.co/datasets/cadene/so101_test），你可以通过运行以下命令获取：
+
+```bash
+echo https://huggingface.co/datasets/${HF_USER}/so101_test
+```
+
+你的 dataset 将自动添加 `LeRobot` 标签，以便社区轻松找到它，你也可以添加自定义标签（例如本示例中的 `tutorial`）。
+
+你可以通过搜索 `LeRobot` [标签](https://huggingface.co/datasets?other=LeRobot)在 Hub 上查找其他 LeRobot dataset。
+
+#### 收集数据的技巧
+
+一旦你熟悉了数据录制，就可以为训练创建更大的 dataset。一个很好的入门任务是抓取不同位置的对象并将其放入箱子中。我们建议至少录制 50 个 episode，每个位置 10 个 episode。保持相机固定，并在整个录制过程中保持一致抓取行为。还要确保你操作的对象在相机画面中可见。一个很好的经验法则是：仅通过查看相机图像，你自己就应该能够完成该任务。
+
+在以下各节中，你将训练你的神经网络。在实现可靠的抓取性能后，你可以开始引入更多变化，例如额外的抓取位置、不同的抓取技术和改变相机位置。
+
+避免过快引入过多变化，因为这可能会妨碍你的结果。
+
+如果你想深入了解这个重要主题，可以查看我们撰写的关于什么才算是好 dataset 的[博客文章](https://huggingface.co/blog/lerobot-datasets#what-makes-a-good-dataset)。
+
+#### 故障排查：
+
+- 在 Linux 上，只要你在交互式终端中运行录制（保持终端处于焦点），录制控制键（方向键、Escape）就能在 X11、Wayland 和无头/SSH 会话中工作——无需设置 `$DISPLAY`；字母等价键 `n` / `r` / `q` 也可用。请注意，**LeKiwi 底座的键盘 teleoperation**有所不同：它依赖全局按键后端，因此只在 X11 会话、Windows 桌面或授予了辅助功能/输入监控权限的 macOS 上工作——在 Wayland 或无头机器上不行。参见 [pynput 限制](https://pynput.readthedocs.io/en/latest/limitations.html#linux)。
+
+## 回放 episode
+
+要回放 episode，请运行下面的 API 示例，确保更改 `remote_ip`、`port`、LeRobotDatasetId 和 episode index。
+
+```bash
+python examples/lekiwi/replay.py
+```
+
+恭喜 🎉，你的机器人已准备好自行学习一项任务。通过本教程的训练部分开始训练它：[真实机器人入门](./il_robots)
+
+## 评估你的 policy
+
+要评估你的 policy，请运行 `evaluate.py` API 示例，确保更改 `remote_ip`、`port`、模型..
+
+```bash
+python examples/lekiwi/evaluate.py
+```
+
+> [!TIP]
+> 如果你有任何问题或需要帮助，请在 [Discord](https://discord.com/invite/s3KuuzsPFb) 上联系我们。
+
+
+
+<EditOnGithub source="https://github.com/huggingface/lerobot/blob/main/docs/source/lekiwi.mdx" />
+
+<!--HF DOCBUILD BODY END-->
+
+HF_DOC_BODY_END
+

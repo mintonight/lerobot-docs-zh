@@ -1,0 +1,627 @@
+{
+ "file": "unitree_g1.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1936,
+   "text": "# Unitree G1",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 2132,
+   "end": 2304,
+   "text": "The Unitree G1 humanoid is now supported in LeRobot! You can teleoperate, train locomanipulation policies, test in sim, and more. Both 29 and 23 DoF variants are supported.",
+   "tokens": []
+  },
+  {
+   "id": 2,
+   "kind": "heading",
+   "start": 2311,
+   "end": 2337,
+   "text": "## Part 1: Getting Started",
+   "tokens": []
+  },
+  {
+   "id": 3,
+   "kind": "heading",
+   "start": 2339,
+   "end": 2366,
+   "text": "### Install the Unitree SDK",
+   "tokens": []
+  },
+  {
+   "id": 4,
+   "kind": "para",
+   "start": 2368,
+   "end": 2551,
+   "text": "Follow the [unitree_sdk2_python installation guide](⟦0⟧). Tested with ⟦1⟧ and ⟦2⟧:",
+   "tokens": [
+    "https://github.com/unitreerobotics/unitree_sdk2_python#installation",
+    "`unitree_sdk2py==1.0.1`",
+    "`cyclonedds==0.10.2`"
+   ]
+  },
+  {
+   "id": 5,
+   "kind": "heading",
+   "start": 2743,
+   "end": 2762,
+   "text": "### Install LeRobot",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "para",
+   "start": 2963,
+   "end": 3086,
+   "text": "⟦0⟧\n  For now, pinocchio must be installed from conda-forge (not pip) to include the\n  CasADi bindings needed for arm IK.",
+   "tokens": [
+    "<Tip>"
+   ]
+  },
+  {
+   "id": 7,
+   "kind": "heading",
+   "start": 3095,
+   "end": 3133,
+   "text": "### Test the Installation (Simulation)",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "para",
+   "start": 3135,
+   "end": 3322,
+   "text": "The simulation environment has its own dependencies. Check the Simulation environment dependencies: [Unitree G1 Mujoco EnvHub](⟦0⟧).",
+   "tokens": [
+    "https://huggingface.co/lerobot/unitree-g1-mujoco/tree/main"
+   ]
+  },
+  {
+   "id": 9,
+   "kind": "para",
+   "start": 3792,
+   "end": 4209,
+   "text": "This will launch a [MuJoCo sim instance](⟦0⟧) for the G1. You can connect a gamepad to your machine before launching in order to control the robot's locomotion in sim. We support both [HolosomaLocomotionController](⟦1⟧) and [GrootLocomotionController](⟦2⟧) via ⟦3⟧.",
+   "tokens": [
+    "https://huggingface.co/lerobot/unitree-g1-mujoco/tree/main",
+    "https://github.com/amazon-far/holosoma",
+    "https://github.com/NVlabs/GR00T-WholeBodyControl",
+    "`--robot.controller`"
+   ]
+  },
+  {
+   "id": 10,
+   "kind": "list",
+   "start": 4211,
+   "end": 4243,
+   "text": "- Press ⟦0⟧ to release the robot",
+   "tokens": [
+    "`9`"
+   ]
+  },
+  {
+   "id": 11,
+   "kind": "list",
+   "start": 4244,
+   "end": 4297,
+   "text": "- Press ⟦0⟧ / ⟦1⟧ to increase / decrease waist height",
+   "tokens": [
+    "`7`",
+    "`8`"
+   ]
+  },
+  {
+   "id": 12,
+   "kind": "heading",
+   "start": 4299,
+   "end": 4332,
+   "text": "### Connect to the Physical Robot",
+   "tokens": []
+  },
+  {
+   "id": 13,
+   "kind": "para",
+   "start": 4334,
+   "end": 4473,
+   "text": "The G1's Ethernet IP is fixed at ⟦0⟧. Your machine must have a static IP on the same subnet: ⟦1⟧ where ⟦2⟧.",
+   "tokens": [
+    "`192.168.123.164`",
+    "`192.168.123.x`",
+    "`x ≠ 164`"
+   ]
+  },
+  {
+   "id": 14,
+   "kind": "heading",
+   "start": 4673,
+   "end": 4695,
+   "text": "### SSH into the Robot",
+   "tokens": []
+  },
+  {
+   "id": 15,
+   "kind": "heading",
+   "start": 4754,
+   "end": 4785,
+   "text": "### Share Internet via Ethernet",
+   "tokens": []
+  },
+  {
+   "id": 16,
+   "kind": "para",
+   "start": 4787,
+   "end": 4898,
+   "text": "The G1 needs internet access to clone repos and install packages. Share your laptop's connection over Ethernet:",
+   "tokens": []
+  },
+  {
+   "id": 17,
+   "kind": "para",
+   "start": 4900,
+   "end": 4919,
+   "text": "**On your laptop:**",
+   "tokens": []
+  },
+  {
+   "id": 18,
+   "kind": "para",
+   "start": 5266,
+   "end": 5280,
+   "text": "**On the G1:**",
+   "tokens": []
+  },
+  {
+   "id": 19,
+   "kind": "heading",
+   "start": 5478,
+   "end": 5515,
+   "text": "### Install the Unitree SDK on the G1",
+   "tokens": []
+  },
+  {
+   "id": 20,
+   "kind": "para",
+   "start": 5517,
+   "end": 5638,
+   "text": "Follow the [unitree_sdk2_python installation guide](⟦0⟧):",
+   "tokens": [
+    "https://github.com/unitreerobotics/unitree_sdk2_python#installation"
+   ]
+  },
+  {
+   "id": 21,
+   "kind": "heading",
+   "start": 5840,
+   "end": 5869,
+   "text": "### Install LeRobot on the G1",
+   "tokens": []
+  },
+  {
+   "id": 22,
+   "kind": "para",
+   "start": 6044,
+   "end": 6167,
+   "text": "⟦0⟧\n  For now, pinocchio must be installed from conda-forge (not pip) to include the\n  CasADi bindings needed for arm IK.",
+   "tokens": [
+    "<Tip>"
+   ]
+  },
+  {
+   "id": 23,
+   "kind": "heading",
+   "start": 6176,
+   "end": 6215,
+   "text": "### (Optional) Enable WiFi on the Robot",
+   "tokens": []
+  },
+  {
+   "id": 24,
+   "kind": "para",
+   "start": 6217,
+   "end": 6298,
+   "text": "For wireless SSH access, you can enable WiFi on the G1 (it's blocked by default):",
+   "tokens": []
+  },
+  {
+   "id": 25,
+   "kind": "para",
+   "start": 6466,
+   "end": 6496,
+   "text": "**Connect to a WiFi network:**",
+   "tokens": []
+  },
+  {
+   "id": 26,
+   "kind": "para",
+   "start": 6892,
+   "end": 6939,
+   "text": "You can then SSH over WiFi instead of Ethernet:",
+   "tokens": []
+  },
+  {
+   "id": 27,
+   "kind": "heading",
+   "start": 7003,
+   "end": 7040,
+   "text": "## Part 2: Teleoperation & Locomotion",
+   "tokens": []
+  },
+  {
+   "id": 28,
+   "kind": "heading",
+   "start": 7042,
+   "end": 7066,
+   "text": "### Run the Robot Server",
+   "tokens": []
+  },
+  {
+   "id": 29,
+   "kind": "para",
+   "start": 7068,
+   "end": 7100,
+   "text": "On the robot (from ⟦0⟧):",
+   "tokens": [
+    "`~/lerobot`"
+   ]
+  },
+  {
+   "id": 30,
+   "kind": "heading",
+   "start": 7191,
+   "end": 7220,
+   "text": "### Run the Locomotion Policy",
+   "tokens": []
+  },
+  {
+   "id": 31,
+   "kind": "para",
+   "start": 7222,
+   "end": 7400,
+   "text": "You can run the teleoperation client from your laptop over Ethernet, over WiFi (experimental), or directly on the robot itself. Mind potential latency introduced by your network.",
+   "tokens": []
+  },
+  {
+   "id": 32,
+   "kind": "para",
+   "start": 7402,
+   "end": 7423,
+   "text": "**From your laptop:**",
+   "tokens": []
+  },
+  {
+   "id": 33,
+   "kind": "para",
+   "start": 7854,
+   "end": 8048,
+   "text": "We support both [GrootLocomotionController](⟦0⟧) and [HolosomaLocomotionController](⟦1⟧) via ⟦2⟧.",
+   "tokens": [
+    "https://github.com/NVlabs/GR00T-WholeBodyControl",
+    "https://github.com/amazon-far/holosoma",
+    "`--robot.controller`"
+   ]
+  },
+  {
+   "id": 34,
+   "kind": "heading",
+   "start": 8055,
+   "end": 8115,
+   "text": "## Part 3: Loco-Manipulation with the Homunculus Exoskeleton",
+   "tokens": []
+  },
+  {
+   "id": 35,
+   "kind": "para",
+   "start": 8117,
+   "end": 8303,
+   "text": "We provide a loco-manipulation solution via the Homunculus Exoskeleton — an open-source 7 DoF exoskeleton for whole-body control. Check it out [here](⟦0⟧).",
+   "tokens": [
+    "https://github.com/nepyope/hmc_exo"
+   ]
+  },
+  {
+   "id": 36,
+   "kind": "heading",
+   "start": 8305,
+   "end": 8318,
+   "text": "### Calibrate",
+   "tokens": []
+  },
+  {
+   "id": 37,
+   "kind": "para",
+   "start": 8495,
+   "end": 8633,
+   "text": "During calibration move each joint through its entire range. After fitting, move the joint in a neutral position and press ⟦0⟧ to advance.",
+   "tokens": [
+    "`n`"
+   ]
+  },
+  {
+   "id": 38,
+   "kind": "heading",
+   "start": 8635,
+   "end": 8655,
+   "text": "### Record a Dataset",
+   "tokens": []
+  },
+  {
+   "id": 39,
+   "kind": "quote",
+   "start": 9330,
+   "end": 9450,
+   "text": "> **Note:** Omit ⟦0⟧ and ⟦1⟧ if you're only using the joystick.",
+   "tokens": [
+    "`--teleop.left_arm_config.port`",
+    "`--teleop.right_arm_config.port`"
+   ]
+  },
+  {
+   "id": 40,
+   "kind": "para",
+   "start": 9452,
+   "end": 9573,
+   "text": "Example dataset: [nepyope/unitree_box_move_blue_full](⟦0⟧)",
+   "tokens": [
+    "https://huggingface.co/datasets/nepyope/unitree_box_move_blue_full"
+   ]
+  },
+  {
+   "id": 41,
+   "kind": "heading",
+   "start": 9580,
+   "end": 9611,
+   "text": "## Part 4: Training & Inference",
+   "tokens": []
+  },
+  {
+   "id": 42,
+   "kind": "heading",
+   "start": 9613,
+   "end": 9622,
+   "text": "### Train",
+   "tokens": []
+  },
+  {
+   "id": 43,
+   "kind": "heading",
+   "start": 10184,
+   "end": 10206,
+   "text": "### Inference with RTC",
+   "tokens": []
+  },
+  {
+   "id": 44,
+   "kind": "para",
+   "start": 10208,
+   "end": 10279,
+   "text": "Once trained, we recommend deploying policies using inference-time RTC:",
+   "tokens": []
+  },
+  {
+   "id": 45,
+   "kind": "heading",
+   "start": 10781,
+   "end": 10840,
+   "text": "## Part 5: SONIC Whole-Body Control (Latent-Token Policies)",
+   "tokens": []
+  },
+  {
+   "id": 46,
+   "kind": "para",
+   "start": 10842,
+   "end": 11302,
+   "text": "LeRobot now ports the **decoder** half of NVIDIA's [SONIC](⟦0⟧) whole-body deploy stack as the ⟦1⟧. Instead of commanding joints, the policy outputs a 64-D **latent motion token** (⟦2⟧) each tick; the SONIC decoder maps that token plus recent proprioception history onto a residual action that is scaled and added to the standing pose, producing 50 Hz joint-position targets for all 29 DoF.",
+   "tokens": [
+    "https://github.com/NVIDIA/sonic",
+    "`SonicWholeBodyController`",
+    "`motion_token.{i}.pos`"
+   ]
+  },
+  {
+   "id": 47,
+   "kind": "para",
+   "start": 11304,
+   "end": 11662,
+   "text": "The controller loads its ONNX decoder and all deploy constants (PD gains, ⟦0⟧, ⟦1⟧, and the neutral token) from [⟦2⟧](⟦3⟧). The repo also ships a distilled low-latency decoder, selectable with the controller's ⟦4⟧ argument (defaults to ⟦5⟧).",
+   "tokens": [
+    "`default_angles`",
+    "`action_scale`",
+    "`lerobot/sonic_decoder`",
+    "https://huggingface.co/lerobot/sonic_decoder",
+    "`policy_type=\"low_latency\"`",
+    "`\"default\"`"
+   ]
+  },
+  {
+   "id": 48,
+   "kind": "heading",
+   "start": 11664,
+   "end": 11686,
+   "text": "### Test in Simulation",
+   "tokens": []
+  },
+  {
+   "id": 49,
+   "kind": "para",
+   "start": 11688,
+   "end": 11829,
+   "text": "Any token-output policy trained on SONIC motion tokens (e.g. [⟦0⟧](⟦1⟧)) can drive it:",
+   "tokens": [
+    "`nepyope/sonic_walk`",
+    "https://huggingface.co/nepyope/sonic_walk"
+   ]
+  },
+  {
+   "id": 50,
+   "kind": "heading",
+   "start": 12237,
+   "end": 12266,
+   "text": "### Run on the Physical Robot",
+   "tokens": []
+  },
+  {
+   "id": 51,
+   "kind": "para",
+   "start": 12268,
+   "end": 12794,
+   "text": "On hardware, run the policy with [async inference](⟦0⟧) rather than a single ⟦1⟧ loop. A rollout driven from your laptop puts the network in the middle of the control loop: every step blocks on inference, and one hiccup stalls the 50 Hz balance loop while the robot is standing on it. Async inference splits the two — the policy runs on your GPU machine, while the robot client runs on the G1's Jetson, so the SONIC controller thread and ⟦2⟧ stay onboard and only 64-D token chunks cross the network.",
+   "tokens": [
+    "./async",
+    "`lerobot-rollout`",
+    "`rt/lowcmd`"
+   ]
+  },
+  {
+   "id": 52,
+   "kind": "para",
+   "start": 12796,
+   "end": 12870,
+   "text": "Three processes, with the robot server from Part 2 running the whole time:",
+   "tokens": []
+  },
+  {
+   "id": 53,
+   "kind": "para",
+   "start": 13209,
+   "end": 13258,
+   "text": "Start the policy server on the GPU machine first:",
+   "tokens": []
+  },
+  {
+   "id": 54,
+   "kind": "para",
+   "start": 13369,
+   "end": 13418,
+   "text": "On the robot, start the server (bridge + camera):",
+   "tokens": []
+  },
+  {
+   "id": 55,
+   "kind": "para",
+   "start": 13496,
+   "end": 13632,
+   "text": "Then, in a second terminal on the robot, start the client. Everything robot-side is loopback, since the bridge runs on the same machine:",
+   "tokens": []
+  },
+  {
+   "id": 56,
+   "kind": "para",
+   "start": 14221,
+   "end": 14250,
+   "text": "A few things to keep in mind:",
+   "tokens": []
+  },
+  {
+   "id": 57,
+   "kind": "list",
+   "start": 14252,
+   "end": 14364,
+   "text": "- ⟦0⟧ is the device the _server_ loads the policy onto — the client sends it during the handshake.",
+   "tokens": [
+    "`--policy_device`"
+   ]
+  },
+  {
+   "id": 58,
+   "kind": "list",
+   "start": 14365,
+   "end": 14463,
+   "text": "- ⟦0⟧ must not exceed the checkpoint's chunk size (50 for ⟦1⟧).",
+   "tokens": [
+    "`--actions_per_chunk`",
+    "`nepyope/sonic_walk`"
+   ]
+  },
+  {
+   "id": 59,
+   "kind": "list",
+   "start": 14464,
+   "end": 14638,
+   "text": "- With ⟦0⟧ the observation state is the 64-D token echo instead of the 29 joint positions, so the checkpoint has to be trained against that same state.",
+   "tokens": [
+    "`SonicWholeBodyController`"
+   ]
+  },
+  {
+   "id": 60,
+   "kind": "para",
+   "start": 14640,
+   "end": 14815,
+   "text": "On connect, the robot eases every joint to the decoder's ⟦0⟧ before the controller takes over, so the first policy commands don't snap from the connect-time pose.",
+   "tokens": [
+    "`default_angles`"
+   ]
+  },
+  {
+   "id": 61,
+   "kind": "heading",
+   "start": 14822,
+   "end": 14845,
+   "text": "## Additional Resources",
+   "tokens": []
+  },
+  {
+   "id": 62,
+   "kind": "list",
+   "start": 14847,
+   "end": 14932,
+   "text": "- [Unitree SDK Documentation](⟦0⟧)",
+   "tokens": [
+    "https://github.com/unitreerobotics/unitree_sdk2_python"
+   ]
+  },
+  {
+   "id": 63,
+   "kind": "list",
+   "start": 14933,
+   "end": 15009,
+   "text": "- [GR00T-WholeBodyControl](⟦0⟧)",
+   "tokens": [
+    "https://github.com/NVlabs/GR00T-WholeBodyControl"
+   ]
+  },
+  {
+   "id": 64,
+   "kind": "list",
+   "start": 15010,
+   "end": 15062,
+   "text": "- [Holosoma](⟦0⟧)",
+   "tokens": [
+    "https://github.com/amazon-far/holosoma"
+   ]
+  },
+  {
+   "id": 65,
+   "kind": "list",
+   "start": 15063,
+   "end": 15128,
+   "text": "- [LeRobot Documentation](⟦0⟧)",
+   "tokens": [
+    "https://github.com/huggingface/lerobot"
+   ]
+  },
+  {
+   "id": 66,
+   "kind": "list",
+   "start": 15129,
+   "end": 15206,
+   "text": "- [Unitree IL LeRobot](⟦0⟧)",
+   "tokens": [
+    "https://github.com/unitreerobotics/unitree_IL_lerobot"
+   ]
+  },
+  {
+   "id": 67,
+   "kind": "para",
+   "start": 15213,
+   "end": 15238,
+   "text": "_Last updated: July 2026_",
+   "tokens": []
+  }
+ ]
+}

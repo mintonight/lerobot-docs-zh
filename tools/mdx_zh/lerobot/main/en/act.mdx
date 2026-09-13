@@ -1,0 +1,145 @@
+<script lang="ts">
+import {onMount} from "svelte";
+import Tip from "$lib/Tip.svelte";
+import CopyLLMTxtMenu from "$lib/CopyLLMTxtMenu.svelte";
+import Youtube from "$lib/Youtube.svelte";
+import Docstring from "$lib/Docstring.svelte";
+import CodeBlock from "$lib/CodeBlock.svelte";
+import CodeBlockFw from "$lib/CodeBlockFw.svelte";
+import DocNotebookDropdown from "$lib/DocNotebookDropdown.svelte";
+import CourseFloatingBanner from "$lib/CourseFloatingBanner.svelte";
+import IconCopyLink from "$lib/IconCopyLink.svelte";
+import FrameworkContent from "$lib/FrameworkContent.svelte";
+import Markdown from "$lib/Markdown.svelte";
+import Question from "$lib/Question.svelte";
+import FrameworkSwitchCourse from "$lib/FrameworkSwitchCourse.svelte";
+import InferenceApi from "$lib/InferenceApi.svelte";
+import TokenizersLanguageContent from "$lib/TokenizersLanguageContent.svelte";
+import ExampleCodeBlock from "$lib/ExampleCodeBlock.svelte";
+import Added from "$lib/Added.svelte";
+import Changed from "$lib/Changed.svelte";
+import Deprecated from "$lib/Deprecated.svelte";
+import PipelineIcon from "$lib/PipelineIcon.svelte";
+import PipelineTag from "$lib/PipelineTag.svelte";
+import Heading from "$lib/Heading.svelte";
+import HfOptions from "$lib/HfOptions.svelte";
+import HfOption from "$lib/HfOption.svelte";
+import EditOnGithub from "$lib/EditOnGithub.svelte";
+import InferenceSnippet from "$lib/InferenceSnippet/InferenceSnippet.svelte";
+import MermaidChart from "$lib/MermaidChart.svelte";
+let fw: "pt" | "tf" = "pt";
+onMount(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    fw = urlParams.get("fw") || "pt";
+});
+</script>
+<svelte:head>
+  <meta name="hf:doc:metadata" content={metadata} >
+</svelte:head>
+
+<!--HF DOCBUILD BODY START-->
+
+HF_DOC_BODY_START
+
+<CopyLLMTxtMenu containerStyle="float: right; margin-left: 10px; display: inline-flex; position: relative; z-index: 10;"></CopyLLMTxtMenu>
+
+# ACT（Action Chunking with Transformers）
+
+ACT 是一个 **轻量且高效的模仿学习 policy**，特别适合细粒度操作任务。由于训练时间快、计算需求低且性能强劲，它是 **我们推荐你入门 LeRobot 时首先尝试的模型**。
+
+<div class="video-container">
+  <iframe
+    width="100%"
+    height="415"
+    src="https://www.youtube.com/embed/ft73x0LfGpM"
+    title="LeRobot ACT Tutorial"
+    frameborder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowfullscreen
+  ></iframe>
+</div>
+
+_观看 LeRobot 团队的这个教程，了解 ACT 的工作原理：[LeRobot ACT 教程](https://www.youtube.com/watch?v=ft73x0LfGpM)_
+
+## 模型概览
+
+Action Chunking with Transformers（ACT）由 Zhao 等人在论文 [Learning Fine-Grained Bimanual Manipulation with Low-Cost Hardware](https://arxiv.org/abs/2304.13705) 中提出。该 policy 旨在使用经济实惠的硬件和极少的 demonstration 数据实现精确、接触丰富的操作任务。
+
+### 为什么 ACT 适合初学者
+
+ACT 作为优秀的入门起点，原因有几点：
+
+- **训练快**：在单个 GPU 上几小时即可完成训练
+- **轻量**：仅约 8000 万参数，高效且易于使用
+- **数据高效**：通常仅用 50 次 demonstration 就能达到较高的成功率
+
+### 架构
+
+ACT 使用基于 transformer 的架构，包含三个主要组件：
+
+1. **视觉骨干网络**：ResNet-18 处理来自多个相机视角的图像
+2. **Transformer 编码器**：综合来自相机特征、关节位置和学习到的潜变量的信息
+3. **Transformer 解码器**：使用交叉注意力生成连贯的 action sequence
+
+该 policy 的输入为：
+
+- 多张 RGB 图像（例如来自腕部相机、前/顶部相机）
+- 当前机器人关节位置
+- 潜风格变量 `z`（在训练期间学习，inference 期间设为零）
+
+并输出 `k` 个未来 action sequence 组成的 action chunk。
+
+## 安装要求
+
+1. 按照我们的 [安装指南](./installation) 安装 LeRobot。
+2. ACT 包含在 LeRobot 基础安装中，因此无需额外依赖！
+
+## 训练 ACT
+
+ACT 与标准 LeRobot 训练流水线无缝协作。以下是在你的 dataset 上训练 ACT 的完整示例：
+
+```bash
+lerobot-train \
+  --dataset.repo_id=${HF_USER}/your_dataset \
+  --policy.type=act \
+  --output_dir=outputs/train/act_your_dataset \
+  --job_name=act_your_dataset \
+  --policy.device=cuda \
+  --wandb.enable=true \
+  --policy.repo_id=${HF_USER}/act_policy
+```
+
+### 训练技巧
+
+1. **从默认值开始**：ACT 的默认超参数对大多数任务都适用
+2. **训练时长**：在单个 GPU 上 100k 训练步预计需要几小时
+3. **批次大小**：从批次大小 8 开始，并根据你的 GPU 内存进行调整
+
+### 使用 Google Colab 训练
+
+如果你的本地电脑没有强大的 GPU，可以按照 [ACT 训练 notebook](./notebooks#training-act) 使用 Google Colab 训练模型。
+
+## 评估 ACT
+
+训练完成后，你可以使用 `lerobot-record` 命令搭配训练好的 policy 来评估 ACT policy。这将运行 inference 并记录评估 episode：
+
+```bash
+lerobot-rollout \
+  --strategy.type=base \
+  --policy.path=${HF_USER}/act_policy \
+  --robot.type=so101_follower \
+  --robot.port=/dev/ttyACM0 \
+  --robot.cameras="{ front: {type: opencv, index_or_path: 0, width: 640, height: 480, fps: 30}}" \
+  --display_data=true \
+  --task="Your task description" \ # can be skipped for ACT
+  --duration=60
+```
+
+
+
+<EditOnGithub source="https://github.com/huggingface/lerobot/blob/main/docs/source/act.mdx" />
+
+<!--HF DOCBUILD BODY END-->
+
+HF_DOC_BODY_END
+

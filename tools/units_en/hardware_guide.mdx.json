@@ -1,0 +1,551 @@
+{
+ "file": "hardware_guide.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1963,
+   "text": "# Compute HW Guide for LeRobot Training",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1965,
+   "end": 2123,
+   "text": "Rough sizing for training a LeRobot policy: how much VRAM each policy needs, what training time looks like, and where to run when local hardware isn't enough.",
+   "tokens": []
+  },
+  {
+   "id": 2,
+   "kind": "para",
+   "start": 2125,
+   "end": 2328,
+   "text": "The numbers below are **indicative** — order-of-magnitude figures for picking hardware, not exact predictions. Throughput depends heavily on dataset I/O, image resolution, batch size, and number of GPUs.",
+   "tokens": []
+  },
+  {
+   "id": 3,
+   "kind": "heading",
+   "start": 2330,
+   "end": 2355,
+   "text": "## Memory by policy group",
+   "tokens": []
+  },
+  {
+   "id": 4,
+   "kind": "para",
+   "start": 2357,
+   "end": 2645,
+   "text": "Policies cluster by backbone size; the groupings below give a single VRAM envelope per group instead of repeating numbers per policy. Memory scales roughly linearly with batch size; AdamW (the LeRobot default) carries optimizer state that adds ~30–100% over a forward+backward pass alone.",
+   "tokens": []
+  },
+  {
+   "id": 5,
+   "kind": "table",
+   "start": 2647,
+   "end": 2769,
+   "text": "| Group      | Policies                                    | Peak VRAM (BS 8, AdamW) | Suitable starter GPUs             |",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "table",
+   "start": 2893,
+   "end": 3015,
+   "text": "| Light BC   | ⟦0⟧, ⟦1⟧, ⟦2⟧                     |                  ~2–6GB | Laptop GPU (RTX 3060), L4, A10G   |",
+   "tokens": [
+    "`act`",
+    "`vqbet`",
+    "`tdmpc`"
+   ]
+  },
+  {
+   "id": 7,
+   "kind": "table",
+   "start": 3016,
+   "end": 3138,
+   "text": "| Diffusion  | ⟦0⟧, ⟦1⟧               |                 ~8–14GB | RTX 4070+ / L4 / A10G             |",
+   "tokens": [
+    "`diffusion`",
+    "`multi_task_dit`"
+   ]
+  },
+  {
+   "id": 8,
+   "kind": "table",
+   "start": 3139,
+   "end": 3261,
+   "text": "| Small VLA  | ⟦0⟧                                   |                ~10–16GB | RTX 4080+ / L4 / A10G             |",
+   "tokens": [
+    "`smolvla`"
+   ]
+  },
+  {
+   "id": 9,
+   "kind": "table",
+   "start": 3262,
+   "end": 3384,
+   "text": "| Large VLA  | ⟦0⟧, ⟦1⟧, ⟦2⟧, ⟦3⟧, ⟦4⟧ |                ~24–40GB | A100 40 GB+ (24 GB tight at BS 1) |",
+   "tokens": [
+    "`pi0`",
+    "`pi0_fast`",
+    "`pi05`",
+    "`xvla`",
+    "`wall_x`"
+   ]
+  },
+  {
+   "id": 10,
+   "kind": "table",
+   "start": 3385,
+   "end": 3507,
+   "text": "| Multimodal | ⟦0⟧, ⟦1⟧                              |                ~24–40GB | A100 40 GB+                       |",
+   "tokens": [
+    "`groot`",
+    "`eo1`"
+   ]
+  },
+  {
+   "id": 11,
+   "kind": "table",
+   "start": 3508,
+   "end": 3630,
+   "text": "| RL         | ⟦0⟧                                       |             config-dep. | See [HIL-SERL guide](⟦1⟧)   |",
+   "tokens": [
+    "`sac`",
+    "./hilserl"
+   ]
+  },
+  {
+   "id": 12,
+   "kind": "para",
+   "start": 3632,
+   "end": 3781,
+   "text": "Memory-bound? Drop the batch size (~linear), use gradient accumulation to recover effective batch, or for SmolVLA leave ⟦0⟧.",
+   "tokens": [
+    "`freeze_vision_encoder=True`"
+   ]
+  },
+  {
+   "id": 13,
+   "kind": "heading",
+   "start": 3783,
+   "end": 3799,
+   "text": "## Training time",
+   "tokens": []
+  },
+  {
+   "id": 14,
+   "kind": "para",
+   "start": 3801,
+   "end": 3984,
+   "text": "Robotics imitation learning typically converges in **5–10 epochs over the dataset**, not hundreds of thousands of raw steps. Once you know your epoch count, wall-clock is essentially:",
+   "tokens": []
+  },
+  {
+   "id": 15,
+   "kind": "para",
+   "start": 4239,
+   "end": 4437,
+   "text": "Per-step time depends on the policy and the GPU. The numbers in the table below are anchors — pick the row closest to your setup and scale linearly with ⟦0⟧ if you train longer or shorter.",
+   "tokens": [
+    "`total_steps`"
+   ]
+  },
+  {
+   "id": 16,
+   "kind": "heading",
+   "start": 4439,
+   "end": 4459,
+   "text": "### Common scenarios",
+   "tokens": []
+  },
+  {
+   "id": 17,
+   "kind": "para",
+   "start": 4461,
+   "end": 4599,
+   "text": "Indicative wall-clock for **5 epochs on a ~50-episode dataset (~45k frames at 30 fps × 30 s)**, default optimizer (AdamW), 640×480 images:",
+   "tokens": []
+  },
+  {
+   "id": 18,
+   "kind": "table",
+   "start": 4601,
+   "end": 4679,
+   "text": "| Setup                                | Policy         | Batch | Wall-clock |",
+   "tokens": []
+  },
+  {
+   "id": 19,
+   "kind": "table",
+   "start": 4759,
+   "end": 4837,
+   "text": "| Single RTX 4090 / RTX 3090 (24 GB)   | ⟦0⟧          | 8     |  ~30–60min |",
+   "tokens": [
+    "`act`"
+   ]
+  },
+  {
+   "id": 20,
+   "kind": "table",
+   "start": 4838,
+   "end": 4916,
+   "text": "| Single RTX 4090 / RTX 3090 (24 GB)   | ⟦0⟧    | 8     |      ~2–4h |",
+   "tokens": [
+    "`diffusion`"
+   ]
+  },
+  {
+   "id": 21,
+   "kind": "table",
+   "start": 4917,
+   "end": 4995,
+   "text": "| Single L4 / A10G (24 GB)             | ⟦0⟧          | 8     |      ~1–2h |",
+   "tokens": [
+    "`act`"
+   ]
+  },
+  {
+   "id": 22,
+   "kind": "table",
+   "start": 4996,
+   "end": 5074,
+   "text": "| Single L4 / A10G (24 GB)             | ⟦0⟧      | 4     |      ~3–6h |",
+   "tokens": [
+    "`smolvla`"
+   ]
+  },
+  {
+   "id": 23,
+   "kind": "table",
+   "start": 5075,
+   "end": 5153,
+   "text": "| Single A100 40 GB                    | ⟦0⟧      | 16    |      ~1–2h |",
+   "tokens": [
+    "`smolvla`"
+   ]
+  },
+  {
+   "id": 24,
+   "kind": "table",
+   "start": 5154,
+   "end": 5232,
+   "text": "| Single A100 40 GB                    | ⟦0⟧ / ⟦1⟧ | 4     |      ~4–8h |",
+   "tokens": [
+    "`pi0`",
+    "`pi05`"
+   ]
+  },
+  {
+   "id": 25,
+   "kind": "table",
+   "start": 5233,
+   "end": 5311,
+   "text": "| 4× H100 80 GB cluster (⟦0⟧) | ⟦1⟧    | 32    |  ~30–60min |",
+   "tokens": [
+    "`accelerate`",
+    "`diffusion`"
+   ]
+  },
+  {
+   "id": 26,
+   "kind": "table",
+   "start": 5312,
+   "end": 5390,
+   "text": "| 4× H100 80 GB cluster (⟦0⟧) | ⟦1⟧      | 32    |      ~1–2h |",
+   "tokens": [
+    "`accelerate`",
+    "`smolvla`"
+   ]
+  },
+  {
+   "id": 27,
+   "kind": "table",
+   "start": 5391,
+   "end": 5469,
+   "text": "| Apple Silicon M1/M2/M3 Max (MPS)     | ⟦0⟧          | 4     |     ~6–14h |",
+   "tokens": [
+    "`act`"
+   ]
+  },
+  {
+   "id": 28,
+   "kind": "para",
+   "start": 5471,
+   "end": 5708,
+   "text": "These are order-of-magnitude figures. Real runs deviate by ±50% depending on image resolution, dataset I/O, dataloader threading, and exact GPU SKU. They are useful as \"is this run going to take an hour or a day?\" intuition, not as SLAs.",
+   "tokens": []
+  },
+  {
+   "id": 29,
+   "kind": "heading",
+   "start": 5710,
+   "end": 5737,
+   "text": "### Multi-GPU matters a lot",
+   "tokens": []
+  },
+  {
+   "id": 30,
+   "kind": "para",
+   "start": 5739,
+   "end": 6049,
+   "text": "⟦0⟧ is the easiest way to cut training time. Each optimizer step processes ⟦1⟧ samples in roughly the same wall-clock as a single-GPU step, so 4 GPUs ≈ 4× speedup for compute-bound runs. See the [Multi GPU training](⟦2⟧) guide for the full setup.",
+   "tokens": [
+    "`accelerate launch --num_processes=N`",
+    "`N × batch_size`",
+    "./multi_gpu_training"
+   ]
+  },
+  {
+   "id": 31,
+   "kind": "para",
+   "start": 6051,
+   "end": 6316,
+   "text": "Reference data points on a 4×H100 80 GB cluster (⟦0⟧), 5000 steps, batch 32, AdamW, dataset [⟦1⟧](⟦2⟧) (~50 episodes, ~640×480 images):",
+   "tokens": [
+    "`accelerate launch --num_processes=4`",
+    "`imstevenpmwork/super_poulain_draft`",
+    "https://huggingface.co/datasets/imstevenpmwork/super_poulain_draft"
+   ]
+  },
+  {
+   "id": 32,
+   "kind": "table",
+   "start": 6318,
+   "end": 6517,
+   "text": "| Policy      | Wall-clock | ⟦0⟧ | ⟦1⟧ | GPU util | Notable flags                                                                                                                  |",
+   "tokens": [
+    "`update_s`",
+    "`dataloading_s`"
+   ]
+  },
+  {
+   "id": 33,
+   "kind": "table",
+   "start": 6718,
+   "end": 6917,
+   "text": "| ⟦0⟧ | 16m 17s    |      0.167 |           0.015 | ~90%     | defaults (training from scratch)                                                                                               |",
+   "tokens": [
+    "`diffusion`"
+   ]
+  },
+  {
+   "id": 34,
+   "kind": "table",
+   "start": 6918,
+   "end": 7117,
+   "text": "| ⟦0⟧   | 27m 49s    |      0.312 |           0.011 | ~80%     | ⟦1⟧, ⟦2⟧, ⟦3⟧                                 |",
+   "tokens": [
+    "`smolvla`",
+    "`--policy.path=lerobot/smolvla_base`",
+    "`freeze_vision_encoder=false`",
+    "`train_expert_only=false`"
+   ]
+  },
+  {
+   "id": 35,
+   "kind": "table",
+   "start": 7118,
+   "end": 7317,
+   "text": "| ⟦0⟧      | 3h 41m     |      2.548 |           0.014 | ~95%     | ⟦1⟧, ⟦2⟧, ⟦3⟧, vision encoder + expert trained |",
+   "tokens": [
+    "`pi05`",
+    "`--policy.pretrained_path=lerobot/pi05_base`",
+    "`gradient_checkpointing=true`",
+    "`dtype=bfloat16`"
+   ]
+  },
+  {
+   "id": 36,
+   "kind": "para",
+   "start": 7319,
+   "end": 7643,
+   "text": "Training logs separate the full iteration into ⟦0⟧ (⟦1⟧), ⟦2⟧\n(image conversion and the policy pipeline), and ⟦3⟧ (the optimizer update). ⟦4⟧ covers all\nthree and drives ⟦5⟧. The benchmark above predates this split, so its ⟦6⟧ includes\npreprocessing.",
+   "tokens": [
+    "`dataloading_s`",
+    "`next(dl_iter)`",
+    "`preprocessing_s`",
+    "`update_s`",
+    "`step_s`",
+    "`samples_per_s`",
+    "`dataloading_s`"
+   ]
+  },
+  {
+   "id": 37,
+   "kind": "heading",
+   "start": 7645,
+   "end": 7673,
+   "text": "### Schedule and checkpoints",
+   "tokens": []
+  },
+  {
+   "id": 38,
+   "kind": "para",
+   "start": 7675,
+   "end": 7893,
+   "text": "If you shorten training (e.g. 5k–10k steps on a small dataset), also shorten the LR schedule with ⟦0⟧. Otherwise the LR stays near its peak and never decays. Same for ⟦1⟧.",
+   "tokens": [
+    "`--policy.scheduler_decay_steps≈--steps`",
+    "`--save_freq`"
+   ]
+  },
+  {
+   "id": 39,
+   "kind": "heading",
+   "start": 7895,
+   "end": 7910,
+   "text": "## Where to run",
+   "tokens": []
+  },
+  {
+   "id": 40,
+   "kind": "para",
+   "start": 7912,
+   "end": 8079,
+   "text": "VRAM is the first filter. Within a tier, pick by budget and availability — the ⟦0⟧–⟦1⟧ columns are relative; check current pricing on the provider you actually use.",
+   "tokens": [
+    "`$`",
+    "`$$$$`"
+   ]
+  },
+  {
+   "id": 41,
+   "kind": "table",
+   "start": 8081,
+   "end": 8190,
+   "text": "| Class                      | VRAM  | Tier   | Comfortable for                                             |",
+   "tokens": []
+  },
+  {
+   "id": 42,
+   "kind": "table",
+   "start": 8301,
+   "end": 8410,
+   "text": "| RTX 3090 / 4090 (consumer) | 24 GB | ⟦0⟧    | Light BC, Diffusion, SmolVLA. Tight for VLAs at batch 1.    |",
+   "tokens": [
+    "`$`"
+   ]
+  },
+  {
+   "id": 43,
+   "kind": "table",
+   "start": 8411,
+   "end": 8520,
+   "text": "| L4 / A10G (cloud)          | 24 GB | ⟦0⟧ | Same envelope; common on Google Cloud, RunPod, AWS ⟦1⟧. |",
+   "tokens": [
+    "`$–$$`",
+    "`g5/g6`"
+   ]
+  },
+  {
+   "id": 44,
+   "kind": "table",
+   "start": 8521,
+   "end": 8630,
+   "text": "| A100 40 GB                 | 40 GB | ⟦0⟧  | Any policy at reasonable batch sizes.                       |",
+   "tokens": [
+    "`$$$`"
+   ]
+  },
+  {
+   "id": 45,
+   "kind": "table",
+   "start": 8631,
+   "end": 8740,
+   "text": "| A100 80 GB / H100 80 GB    | 80 GB | ⟦0⟧ | Multi-GPU clusters; large batches for VLAs.                 |",
+   "tokens": [
+    "`$$$$`"
+   ]
+  },
+  {
+   "id": 46,
+   "kind": "table",
+   "start": 8741,
+   "end": 8850,
+   "text": "| **CPU only**               | —     | —      | Don't train. Use Colab or rent a GPU.                       |",
+   "tokens": []
+  },
+  {
+   "id": 47,
+   "kind": "heading",
+   "start": 8852,
+   "end": 8873,
+   "text": "### Hugging Face Jobs",
+   "tokens": []
+  },
+  {
+   "id": 48,
+   "kind": "para",
+   "start": 8875,
+   "end": 9145,
+   "text": "[Hugging Face Jobs](⟦0⟧) lets you run training on managed HF infrastructure, billed by the second, without owning a GPU. ⟦1⟧ submits and streams the job for you — just add ⟦2⟧ to a normal training command:",
+   "tokens": [
+    "https://huggingface.co/docs/hub/jobs",
+    "`lerobot-train`",
+    "`--job.target=<flavor>`"
+   ]
+  },
+  {
+   "id": 49,
+   "kind": "para",
+   "start": 9298,
+   "end": 9304,
+   "text": "Notes:",
+   "tokens": []
+  },
+  {
+   "id": 50,
+   "kind": "list",
+   "start": 9306,
+   "end": 9382,
+   "text": "- Run ⟦0⟧ once before submitting, the job runs under your token.",
+   "tokens": [
+    "`hf auth login`"
+   ]
+  },
+  {
+   "id": 51,
+   "kind": "list",
+   "start": 9383,
+   "end": 9721,
+   "text": "- ⟦0⟧ maps onto the table above: ⟦1⟧/⟦2⟧ (T4, ACT only), ⟦3⟧/⟦4⟧ (L4 24 GB), ⟦5⟧ (A10G 24 GB scaled out), ⟦6⟧ (A100). List the current catalogue with pricing via ⟦7⟧, or see [⟦8⟧](⟦9⟧).",
+   "tokens": [
+    "`--job.target`",
+    "`t4-small`",
+    "`t4-medium`",
+    "`l4x1`",
+    "`l4x4`",
+    "`a10g-small/large/largex2/largex4`",
+    "`a100-large`",
+    "`hf jobs hardware`",
+    "https://huggingface.co/docs/hub/jobs",
+    "https://huggingface.co/docs/hub/jobs"
+   ]
+  },
+  {
+   "id": 52,
+   "kind": "list",
+   "start": 9722,
+   "end": 9928,
+   "text": "- The job defaults to a ⟦0⟧ (48h) timeout. Override it with ⟦1⟧ (or any other valid duration string) to shorten or extend the timeout. The job automatically stops when the command completes.",
+   "tokens": [
+    "`2d`",
+    "`--job.timeout=4h`"
+   ]
+  },
+  {
+   "id": 53,
+   "kind": "list",
+   "start": 9929,
+   "end": 10109,
+   "text": "- For the full walkthrough — dataset upload, checkpoint streaming, resuming a run on a job — see the [imitation-learning training guide](⟦0⟧).",
+   "tokens": [
+    "./il_robots#train-using-hugging-face-jobs"
+   ]
+  }
+ ]
+}

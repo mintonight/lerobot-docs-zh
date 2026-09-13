@@ -1,0 +1,1443 @@
+{
+ "file": "inference.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1961,
+   "text": "# Policy Deployment (lerobot-rollout)",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1963,
+   "end": 2196,
+   "text": "⟦0⟧ is the single CLI for deploying trained policies on real robots. It supports multiple execution strategies and inference backends, from quick evaluation to continuous recording and human-in-the-loop data collection.",
+   "tokens": [
+    "`lerobot-rollout`"
+   ]
+  },
+  {
+   "id": 2,
+   "kind": "heading",
+   "start": 2198,
+   "end": 2212,
+   "text": "## Quick Start",
+   "tokens": []
+  },
+  {
+   "id": 3,
+   "kind": "para",
+   "start": 2214,
+   "end": 2283,
+   "text": "No extra dependencies are needed beyond your robot and policy extras.",
+   "tokens": []
+  },
+  {
+   "id": 4,
+   "kind": "para",
+   "start": 2496,
+   "end": 2550,
+   "text": "This runs the policy for 30 seconds with no recording.",
+   "tokens": []
+  },
+  {
+   "id": 5,
+   "kind": "heading",
+   "start": 2557,
+   "end": 2570,
+   "text": "## Strategies",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "para",
+   "start": 2572,
+   "end": 2717,
+   "text": "Select a strategy with ⟦0⟧. Each strategy defines a different control loop with its own recording and interaction semantics.",
+   "tokens": [
+    "`--strategy.type=<name>`"
+   ]
+  },
+  {
+   "id": 7,
+   "kind": "heading",
+   "start": 2719,
+   "end": 2752,
+   "text": "### Base (⟦0⟧)",
+   "tokens": [
+    "`--strategy.type=base`"
+   ]
+  },
+  {
+   "id": 8,
+   "kind": "para",
+   "start": 2754,
+   "end": 2887,
+   "text": "Autonomous policy execution with no data recording. Use this for quick evaluation, demos, or when you only need to observe the robot.",
+   "tokens": []
+  },
+  {
+   "id": 9,
+   "kind": "table",
+   "start": 3216,
+   "end": 3293,
+   "text": "| Flag             | Description                                            |",
+   "tokens": []
+  },
+  {
+   "id": 10,
+   "kind": "table",
+   "start": 3372,
+   "end": 3449,
+   "text": "| ⟦0⟧     | Run time in seconds (0 = infinite)                     |",
+   "tokens": [
+    "`--duration`"
+   ]
+  },
+  {
+   "id": 11,
+   "kind": "table",
+   "start": 3450,
+   "end": 3527,
+   "text": "| ⟦0⟧         | Task description passed to the policy                  |",
+   "tokens": [
+    "`--task`"
+   ]
+  },
+  {
+   "id": 12,
+   "kind": "table",
+   "start": 3528,
+   "end": 3605,
+   "text": "| ⟦0⟧ | Stream observations/actions to Rerun for visualization |",
+   "tokens": [
+    "`--display_data`"
+   ]
+  },
+  {
+   "id": 13,
+   "kind": "heading",
+   "start": 3607,
+   "end": 3644,
+   "text": "### Sentry (⟦0⟧)",
+   "tokens": [
+    "`--strategy.type=sentry`"
+   ]
+  },
+  {
+   "id": 14,
+   "kind": "para",
+   "start": 3646,
+   "end": 3872,
+   "text": "Continuous autonomous recording with periodic upload to the Hugging Face Hub. Episode boundaries are auto-computed from camera resolution and FPS so each saved episode produces a complete video file, keeping uploads efficient.",
+   "tokens": []
+  },
+  {
+   "id": 15,
+   "kind": "para",
+   "start": 3874,
+   "end": 3991,
+   "text": "Policy state (hidden state, RTC queue) persists across episode boundaries: the robot does not reset between episodes.",
+   "tokens": []
+  },
+  {
+   "id": 16,
+   "kind": "table",
+   "start": 4435,
+   "end": 4539,
+   "text": "| Flag                                   | Description                                                 |",
+   "tokens": []
+  },
+  {
+   "id": 17,
+   "kind": "table",
+   "start": 4645,
+   "end": 4749,
+   "text": "| ⟦0⟧   | Push to Hub every N episodes (default: 5)                   |",
+   "tokens": [
+    "`--strategy.upload_every_n_episodes`"
+   ]
+  },
+  {
+   "id": 18,
+   "kind": "table",
+   "start": 4750,
+   "end": 4854,
+   "text": "| ⟦0⟧ | Target video file size for episode rotation (default: auto) |",
+   "tokens": [
+    "`--strategy.target_video_file_size_mb`"
+   ]
+  },
+  {
+   "id": 19,
+   "kind": "table",
+   "start": 4855,
+   "end": 4959,
+   "text": "| ⟦0⟧                    | **Required.** Hub repository for the recorded dataset       |",
+   "tokens": [
+    "`--dataset.repo_id`"
+   ]
+  },
+  {
+   "id": 20,
+   "kind": "table",
+   "start": 4960,
+   "end": 5064,
+   "text": "| ⟦0⟧                | Whether to push to Hub on teardown (default: true)          |",
+   "tokens": [
+    "`--dataset.push_to_hub`"
+   ]
+  },
+  {
+   "id": 21,
+   "kind": "heading",
+   "start": 5066,
+   "end": 5109,
+   "text": "### Highlight (⟦0⟧)",
+   "tokens": [
+    "`--strategy.type=highlight`"
+   ]
+  },
+  {
+   "id": 22,
+   "kind": "para",
+   "start": 5111,
+   "end": 5376,
+   "text": "Autonomous rollout with on-demand recording via a memory-bounded ring buffer. The robot runs continuously while the buffer captures the last N seconds of telemetry. Press the save key to flush the buffer and start live recording; press it again to save the episode.",
+   "tokens": []
+  },
+  {
+   "id": 23,
+   "kind": "para",
+   "start": 5750,
+   "end": 5772,
+   "text": "**Keyboard controls:**",
+   "tokens": []
+  },
+  {
+   "id": 24,
+   "kind": "table",
+   "start": 5774,
+   "end": 5855,
+   "text": "| Key                | Action                                                   |",
+   "tokens": []
+  },
+  {
+   "id": 25,
+   "kind": "table",
+   "start": 5938,
+   "end": 6019,
+   "text": "| ⟦0⟧ (configurable) | Start recording (flushes buffer) / stop and save episode |",
+   "tokens": [
+    "`s`"
+   ]
+  },
+  {
+   "id": 26,
+   "kind": "table",
+   "start": 6020,
+   "end": 6101,
+   "text": "| ⟦0⟧ (configurable) | Push dataset to Hub                                      |",
+   "tokens": [
+    "`h`"
+   ]
+  },
+  {
+   "id": 27,
+   "kind": "table",
+   "start": 6102,
+   "end": 6183,
+   "text": "| ⟦0⟧              | Stop the session                                         |",
+   "tokens": [
+    "`ESC`"
+   ]
+  },
+  {
+   "id": 28,
+   "kind": "table",
+   "start": 6185,
+   "end": 6276,
+   "text": "| Flag                                   | Description                                    |",
+   "tokens": []
+  },
+  {
+   "id": 29,
+   "kind": "table",
+   "start": 6369,
+   "end": 6460,
+   "text": "| ⟦0⟧       | Duration of buffered telemetry (default: 30)   |",
+   "tokens": [
+    "`--strategy.ring_buffer_seconds`"
+   ]
+  },
+  {
+   "id": 30,
+   "kind": "table",
+   "start": 6461,
+   "end": 6552,
+   "text": "| ⟦0⟧ | Memory cap for the ring buffer (default: 2048) |",
+   "tokens": [
+    "`--strategy.ring_buffer_max_memory_mb`"
+   ]
+  },
+  {
+   "id": 31,
+   "kind": "table",
+   "start": 6553,
+   "end": 6644,
+   "text": "| ⟦0⟧                  | Key to toggle recording (default: ⟦1⟧)         |",
+   "tokens": [
+    "`--strategy.save_key`",
+    "`s`"
+   ]
+  },
+  {
+   "id": 32,
+   "kind": "table",
+   "start": 6645,
+   "end": 6736,
+   "text": "| ⟦0⟧                  | Key to push to Hub (default: ⟦1⟧)              |",
+   "tokens": [
+    "`--strategy.push_key`",
+    "`h`"
+   ]
+  },
+  {
+   "id": 33,
+   "kind": "heading",
+   "start": 6738,
+   "end": 6775,
+   "text": "### DAgger (⟦0⟧)",
+   "tokens": [
+    "`--strategy.type=dagger`"
+   ]
+  },
+  {
+   "id": 34,
+   "kind": "para",
+   "start": 6777,
+   "end": 7001,
+   "text": "Human-in-the-loop data collection. Alternates between autonomous policy execution and human intervention via a teleoperator. Intervention frames are tagged with ⟦0⟧. Requires a teleoperator (⟦1⟧).",
+   "tokens": [
+    "`intervention=True`",
+    "`--teleop.type`"
+   ]
+  },
+  {
+   "id": 35,
+   "kind": "para",
+   "start": 7003,
+   "end": 7103,
+   "text": "See the [Human-In-the-Loop Data Collection](⟦0⟧) guide for a detailed walkthrough.",
+   "tokens": [
+    "./hil_data_collection"
+   ]
+  },
+  {
+   "id": 36,
+   "kind": "para",
+   "start": 7105,
+   "end": 7222,
+   "text": "**Corrections-only mode** (default): Only human correction windows are recorded. Each correction becomes one episode.",
+   "tokens": []
+  },
+  {
+   "id": 37,
+   "kind": "para",
+   "start": 7560,
+   "end": 7730,
+   "text": "**Continuous recording mode** (⟦0⟧): Both autonomous and correction frames are recorded with time-based episode rotation (same as Sentry).",
+   "tokens": [
+    "`--strategy.record_autonomous=true`"
+   ]
+  },
+  {
+   "id": 38,
+   "kind": "para",
+   "start": 8137,
+   "end": 8182,
+   "text": "**Keyboard controls** (default input device):",
+   "tokens": []
+  },
+  {
+   "id": 39,
+   "kind": "table",
+   "start": 8184,
+   "end": 8241,
+   "text": "| Key     | Action                                      |",
+   "tokens": []
+  },
+  {
+   "id": 40,
+   "kind": "table",
+   "start": 8300,
+   "end": 8357,
+   "text": "| ⟦0⟧ | Pause / resume policy execution             |",
+   "tokens": [
+    "`Space`"
+   ]
+  },
+  {
+   "id": 41,
+   "kind": "table",
+   "start": 8358,
+   "end": 8415,
+   "text": "| ⟦0⟧   | Start / stop human correction               |",
+   "tokens": [
+    "`Tab`"
+   ]
+  },
+  {
+   "id": 42,
+   "kind": "table",
+   "start": 8416,
+   "end": 8473,
+   "text": "| ⟦0⟧ | Push dataset to Hub (corrections-only mode) |",
+   "tokens": [
+    "`Enter`"
+   ]
+  },
+  {
+   "id": 43,
+   "kind": "table",
+   "start": 8474,
+   "end": 8531,
+   "text": "| ⟦0⟧   | Stop the session                            |",
+   "tokens": [
+    "`ESC`"
+   ]
+  },
+  {
+   "id": 44,
+   "kind": "para",
+   "start": 8533,
+   "end": 8659,
+   "text": "Foot pedal input is also supported via ⟦0⟧. Configure pedal codes with ⟦1⟧ flags.",
+   "tokens": [
+    "`--strategy.input_device=pedal`",
+    "`--strategy.pedal.*`"
+   ]
+  },
+  {
+   "id": 45,
+   "kind": "table",
+   "start": 8661,
+   "end": 8862,
+   "text": "| Flag                                 | Description                                                                                                                                                    |",
+   "tokens": []
+  },
+  {
+   "id": 46,
+   "kind": "table",
+   "start": 9065,
+   "end": 9266,
+   "text": "| ⟦0⟧            | Number of correction episodes to record (default: 10)                                                                                                          |",
+   "tokens": [
+    "`--strategy.num_episodes`"
+   ]
+  },
+  {
+   "id": 47,
+   "kind": "table",
+   "start": 9267,
+   "end": 9468,
+   "text": "| ⟦0⟧       | Record autonomous frames too (default: false)                                                                                                                  |",
+   "tokens": [
+    "`--strategy.record_autonomous`"
+   ]
+  },
+  {
+   "id": 48,
+   "kind": "table",
+   "start": 9469,
+   "end": 9670,
+   "text": "| ⟦0⟧ | Push to Hub every N episodes (default: 5)                                                                                                                      |",
+   "tokens": [
+    "`--strategy.upload_every_n_episodes`"
+   ]
+  },
+  {
+   "id": 49,
+   "kind": "table",
+   "start": 9671,
+   "end": 9872,
+   "text": "| ⟦0⟧            | Input device: ⟦1⟧ or ⟦2⟧ (default: keyboard)                                                                                                        |",
+   "tokens": [
+    "`--strategy.input_device`",
+    "`keyboard`",
+    "`pedal`"
+   ]
+  },
+  {
+   "id": 50,
+   "kind": "table",
+   "start": 9873,
+   "end": 10074,
+   "text": "| ⟦0⟧         | Smoothly hand control over at pause / correction start (default: true). Disable for clutch-style teleops that re-reference at the current robot pose on engage |",
+   "tokens": [
+    "`--strategy.smooth_handover`"
+   ]
+  },
+  {
+   "id": 51,
+   "kind": "table",
+   "start": 10075,
+   "end": 10276,
+   "text": "| ⟦0⟧                      | **Required.** Teleoperator type                                                                                                                                |",
+   "tokens": [
+    "`--teleop.type`"
+   ]
+  },
+  {
+   "id": 52,
+   "kind": "heading",
+   "start": 10278,
+   "end": 10319,
+   "text": "### Episodic (⟦0⟧)",
+   "tokens": [
+    "`--strategy.type=episodic`"
+   ]
+  },
+  {
+   "id": 53,
+   "kind": "para",
+   "start": 10321,
+   "end": 10526,
+   "text": "Episode-oriented recording that mirrors the behavior of ⟦0⟧. The policy drives the robot for each episode; an optional teleoperator can drive the robot during the reset phase between episodes.",
+   "tokens": [
+    "`lerobot-record`"
+   ]
+  },
+  {
+   "id": 54,
+   "kind": "para",
+   "start": 10958,
+   "end": 11042,
+   "text": "Teleop is optional — if omitted the robot holds its position during the reset phase.",
+   "tokens": []
+  },
+  {
+   "id": 55,
+   "kind": "para",
+   "start": 11044,
+   "end": 11066,
+   "text": "**Keyboard controls:**",
+   "tokens": []
+  },
+  {
+   "id": 56,
+   "kind": "table",
+   "start": 11068,
+   "end": 11118,
+   "text": "| Key         | Action                           |",
+   "tokens": []
+  },
+  {
+   "id": 57,
+   "kind": "table",
+   "start": 11170,
+   "end": 11220,
+   "text": "| ⟦0⟧ (right) | End the current episode early    |",
+   "tokens": [
+    "`→`"
+   ]
+  },
+  {
+   "id": 58,
+   "kind": "table",
+   "start": 11221,
+   "end": 11271,
+   "text": "| ⟦0⟧ (left)  | Discard episode and re-record it |",
+   "tokens": [
+    "`←`"
+   ]
+  },
+  {
+   "id": 59,
+   "kind": "table",
+   "start": 11272,
+   "end": 11322,
+   "text": "| ⟦0⟧       | Stop the recording session       |",
+   "tokens": [
+    "`ESC`"
+   ]
+  },
+  {
+   "id": 60,
+   "kind": "table",
+   "start": 11324,
+   "end": 11532,
+   "text": "| Flag                                            | Description                                                                                                                                                |",
+   "tokens": []
+  },
+  {
+   "id": 61,
+   "kind": "table",
+   "start": 11742,
+   "end": 11950,
+   "text": "| ⟦0⟧                        | Number of episodes to record                                                                                                                               |",
+   "tokens": [
+    "`--dataset.num_episodes`"
+   ]
+  },
+  {
+   "id": 62,
+   "kind": "table",
+   "start": 11951,
+   "end": 12159,
+   "text": "| ⟦0⟧                      | Duration of each recording episode in seconds                                                                                                              |",
+   "tokens": [
+    "`--dataset.episode_time_s`"
+   ]
+  },
+  {
+   "id": 63,
+   "kind": "table",
+   "start": 12160,
+   "end": 12368,
+   "text": "| ⟦0⟧                        | Duration of the reset phase between episodes in seconds                                                                                                    |",
+   "tokens": [
+    "`--dataset.reset_time_s`"
+   ]
+  },
+  {
+   "id": 64,
+   "kind": "table",
+   "start": 12369,
+   "end": 12577,
+   "text": "| ⟦0⟧                                 | Optional. Teleoperator to drive the robot during resets                                                                                                    |",
+   "tokens": [
+    "`--teleop.type`"
+   ]
+  },
+  {
+   "id": 65,
+   "kind": "table",
+   "start": 12578,
+   "end": 12786,
+   "text": "| ⟦0⟧          | Whether to reset the robot to its initial position between episodes                                                                                        |",
+   "tokens": [
+    "`--strategy.reset_to_initial_position`"
+   ]
+  },
+  {
+   "id": 66,
+   "kind": "table",
+   "start": 12787,
+   "end": 12995,
+   "text": "| ⟦0⟧ | Whether to turn on or off the leader -> follower smooth handover behavior.                                                                                 |",
+   "tokens": [
+    "`--strategy.smooth_leader_to_follower_handover`"
+   ]
+  },
+  {
+   "id": 67,
+   "kind": "table",
+   "start": 12996,
+   "end": 13204,
+   "text": "| ⟦0⟧                    | Smoothly hand control to the teleop at reset start (default: true). Disable for clutch-style teleops that re-reference at the current robot pose on engage |",
+   "tokens": [
+    "`--strategy.smooth_handover`"
+   ]
+  },
+  {
+   "id": 68,
+   "kind": "heading",
+   "start": 13206,
+   "end": 13233,
+   "text": "### Bring your own strategy",
+   "tokens": []
+  },
+  {
+   "id": 69,
+   "kind": "para",
+   "start": 13235,
+   "end": 13679,
+   "text": "⟦0⟧ accepts any strategy registered in the environment, not only the built-ins above. A strategy is two classes in a pip-installable package: a config registered on ⟦1⟧, and a ⟦2⟧ subclass named after it without the ⟦3⟧ suffix — the same ⟦4⟧/⟦5⟧ convention as [custom hardware](⟦6⟧), resolved from the config's module or package.",
+   "tokens": [
+    "`--strategy.type`",
+    "`RolloutStrategyConfig`",
+    "`RolloutStrategy`",
+    "`Config`",
+    "`SomethingConfig`",
+    "`Something`",
+    "./integrate_hardware#the-4-core-conventions"
+   ]
+  },
+  {
+   "id": 70,
+   "kind": "para",
+   "start": 14437,
+   "end": 14553,
+   "text": "The config declares what the engine arranges on the strategy's behalf, so nothing in LeRobot needs to know its type:",
+   "tokens": []
+  },
+  {
+   "id": 71,
+   "kind": "table",
+   "start": 14555,
+   "end": 14731,
+   "text": "| Declaration                     | Effect                                                                                                                                     |",
+   "tokens": []
+  },
+  {
+   "id": 72,
+   "kind": "table",
+   "start": 14909,
+   "end": 15085,
+   "text": "| ⟦0⟧                  | ⟦1⟧ (default) rejects ⟦2⟧ flags, ⟦3⟧ records when they are given, ⟦4⟧ makes ⟦5⟧ mandatory |",
+   "tokens": [
+    "`dataset_mode`",
+    "`\"none\"`",
+    "`--dataset.*`",
+    "`\"optional\"`",
+    "`\"required\"`",
+    "`--dataset.repo_id`"
+   ]
+  },
+  {
+   "id": 73,
+   "kind": "table",
+   "start": 15086,
+   "end": 15262,
+   "text": "| ⟦0⟧               | Makes ⟦1⟧ mandatory                                                                                                            |",
+   "tokens": [
+    "`requires_teleop`",
+    "`--teleop.type`"
+   ]
+  },
+  {
+   "id": 74,
+   "kind": "table",
+   "start": 15263,
+   "end": 15439,
+   "text": "| ⟦0⟧          | Allows ⟦1⟧; ⟦2⟧ must then honour the restartable contract documented on ⟦3⟧                             |",
+   "tokens": [
+    "`supports_interactive`",
+    "`--interactive=true`",
+    "`run()`",
+    "`RolloutStrategy`"
+   ]
+  },
+  {
+   "id": 75,
+   "kind": "table",
+   "start": 15440,
+   "end": 15616,
+   "text": "| ⟦0⟧ | Return ⟦1⟧ when frames are written from inside the control loop: ⟦2⟧ is forced on                            |",
+   "tokens": [
+    "`requires_streaming_encoding()`",
+    "`True`",
+    "`--dataset.streaming_encoding`"
+   ]
+  },
+  {
+   "id": 76,
+   "kind": "table",
+   "start": 15617,
+   "end": 15793,
+   "text": "| ⟦0⟧      | Strategy-owned dataset columns (DAgger's ⟦1⟧, for instance); every recorded frame must carry them                               |",
+   "tokens": [
+    "`extra_dataset_features()`",
+    "`intervention`"
+   ]
+  },
+  {
+   "id": 77,
+   "kind": "para",
+   "start": 15795,
+   "end": 16141,
+   "text": "Name the distribution ⟦0⟧ and ⟦1⟧ imports the package before parsing the CLI — only its ⟦2⟧ runs, so import the config there. A package with any other name is loaded, submodules included, with ⟦3⟧. The strategy's dataclass fields become ⟦4⟧ flags:",
+   "tokens": [
+    "`lerobot_strategy_<name>`",
+    "`lerobot-rollout`",
+    "`__init__.py`",
+    "`--strategy.discover_packages_path=<package>`",
+    "`--strategy.*`"
+   ]
+  },
+  {
+   "id": 78,
+   "kind": "para",
+   "start": 16429,
+   "end": 16696,
+   "text": "⟦0⟧ (recording, interactive-safe) and ⟦1⟧ (no recording) are the reference implementations to copy from; ⟦2⟧, ⟦3⟧ and ⟦4⟧ from ⟦5⟧ are the helpers they build on.",
+   "tokens": [
+    "`SentryStrategy`",
+    "`BaseStrategy`",
+    "`send_next_action`",
+    "`safe_push_to_hub`",
+    "`estimate_max_episode_seconds`",
+    "`lerobot.rollout.strategies`"
+   ]
+  },
+  {
+   "id": 79,
+   "kind": "heading",
+   "start": 16703,
+   "end": 16724,
+   "text": "## Inference Backends",
+   "tokens": []
+  },
+  {
+   "id": 80,
+   "kind": "para",
+   "start": 16726,
+   "end": 16814,
+   "text": "Select a backend with ⟦0⟧. All strategies work with both backends.",
+   "tokens": [
+    "`--inference.type=<name>`"
+   ]
+  },
+  {
+   "id": 81,
+   "kind": "heading",
+   "start": 16816,
+   "end": 16834,
+   "text": "### Sync (default)",
+   "tokens": []
+  },
+  {
+   "id": 82,
+   "kind": "para",
+   "start": 16836,
+   "end": 16920,
+   "text": "One policy call per control tick. The main loop blocks until the action is computed.",
+   "tokens": []
+  },
+  {
+   "id": 83,
+   "kind": "para",
+   "start": 16922,
+   "end": 16969,
+   "text": "Works with all policies. No extra flags needed.",
+   "tokens": []
+  },
+  {
+   "id": 84,
+   "kind": "heading",
+   "start": 16971,
+   "end": 17018,
+   "text": "### Real-Time Chunking (⟦0⟧)",
+   "tokens": [
+    "`--inference.type=rtc`"
+   ]
+  },
+  {
+   "id": 85,
+   "kind": "para",
+   "start": 17020,
+   "end": 17186,
+   "text": "A background thread produces action chunks asynchronously. The main control loop polls for the next ready action while the policy computes the next chunk in parallel.",
+   "tokens": []
+  },
+  {
+   "id": 86,
+   "kind": "para",
+   "start": 17188,
+   "end": 17307,
+   "text": "Use RTC with large, slow VLA models (Pi0, Pi0.5, SmolVLA) for smooth, continuous motion despite high inference latency.",
+   "tokens": []
+  },
+  {
+   "id": 87,
+   "kind": "table",
+   "start": 17763,
+   "end": 17891,
+   "text": "| Flag                                        | Description                                                                    |",
+   "tokens": []
+  },
+  {
+   "id": 88,
+   "kind": "table",
+   "start": 18021,
+   "end": 18149,
+   "text": "| ⟦0⟧         | Steps to blend with previous chunk (default: varies by policy)                 |",
+   "tokens": [
+    "`--inference.rtc.execution_horizon`"
+   ]
+  },
+  {
+   "id": 89,
+   "kind": "table",
+   "start": 18150,
+   "end": 18278,
+   "text": "| ⟦0⟧                      | ⟦1⟧ (default) or trained-prefix ⟦2⟧ for compatible Pi05 checkpoints |",
+   "tokens": [
+    "`--inference.rtc.mode`",
+    "`guided`",
+    "`trained`"
+   ]
+  },
+  {
+   "id": 90,
+   "kind": "table",
+   "start": 18279,
+   "end": 18407,
+   "text": "| ⟦0⟧       | Consistency enforcement strength (default: varies by policy)                   |",
+   "tokens": [
+    "`--inference.rtc.max_guidance_weight`"
+   ]
+  },
+  {
+   "id": 91,
+   "kind": "table",
+   "start": 18408,
+   "end": 18536,
+   "text": "| ⟦0⟧ | Blend schedule: ⟦1⟧, ⟦2⟧, ⟦3⟧, ⟦4⟧                               |",
+   "tokens": [
+    "`--inference.rtc.prefix_attention_schedule`",
+    "`LINEAR`",
+    "`EXP`",
+    "`ONES`",
+    "`ZEROS`"
+   ]
+  },
+  {
+   "id": 92,
+   "kind": "table",
+   "start": 18537,
+   "end": 18665,
+   "text": "| ⟦0⟧               | Backpressure threshold; trained RTC requires at least its maximum delay        |",
+   "tokens": [
+    "`--inference.queue_threshold`"
+   ]
+  },
+  {
+   "id": 93,
+   "kind": "para",
+   "start": 18667,
+   "end": 18746,
+   "text": "See the [Real-Time Chunking](⟦0⟧) guide for details on tuning RTC parameters.",
+   "tokens": [
+    "./rtc"
+   ]
+  },
+  {
+   "id": 94,
+   "kind": "heading",
+   "start": 18753,
+   "end": 18776,
+   "text": "## Interactive Sessions",
+   "tokens": []
+  },
+  {
+   "id": 95,
+   "kind": "para",
+   "start": 18778,
+   "end": 19127,
+   "text": "Add ⟦0⟧ to drive the rollout from the terminal instead of starting immediately. Hardware connects and the policy loads as usual, but **the robot stays still until you type ⟦1⟧** — useful when you want to position the scene first, re-instruct the policy between attempts, or run several takes without paying the load time again.",
+   "tokens": [
+    "`--interactive=true`",
+    "`/start`"
+   ]
+  },
+  {
+   "id": 96,
+   "kind": "table",
+   "start": 19458,
+   "end": 19662,
+   "text": "| Command             | Action                                                                                                                                                                             |",
+   "tokens": []
+  },
+  {
+   "id": 97,
+   "kind": "table",
+   "start": 19868,
+   "end": 20072,
+   "text": "| ⟦0⟧            | Start (or restart) the policy control loop                                                                                                                                         |",
+   "tokens": [
+    "`/start`"
+   ]
+  },
+  {
+   "id": 98,
+   "kind": "table",
+   "start": 20073,
+   "end": 20277,
+   "text": "| ⟦0⟧   | Change the instruction the policy follows, without stopping. No argument prints the current task. Only affects policies that condition on language (SmolVLA, π0/π0.5, and similar) |",
+   "tokens": [
+    "`/subtask <text>`"
+   ]
+  },
+  {
+   "id": 99,
+   "kind": "table",
+   "start": 20278,
+   "end": 20482,
+   "text": "| ⟦0⟧       | Ask the policy a question about what it currently sees. Only while a run is in progress, and only for policies with a text head                                                    |",
+   "tokens": [
+    "`/vqa <text>`"
+   ]
+  },
+  {
+   "id": 100,
+   "kind": "table",
+   "start": 20483,
+   "end": 20687,
+   "text": "| ⟦0⟧ | Hand the policy a high-level goal and let it choose its own subtasks. ⟦1⟧ hands control back; no argument reports the current goal                                    |",
+   "tokens": [
+    "`/autosteer <goal>`",
+    "`/autosteer off`"
+   ]
+  },
+  {
+   "id": 101,
+   "kind": "table",
+   "start": 20688,
+   "end": 20892,
+   "text": "| ⟦0⟧            | Stop movement, return the robot to its startup position, and restore the ⟦1⟧ instruction                                                                                      |",
+   "tokens": [
+    "`/reset`",
+    "`--task`"
+   ]
+  },
+  {
+   "id": 102,
+   "kind": "table",
+   "start": 20893,
+   "end": 21097,
+   "text": "| ⟦0⟧             | End the session and run the normal shutdown routines                                                                                                                               |",
+   "tokens": [
+    "`/stop`"
+   ]
+  },
+  {
+   "id": 103,
+   "kind": "table",
+   "start": 21098,
+   "end": 21302,
+   "text": "| ⟦0⟧             | List the commands                                                                                                                                                                  |",
+   "tokens": [
+    "`/help`"
+   ]
+  },
+  {
+   "id": 104,
+   "kind": "para",
+   "start": 21903,
+   "end": 21987,
+   "text": "Lines starting with ⟦0⟧ are what you type; the session renders no prompt of its own.",
+   "tokens": [
+    "`>`"
+   ]
+  },
+  {
+   "id": 105,
+   "kind": "para",
+   "start": 21989,
+   "end": 22168,
+   "text": "⟦0⟧ still shuts down as usual, and closing stdin (⟦1⟧, or the end of a piped script) ends the session — so a piped script must keep stdin open for the intended duration:",
+   "tokens": [
+    "`Ctrl-C`",
+    "`Ctrl-D`"
+   ]
+  },
+  {
+   "id": 106,
+   "kind": "para",
+   "start": 22272,
+   "end": 22691,
+   "text": "**⟦0⟧** applies from the next inference. With ⟦1⟧ the precomputed chunk actions are dropped, so the switch lands on the next control tick; with ⟦2⟧ the new chunk is blended over the previous chunk's leftover prefix, so it lands within one inference and the motion stays continuous (with ⟦3⟧ the queued chunk drains first, delaying the switch by up to one chunk).",
+   "tokens": [
+    "`/subtask`",
+    "`--inference.type=sync`",
+    "`rtc`",
+    "`--inference.rtc.enabled=false`"
+   ]
+  },
+  {
+   "id": 107,
+   "kind": "para",
+   "start": 22693,
+   "end": 22925,
+   "text": "With ⟦0⟧, an instruction that tokenizes to a different length can trigger a recompilation, pausing inference for as long as the original warm-up took — leave compilation off if you expect to re-instruct often.",
+   "tokens": [
+    "`--use_torch_compile=true`"
+   ]
+  },
+  {
+   "id": 108,
+   "kind": "para",
+   "start": 22927,
+   "end": 23130,
+   "text": "⟦0⟧ and ⟦1⟧ need a policy with a text head (an implementation of ⟦2⟧); no built-in LeRobot policy ships one yet, so both commands are refused unless yours does.",
+   "tokens": [
+    "`/vqa`",
+    "`/autosteer`",
+    "`PreTrainedPolicy.generate_text()`"
+   ]
+  },
+  {
+   "id": 109,
+   "kind": "para",
+   "start": 23132,
+   "end": 23662,
+   "text": "**⟦0⟧** answers from the next observation and prints when ready, so you can keep typing meanwhile; only one question is in flight at a time (autosteer's own queries share that slot). Text generation is far slower than a control tick, so the robot drains its queued actions and then holds position until the answer lands, and that time counts against ⟦1⟧. Questions are only accepted while a run is in progress — an idle engine has no current view — and one still unanswered when a segment ends is dropped and reported.",
+   "tokens": [
+    "`/vqa`",
+    "`--duration`"
+   ]
+  },
+  {
+   "id": 110,
+   "kind": "para",
+   "start": 23664,
+   "end": 24223,
+   "text": "**⟦0⟧** hands the policy a goal and asks it for the next subtask every ⟦1⟧ seconds (default 10), applying each one through the same path as ⟦2⟧ and announcing it in the chat. Every query is a full text generation, so the interval is a cost knob: lower values re-plan sooner but spend more of the loop generating text instead of acting. Plan progress lives in the policy, not the rollout, so the plan dies with the segment; the sequencer also stops on ⟦3⟧, ⟦4⟧, ⟦5⟧, and the first planning failure.",
+   "tokens": [
+    "`/autosteer`",
+    "`--autosteer_interval_s`",
+    "`/subtask`",
+    "`/reset`",
+    "`/subtask`",
+    "`/autosteer off`"
+   ]
+  },
+  {
+   "id": 111,
+   "kind": "para",
+   "start": 24225,
+   "end": 24579,
+   "text": "**Logs below ERROR are muted while the session runs** so routine output doesn't interleave with what you're typing; errors and fatal inference failures still show, and normal logging resumes when the session ends. The [cadence summaries](⟦0⟧) are printed in the chat instead, and running without ⟦1⟧ gets you the live log back.",
+   "tokens": [
+    "#cadence-reporting",
+    "`--interactive`"
+   ]
+  },
+  {
+   "id": 112,
+   "kind": "para",
+   "start": 24581,
+   "end": 24656,
+   "text": "Sessions work over SSH and on headless machines — no display server needed.",
+   "tokens": []
+  },
+  {
+   "id": 113,
+   "kind": "para",
+   "start": 24658,
+   "end": 25064,
+   "text": "**Recording while interactive.** ⟦0⟧ also accepts ⟦1⟧ and records continuously while you steer: each ⟦2⟧…⟦3⟧ segment saves complete episodes plus one final partial episode, and the dataset stays open until shutdown. Frames carry the task provenance of the action actually sent, so actions already queued or interpolated under the old task keep the old label.",
+   "tokens": [
+    "`--strategy.type=sentry`",
+    "`--interactive=true`",
+    "`/start`",
+    "`/reset`"
+   ]
+  },
+  {
+   "id": 114,
+   "kind": "para",
+   "start": 25353,
+   "end": 25563,
+   "text": "The other recording strategies (episodic, DAgger, highlight) are not supported: they bind their own keyboard controls and finalize the dataset when ⟦0⟧ exits, so they cannot be restarted segment by segment.",
+   "tokens": [
+    "`run()`"
+   ]
+  },
+  {
+   "id": 115,
+   "kind": "heading",
+   "start": 25565,
+   "end": 25589,
+   "text": "### Programmatic control",
+   "tokens": []
+  },
+  {
+   "id": 116,
+   "kind": "para",
+   "start": 25591,
+   "end": 25797,
+   "text": "⟦0⟧ exposes the same operations as a library API — thread-safe ⟦1⟧ / ⟦2⟧ / ⟦3⟧ / ⟦4⟧ plus a ⟦5⟧ callback, with no stdin, printing or log muting attached:",
+   "tokens": [
+    "`RolloutController`",
+    "`start()`",
+    "`reset()`",
+    "`stop()`",
+    "`set_task()`",
+    "`RolloutEvent`"
+   ]
+  },
+  {
+   "id": 117,
+   "kind": "para",
+   "start": 26747,
+   "end": 27021,
+   "text": "⟦0⟧ requires the context's shutdown event to be a ⟦1⟧, built as above: the controller ends run segments through its local flag, while your ⟦2⟧ event still forces a full shutdown. Set ⟦3⟧ unless you want the vocal announcements.",
+   "tokens": [
+    "`RolloutController`",
+    "`LinkedEvent`",
+    "`parent`",
+    "`play_sounds=False`"
+   ]
+  },
+  {
+   "id": 118,
+   "kind": "heading",
+   "start": 27028,
+   "end": 27043,
+   "text": "## Common Flags",
+   "tokens": []
+  },
+  {
+   "id": 119,
+   "kind": "table",
+   "start": 27045,
+   "end": 27160,
+   "text": "| Flag                              | Description                                                       | Default |",
+   "tokens": []
+  },
+  {
+   "id": 120,
+   "kind": "table",
+   "start": 27277,
+   "end": 27392,
+   "text": "| ⟦0⟧                   | **Required.** HF Hub model ID or local checkpoint path            | --      |",
+   "tokens": [
+    "`--policy.path`"
+   ]
+  },
+  {
+   "id": 121,
+   "kind": "table",
+   "start": 27393,
+   "end": 27508,
+   "text": "| ⟦0⟧                    | **Required.** Robot type (e.g. ⟦1⟧, ⟦2⟧) | --      |",
+   "tokens": [
+    "`--robot.type`",
+    "`so100_follower`",
+    "`koch_follower`"
+   ]
+  },
+  {
+   "id": 122,
+   "kind": "table",
+   "start": 27509,
+   "end": 27624,
+   "text": "| ⟦0⟧                    | Serial port for the robot                                         | --      |",
+   "tokens": [
+    "`--robot.port`"
+   ]
+  },
+  {
+   "id": 123,
+   "kind": "table",
+   "start": 27625,
+   "end": 27740,
+   "text": "| ⟦0⟧                 | Camera configuration (JSON dict)                                  | --      |",
+   "tokens": [
+    "`--robot.cameras`"
+   ]
+  },
+  {
+   "id": 124,
+   "kind": "table",
+   "start": 27741,
+   "end": 27856,
+   "text": "| ⟦0⟧                           | Policy inference and dataset recording frequency                  | 30      |",
+   "tokens": [
+    "`--fps`"
+   ]
+  },
+  {
+   "id": 125,
+   "kind": "table",
+   "start": 27857,
+   "end": 27972,
+   "text": "| ⟦0⟧                      | Run time in seconds (0 = infinite; per segment if interactive)    | 0       |",
+   "tokens": [
+    "`--duration`"
+   ]
+  },
+  {
+   "id": 126,
+   "kind": "table",
+   "start": 27973,
+   "end": 28088,
+   "text": "| ⟦0⟧                        | Torch device (⟦1⟧, ⟦2⟧, ⟦3⟧)                               | auto    |",
+   "tokens": [
+    "`--device`",
+    "`cpu`",
+    "`cuda`",
+    "`mps`"
+   ]
+  },
+  {
+   "id": 127,
+   "kind": "table",
+   "start": 28089,
+   "end": 28204,
+   "text": "| ⟦0⟧                          | Task description (used when no dataset is provided)               | --      |",
+   "tokens": [
+    "`--task`"
+   ]
+  },
+  {
+   "id": 128,
+   "kind": "table",
+   "start": 28205,
+   "end": 28320,
+   "text": "| ⟦0⟧                  | Stream telemetry to Rerun visualization                           | false   |",
+   "tokens": [
+    "`--display_data`"
+   ]
+  },
+  {
+   "id": 129,
+   "kind": "table",
+   "start": 28321,
+   "end": 28436,
+   "text": "| ⟦0⟧ / ⟦1⟧ | Remote Rerun server address                                       | --      |",
+   "tokens": [
+    "`--display_ip`",
+    "`--display_port`"
+   ]
+  },
+  {
+   "id": 130,
+   "kind": "table",
+   "start": 28437,
+   "end": 28552,
+   "text": "| ⟦0⟧      | Robot commands per policy action (control at ⟦1⟧ Hz)        | 1       |",
+   "tokens": [
+    "`--interpolation_multiplier`",
+    "`fps × N`"
+   ]
+  },
+  {
+   "id": 131,
+   "kind": "table",
+   "start": 28553,
+   "end": 28668,
+   "text": "| ⟦0⟧                   | Chat session on stdin; robot idles until ⟦1⟧ (base, sentry)  | false   |",
+   "tokens": [
+    "`--interactive`",
+    "`/start`"
+   ]
+  },
+  {
+   "id": 132,
+   "kind": "table",
+   "start": 28669,
+   "end": 28784,
+   "text": "| ⟦0⟧             | Enable ⟦1⟧ for inference                              | false   |",
+   "tokens": [
+    "`--use_torch_compile`",
+    "`torch.compile`"
+   ]
+  },
+  {
+   "id": 133,
+   "kind": "table",
+   "start": 28785,
+   "end": 28900,
+   "text": "| ⟦0⟧                        | Resume a previous recording session                               | false   |",
+   "tokens": [
+    "`--resume`"
+   ]
+  },
+  {
+   "id": 134,
+   "kind": "table",
+   "start": 28901,
+   "end": 29016,
+   "text": "| ⟦0⟧                   | Vocal synthesis for events                                        | true    |",
+   "tokens": [
+    "`--play_sounds`"
+   ]
+  },
+  {
+   "id": 135,
+   "kind": "heading",
+   "start": 29023,
+   "end": 29043,
+   "text": "## Cadence Reporting",
+   "tokens": []
+  },
+  {
+   "id": 136,
+   "kind": "para",
+   "start": 29045,
+   "end": 29339,
+   "text": "Every strategy reports what its control loop actually achieved, as do ⟦0⟧, ⟦1⟧ and ⟦2⟧ — they all pace through the same timer. Each saved episode gets a one-line digest, and when the loop ends — including on ⟦3⟧ — a block covering the whole run:",
+   "tokens": [
+    "`lerobot-record`",
+    "`lerobot-teleoperate`",
+    "`lerobot-replay`",
+    "`Ctrl-C`"
+   ]
+  },
+  {
+   "id": 137,
+   "kind": "para",
+   "start": 30593,
+   "end": 31134,
+   "text": "Read it top-down: **effective cadence** is what you got against ⟦0⟧, **cycles over budget** is how often the loop could not hold it, the **step breakdown** says where the time went, and **pacing headroom** near zero means there is nothing left to absorb a slow tick. A high ⟦1⟧ share points at the policy or the device; a high ⟦2⟧ share points at the cameras. A step's ⟦3⟧ far above its ⟦4⟧ is a one-off — above, ⟦5⟧ is 0.67 ms per frame and the 620 ms outlier is the blocking ⟦6⟧ that closed an episode.",
+   "tokens": [
+    "`--fps`",
+    "`infer`",
+    "`observe`",
+    "`worst`",
+    "`mean`",
+    "`record`",
+    "`save_episode`"
+   ]
+  },
+  {
+   "id": 138,
+   "kind": "para",
+   "start": 31136,
+   "end": 31532,
+   "text": "A _cycle_ here is one policy action's worth of ticks (⟦0⟧ of them). Only whole cycles over the ⟦1⟧ budget can cost you frames; a single tick overrunning its slot only makes the interpolated motion less smooth, which is why the two are counted separately. Without interpolation a cycle is a single tick, so the report drops the distinction and counts ticks throughout.",
+   "tokens": [
+    "`--interpolation_multiplier`",
+    "`1/fps`"
+   ]
+  },
+  {
+   "id": 139,
+   "kind": "para",
+   "start": 31534,
+   "end": 31740,
+   "text": "In [interactive sessions](⟦0⟧) each ⟦1⟧ segment owns its own timer, so the report lands in the chat once per segment (⟦2⟧, ⟦3⟧, or ⟦4⟧) rather than once per process.",
+   "tokens": [
+    "#interactive-sessions",
+    "`/start`",
+    "`/reset`",
+    "`/stop`",
+    "`--duration`"
+   ]
+  },
+  {
+   "id": 140,
+   "kind": "heading",
+   "start": 31747,
+   "end": 31768,
+   "text": "## Programmatic Usage",
+   "tokens": []
+  },
+  {
+   "id": 141,
+   "kind": "para",
+   "start": 31770,
+   "end": 31864,
+   "text": "For custom deployments (e.g. with kinematics processors), use the rollout module API directly:",
+   "tokens": []
+  },
+  {
+   "id": 142,
+   "kind": "para",
+   "start": 32734,
+   "end": 32864,
+   "text": "See ⟦0⟧ and ⟦1⟧ for full examples with kinematics processors.",
+   "tokens": [
+    "`examples/so100_to_so100_EE/rollout.py`",
+    "`examples/phone_to_so100/rollout.py`"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,377 @@
+{
+ "file": "backwardcomp.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1948,
+   "text": "# Backward compatibility",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "heading",
+   "start": 1950,
+   "end": 1994,
+   "text": "## Policy Normalization Migration (PR #1452)",
+   "tokens": []
+  },
+  {
+   "id": 2,
+   "kind": "para",
+   "start": 1996,
+   "end": 2184,
+   "text": "**Breaking Change**: LeRobot policies no longer have built-in normalization layers embedded in their weights. Normalization is now handled by external ⟦0⟧ components.",
+   "tokens": [
+    "`PolicyProcessorPipeline`"
+   ]
+  },
+  {
+   "id": 3,
+   "kind": "heading",
+   "start": 2186,
+   "end": 2203,
+   "text": "### What changed?",
+   "tokens": []
+  },
+  {
+   "id": 4,
+   "kind": "table",
+   "start": 2205,
+   "end": 2349,
+   "text": "|                            | Before PR #1452                                  | After PR #1452                                               |",
+   "tokens": []
+  },
+  {
+   "id": 5,
+   "kind": "table",
+   "start": 2495,
+   "end": 2639,
+   "text": "| **Normalization Location** | Embedded in model weights (⟦0⟧) | External ⟦1⟧ components                |",
+   "tokens": [
+    "`normalize_inputs.*`",
+    "`PolicyProcessorPipeline`"
+   ]
+  },
+  {
+   "id": 6,
+   "kind": "table",
+   "start": 2640,
+   "end": 2784,
+   "text": "| **Model State Dict**       | Contains normalization statistics                | **Clean weights only** - no normalization parameters         |",
+   "tokens": []
+  },
+  {
+   "id": 7,
+   "kind": "table",
+   "start": 2785,
+   "end": 2929,
+   "text": "| **Usage**                  | ⟦0⟧ handles everything               | ⟦1⟧ → ⟦2⟧ → ⟦3⟧ |",
+   "tokens": [
+    "`policy(batch)`",
+    "`preprocessor(batch)`",
+    "`policy(...)`",
+    "`postprocessor(...)`"
+   ]
+  },
+  {
+   "id": 8,
+   "kind": "heading",
+   "start": 2931,
+   "end": 2960,
+   "text": "### Impact on existing models",
+   "tokens": []
+  },
+  {
+   "id": 9,
+   "kind": "list",
+   "start": 2962,
+   "end": 3043,
+   "text": "- Models trained **before** PR #1452 have normalization embedded in their weights",
+   "tokens": []
+  },
+  {
+   "id": 10,
+   "kind": "list",
+   "start": 3044,
+   "end": 3127,
+   "text": "- These models need migration to work with the new ⟦0⟧ system",
+   "tokens": [
+    "`PolicyProcessorPipeline`"
+   ]
+  },
+  {
+   "id": 11,
+   "kind": "list",
+   "start": 3128,
+   "end": 3218,
+   "text": "- The migration extracts normalization statistics and creates separate processor pipelines",
+   "tokens": []
+  },
+  {
+   "id": 12,
+   "kind": "heading",
+   "start": 3220,
+   "end": 3244,
+   "text": "### Migrating old models",
+   "tokens": []
+  },
+  {
+   "id": 13,
+   "kind": "para",
+   "start": 3246,
+   "end": 3317,
+   "text": "Use the migration script to convert models with embedded normalization:",
+   "tokens": []
+  },
+  {
+   "id": 14,
+   "kind": "para",
+   "start": 3504,
+   "end": 3515,
+   "text": "The script:",
+   "tokens": []
+  },
+  {
+   "id": 15,
+   "kind": "list",
+   "start": 3517,
+   "end": 3576,
+   "text": "1. **Extracts** normalization statistics from model weights",
+   "tokens": []
+  },
+  {
+   "id": 16,
+   "kind": "list",
+   "start": 3577,
+   "end": 3641,
+   "text": "2. **Creates** external preprocessor and postprocessor pipelines",
+   "tokens": []
+  },
+  {
+   "id": 17,
+   "kind": "list",
+   "start": 3642,
+   "end": 3696,
+   "text": "3. **Removes** normalization layers from model weights",
+   "tokens": []
+  },
+  {
+   "id": 18,
+   "kind": "list",
+   "start": 3697,
+   "end": 3743,
+   "text": "4. **Saves** clean model + processor pipelines",
+   "tokens": []
+  },
+  {
+   "id": 19,
+   "kind": "list",
+   "start": 3744,
+   "end": 3791,
+   "text": "5. **Pushes** to Hub with automatic PR creation",
+   "tokens": []
+  },
+  {
+   "id": 20,
+   "kind": "heading",
+   "start": 3793,
+   "end": 3818,
+   "text": "### Using migrated models",
+   "tokens": []
+  },
+  {
+   "id": 21,
+   "kind": "heading",
+   "start": 4308,
+   "end": 4332,
+   "text": "## Hardware API redesign",
+   "tokens": []
+  },
+  {
+   "id": 22,
+   "kind": "para",
+   "start": 4334,
+   "end": 4579,
+   "text": "PR [#777](⟦0⟧) improves the LeRobot calibration but is **not backward-compatible**. Below is an overview of what changed and how you can continue to work with datasets created before this pull request.",
+   "tokens": [
+    "https://github.com/huggingface/lerobot/pull/777"
+   ]
+  },
+  {
+   "id": 23,
+   "kind": "heading",
+   "start": 4581,
+   "end": 4598,
+   "text": "### What changed?",
+   "tokens": []
+  },
+  {
+   "id": 24,
+   "kind": "table",
+   "start": 4600,
+   "end": 4752,
+   "text": "|                                   | Before PR #777                                    | After PR #777                                                |",
+   "tokens": []
+  },
+  {
+   "id": 25,
+   "kind": "table",
+   "start": 4906,
+   "end": 5058,
+   "text": "| **Joint range**                   | Degrees ⟦0⟧                             | **Normalised range** Joints: ⟦1⟧ Gripper: ⟦2⟧ |",
+   "tokens": [
+    "`-180...180°`",
+    "`–100...100`",
+    "`0...100`"
+   ]
+  },
+  {
+   "id": 26,
+   "kind": "table",
+   "start": 5059,
+   "end": 5211,
+   "text": "| **Zero position (SO100 / SO101)** | Arm fully extended horizontally                   | **In middle of the range for each joint**                    |",
+   "tokens": []
+  },
+  {
+   "id": 27,
+   "kind": "table",
+   "start": 5212,
+   "end": 5364,
+   "text": "| **Boundary handling**             | Software safeguards to detect ±180 ° wrap-arounds | No wrap-around logic needed due to mid-range zero            |",
+   "tokens": []
+  },
+  {
+   "id": 28,
+   "kind": "heading",
+   "start": 5371,
+   "end": 5402,
+   "text": "### Impact on existing datasets",
+   "tokens": []
+  },
+  {
+   "id": 29,
+   "kind": "list",
+   "start": 5404,
+   "end": 5498,
+   "text": "- Recorded trajectories created **before** PR #777 will replay incorrectly if loaded directly:",
+   "tokens": []
+  },
+  {
+   "id": 30,
+   "kind": "list",
+   "start": 5499,
+   "end": 5554,
+   "text": "  - Joint angles are offset and incorrectly normalized.",
+   "tokens": []
+  },
+  {
+   "id": 31,
+   "kind": "list",
+   "start": 5555,
+   "end": 5659,
+   "text": "- Any models directly finetuned or trained on the old data will need their inputs and outputs converted.",
+   "tokens": []
+  },
+  {
+   "id": 32,
+   "kind": "heading",
+   "start": 5661,
+   "end": 5721,
+   "text": "### Using datasets made with the previous calibration system",
+   "tokens": []
+  },
+  {
+   "id": 33,
+   "kind": "para",
+   "start": 5723,
+   "end": 6003,
+   "text": "We provide a migration example script for replaying an episode recorded with the previous calibration here: ⟦0⟧.\nBelow we take you through the modifications that are done in the example script to make the previous calibration datasets work.",
+   "tokens": [
+    "`examples/backward_compatibility/replay.py`"
+   ]
+  },
+  {
+   "id": 34,
+   "kind": "para",
+   "start": 6210,
+   "end": 6330,
+   "text": "Let's break this down.\nNew codebase uses ⟦0⟧ suffix for the position observations and we have removed ⟦1⟧ prefix:",
+   "tokens": [
+    "`.pos`",
+    "`main_`"
+   ]
+  },
+  {
+   "id": 35,
+   "kind": "para",
+   "start": 6449,
+   "end": 6585,
+   "text": "For ⟦0⟧ (id = 2), the 0 position is changed by -90 degrees and the direction is reversed compared to old calibration/code.",
+   "tokens": [
+    "`\"shoulder_lift\"`"
+   ]
+  },
+  {
+   "id": 36,
+   "kind": "para",
+   "start": 6728,
+   "end": 6831,
+   "text": "For ⟦0⟧ (id = 3), the 0 position is changed by -90 degrees compared to old calibration/code.",
+   "tokens": [
+    "`\"elbow_flex\"`"
+   ]
+  },
+  {
+   "id": 37,
+   "kind": "para",
+   "start": 6939,
+   "end": 7023,
+   "text": "To use degrees normalization we then set the ⟦0⟧ option to ⟦1⟧.",
+   "tokens": [
+    "`--robot.use_degrees`",
+    "`true`"
+   ]
+  },
+  {
+   "id": 38,
+   "kind": "heading",
+   "start": 7286,
+   "end": 7349,
+   "text": "### Using policies trained with the previous calibration system",
+   "tokens": []
+  },
+  {
+   "id": 39,
+   "kind": "para",
+   "start": 7351,
+   "end": 7483,
+   "text": "Policies output actions in the same format as the datasets (⟦0⟧). Therefore, the same transformations should be applied.",
+   "tokens": [
+    "`torch.Tensors`"
+   ]
+  },
+  {
+   "id": 40,
+   "kind": "para",
+   "start": 7485,
+   "end": 7724,
+   "text": "To find these transformations, we recommend first replaying an episode of the dataset your policy was trained on using the section above.\nThen, add these same transformations to your inference script (shown here in the ⟦0⟧ script):",
+   "tokens": [
+    "`record.py`"
+   ]
+  },
+  {
+   "id": 41,
+   "kind": "para",
+   "start": 8170,
+   "end": 8287,
+   "text": "If you have questions or run into migration issues, feel free to ask them on [Discord](⟦0⟧)",
+   "tokens": [
+    "https://discord.gg/s3KuuzsPFb"
+   ]
+  }
+ ]
+}

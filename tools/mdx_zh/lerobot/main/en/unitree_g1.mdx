@@ -1,0 +1,433 @@
+<script lang="ts">
+import {onMount} from "svelte";
+import Tip from "$lib/Tip.svelte";
+import CopyLLMTxtMenu from "$lib/CopyLLMTxtMenu.svelte";
+import Youtube from "$lib/Youtube.svelte";
+import Docstring from "$lib/Docstring.svelte";
+import CodeBlock from "$lib/CodeBlock.svelte";
+import CodeBlockFw from "$lib/CodeBlockFw.svelte";
+import DocNotebookDropdown from "$lib/DocNotebookDropdown.svelte";
+import CourseFloatingBanner from "$lib/CourseFloatingBanner.svelte";
+import IconCopyLink from "$lib/IconCopyLink.svelte";
+import FrameworkContent from "$lib/FrameworkContent.svelte";
+import Markdown from "$lib/Markdown.svelte";
+import Question from "$lib/Question.svelte";
+import FrameworkSwitchCourse from "$lib/FrameworkSwitchCourse.svelte";
+import InferenceApi from "$lib/InferenceApi.svelte";
+import TokenizersLanguageContent from "$lib/TokenizersLanguageContent.svelte";
+import ExampleCodeBlock from "$lib/ExampleCodeBlock.svelte";
+import Added from "$lib/Added.svelte";
+import Changed from "$lib/Changed.svelte";
+import Deprecated from "$lib/Deprecated.svelte";
+import PipelineIcon from "$lib/PipelineIcon.svelte";
+import PipelineTag from "$lib/PipelineTag.svelte";
+import Heading from "$lib/Heading.svelte";
+import HfOptions from "$lib/HfOptions.svelte";
+import HfOption from "$lib/HfOption.svelte";
+import EditOnGithub from "$lib/EditOnGithub.svelte";
+import InferenceSnippet from "$lib/InferenceSnippet/InferenceSnippet.svelte";
+import MermaidChart from "$lib/MermaidChart.svelte";
+let fw: "pt" | "tf" = "pt";
+onMount(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    fw = urlParams.get("fw") || "pt";
+});
+</script>
+<svelte:head>
+  <meta name="hf:doc:metadata" content={metadata} >
+</svelte:head>
+
+<!--HF DOCBUILD BODY START-->
+
+HF_DOC_BODY_START
+
+<CopyLLMTxtMenu containerStyle="float: right; margin-left: 10px; display: inline-flex; position: relative; z-index: 10;"></CopyLLMTxtMenu>
+
+# Unitree G1
+
+<img
+  src="https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/lerobot/unitree_thumbnail.jpg"
+  alt="Unitree G1 locomanipulation demo"
+  style={{ width: "100%" }}
+/>
+
+Unitree G1 人形机器人现在已获 LeRobot 支持！你可以进行 teleoperation、训练移动操作（locomanipulation）policy、在 simulation 中测试等。29 和 23 自由度两种型号均受支持。
+
+---
+
+## 第一部分：入门
+
+### 安装 Unitree SDK
+
+请遵循 [unitree_sdk2_python 安装指南](https://github.com/unitreerobotics/unitree_sdk2_python#installation)。已使用 `unitree_sdk2py==1.0.1` 和 `cyclonedds==0.10.2` 测试通过：
+
+```bash
+conda create -y -n lerobot python=3.12
+conda activate lerobot
+git clone https://github.com/unitreerobotics/unitree_sdk2_python.git
+cd unitree_sdk2_python
+pip install -e .
+cd ..
+```
+
+### 安装 LeRobot
+
+```bash
+conda install ffmpeg -c conda-forge
+conda install -c conda-forge "pinocchio>=3.0.0,<4.0.0"
+git clone https://github.com/huggingface/lerobot.git
+cd lerobot
+pip install -e '.[unitree_g1]'
+```
+
+<Tip>
+  目前，pinocchio 必须从 conda-forge（而非 pip）安装，以包含机械臂 IK 所需的 CasADi 绑定。
+</Tip>
+
+### 测试安装（simulation）
+
+simulation environment 有自己的依赖。请查看 simulation environment 依赖：[Unitree G1 Mujoco EnvHub](https://huggingface.co/lerobot/unitree-g1-mujoco/tree/main)。
+
+```bash
+pip install mujoco loguru msgpack msgpack-numpy
+```
+
+```bash
+lerobot-teleoperate \
+  --robot.type=unitree_g1 \
+  --robot.is_simulation=true \
+  --teleop.type=unitree_g1 \
+  --teleop.id=wbc_unitree \
+  --robot.cameras='{"global_view": {"type": "zmq", "server_address": "localhost", "port": 5555, "camera_name": "head_camera", "width": 640, "height": 480, "fps": 30, "warmup_s": 5}}' \
+  --display_data=true \
+  --robot.controller=GrootLocomotionController
+```
+
+这将为 G1 启动一个 [MuJoCo simulation 实例](https://huggingface.co/lerobot/unitree-g1-mujoco/tree/main)。你可以在启动前将游戏手柄连接到机器，以便在 simulation 中控制机器人的移动。我们通过 `--robot.controller` 同时支持 [HolosomaLocomotionController](https://github.com/amazon-far/holosoma) 和 [GrootLocomotionController](https://github.com/NVlabs/GR00T-WholeBodyControl)。
+
+- 按下 `9` 释放机器人
+- 按下 `7` / `8` 增加 / 降低腰部高度
+
+### 连接到物理机器人
+
+G1 的以太网 IP 固定为 `192.168.123.164`。你的机器必须在同一子网上具有静态 IP：`192.168.123.x`，其中 `x ≠ 164`。
+
+```bash
+# Replace 'enp131s0' with your ethernet interface name (check with `ip a`)
+sudo ip addr flush dev enp131s0
+sudo ip addr add 192.168.123.200/24 dev enp131s0
+sudo ip link set enp131s0 up
+```
+
+### SSH 登录机器人
+
+```bash
+ssh unitree@192.168.123.164
+# Password: 123
+```
+
+### 通过以太网共享网络
+
+G1 需要网络访问来克隆仓库和安装软件包。通过以太网共享你笔记本电脑的连接：
+
+**在笔记本电脑上：**
+
+```bash
+sudo sysctl -w net.ipv4.ip_forward=1
+
+# Replace wlp132s0f0 with your WiFi interface name
+sudo iptables -t nat -A POSTROUTING -o wlp132s0f0 -s 192.168.123.0/24 -j MASQUERADE
+sudo iptables -A FORWARD -i wlp132s0f0 -o enp131s0 -m state --state RELATED,ESTABLISHED -j ACCEPT
+sudo iptables -A FORWARD -i enp131s0 -o wlp132s0f0 -j ACCEPT
+```
+
+**在 G1 上：**
+
+```bash
+sudo ip route del default 2>/dev/null || true
+sudo ip route add default via 192.168.123.200 dev eth0
+echo "nameserver 8.8.8.8" | sudo tee /etc/resolv.conf
+
+# Verify
+ping -c 3 8.8.8.8
+```
+
+### 在 G1 上安装 Unitree SDK
+
+参照 [unitree_sdk2_python 安装指南](https://github.com/unitreerobotics/unitree_sdk2_python#installation)：
+
+```bash
+conda create -y -n lerobot python=3.12
+conda activate lerobot
+git clone https://github.com/unitreerobotics/unitree_sdk2_python.git
+cd unitree_sdk2_python
+python -m pip install -e .
+cd ..
+```
+
+### 在 G1 上安装 LeRobot
+
+```bash
+git clone https://github.com/huggingface/lerobot.git
+cd lerobot
+conda install -c conda-forge "pinocchio>=3.0.0,<4.0.0"
+python -m pip install -e '.[unitree_g1]'
+```
+
+<Tip>
+  目前，pinocchio 必须从 conda-forge（而非 pip）安装，以包含机械臂 IK 所需的 CasADi 绑定。
+</Tip>
+
+###（可选）在机器人上启用 WiFi
+
+为了进行无线 SSH 访问，你可以在 G1 上启用 WiFi（默认是禁用的）：
+
+```bash
+sudo rfkill unblock all
+sudo ip link set wlan0 up
+sudo nmcli radio wifi on
+sudo nmcli device set wlan0 managed yes
+sudo systemctl restart NetworkManager
+```
+
+**连接到 WiFi 网络：**
+
+```bash
+nmcli device wifi list
+
+sudo nmcli connection add type wifi ifname wlan0 con-name "YourNetwork" ssid "YourNetwork"
+sudo nmcli connection modify "YourNetwork" wifi-sec.key-mgmt wpa-psk
+sudo nmcli connection modify "YourNetwork" wifi-sec.psk "YourPassword"
+sudo nmcli connection modify "YourNetwork" connection.autoconnect yes
+sudo nmcli connection up "YourNetwork"
+
+ip a show wlan0
+```
+
+然后你就可以通过 WiFi（而非以太网）进行 SSH：
+
+```bash
+ssh unitree@<ROBOT_WIFI_IP>
+# Password: 123
+```
+
+---
+
+## 第二部分：teleoperation 与移动
+
+### 运行机器人服务器
+
+在机器人上（从 `~/lerobot` 目录）：
+
+```bash
+cd ~/lerobot
+python src/lerobot/robots/unitree_g1/run_g1_server.py --camera
+```
+
+### 运行移动 policy
+
+你可以从笔记本电脑通过以太网、通过 WiFi（实验性）运行 teleoperation 客户端，或直接在机器人本身上运行。请注意网络可能引入的延迟。
+
+**从你的笔记本电脑：**
+
+```bash
+lerobot-teleoperate \
+  --robot.type=unitree_g1 \
+  --robot.is_simulation=false \
+  --robot.robot_ip=<ROBOT_IP> \
+  --teleop.type=unitree_g1 \
+  --teleop.id=wbc_unitree \
+  --robot.cameras='{"global_view": {"type": "zmq", "server_address": "<ROBOT_IP>", "port": 5555, "camera_name": "head_camera", "width": 640, "height": 480, "fps": 30}}' \
+  --display_data=true \
+  --robot.controller=HolosomaLocomotionController
+```
+
+我们通过 `--robot.controller` 同时支持 [GrootLocomotionController](https://github.com/NVlabs/GR00T-WholeBodyControl) 和 [HolosomaLocomotionController](https://github.com/amazon-far/holosoma)。
+
+---
+
+## 第三部分：使用 Homunculus 外骨骼进行移动操作
+
+我们通过 Homunculus 外骨骼提供了一种移动操作解决方案——这是一款用于全身控制的开源 7 自由度外骨骼。[点击这里](https://github.com/nepyope/hmc_exo)了解详情。
+
+### calibration
+
+```bash
+lerobot-calibrate \
+  --teleop.type=unitree_g1 \
+  --teleop.left_arm_config.port=/dev/ttyACM1 \
+  --teleop.right_arm_config.port=/dev/ttyACM0 \
+  --teleop.id=exo
+```
+
+calibration 期间，将每个关节移动到其整个范围。装好后，将关节移动到中立位置并按下 `n` 继续。
+
+### 录制 dataset
+
+```bash
+lerobot-record \
+  --robot.type=unitree_g1 \
+  --robot.is_simulation=true \
+  --robot.cameras='{"global_view": {"type": "zmq", "server_address": "localhost", "port": 5555, "camera_name": "head_camera", "width": 640, "height": 480, "fps": 30}}' \
+  --teleop.type=unitree_g1 \
+  --teleop.left_arm_config.port=/dev/ttyACM1 \
+  --teleop.right_arm_config.port=/dev/ttyACM0 \
+  --teleop.id=exo \
+  --dataset.repo_id=your-username/dataset-name \
+  --dataset.single_task="Test" \
+  --dataset.num_episodes=2 \
+  --dataset.episode_time_s=5 \
+  --dataset.reset_time_s=5 \
+  --dataset.push_to_hub=true \
+  --dataset.streaming_encoding=true \
+  --dataset.encoder_threads=2
+```
+
+> **注意：** 如果你只使用操纵杆，请省略 `--teleop.left_arm_config.port` 和 `--teleop.right_arm_config.port`。
+
+示例 dataset：[nepyope/unitree_box_move_blue_full](https://huggingface.co/datasets/nepyope/unitree_box_move_blue_full)
+
+---
+
+## 第四部分：训练与 inference
+
+### 训练
+
+```bash
+python src/lerobot/scripts/lerobot_train.py \
+  --dataset.repo_id=your-username/dataset-name  \
+  --policy.type=pi05 \
+  --output_dir=./outputs/pi05_training \
+  --job_name=pi05_training \
+  --policy.repo_id=your-username/your-repo-id \
+  --policy.pretrained_path=lerobot/pi05_base \
+  --policy.compile_model=true \
+  --policy.gradient_checkpointing=true \
+  --wandb.enable=true \
+  --policy.dtype=bfloat16 \
+  --policy.freeze_vision_encoder=false \
+  --policy.train_expert_only=false \
+  --steps=3000 \
+  --policy.device=cuda \
+  --batch_size=32
+```
+
+### 使用 RTC 进行 inference
+
+训练完成后，我们建议使用 inference 时 RTC 部署 policy：
+
+```bash
+lerobot-rollout \
+  --strategy.type=base \
+  --policy.path=your-username/your-repo-id \
+  --policy.device=cuda \
+  --robot.type=unitree_g1 \
+  --robot.is_simulation=false \
+  --robot.controller=HolosomaLocomotionController \
+  --robot.cameras='{"global_view": {"type": "zmq", "server_address": "<ROBOT_IP>", "port": 5555, "camera_name": "head_camera", "width": 640, "height": 480, "fps": 30}}' \
+  --task="task_description" \
+  --duration=1000 \
+  --fps=30 \
+  --inference.type=rtc
+```
+
+---
+
+## 第五部分：SONIC 全身控制（潜空间 token policy）
+
+LeRobot 现在将 NVIDIA [SONIC](https://github.com/NVIDIA/sonic) 全身部署技术栈的**解码器**部分移植为 `SonicWholeBodyController`。policy 不再直接命令关节，而是每个周期输出一个 64 维的**潜空间运动 token**（`motion_token.{i}.pos`）；SONIC 解码器将该 token 与近期的本体感受历史映射为一个残差 action，该残差 action 经缩放后叠加到站立姿态上，为全部 29 个自由度生成 50 Hz 的关节位置目标。
+
+控制器从 [`lerobot/sonic_decoder`](https://huggingface.co/lerobot/sonic_decoder) 加载其 ONNX 解码器和所有部署常量（PD 增益、`default_angles`、`action_scale` 以及中性 token）。该仓库还附带了蒸馏后的低延迟解码器，可通过控制器的 `policy_type="low_latency"` 参数选择（默认为 `"default"`）。
+
+### 在 simulation 中测试
+
+任何在 SONIC 运动 token 上训练的 token 输出 policy（例如 [`nepyope/sonic_walk`](https://huggingface.co/nepyope/sonic_walk)）都可以驱动它：
+
+```bash
+lerobot-rollout \
+  --strategy.type=base \
+  --policy.path=nepyope/sonic_walk \
+  --policy.device=cuda \
+  --robot.type=unitree_g1 \
+  --robot.is_simulation=true \
+  --robot.controller=SonicWholeBodyController \
+  --robot.cameras='{"ego_view": {"type": "zmq", "server_address": "localhost", "port": 5555, "camera_name": "head_camera", "width": 640, "height": 480, "fps": 30, "warmup_s": 15}}'
+```
+
+### 在物理机器人上运行
+
+在硬件上，请使用[async inference](./async)而不是单一的 `lerobot-rollout` 循环来运行 policy。从笔记本电脑驱动的 rollout 会把网络置于控制回路中间：每一步都会阻塞在 inference 上，一次卡顿就会在机器人站立期间让 50 Hz 的平衡回路停摆。async inference 将两者分开——policy 在你的 GPU 机器上运行，而机器人客户端在 G1 的 Jetson 上运行，因此 SONIC 控制器线程和 `rt/lowcmd` 保持在机载端，只有 64 维的 token 块穿过网络。
+
+三个进程，同时第二部分中的机器人服务器持续运行：
+
+```text
+GPU machine                     G1 (Jetson)
+policy_server  ◄── gRPC ──►  robot_client: UnitreeG1 + SONIC decoder @ 50 Hz
+  checkpoint                        │ ZMQ (lowcmd 6000, lowstate 6001, camera 5555)
+                                    ▼
+                             run_g1_server.py  ◄──► rt/lowcmd, rt/lowstate (DDS)
+```
+
+首先在 GPU 机器上启动 policy server：
+
+```bash
+python -m lerobot.async_inference.policy_server \
+  --host=0.0.0.0 \
+  --port=8080 \
+  --fps=30
+```
+
+在机器人上启动服务器（桥接 + 相机）：
+
+```bash
+python src/lerobot/robots/unitree_g1/run_g1_server.py --camera
+```
+
+然后，在机器人的第二个终端中启动客户端。由于桥接在同一台机器上运行，机器人侧的一切都是回环：
+
+```bash
+python -m lerobot.async_inference.robot_client \
+  --server_address=<GPU_MACHINE_IP>:8080 \
+  --policy_type=pi05 \
+  --pretrained_name_or_path=nepyope/sonic_walk \
+  --policy_device=cuda \
+  --actions_per_chunk=50 \
+  --fps=30 \
+  --task="walk forward" \
+  --robot.type=unitree_g1 \
+  --robot.is_simulation=false \
+  --robot.robot_ip=127.0.0.1 \
+  --robot.controller=SonicWholeBodyController \
+  --robot.cameras='{"ego_view": {"type": "zmq", "server_address": "127.0.0.1", "port": 5555, "camera_name": "head_camera", "width": 640, "height": 480, "fps": 30, "warmup_s": 5}}'
+```
+
+有几点需要注意：
+
+- `--policy_device` 是 _服务器_ 加载 policy 的目标设备——客户端在握手期间发送它。
+- `--actions_per_chunk` 不得超过 checkpoint 的 action chunk 大小（`nepyope/sonic_walk` 为 50）。
+- 使用 `SonicWholeBodyController` 时，observation state 是 64 维的 token 回显，而不是 29 个关节位置，因此 checkpoint 必须针对相同的 state 进行训练。
+
+连接时，机器人在控制器接管之前会将每个关节缓慢移动到解码器的 `default_angles`，因此最初的 policy 命令不会从连接时的姿态突然跳动。
+
+---
+
+## 其他资源
+
+- [Unitree SDK 文档](https://github.com/unitreerobotics/unitree_sdk2_python)
+- [GR00T-WholeBodyControl](https://github.com/NVlabs/GR00T-WholeBodyControl)
+- [Holosoma](https://github.com/amazon-far/holosoma)
+- [LeRobot 文档](https://github.com/huggingface/lerobot)
+- [Unitree IL LeRobot](https://github.com/unitreerobotics/unitree_IL_lerobot)
+
+---
+
+_最后更新：2026 年 7 月_
+
+
+
+<EditOnGithub source="https://github.com/huggingface/lerobot/blob/main/docs/source/unitree_g1.mdx" />
+
+<!--HF DOCBUILD BODY END-->
+
+HF_DOC_BODY_END
+

@@ -1,0 +1,277 @@
+{
+ "file": "libero_plus.mdx",
+ "units": [
+  {
+   "id": 0,
+   "zh": "# LIBERO-plus"
+  },
+  {
+   "id": 1,
+   "zh": "LIBERO-plus 是构建在 [LIBERO](⟦0⟧) 之上的**鲁棒性 benchmark**，用于评估 Vision-Language-Action（VLA）模型。它通过向原始 LIBERO 任务集施加**七个独立的扰动维度**来系统性地压测 policy，揭示标准 benchmark 未能发现的失败模式。"
+  },
+  {
+   "id": 2,
+   "zh": "- 论文：[In-depth Robustness Analysis of Vision-Language-Action Models](⟦0⟧)"
+  },
+  {
+   "id": 3,
+   "zh": "- GitHub：[sylvestf/LIBERO-plus](⟦0⟧)"
+  },
+  {
+   "id": 4,
+   "zh": "- dataset：[lerobot/libero_plus](⟦0⟧)"
+  },
+  {
+   "id": 5,
+   "zh": "## 扰动维度"
+  },
+  {
+   "id": 6,
+   "zh": "LIBERO-plus 通过沿以下轴扰动每个原始 LIBERO 任务，创建了约 10 000 个任务变体："
+  },
+  {
+   "id": 7,
+   "zh": "| 维度                    | 变化内容                                               |"
+  },
+  {
+   "id": 8,
+   "zh": "| 物体布局                | 目标位置、干扰物体的存在与否                           |"
+  },
+  {
+   "id": 9,
+   "zh": "| 相机视角                | 相机位置、朝向、视场角                                |"
+  },
+  {
+   "id": 10,
+   "zh": "| 机器人初始 state           | 机械臂起始位姿                                         |"
+  },
+  {
+   "id": 11,
+   "zh": "| 语言指令                | LLM 改写后的任务描述（改写 / 同义词）                  |"
+  },
+  {
+   "id": 12,
+   "zh": "| 光照条件                | 强度、方向、颜色、阴影                                |"
+  },
+  {
+   "id": 13,
+   "zh": "| 背景纹理                | 场景表面和物体外观                                    |"
+  },
+  {
+   "id": 14,
+   "zh": "| 传感器噪声              | 光度失真和图像退化                                    |"
+  },
+  {
+   "id": 15,
+   "zh": "## 可用的任务套件"
+  },
+  {
+   "id": 16,
+   "zh": "LIBERO-plus 涵盖与 LIBERO 相同的五个套件："
+  },
+  {
+   "id": 17,
+   "zh": "| 套件             | CLI 名称        | 任务数 | 最大步数  | 描述                                                |"
+  },
+  {
+   "id": 18,
+   "zh": "| LIBERO-Spatial | ⟦0⟧ | 10    | 280       | 需要 inference 空间关系的任务                                |"
+  },
+  {
+   "id": 19,
+   "zh": "| LIBERO-Object  | ⟦0⟧  | 10    | 280       | 专注于操作不同物体的任务                              |"
+  },
+  {
+   "id": 20,
+   "zh": "| LIBERO-Goal    | ⟦0⟧    | 10    | 300       | 目标条件任务，目标会发生变化                          |"
+  },
+  {
+   "id": 21,
+   "zh": "| LIBERO-90      | ⟦0⟧      | 90    | 400       | 来自 LIBERO-100 集合的短时域任务                      |"
+  },
+  {
+   "id": 22,
+   "zh": "| LIBERO-Long    | ⟦0⟧      | 10    | 520       | 来自 LIBERO-100 集合的长时域任务                      |"
+  },
+  {
+   "id": 23,
+   "zh": "⟦0⟧\n  安装 LIBERO-plus 会**替换** vanilla LIBERO——它会卸载 ⟦1⟧，\n  从而使 ⟦2⟧ 解析到 LIBERO-plus 分支。你不能同时安装这两个版本。\n  要切换回 vanilla LIBERO，请卸载该分支并使用 ⟦3⟧ 重新安装。"
+  },
+  {
+   "id": 24,
+   "zh": "## 安装"
+  },
+  {
+   "id": 25,
+   "zh": "### 系统依赖（仅限 Linux）"
+  },
+  {
+   "id": 26,
+   "zh": "### Python 包"
+  },
+  {
+   "id": 27,
+   "zh": "LIBERO-plus 从其 GitHub 分支安装，而不是作为 pyproject 额外扩展——该分支以 pip 无法处理的命名空间包形式发布，因此必须克隆它并将其添加到 ⟦0⟧。规范的安装方式请参阅 ⟦1⟧。需要 MuJoCo，因此只支持 Linux。"
+  },
+  {
+   "id": 28,
+   "zh": "⟦0⟧\n在运行评估之前设置 MuJoCo 渲染后端："
+  },
+  {
+   "id": 29,
+   "zh": "### 下载 LIBERO-plus 资源"
+  },
+  {
+   "id": 30,
+   "zh": "LIBERO-plus 单独发布其扩展资源包。从 [Hugging Face dataset](⟦1⟧) 下载 ⟦0⟧，并将其解压到 LIBERO-plus 包目录中："
+  },
+  {
+   "id": 31,
+   "zh": "## 评估"
+  },
+  {
+   "id": 32,
+   "zh": "### 默认评估（推荐）"
+  },
+  {
+   "id": 33,
+   "zh": "在四个标准套件上评估（每个任务 10 个 episode）："
+  },
+  {
+   "id": 34,
+   "zh": "### 单套件评估"
+  },
+  {
+   "id": 35,
+   "zh": "在一个 LIBERO-plus 套件上评估："
+  },
+  {
+   "id": 36,
+   "zh": "- ⟦0⟧ 用于选择套件（⟦1⟧、⟦2⟧ 等）。"
+  },
+  {
+   "id": 37,
+   "zh": "- ⟦0⟧ 用于限制为特定的任务索引（⟦1⟧、⟦2⟧ 等）。省略该项可运行套件中的所有任务。"
+  },
+  {
+   "id": 38,
+   "zh": "- ⟦0⟧ 控制并行运行多少个环境。"
+  },
+  {
+   "id": 39,
+   "zh": "- ⟦0⟧ 设置每个任务运行多少个 episode。"
+  },
+  {
+   "id": 40,
+   "zh": "### 多套件评估"
+  },
+  {
+   "id": 41,
+   "zh": "通过传递逗号分隔的列表，一次在多个套件上对 policy 进行 benchmark："
+  },
+  {
+   "id": 42,
+   "zh": "### 控制模式"
+  },
+  {
+   "id": 43,
+   "zh": "LIBERO-plus 支持两种控制模式——⟦0⟧（默认）和 ⟦1⟧。不同的 VLA checkpoint 使用不同的 action 参数化进行训练，因此请确保模式与你的 policy 匹配："
+  },
+  {
+   "id": 44,
+   "zh": "### 重置性能"
+  },
+  {
+   "id": 45,
+   "zh": "默认情况下，LeRobot 保留 LIBERO 的硬重置行为。在启用固定初始 state 后，你可以选择软重置，以跳过在每个 episode 重建 simulation 器模型和渲染器："
+  },
+  {
+   "id": 46,
+   "zh": "软重置更快，但在环境的稳定步进之后与硬重置并非完全一致，因此相机 observation 和 policy 结果可能会有轻微差异。在复现 benchmark 结果时请使用硬重置。"
+  },
+  {
+   "id": 47,
+   "zh": "### policy 输入和输出"
+  },
+  {
+   "id": 48,
+   "zh": "**observation：**"
+  },
+  {
+   "id": 49,
+   "zh": "- ⟦0⟧ — 8 维本体感受特征（end-effector 位置、轴角朝向、gripper qpos）"
+  },
+  {
+   "id": 50,
+   "zh": "- ⟦0⟧ — 主相机视角（⟦1⟧），HWC uint8"
+  },
+  {
+   "id": 51,
+   "zh": "- ⟦0⟧ — 腕部相机视角（⟦1⟧），HWC uint8"
+  },
+  {
+   "id": 52,
+   "zh": "**action：**"
+  },
+  {
+   "id": 53,
+   "zh": "- ⟦0⟧ 中的连续控制 — 6D end-effector 增量 + 1D gripper"
+  },
+  {
+   "id": 54,
+   "zh": "### 推荐的评估 episode 数"
+  },
+  {
+   "id": 55,
+   "zh": "为了可复现的 benchmark，请在全部四个标准套件（Spatial、Object、Goal、Long）中使用**每个任务 10 个 episode**。这样总共得到 400 个 episode，与已发表结果所用的协议一致。"
+  },
+  {
+   "id": 56,
+   "zh": "## 训练"
+  },
+  {
+   "id": 57,
+   "zh": "### dataset"
+  },
+  {
+   "id": 58,
+   "zh": "LIBERO-plus 的 LeRobot 格式训练 dataset 可在以下位置获取："
+  },
+  {
+   "id": 59,
+   "zh": "- [lerobot/libero_plus](⟦0⟧)"
+  },
+  {
+   "id": 60,
+   "zh": "### 示例训练命令"
+  },
+  {
+   "id": 61,
+   "zh": "## 与 LIBERO 的关系"
+  },
+  {
+   "id": 62,
+   "zh": "LIBERO-plus 是 LIBERO 的直接扩展："
+  },
+  {
+   "id": 63,
+   "zh": "- 相同的 Python gym 接口（⟦0⟧、⟦1⟧）"
+  },
+  {
+   "id": 64,
+   "zh": "- 相同的相机名称和 observation/action 格式"
+  },
+  {
+   "id": 65,
+   "zh": "- 相同的任务套件名称"
+  },
+  {
+   "id": 66,
+   "zh": "- 以相同的 ⟦0⟧ Python 包名安装（不同的 GitHub 仓库）"
+  },
+  {
+   "id": 67,
+   "zh": "要使用原始的 LIBERO benchmark，请参阅 [LIBERO](⟦0⟧)，并使用 ⟦1⟧。"
+  }
+ ]
+}

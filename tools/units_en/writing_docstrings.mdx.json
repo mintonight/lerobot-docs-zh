@@ -1,0 +1,724 @@
+{
+ "file": "writing_docstrings.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1944,
+   "text": "# Writing docstrings",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1946,
+   "end": 2179,
+   "text": "LeRobot's API reference is generated directly from the docstrings in ⟦0⟧. A docstring is not a\ncomment — it is the published documentation for that object, and the format below is what the renderer and\nthe CI checks parse.",
+   "tokens": [
+    "`src/lerobot/`"
+   ]
+  },
+  {
+   "id": 2,
+   "kind": "para",
+   "start": 2181,
+   "end": 2282,
+   "text": "This page is the contract. If you are adding or editing anything public in ⟦0⟧, follow it.",
+   "tokens": [
+    "`src/lerobot/`"
+   ]
+  },
+  {
+   "id": 3,
+   "kind": "quote",
+   "start": 2284,
+   "end": 2553,
+   "text": "> [!IMPORTANT]\n> **An undocumented public method is an invisible one.** ⟦0⟧ silently skips members that have no\n> docstring — no warning, no error, it simply does not appear on the rendered page. Coverage and\n> API-reference completeness are the same problem.",
+   "tokens": [
+    "`[[autodoc]]`"
+   ]
+  },
+  {
+   "id": 4,
+   "kind": "heading",
+   "start": 2555,
+   "end": 2583,
+   "text": "## The format in one example",
+   "tokens": []
+  },
+  {
+   "id": 5,
+   "kind": "para",
+   "start": 2585,
+   "end": 2666,
+   "text": "Google section headers, Hugging Face type formatting. Both, not one or the other.",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "para",
+   "start": 3486,
+   "end": 3786,
+   "text": "        >>> from lerobot.robots.so_follower import SO101Follower, SO101FollowerConfig\n        >>> robot = SO101Follower(SO101FollowerConfig(port=\"/dev/ttyACM0\"))  # doctest: +SKIP\n        >>> robot.connect()  # doctest: +SKIP\n        >>> robot.send_action(⟦0⟧)  # doctest: +SKIP",
+   "tokens": [
+    "{\"shoulder_pan.pos\": 0.0}"
+   ]
+  },
+  {
+   "id": 7,
+   "kind": "para",
+   "start": 3813,
+   "end": 3983,
+   "text": "Cross-references are omitted from the examples on this page — see [Cross-references](⟦0⟧) for\ntheir syntax and why they cannot be shown inside a code block.",
+   "tokens": [
+    "#cross-references"
+   ]
+  },
+  {
+   "id": 8,
+   "kind": "heading",
+   "start": 3985,
+   "end": 3993,
+   "text": "## Rules",
+   "tokens": []
+  },
+  {
+   "id": 9,
+   "kind": "heading",
+   "start": 3995,
+   "end": 4007,
+   "text": "### Sections",
+   "tokens": []
+  },
+  {
+   "id": 10,
+   "kind": "para",
+   "start": 4078,
+   "end": 4209,
+   "text": "In that order. No other section headers. A one-line summary comes first, then an optional free-form\ndescription, then the sections.",
+   "tokens": []
+  },
+  {
+   "id": 11,
+   "kind": "heading",
+   "start": 4211,
+   "end": 4249,
+   "text": "### The ⟦0⟧ line is machine-parsed",
+   "tokens": [
+    "`Args:`"
+   ]
+  },
+  {
+   "id": 12,
+   "kind": "para",
+   "start": 4347,
+   "end": 4599,
+   "text": "The ⟦0⟧ clause is **checked against the real signature default** by\n⟦1⟧. It is not decorative — if you write a default that has drifted from the code, CI\nfails. Omit the clause entirely for required parameters:",
+   "tokens": [
+    "`*optional*, defaults to`",
+    "`make check-docstrings`"
+   ]
+  },
+  {
+   "id": 13,
+   "kind": "para",
+   "start": 5037,
+   "end": 5162,
+   "text": "Types go in backticks. Use ⟦0⟧ with no ⟦1⟧ when the default is ⟦2⟧ or is otherwise not\nworth restating.",
+   "tokens": [
+    "`*optional*`",
+    "`defaults to`",
+    "`None`"
+   ]
+  },
+  {
+   "id": 14,
+   "kind": "heading",
+   "start": 5164,
+   "end": 5192,
+   "text": "### ⟦0⟧ is type-first",
+   "tokens": [
+    "`Returns:`"
+   ]
+  },
+  {
+   "id": 15,
+   "kind": "para",
+   "start": 5194,
+   "end": 5260,
+   "text": "One indented line, type first, then a colon, then the description:",
+   "tokens": []
+  },
+  {
+   "id": 16,
+   "kind": "para",
+   "start": 5383,
+   "end": 5414,
+   "text": "⟦0⟧ takes the same shape.",
+   "tokens": [
+    "`Yields:`"
+   ]
+  },
+  {
+   "id": 17,
+   "kind": "heading",
+   "start": 5416,
+   "end": 5458,
+   "text": "### ⟦0⟧, never ⟦1⟧",
+   "tokens": [
+    "`**Attributes**:`",
+    "`Attributes:`"
+   ]
+  },
+  {
+   "id": 18,
+   "kind": "para",
+   "start": 5460,
+   "end": 5724,
+   "text": "doc-builder parses a bare ⟦0⟧ as a **synonym for ⟦1⟧**, so your attributes get rendered\nas constructor arguments. This is silent and wrong. Whenever the attributes differ from the constructor\nparameters, use the bold form with a ⟦2⟧ separator:",
+   "tokens": [
+    "`Attributes:`",
+    "`Parameters:`",
+    "`--`"
+   ]
+  },
+  {
+   "id": 19,
+   "kind": "para",
+   "start": 6045,
+   "end": 6064,
+   "text": "Note ⟦0⟧, not ⟦1⟧.",
+   "tokens": [
+    "`--`",
+    "`:`"
+   ]
+  },
+  {
+   "id": 20,
+   "kind": "heading",
+   "start": 6066,
+   "end": 6086,
+   "text": "### Cross-references",
+   "tokens": []
+  },
+  {
+   "id": 21,
+   "kind": "para",
+   "start": 6088,
+   "end": 6262,
+   "text": "Use doc-builder's bracket syntax: a square-bracketed backtick-quoted path. **Sphinx roles (⟦0⟧,\n⟦1⟧) are not supported** and render as literal text on the page.",
+   "tokens": [
+    "`:pymeth:`",
+    "`:pyattr:`"
+   ]
+  },
+  {
+   "id": 22,
+   "kind": "table",
+   "start": 6264,
+   "end": 6334,
+   "text": "| Want                         | Write                               |",
+   "tokens": []
+  },
+  {
+   "id": 23,
+   "kind": "table",
+   "start": 6406,
+   "end": 6476,
+   "text": "| Class in the main package    | &#91;⟦0⟧&#93;                   |",
+   "tokens": [
+    "`Robot`"
+   ]
+  },
+  {
+   "id": 24,
+   "kind": "table",
+   "start": 6477,
+   "end": 6547,
+   "text": "| Method, show the full path   | &#91;⟦0⟧&#93;           |",
+   "tokens": [
+    "`Robot.connect`"
+   ]
+  },
+  {
+   "id": 25,
+   "kind": "table",
+   "start": 6548,
+   "end": 6618,
+   "text": "| Method, show the bare name   | &#91;⟦0⟧&#93;          |",
+   "tokens": [
+    "`~Robot.connect`"
+   ]
+  },
+  {
+   "id": 26,
+   "kind": "table",
+   "start": 6619,
+   "end": 6689,
+   "text": "| Nested path                  | &#91;⟦0⟧&#93;   |",
+   "tokens": [
+    "`~robots.Robot.connect`"
+   ]
+  },
+  {
+   "id": 27,
+   "kind": "table",
+   "start": 6690,
+   "end": 6760,
+   "text": "| Object in another HF library | &#91;⟦0⟧&#93; |",
+   "tokens": [
+    "`~accelerate.Accelerator`"
+   ]
+  },
+  {
+   "id": 28,
+   "kind": "para",
+   "start": 6762,
+   "end": 6856,
+   "text": "The ⟦0⟧ strips the path from the **link text only**; the link still resolves to the full path.",
+   "tokens": [
+    "`~`"
+   ]
+  },
+  {
+   "id": 29,
+   "kind": "quote",
+   "start": 6858,
+   "end": 7278,
+   "text": "> [!NOTE]\n> doc-builder resolves this syntax everywhere in a page — including inside fenced code blocks. That is why\n> the docstring examples on this page use plain prose instead of cross-references: a code block containing\n> one would render the resolved link rather than the syntax you need to type. In your own docstrings, use\n> cross-references freely; this restriction only affects documentation _about_ the syntax.",
+   "tokens": []
+  },
+  {
+   "id": 30,
+   "kind": "heading",
+   "start": 7280,
+   "end": 7292,
+   "text": "### Callouts",
+   "tokens": []
+  },
+  {
+   "id": 31,
+   "kind": "para",
+   "start": 7294,
+   "end": 7323,
+   "text": "Use GitHub-style blockquotes:",
+   "tokens": []
+  },
+  {
+   "id": 32,
+   "kind": "para",
+   "start": 7502,
+   "end": 7570,
+   "text": "The ⟦0⟧ component is legacy per doc-builder; don't add new ones.",
+   "tokens": [
+    "`<Tip>`"
+   ]
+  },
+  {
+   "id": 33,
+   "kind": "heading",
+   "start": 7572,
+   "end": 7599,
+   "text": "### Examples must be fenced",
+   "tokens": []
+  },
+  {
+   "id": 34,
+   "kind": "para",
+   "start": 7601,
+   "end": 7782,
+   "text": "An example lives inside a fenced ⟦0⟧`⟦1⟧ block containing ⟦2⟧. The fence is what makes it render\nas a code block, and it is what the doctest preprocessor's regex looks for:",
+   "tokens": [
+    "` `",
+    "`python `",
+    "`>>> `"
+   ]
+  },
+  {
+   "id": 35,
+   "kind": "para",
+   "start": 7826,
+   "end": 7996,
+   "text": "        >>> from lerobot.robots.so_follower import SO101FollowerConfig\n        >>> cfg = SO101FollowerConfig(port=\"/dev/ttyACM0\")\n        >>> cfg.use_degrees\n        True",
+   "tokens": []
+  },
+  {
+   "id": 36,
+   "kind": "quote",
+   "start": 8015,
+   "end": 8227,
+   "text": "> [!WARNING]\n> An unfenced ⟦0⟧ is still collected — doctest finds prompts anywhere in a docstring. What you lose is the\n> rendering, so it shows up as a wall of prose on the page. Every example needs the fence.",
+   "tokens": [
+    "`>>>`"
+   ]
+  },
+  {
+   "id": 37,
+   "kind": "para",
+   "start": 8229,
+   "end": 8374,
+   "text": "Every example either executes in CI or carries ⟦0⟧. Anything that touches hardware, a GPU, or\ndownloads from the Hub gets ⟦1⟧:",
+   "tokens": [
+    "`# doctest: +SKIP`",
+    "`+SKIP`"
+   ]
+  },
+  {
+   "id": 38,
+   "kind": "para",
+   "start": 8418,
+   "end": 8573,
+   "text": "        >>> robot.connect()  # doctest: +SKIP\n        >>> policy = ACTPolicy.from_pretrained(\"lerobot/act_aloha_sim_transfer_cube_human\")  # doctest: +SKIP",
+   "tokens": []
+  },
+  {
+   "id": 39,
+   "kind": "para",
+   "start": 8592,
+   "end": 8666,
+   "text": "Add files containing runnable examples to ⟦0⟧.",
+   "tokens": [
+    "`utils/documentation_tests.txt`"
+   ]
+  },
+  {
+   "id": 40,
+   "kind": "para",
+   "start": 8668,
+   "end": 8776,
+   "text": "Put examples on the three to five genuine entry points of a module. Examples on trivial accessors are noise.",
+   "tokens": []
+  },
+  {
+   "id": 41,
+   "kind": "heading",
+   "start": 8778,
+   "end": 8819,
+   "text": "## Three patterns you will hit constantly",
+   "tokens": []
+  },
+  {
+   "id": 42,
+   "kind": "heading",
+   "start": 8821,
+   "end": 8843,
+   "text": "### Config dataclasses",
+   "tokens": []
+  },
+  {
+   "id": 43,
+   "kind": "para",
+   "start": 8845,
+   "end": 9105,
+   "text": "Configuration fields are historically documented with ⟦0⟧ comments above each field. **doc-builder cannot\nsee inline comments** — such a class renders with every field listed and not a single description. Move them\ninto an ⟦1⟧ block on the class docstring:",
+   "tokens": [
+    "`#`",
+    "`Args:`"
+   ]
+  },
+  {
+   "id": 44,
+   "kind": "quote",
+   "start": 9832,
+   "end": 9992,
+   "text": "> [!IMPORTANT]\n> **doc-builder does not inherit docstrings from base classes.** LeRobot's registered config classes are\n> often thin multiple-inheritance shims:",
+   "tokens": []
+  },
+  {
+   "id": 45,
+   "kind": "quote",
+   "start": 10152,
+   "end": 10417,
+   "text": "> That class renders **every** field — including the ones it inherits — with no descriptions at all, no\n> matter how well the bases are documented. The ⟦0⟧ block must live on the concrete class that\n> ⟦1⟧ names, and it must cover inherited fields too.",
+   "tokens": [
+    "`Args:`",
+    "`[[autodoc]]`"
+   ]
+  },
+  {
+   "id": 46,
+   "kind": "heading",
+   "start": 10419,
+   "end": 10457,
+   "text": "### Base class, then concrete subclass",
+   "tokens": []
+  },
+  {
+   "id": 47,
+   "kind": "para",
+   "start": 10459,
+   "end": 10674,
+   "text": "The abstract base carries the canonical contract. Subclasses document only what deviates — port semantics,\ncalibration quirks, motor layout, supported feature keys. Do not copy the base contract into every subclass.",
+   "tokens": []
+  },
+  {
+   "id": 48,
+   "kind": "para",
+   "start": 10676,
+   "end": 10786,
+   "text": "⟦0⟧, ⟦1⟧, ⟦2⟧, ⟦3⟧, ⟦4⟧, and ⟦5⟧ all follow this\nshape.",
+   "tokens": [
+    "`Robot`",
+    "`Teleoperator`",
+    "`Camera`",
+    "`MotorsBus`",
+    "`ProcessorStep`",
+    "`PreTrainedPolicy`"
+   ]
+  },
+  {
+   "id": 49,
+   "kind": "heading",
+   "start": 10788,
+   "end": 10812,
+   "text": "### Module-level aliases",
+   "tokens": []
+  },
+  {
+   "id": 50,
+   "kind": "para",
+   "start": 10814,
+   "end": 10876,
+   "text": "Several public names are aliases rather than distinct classes:",
+   "tokens": []
+  },
+  {
+   "id": 51,
+   "kind": "para",
+   "start": 10981,
+   "end": 11305,
+   "text": "⟦0⟧ resolves the alias and renders the **canonical** class name, so a ⟦1⟧\nheading will show ⟦2⟧ in the body. Document the\ncanonical class once, and mention the aliases in the page's prose rather than giving each alias its own\nautodoc block.",
+   "tokens": [
+    "`[[autodoc]]`",
+    "`## SO101FollowerConfig`",
+    "`class lerobot.robots.so_follower.SOFollowerRobotConfig`"
+   ]
+  },
+  {
+   "id": 52,
+   "kind": "heading",
+   "start": 11307,
+   "end": 11330,
+   "text": "## What not to document",
+   "tokens": []
+  },
+  {
+   "id": 53,
+   "kind": "list",
+   "start": 11332,
+   "end": 11412,
+   "text": "- **Private members.** Anything starting with ⟦0⟧ is not part of the public API.",
+   "tokens": [
+    "`_`"
+   ]
+  },
+  {
+   "id": 54,
+   "kind": "list",
+   "start": 11413,
+   "end": 11517,
+   "text": "- **The type annotation restated as prose.** ⟦0⟧str⟦1⟧ adds nothing. Say what it is for.",
+   "tokens": [
+    "`port (`",
+    "`): A string.`"
+   ]
+  },
+  {
+   "id": 55,
+   "kind": "list",
+   "start": 11518,
+   "end": 11823,
+   "text": "- **Vendored upstream code.** ⟦0⟧ is vendored from\n  ⟦1⟧ and already carries upstream-style docstrings. Leave it alone — restyling it only creates\n  conflicts on the next sync. It is excluded from the API reference and from the docstring checks.",
+   "tokens": [
+    "`src/lerobot/policies/molmoact2/molmoact2_hf_model/`",
+    "`transformers`"
+   ]
+  },
+  {
+   "id": 56,
+   "kind": "heading",
+   "start": 11825,
+   "end": 11848,
+   "text": "## How this is enforced",
+   "tokens": []
+  },
+  {
+   "id": 57,
+   "kind": "table",
+   "start": 11850,
+   "end": 11988,
+   "text": "| Check                     | What it catches                                                                                            |",
+   "tokens": []
+  },
+  {
+   "id": 58,
+   "kind": "table",
+   "start": 12128,
+   "end": 12266,
+   "text": "| ⟦0⟧   | An ⟦1⟧ entry that doesn't match the signature; a documented default that has drifted from the real one |",
+   "tokens": [
+    "`make check-docstrings`",
+    "`Args:`"
+   ]
+  },
+  {
+   "id": 59,
+   "kind": "table",
+   "start": 12267,
+   "end": 12405,
+   "text": "| ⟦0⟧            | Examples that no longer run                                                                                |",
+   "tokens": [
+    "`make doctest`"
+   ]
+  },
+  {
+   "id": 60,
+   "kind": "table",
+   "start": 12406,
+   "end": 12544,
+   "text": "| ⟦0⟧ | Stale or unsorted entries in ⟦1⟧                                               |",
+   "tokens": [
+    "`make check-doctest-list`",
+    "`utils/documentation_tests.txt`"
+   ]
+  },
+  {
+   "id": 61,
+   "kind": "table",
+   "start": 12545,
+   "end": 12683,
+   "text": "| ⟦0⟧ (⟦1⟧ rules)        | Google-convention style violations                                                                         |",
+   "tokens": [
+    "`ruff`",
+    "`D`"
+   ]
+  },
+  {
+   "id": 62,
+   "kind": "table",
+   "start": 12684,
+   "end": 12822,
+   "text": "| ⟦0⟧             | Docstring coverage falling below the current threshold                                                     |",
+   "tokens": [
+    "`interrogate`"
+   ]
+  },
+  {
+   "id": 63,
+   "kind": "table",
+   "start": 12823,
+   "end": 12961,
+   "text": "| doc-builder               | A ⟦0⟧ path that points at something that doesn't exist — this breaks the docs build              |",
+   "tokens": [
+    "`[[autodoc]]`"
+   ]
+  },
+  {
+   "id": 64,
+   "kind": "para",
+   "start": 12963,
+   "end": 13001,
+   "text": "Run them together before opening a PR:",
+   "tokens": []
+  },
+  {
+   "id": 65,
+   "kind": "para",
+   "start": 13084,
+   "end": 13129,
+   "text": "Then render the page and actually look at it:",
+   "tokens": []
+  },
+  {
+   "id": 66,
+   "kind": "heading",
+   "start": 13210,
+   "end": 13222,
+   "text": "## Checklist",
+   "tokens": []
+  },
+  {
+   "id": 67,
+   "kind": "list",
+   "start": 13224,
+   "end": 13278,
+   "text": "- [ ] Every public member you touched has a docstring.",
+   "tokens": []
+  },
+  {
+   "id": 68,
+   "kind": "list",
+   "start": 13279,
+   "end": 13375,
+   "text": "- [ ] Every ⟦0⟧ entry matches the signature, including the ⟦1⟧ clause.",
+   "tokens": [
+    "`Args:`",
+    "`*optional*, defaults to`"
+   ]
+  },
+  {
+   "id": 69,
+   "kind": "list",
+   "start": 13376,
+   "end": 13428,
+   "text": "- [ ] ⟦0⟧ is type-first on one indented line.",
+   "tokens": [
+    "`Returns:`"
+   ]
+  },
+  {
+   "id": 70,
+   "kind": "list",
+   "start": 13429,
+   "end": 13502,
+   "text": "- [ ] No bare ⟦0⟧ — use ⟦1⟧ with ⟦2⟧ separators.",
+   "tokens": [
+    "`Attributes:`",
+    "`**Attributes**:`",
+    "`--`"
+   ]
+  },
+  {
+   "id": 71,
+   "kind": "list",
+   "start": 13503,
+   "end": 13581,
+   "text": "- [ ] No Sphinx roles — cross-references use &#91;⟦0⟧&#93;.",
+   "tokens": [
+    "`~module.Class.method`"
+   ]
+  },
+  {
+   "id": 72,
+   "kind": "list",
+   "start": 13582,
+   "end": 13687,
+   "text": "- [ ] Examples are inside a fenced ⟦0⟧`⟦1⟧ block, and either run in CI or carry ⟦2⟧.",
+   "tokens": [
+    "` `",
+    "`python `",
+    "`# doctest: +SKIP`"
+   ]
+  },
+  {
+   "id": 73,
+   "kind": "list",
+   "start": 13688,
+   "end": 13782,
+   "text": "- [ ] Config dataclass fields are in an ⟦0⟧ block on the concrete class, not ⟦1⟧ comments.",
+   "tokens": [
+    "`Args:`",
+    "`#`"
+   ]
+  },
+  {
+   "id": 74,
+   "kind": "list",
+   "start": 13783,
+   "end": 13826,
+   "text": "- [ ] The rendered page has been eyeballed.",
+   "tokens": []
+  }
+ ]
+}

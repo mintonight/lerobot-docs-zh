@@ -1,0 +1,742 @@
+{
+ "file": "streaming_video_encoding.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1956,
+   "text": "# Streaming Video Encoding Guide",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "heading",
+   "start": 1958,
+   "end": 1972,
+   "text": "## 1. Overview",
+   "tokens": []
+  },
+  {
+   "id": 2,
+   "kind": "para",
+   "start": 1974,
+   "end": 2084,
+   "text": "Streaming video encoding eliminates the traditional PNG round-trip during video dataset recording. Instead of:",
+   "tokens": []
+  },
+  {
+   "id": 3,
+   "kind": "list",
+   "start": 2086,
+   "end": 2187,
+   "text": "1. Capture frame -> write PNG to disk -> (at episode end) read PNG's -> encode to MP4 -> delete PNG's",
+   "tokens": []
+  },
+  {
+   "id": 4,
+   "kind": "para",
+   "start": 2189,
+   "end": 2239,
+   "text": "Frames can be encoded in real-time during capture:",
+   "tokens": []
+  },
+  {
+   "id": 5,
+   "kind": "list",
+   "start": 2241,
+   "end": 2310,
+   "text": "1. Capture frame -> queue to encoder thread -> encode to MP4 directly",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "para",
+   "start": 2312,
+   "end": 2536,
+   "text": "This makes ⟦0⟧ near-instant (the video is already encoded by the time the episode ends) and removes the blocking wait that previously occurred between episodes, especially with multiple cameras in long episodes.",
+   "tokens": [
+    "`save_episode()`"
+   ]
+  },
+  {
+   "id": 7,
+   "kind": "heading",
+   "start": 2538,
+   "end": 2561,
+   "text": "## 2. Tuning Parameters",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "table",
+   "start": 2563,
+   "end": 2726,
+   "text": "| Parameter               | CLI Flag                          | Type          | Default       | Description                                                       |",
+   "tokens": []
+  },
+  {
+   "id": 9,
+   "kind": "table",
+   "start": 2891,
+   "end": 3054,
+   "text": "| ⟦0⟧    | ⟦1⟧    | ⟦2⟧        | ⟦3⟧        | Enable real-time encoding during capture                          |",
+   "tokens": [
+    "`streaming_encoding`",
+    "`--dataset.streaming_encoding`",
+    "`bool`",
+    "`True`"
+   ]
+  },
+  {
+   "id": 10,
+   "kind": "table",
+   "start": 3055,
+   "end": 3218,
+   "text": "| ⟦0⟧                | ⟦1⟧    | ⟦2⟧         | ⟦3⟧ | Video codec. ⟦4⟧ detects best HW encoder                     |",
+   "tokens": [
+    "`vcodec`",
+    "`--dataset.rgb_encoder.vcodec`",
+    "`str`",
+    "`\"libsvtav1\"`",
+    "`\"auto\"`"
+   ]
+  },
+  {
+   "id": 11,
+   "kind": "table",
+   "start": 3219,
+   "end": 3382,
+   "text": "| ⟦0⟧       | ⟦1⟧       | ⟦2⟧ | ⟦3⟧ (auto) | Threads per encoder instance. ⟦4⟧ will leave the vcoded decide |",
+   "tokens": [
+    "`encoder_threads`",
+    "`--dataset.encoder_threads`",
+    "`int \\| None`",
+    "`None`",
+    "`None`"
+   ]
+  },
+  {
+   "id": 12,
+   "kind": "table",
+   "start": 3383,
+   "end": 3546,
+   "text": "| ⟦0⟧ | ⟦1⟧ | ⟦2⟧         | ⟦3⟧          | Max buffered frames per camera (~1s at 30fps). Consumes RAM       |",
+   "tokens": [
+    "`encoder_queue_maxsize`",
+    "`--dataset.encoder_queue_maxsize`",
+    "`int`",
+    "`30`"
+   ]
+  },
+  {
+   "id": 13,
+   "kind": "heading",
+   "start": 3548,
+   "end": 3580,
+   "text": "## 3. Performance Considerations",
+   "tokens": []
+  },
+  {
+   "id": 14,
+   "kind": "para",
+   "start": 3582,
+   "end": 3727,
+   "text": "Streaming encoding means the CPU is encoding video **during** the capture loop, not after. This creates a CPU budget that must be shared between:",
+   "tokens": []
+  },
+  {
+   "id": 15,
+   "kind": "list",
+   "start": 3729,
+   "end": 3808,
+   "text": "- **Control loop** (reading cameras, control the robot, writing non-video data)",
+   "tokens": []
+  },
+  {
+   "id": 16,
+   "kind": "list",
+   "start": 3809,
+   "end": 3852,
+   "text": "- **Encoder threads** (one pool per camera)",
+   "tokens": []
+  },
+  {
+   "id": 17,
+   "kind": "list",
+   "start": 3853,
+   "end": 3891,
+   "text": "- **Rerun visualization** (if enabled)",
+   "tokens": []
+  },
+  {
+   "id": 18,
+   "kind": "list",
+   "start": 3892,
+   "end": 3920,
+   "text": "- **OS and other processes**",
+   "tokens": []
+  },
+  {
+   "id": 19,
+   "kind": "heading",
+   "start": 3922,
+   "end": 3963,
+   "text": "### Resolution & Number of Cameras Impact",
+   "tokens": []
+  },
+  {
+   "id": 20,
+   "kind": "table",
+   "start": 3965,
+   "end": 4069,
+   "text": "| Setup                     | Throughput (px/sec) | CPU Encoding Load | Notes                          |",
+   "tokens": []
+  },
+  {
+   "id": 21,
+   "kind": "table",
+   "start": 4175,
+   "end": 4279,
+   "text": "| 2camsx 640x480x3 @30fps   | 55M                 | Low               | Works on most systems          |",
+   "tokens": []
+  },
+  {
+   "id": 22,
+   "kind": "table",
+   "start": 4280,
+   "end": 4384,
+   "text": "| 2camsx 1280x720x3 @30fps  | 165M                | Moderate          | Comfortable on modern systems  |",
+   "tokens": []
+  },
+  {
+   "id": 23,
+   "kind": "table",
+   "start": 4385,
+   "end": 4489,
+   "text": "| 2camsx 1920x1080x3 @30fps | 373M                | High              | Requires powerful high-end CPU |",
+   "tokens": []
+  },
+  {
+   "id": 24,
+   "kind": "heading",
+   "start": 4491,
+   "end": 4519,
+   "text": "### ⟦0⟧ Tuning",
+   "tokens": [
+    "`encoder_threads`"
+   ]
+  },
+  {
+   "id": 25,
+   "kind": "para",
+   "start": 4521,
+   "end": 4600,
+   "text": "This parameter controls how many threads each encoder instance uses internally:",
+   "tokens": []
+  },
+  {
+   "id": 26,
+   "kind": "list",
+   "start": 4602,
+   "end": 4730,
+   "text": "- **Higher values** (e.g., 4-5): Faster encoding, but uses more CPU cores per camera. Good for high-end systems with many cores.",
+   "tokens": []
+  },
+  {
+   "id": 27,
+   "kind": "list",
+   "start": 4731,
+   "end": 4870,
+   "text": "- **Lower values** (e.g., 1-2): Less CPU per camera, freeing cores for capture and visualization. Good for low-res images and capable CPUs.",
+   "tokens": []
+  },
+  {
+   "id": 28,
+   "kind": "list",
+   "start": 4871,
+   "end": 4958,
+   "text": "- **⟦0⟧ (default)**: Lets the codec decide. Information available in the codec logs.",
+   "tokens": [
+    "`None`"
+   ]
+  },
+  {
+   "id": 29,
+   "kind": "heading",
+   "start": 4960,
+   "end": 4995,
+   "text": "### Backpressure and Frame Dropping",
+   "tokens": []
+  },
+  {
+   "id": 30,
+   "kind": "para",
+   "start": 4997,
+   "end": 5106,
+   "text": "Each camera has a bounded queue (⟦0⟧, default 30 frames). When the encoder can't keep up:",
+   "tokens": [
+    "`encoder_queue_maxsize`"
+   ]
+  },
+  {
+   "id": 31,
+   "kind": "list",
+   "start": 5108,
+   "end": 5145,
+   "text": "1. The queue fills up (consuming RAM)",
+   "tokens": []
+  },
+  {
+   "id": 32,
+   "kind": "list",
+   "start": 5146,
+   "end": 5232,
+   "text": "2. New frames are **dropped** (not blocked) — the capture loop continues uninterrupted",
+   "tokens": []
+  },
+  {
+   "id": 33,
+   "kind": "list",
+   "start": 5233,
+   "end": 5312,
+   "text": "3. A warning is logged: ⟦0⟧",
+   "tokens": [
+    "`\"Encoder queue full for {camera}, dropped N frame(s)\"`"
+   ]
+  },
+  {
+   "id": 34,
+   "kind": "list",
+   "start": 5313,
+   "end": 5376,
+   "text": "4. At episode end, total dropped frames per camera are reported",
+   "tokens": []
+  },
+  {
+   "id": 35,
+   "kind": "heading",
+   "start": 5378,
+   "end": 5416,
+   "text": "### Symptoms of Encoder Falling Behind",
+   "tokens": []
+  },
+  {
+   "id": 36,
+   "kind": "list",
+   "start": 5418,
+   "end": 5476,
+   "text": "- **System feels laggy and freezes**: all CPUs are at 100%",
+   "tokens": []
+  },
+  {
+   "id": 37,
+   "kind": "list",
+   "start": 5477,
+   "end": 5574,
+   "text": "- **Dropped frame warnings** in the log or lower frames/FPS than expected in the recorded dataset",
+   "tokens": []
+  },
+  {
+   "id": 38,
+   "kind": "list",
+   "start": 5575,
+   "end": 5672,
+   "text": "- **Choppy robot movement**: If CPU is severely overloaded, even the capture loop may be affected",
+   "tokens": []
+  },
+  {
+   "id": 39,
+   "kind": "list",
+   "start": 5673,
+   "end": 5738,
+   "text": "- **Accumulated rerun lag**: Visualization falls behind real-time",
+   "tokens": []
+  },
+  {
+   "id": 40,
+   "kind": "heading",
+   "start": 5740,
+   "end": 5775,
+   "text": "## 4. Hardware-Accelerated Encoding",
+   "tokens": []
+  },
+  {
+   "id": 41,
+   "kind": "heading",
+   "start": 5777,
+   "end": 5792,
+   "text": "### When to Use",
+   "tokens": []
+  },
+  {
+   "id": 42,
+   "kind": "para",
+   "start": 5794,
+   "end": 5815,
+   "text": "Use HW encoding when:",
+   "tokens": []
+  },
+  {
+   "id": 43,
+   "kind": "list",
+   "start": 5817,
+   "end": 5882,
+   "text": "- CPU is the bottleneck (dropped frames, choppy robot, rerun lag)",
+   "tokens": []
+  },
+  {
+   "id": 44,
+   "kind": "list",
+   "start": 5883,
+   "end": 5940,
+   "text": "- You have compatible hardware (GPU or dedicated encoder)",
+   "tokens": []
+  },
+  {
+   "id": 45,
+   "kind": "list",
+   "start": 5941,
+   "end": 6017,
+   "text": "- You're recording at high throughput (high resolution or with many cameras)",
+   "tokens": []
+  },
+  {
+   "id": 46,
+   "kind": "heading",
+   "start": 6019,
+   "end": 6039,
+   "text": "### Choosing a Codec",
+   "tokens": []
+  },
+  {
+   "id": 47,
+   "kind": "table",
+   "start": 6041,
+   "end": 6172,
+   "text": "| Codec                 | CPU Usage | File Size      | Quality | Notes                                                            |",
+   "tokens": []
+  },
+  {
+   "id": 48,
+   "kind": "table",
+   "start": 6305,
+   "end": 6436,
+   "text": "| ⟦0⟧ (default) | High      | Smallest       | Best    | Default. Best compression but most CPU-intensive                 |",
+   "tokens": [
+    "`libsvtav1`"
+   ]
+  },
+  {
+   "id": 49,
+   "kind": "table",
+   "start": 6437,
+   "end": 6568,
+   "text": "| ⟦0⟧                | Medium    | ~30-50% larger | Good    | Software H.264. Lower CPU                                        |",
+   "tokens": [
+    "`h264`"
+   ]
+  },
+  {
+   "id": 50,
+   "kind": "table",
+   "start": 6569,
+   "end": 6700,
+   "text": "| HW encoders           | Very Low  | Largest        | Good    | Offloads to dedicated hardware. Best for CPU-constrained systems |",
+   "tokens": []
+  },
+  {
+   "id": 51,
+   "kind": "heading",
+   "start": 6702,
+   "end": 6727,
+   "text": "### Available HW Encoders",
+   "tokens": []
+  },
+  {
+   "id": 52,
+   "kind": "table",
+   "start": 6729,
+   "end": 6918,
+   "text": "| Encoder             | Platform      | Hardware                                                                                         | CLI Value                                        |",
+   "tokens": []
+  },
+  {
+   "id": 53,
+   "kind": "table",
+   "start": 7109,
+   "end": 7298,
+   "text": "| ⟦0⟧ | macOS         | Apple Silicon / Intel                                                                            | ⟦1⟧ |",
+   "tokens": [
+    "`h264_videotoolbox`",
+    "`--dataset.rgb_encoder.vcodec=h264_videotoolbox`"
+   ]
+  },
+  {
+   "id": 54,
+   "kind": "table",
+   "start": 7299,
+   "end": 7488,
+   "text": "| ⟦0⟧ | macOS         | Apple Silicon / Intel                                                                            | ⟦1⟧ |",
+   "tokens": [
+    "`hevc_videotoolbox`",
+    "`--dataset.rgb_encoder.vcodec=hevc_videotoolbox`"
+   ]
+  },
+  {
+   "id": 55,
+   "kind": "table",
+   "start": 7489,
+   "end": 7678,
+   "text": "| ⟦0⟧        | Linux/Windows | NVIDIA GPU                                                                                       | ⟦1⟧        |",
+   "tokens": [
+    "`h264_nvenc`",
+    "`--dataset.rgb_encoder.vcodec=h264_nvenc`"
+   ]
+  },
+  {
+   "id": 56,
+   "kind": "table",
+   "start": 7679,
+   "end": 7868,
+   "text": "| ⟦0⟧        | Linux/Windows | NVIDIA GPU                                                                                       | ⟦1⟧        |",
+   "tokens": [
+    "`hevc_nvenc`",
+    "`--dataset.rgb_encoder.vcodec=hevc_nvenc`"
+   ]
+  },
+  {
+   "id": 57,
+   "kind": "table",
+   "start": 7869,
+   "end": 8058,
+   "text": "| ⟦0⟧        | Linux         | Intel/AMD GPU                                                                                    | ⟦1⟧        |",
+   "tokens": [
+    "`h264_vaapi`",
+    "`--dataset.rgb_encoder.vcodec=h264_vaapi`"
+   ]
+  },
+  {
+   "id": 58,
+   "kind": "table",
+   "start": 8059,
+   "end": 8248,
+   "text": "| ⟦0⟧          | Linux/Windows | Intel Quick Sync                                                                                 | ⟦1⟧          |",
+   "tokens": [
+    "`h264_qsv`",
+    "`--dataset.rgb_encoder.vcodec=h264_qsv`"
+   ]
+  },
+  {
+   "id": 59,
+   "kind": "table",
+   "start": 8249,
+   "end": 8438,
+   "text": "| ⟦0⟧              | Any           | Probes the system for available HW encoders. Falls back to ⟦1⟧ if no HW encoder is found | ⟦2⟧              |",
+   "tokens": [
+    "`auto`",
+    "`libsvtav1`",
+    "`--dataset.rgb_encoder.vcodec=auto`"
+   ]
+  },
+  {
+   "id": 60,
+   "kind": "quote",
+   "start": 8440,
+   "end": 8539,
+   "text": "> [!NOTE]\n> In order to use the HW accelerated encoders you might need to upgrade your GPU drivers.",
+   "tokens": []
+  },
+  {
+   "id": 61,
+   "kind": "quote",
+   "start": 8541,
+   "end": 8750,
+   "text": "> [!NOTE]\n> ⟦0⟧ is the default because it provides the best training performance; other vcodecs can reduce CPU usage and be faster, but they typically produce larger files and may affect training time.",
+   "tokens": [
+    "`libsvtav1`"
+   ]
+  },
+  {
+   "id": 62,
+   "kind": "heading",
+   "start": 8752,
+   "end": 8773,
+   "text": "## 5. Troubleshooting",
+   "tokens": []
+  },
+  {
+   "id": 63,
+   "kind": "table",
+   "start": 8775,
+   "end": 9183,
+   "text": "| Symptom                                                            | Likely Cause                                 | Fix                                                                                                                                                                                                                                                                                              |",
+   "tokens": []
+  },
+  {
+   "id": 64,
+   "kind": "table",
+   "start": 9593,
+   "end": 10001,
+   "text": "| System freezes or choppy robot movement or Rerun visualization lag | CPU starved (100% load usage)                | Close other apps, reduce encoding throughput, lower ⟦0⟧, use ⟦1⟧, use ⟦2⟧. If the CPU continues to be at 100% then it might be insufficient for your setup, consider ⟦3⟧ or HW encoding (⟦4⟧) |",
+   "tokens": [
+    "`encoder_threads`",
+    "`h264`",
+    "`display_data=False`",
+    "`--dataset.streaming_encoding=false`",
+    "`--dataset.rgb_encoder.vcodec=auto`"
+   ]
+  },
+  {
+   "id": 65,
+   "kind": "table",
+   "start": 10002,
+   "end": 10410,
+   "text": "| \"Encoder queue full\" warnings or dropped frames in dataset         | Encoder can't keep up (Queue overflow)       | If CPU is not at 100%: Increase ⟦0⟧, increase ⟦1⟧ or use HW encoding (⟦2⟧).                                                                                                                                                    |",
+   "tokens": [
+    "`encoder_threads`",
+    "`encoder_queue_maxsize`",
+    "`--dataset.rgb_encoder.vcodec=auto`"
+   ]
+  },
+  {
+   "id": 66,
+   "kind": "table",
+   "start": 10411,
+   "end": 10819,
+   "text": "| High RAM usage                                                     | Queue filling faster than encoding           | ⟦0⟧ too low or CPU insufficient. Reduce ⟦1⟧ or use HW encoding                                                                                                                                                                                                 |",
+   "tokens": [
+    "`encoder_threads`",
+    "`encoder_queue_maxsize`"
+   ]
+  },
+  {
+   "id": 67,
+   "kind": "table",
+   "start": 10820,
+   "end": 11228,
+   "text": "| Large video files                                                  | Using HW encoder or H.264                    | Expected trade-off. Switch to ⟦0⟧ if CPU allows                                                                                                                                                                                                                                          |",
+   "tokens": [
+    "`libsvtav1`"
+   ]
+  },
+  {
+   "id": 68,
+   "kind": "table",
+   "start": 11229,
+   "end": 11637,
+   "text": "| ⟦0⟧ still slow                                        | ⟦1⟧ is ⟦2⟧              | Set ⟦3⟧                                                                                                                                                                                                                                                          |",
+   "tokens": [
+    "`save_episode()`",
+    "`streaming_encoding`",
+    "`False`",
+    "`--dataset.streaming_encoding=true`"
+   ]
+  },
+  {
+   "id": 69,
+   "kind": "table",
+   "start": 11638,
+   "end": 12046,
+   "text": "| Encoder thread crash                                               | Codec not available or invalid settings      | Check ⟦0⟧ is installed, try ⟦1⟧                                                                                                                                                                                                                             |",
+   "tokens": [
+    "`vcodec`",
+    "`--dataset.rgb_encoder.vcodec=auto`"
+   ]
+  },
+  {
+   "id": 70,
+   "kind": "table",
+   "start": 12047,
+   "end": 12455,
+   "text": "| Recorded dataset is missing frames                                 | CPU/GPU starvation or occasional load spikes | If ~5% of frames are missing, your system is likely overloaded — follow the recommendations above. If fewer frames are missing (~2%), they are probably due to occasional transient load spikes (often at startup) and can be considered expected.                                               |",
+   "tokens": []
+  },
+  {
+   "id": 71,
+   "kind": "heading",
+   "start": 12457,
+   "end": 12489,
+   "text": "## 6. Recommended Configurations",
+   "tokens": []
+  },
+  {
+   "id": 72,
+   "kind": "para",
+   "start": 12491,
+   "end": 12613,
+   "text": "These estimates are conservative; we recommend testing them on your setup—start with a low load and increase it gradually.",
+   "tokens": []
+  },
+  {
+   "id": 73,
+   "kind": "heading",
+   "start": 12615,
+   "end": 12667,
+   "text": "### High-End Systems: modern 12+ cores (24+ threads)",
+   "tokens": []
+  },
+  {
+   "id": 74,
+   "kind": "para",
+   "start": 12669,
+   "end": 12790,
+   "text": "A throughput between ~250-500M px/sec should be comfortable in CPU. For even better results try HW encoding if available.",
+   "tokens": []
+  },
+  {
+   "id": 75,
+   "kind": "heading",
+   "start": 13088,
+   "end": 13157,
+   "text": "### Mid-Range Systems: modern 8+ cores (16+ threads) or Apple Silicon",
+   "tokens": []
+  },
+  {
+   "id": 76,
+   "kind": "para",
+   "start": 13159,
+   "end": 13222,
+   "text": "A throughput between ~80-300M px/sec should be possible in CPU.",
+   "tokens": []
+  },
+  {
+   "id": 77,
+   "kind": "heading",
+   "start": 13518,
+   "end": 13590,
+   "text": "### Low-Resource Systems: modern 4+ cores (8+ threads) or Raspberry Pi 5",
+   "tokens": []
+  },
+  {
+   "id": 78,
+   "kind": "para",
+   "start": 13592,
+   "end": 13975,
+   "text": "On very constrained systems, streaming encoding may compete too heavily with the capture loop. Disabling it falls back to the PNG-based approach where encoding happens between episodes (blocking, but doesn't interfere with capture). Alternatively, record at a lower throughput to reduce both capture and encoding load. Consider also changing codec to ⟦0⟧ and using batch encoding.",
+   "tokens": [
+    "`h264`"
+   ]
+  },
+  {
+   "id": 79,
+   "kind": "heading",
+   "start": 14187,
+   "end": 14205,
+   "text": "## 7. Closing note",
+   "tokens": []
+  },
+  {
+   "id": 80,
+   "kind": "para",
+   "start": 14207,
+   "end": 14899,
+   "text": "Performance ultimately depends on your exact setup — frames-per-second, resolution, CPU cores and load, available memory, episode length, and the encoder you choose. Always test with your target workload, be mindful about your CPU & system capabilities and tune ⟦0⟧, ⟦1⟧, and\n⟦2⟧ reasonably. That said, a common practical configuration (for many applications) is three cameras at 640×480x3 @30fps; this usually runs fine with the default streaming video encoding settings in modern systems. Always verify your recorded dataset is healthy by comparing the video duration to the CLI episode duration and confirming the row count equals FPS × CLI duration.",
+   "tokens": [
+    "`encoder_threads`",
+    "`encoder_queue_maxsize`",
+    "`vcodec`"
+   ]
+  }
+ ]
+}

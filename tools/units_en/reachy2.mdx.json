@@ -1,0 +1,505 @@
+{
+ "file": "reachy2.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1934,
+   "text": "# Reachy 2",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1936,
+   "end": 2274,
+   "text": "Reachy 2 is an open-source humanoid robot made by Pollen Robotics, specifically designed for the development of embodied AI and real-world applications.\nCheck out [Pollen Robotics website](⟦0⟧), or access [Reachy 2 documentation](⟦1⟧) for more information on the platform!",
+   "tokens": [
+    "https://www.pollen-robotics.com/reachy/",
+    "https://docs.pollen-robotics.com/"
+   ]
+  },
+  {
+   "id": 2,
+   "kind": "heading",
+   "start": 2276,
+   "end": 2299,
+   "text": "## Teleoperate Reachy 2",
+   "tokens": []
+  },
+  {
+   "id": 3,
+   "kind": "para",
+   "start": 2301,
+   "end": 2355,
+   "text": "Currently, there are two ways to teleoperate Reachy 2:",
+   "tokens": []
+  },
+  {
+   "id": 4,
+   "kind": "list",
+   "start": 2357,
+   "end": 2419,
+   "text": "- Pollen Robotics’ VR teleoperation (not included in LeRobot).",
+   "tokens": []
+  },
+  {
+   "id": 5,
+   "kind": "list",
+   "start": 2420,
+   "end": 2489,
+   "text": "- Robot-to-robot teleoperation (use one Reachy 2 to control another).",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "heading",
+   "start": 2491,
+   "end": 2513,
+   "text": "## Reachy 2 Simulation",
+   "tokens": []
+  },
+  {
+   "id": 7,
+   "kind": "para",
+   "start": 2515,
+   "end": 2674,
+   "text": "**(Linux only)** You can run Reachy 2 in simulation (Gazebo or MuJoCo) using the provided [Docker image](⟦0⟧).",
+   "tokens": [
+    "https://hub.docker.com/r/pollenrobotics/reachy2_core"
+   ]
+  },
+  {
+   "id": 8,
+   "kind": "list",
+   "start": 2676,
+   "end": 2736,
+   "text": "1. Install [Docker Engine](⟦0⟧).",
+   "tokens": [
+    "https://docs.docker.com/engine/"
+   ]
+  },
+  {
+   "id": 9,
+   "kind": "list",
+   "start": 2737,
+   "end": 2757,
+   "text": "2. Run (for MuJoCo):",
+   "tokens": []
+  },
+  {
+   "id": 10,
+   "kind": "quote",
+   "start": 3436,
+   "end": 3609,
+   "text": "> [!NOTE]\n> If MuJoCo runs slowly (low simulation frequency), append ⟦0⟧ to the previous command to improve performance:",
+   "tokens": [
+    "`-e LD_LIBRARY_PATH=\"/opt/host-libs:$LD_LIBRARY_PATH\" \\`"
+   ]
+  },
+  {
+   "id": 11,
+   "kind": "heading",
+   "start": 4388,
+   "end": 4396,
+   "text": "## Setup",
+   "tokens": []
+  },
+  {
+   "id": 12,
+   "kind": "heading",
+   "start": 4398,
+   "end": 4415,
+   "text": "### Prerequisites",
+   "tokens": []
+  },
+  {
+   "id": 13,
+   "kind": "list",
+   "start": 4417,
+   "end": 4489,
+   "text": "- On your robot, check the **service images** meet the minimum versions:",
+   "tokens": []
+  },
+  {
+   "id": 14,
+   "kind": "list",
+   "start": 4490,
+   "end": 4521,
+   "text": "  - **reachy2-core >= 1.7.5.2**",
+   "tokens": []
+  },
+  {
+   "id": 15,
+   "kind": "list",
+   "start": 4522,
+   "end": 4547,
+   "text": "  - **webrtc >= 2.0.1.1**",
+   "tokens": []
+  },
+  {
+   "id": 16,
+   "kind": "para",
+   "start": 4549,
+   "end": 4591,
+   "text": "Then, if you want to use VR teleoperation:",
+   "tokens": []
+  },
+  {
+   "id": 17,
+   "kind": "list",
+   "start": 4593,
+   "end": 4770,
+   "text": "- Install the [Reachy 2 teleoperation application](⟦0⟧).\n  Use version **>=v1.2.0**",
+   "tokens": [
+    "https://docs.pollen-robotics.com/teleoperation/teleoperation-introduction/discover-teleoperation/"
+   ]
+  },
+  {
+   "id": 18,
+   "kind": "para",
+   "start": 4772,
+   "end": 4886,
+   "text": "We recommend using two computers: one for teleoperation (Windows required) and another for recording with LeRobot.",
+   "tokens": []
+  },
+  {
+   "id": 19,
+   "kind": "heading",
+   "start": 4888,
+   "end": 4907,
+   "text": "### Install LeRobot",
+   "tokens": []
+  },
+  {
+   "id": 20,
+   "kind": "para",
+   "start": 4909,
+   "end": 5020,
+   "text": "Follow the [installation instructions](⟦0⟧) to install LeRobot.",
+   "tokens": [
+    "https://github.com/huggingface/lerobot#installation"
+   ]
+  },
+  {
+   "id": 21,
+   "kind": "para",
+   "start": 5022,
+   "end": 5065,
+   "text": "Install LeRobot with Reachy 2 dependencies:",
+   "tokens": []
+  },
+  {
+   "id": 22,
+   "kind": "heading",
+   "start": 5108,
+   "end": 5128,
+   "text": "## Step 1: Recording",
+   "tokens": []
+  },
+  {
+   "id": 23,
+   "kind": "heading",
+   "start": 5130,
+   "end": 5157,
+   "text": "### Get Reachy 2 IP address",
+   "tokens": []
+  },
+  {
+   "id": 24,
+   "kind": "para",
+   "start": 5159,
+   "end": 5398,
+   "text": "Before starting teleoperation and data recording, find the [robot's IP address](⟦0⟧).\nWe strongly recommend connecting all devices (PC and robot) via **Ethernet**.",
+   "tokens": [
+    "https://docs.pollen-robotics.com/getting-started/setup-reachy2/connect-reachy2/"
+   ]
+  },
+  {
+   "id": 25,
+   "kind": "heading",
+   "start": 5400,
+   "end": 5420,
+   "text": "### Launch recording",
+   "tokens": []
+  },
+  {
+   "id": 26,
+   "kind": "para",
+   "start": 5422,
+   "end": 5587,
+   "text": "Use LeRobot's ⟦0⟧ command to manage recording sessions. The ⟦1⟧ workflow previously documented here is no longer available.",
+   "tokens": [
+    "`lerobot-record`",
+    "`pollen_data_acquisition_server`"
+   ]
+  },
+  {
+   "id": 27,
+   "kind": "para",
+   "start": 5589,
+   "end": 5791,
+   "text": "When using the Reachy 2 VR teleoperation application, choose \"Standard session\". The VR application controls the robot's motion, while ⟦0⟧ manages the dataset and starts and stops episodes.",
+   "tokens": [
+    "`lerobot-record`"
+   ]
+  },
+  {
+   "id": 28,
+   "kind": "heading",
+   "start": 5793,
+   "end": 5825,
+   "text": "### Record with ⟦0⟧",
+   "tokens": [
+    "`lerobot-record`"
+   ]
+  },
+  {
+   "id": 29,
+   "kind": "para",
+   "start": 5827,
+   "end": 5887,
+   "text": "Reachy 2 is fully supported by LeRobot’s recording features.",
+   "tokens": []
+  },
+  {
+   "id": 30,
+   "kind": "para",
+   "start": 5889,
+   "end": 6064,
+   "text": "**Example: start a recording without the mobile base:**\nFirst add reachy2 and reachy2_teleoperator to the imports of the record script. Then you can use the following command:",
+   "tokens": []
+  },
+  {
+   "id": 31,
+   "kind": "heading",
+   "start": 6816,
+   "end": 6837,
+   "text": "#### Specific Options",
+   "tokens": []
+  },
+  {
+   "id": 32,
+   "kind": "para",
+   "start": 6839,
+   "end": 6890,
+   "text": "**Extended setup overview (all options included):**",
+   "tokens": []
+  },
+  {
+   "id": 33,
+   "kind": "para",
+   "start": 8183,
+   "end": 8363,
+   "text": "Determine whether LeRobot robot.send_action() sends commands to the robot.\n**Must** be set to false while using the VR teleoperation application, as the app already sends commands.",
+   "tokens": []
+  },
+  {
+   "id": 34,
+   "kind": "para",
+   "start": 8404,
+   "end": 8563,
+   "text": "Determine whether the teleoperator reads the goal or present position of the robot.\nMust be set to true if a compliant Reachy 2 is used to control another one.",
+   "tokens": []
+  },
+  {
+   "id": 35,
+   "kind": "heading",
+   "start": 8565,
+   "end": 8593,
+   "text": "##### Use the relevant parts",
+   "tokens": []
+  },
+  {
+   "id": 36,
+   "kind": "para",
+   "start": 8595,
+   "end": 8796,
+   "text": "From our initial tests, recording **all** joints when only some are moving can reduce model quality with certain policies.\nTo avoid this, you can exclude specific parts from recording and replay using:",
+   "tokens": []
+  },
+  {
+   "id": 37,
+   "kind": "para",
+   "start": 8837,
+   "end": 9012,
+   "text": "with ⟦0⟧ being one of : ⟦1⟧, ⟦2⟧, ⟦3⟧neck⟦4⟧antennas`.\nIt determine whether the corresponding part is recorded in the observations. True if not set.",
+   "tokens": [
+    "`<part>`",
+    "`mobile_base`",
+    "`l_arm`",
+    "`r_arm\", `",
+    "`, `"
+   ]
+  },
+  {
+   "id": 38,
+   "kind": "para",
+   "start": 9014,
+   "end": 9053,
+   "text": "By default, **all parts are recorded**.",
+   "tokens": []
+  },
+  {
+   "id": 39,
+   "kind": "para",
+   "start": 9055,
+   "end": 9130,
+   "text": "The same per-part mechanism is available in ⟦0⟧ as well.",
+   "tokens": [
+    "`reachy2_teleoperator`"
+   ]
+  },
+  {
+   "id": 40,
+   "kind": "para",
+   "start": 9167,
+   "end": 9334,
+   "text": "with ⟦0⟧ being one of : ⟦1⟧, ⟦2⟧, ⟦3⟧neck⟦4⟧antennas`.\nDetermine whether the corresponding part is recorded in the actions. True if not set.",
+   "tokens": [
+    "`<part>`",
+    "`mobile_base`",
+    "`l_arm`",
+    "`r_arm\", `",
+    "`, `"
+   ]
+  },
+  {
+   "id": 41,
+   "kind": "quote",
+   "start": 9336,
+   "end": 9602,
+   "text": "> **Important:** In a given session, the **enabled parts must match** on both the robot and the teleoperator.\n> For example, if the robot runs with ⟦0⟧, the teleoperator must disable the same part ⟦1⟧.",
+   "tokens": [
+    "`--robot.with_mobile_base=false`",
+    "`--teleoperator.with_mobile_base=false`"
+   ]
+  },
+  {
+   "id": 42,
+   "kind": "heading",
+   "start": 9604,
+   "end": 9634,
+   "text": "##### Use the relevant cameras",
+   "tokens": []
+  },
+  {
+   "id": 43,
+   "kind": "para",
+   "start": 9636,
+   "end": 9733,
+   "text": "You can do the same for **cameras**. Enable or disable each camera with default parameters using:",
+   "tokens": []
+  },
+  {
+   "id": 44,
+   "kind": "para",
+   "start": 9882,
+   "end": 10116,
+   "text": "By default, no camera is recorded, all camera arguments are set to ⟦0⟧.\nIf you want to, you can use custom ⟦1⟧ and ⟦2⟧ parameters for Reachy 2's cameras using the ⟦3⟧ & ⟦4⟧ argument:",
+   "tokens": [
+    "`false`",
+    "`width`",
+    "`height`",
+    "`--robot.camera_width`",
+    "`--robot.camera_height`"
+   ]
+  },
+  {
+   "id": 45,
+   "kind": "para",
+   "start": 10186,
+   "end": 10287,
+   "text": "This will change the resolution of all 3 default robot cameras (enabled by the above bool arguments).",
+   "tokens": []
+  },
+  {
+   "id": 46,
+   "kind": "para",
+   "start": 10289,
+   "end": 10380,
+   "text": "If you want, you can add additional cameras other than the ones in the robot as usual with:",
+   "tokens": []
+  },
+  {
+   "id": 47,
+   "kind": "heading",
+   "start": 10493,
+   "end": 10510,
+   "text": "## Step 2: Replay",
+   "tokens": []
+  },
+  {
+   "id": 48,
+   "kind": "para",
+   "start": 10512,
+   "end": 10581,
+   "text": "Make sure the robot is configured with the same parts as the dataset:",
+   "tokens": []
+  },
+  {
+   "id": 49,
+   "kind": "heading",
+   "start": 10834,
+   "end": 10850,
+   "text": "## Step 3: Train",
+   "tokens": []
+  },
+  {
+   "id": 50,
+   "kind": "heading",
+   "start": 11122,
+   "end": 11141,
+   "text": "## Step 4: Evaluate",
+   "tokens": []
+  },
+  {
+   "id": 51,
+   "kind": "para",
+   "start": 11447,
+   "end": 11472,
+   "text": "Sections that were moved:",
+   "tokens": []
+  },
+  {
+   "id": 52,
+   "kind": "para",
+   "start": 11474,
+   "end": 11658,
+   "text": "[ ⟦0⟧(Optional but recommended) Install pollen_data_acquisition_server⟦1⟧⟦2⟧⟦3⟧ ]",
+   "tokens": [
+    "<a href=\"#record-with-lerobot-record\">",
+    "</a>",
+    "<a id=\"optional-but-recommended-install-pollendataacquisitionserver\">",
+    "</a>"
+   ]
+  },
+  {
+   "id": 53,
+   "kind": "para",
+   "start": 11660,
+   "end": 11864,
+   "text": "[ ⟦0⟧Option 1: Using Pollen data acquisition server (recommended for VR teleop)⟦1⟧⟦2⟧⟦3⟧ ]",
+   "tokens": [
+    "<a href=\"#record-with-lerobot-record\">",
+    "</a>",
+    "<a id=\"option-1-using-pollen-data-acquisition-server-recommended-for-vr-teleop\">",
+    "</a>"
+   ]
+  },
+  {
+   "id": 54,
+   "kind": "para",
+   "start": 11866,
+   "end": 11983,
+   "text": "[ ⟦0⟧Option 2: Using lerobot.record⟦1⟧⟦2⟧⟦3⟧ ]",
+   "tokens": [
+    "<a href=\"#record-with-lerobot-record\">",
+    "</a>",
+    "<a id=\"option-2-using-lerobotrecord\">",
+    "</a>"
+   ]
+  }
+ ]
+}

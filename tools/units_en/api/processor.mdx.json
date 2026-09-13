@@ -1,0 +1,967 @@
+{
+ "file": "api/processor.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1936,
+   "text": "# Processors",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1938,
+   "end": 2143,
+   "text": "Processors are the data transformation layer between a robot, a dataset and a policy. A pipeline is a chain\nof ⟦0⟧s; each step declares how it transforms both the data and the feature contract.",
+   "tokens": [
+    "`ProcessorStep`"
+   ]
+  },
+  {
+   "id": 2,
+   "kind": "para",
+   "start": 2145,
+   "end": 2403,
+   "text": "See [Introduction to Robot Processors](⟦0⟧) for the concepts,\n[Implement your own processor](⟦1⟧) to write a step, and\n[Debug your processor pipeline](⟦2⟧) when a pipeline misbehaves.",
+   "tokens": [
+    "../introduction_processors",
+    "../implement_your_own_processor",
+    "../debug_processor_pipeline"
+   ]
+  },
+  {
+   "id": 3,
+   "kind": "heading",
+   "start": 2405,
+   "end": 2456,
+   "text": "## ProcessorStep⟦0⟧",
+   "tokens": [
+    "[[lerobot.processor.ProcessorStep]]"
+   ]
+  },
+  {
+   "id": 4,
+   "kind": "para",
+   "start": 2775,
+   "end": 2856,
+   "text": "⟦0⟧\nAbstract base class for a single step in a data processing pipeline.",
+   "tokens": [
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 5,
+   "kind": "para",
+   "start": 2858,
+   "end": 3053,
+   "text": "Each step must implement the ⟦0⟧ method to perform its transformation\non a data transition and the ⟦1⟧ method to describe how it\nalters the shape or type of data features.",
+   "tokens": [
+    "`__call__`",
+    "`transform_features`"
+   ]
+  },
+  {
+   "id": 6,
+   "kind": "para",
+   "start": 3055,
+   "end": 3144,
+   "text": "Subclasses can optionally be stateful by implementing ⟦0⟧ and ⟦1⟧.",
+   "tokens": [
+    "`state_dict`",
+    "`load_state_dict`"
+   ]
+  },
+  {
+   "id": 7,
+   "kind": "docfield",
+   "start": 3449,
+   "end": 3539,
+   "text": "⟦0⟧A JSON-serializable dictionary of configuration parameters.⟦1⟧⟦2⟧",
+   "tokens": [
+    "<retdesc>",
+    "</retdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 8,
+   "kind": "para",
+   "start": 3540,
+   "end": 3596,
+   "text": "Returns the configuration of the step for serialization.",
+   "tokens": []
+  },
+  {
+   "id": 9,
+   "kind": "docfield",
+   "start": 3972,
+   "end": 4054,
+   "text": "⟦0⟧- **state** -- A dictionary of state tensors.⟦1⟧⟦2⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "</paramsdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 10,
+   "kind": "para",
+   "start": 4055,
+   "end": 4102,
+   "text": "Loads the step's state from a state dictionary.",
+   "tokens": []
+  },
+  {
+   "id": 11,
+   "kind": "para",
+   "start": 4405,
+   "end": 4474,
+   "text": "⟦0⟧\nResets the internal state of the processor step, if any.",
+   "tokens": [
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 12,
+   "kind": "para",
+   "start": 4835,
+   "end": 4919,
+   "text": "⟦0⟧\nSave non-tensor assets and map constructor arguments to relative paths.",
+   "tokens": [
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 13,
+   "kind": "docfield",
+   "start": 5229,
+   "end": 5304,
+   "text": "⟦0⟧A dictionary mapping state names to tensors.⟦1⟧⟦2⟧",
+   "tokens": [
+    "<retdesc>",
+    "</retdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 14,
+   "kind": "para",
+   "start": 5305,
+   "end": 5377,
+   "text": "Returns the state of the step (e.g., learned parameters, running means).",
+   "tokens": []
+  },
+  {
+   "id": 15,
+   "kind": "docfield",
+   "start": 5790,
+   "end": 6015,
+   "text": "⟦0⟧- **features** -- A dictionary describing the input features for observations, actions, etc.⟦1⟧⟦2⟧A dictionary describing the output features after this step's transformation.⟦3⟧⟦4⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "</paramsdesc>",
+    "<retdesc>",
+    "</retdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 16,
+   "kind": "para",
+   "start": 6016,
+   "end": 6084,
+   "text": "Defines how this step modifies the description of pipeline features.",
+   "tokens": []
+  },
+  {
+   "id": 17,
+   "kind": "para",
+   "start": 6086,
+   "end": 6236,
+   "text": "This method is used to track changes in data shapes, dtypes, or modalities\nas data flows through the pipeline, without needing to process actual data.",
+   "tokens": []
+  },
+  {
+   "id": 18,
+   "kind": "heading",
+   "start": 6257,
+   "end": 6324,
+   "text": "## DataProcessorPipeline⟦0⟧",
+   "tokens": [
+    "[[lerobot.processor.DataProcessorPipeline]]"
+   ]
+  },
+  {
+   "id": 19,
+   "kind": "docfield",
+   "start": 7146,
+   "end": 7696,
+   "text": "⟦0⟧- **steps** -- A sequence of ⟦1⟧ objects that make up the pipeline.\n- **name** -- A descriptive name for the pipeline.\n- **to_transition** -- A function to convert raw input data into the standardized ⟦2⟧ format.\n- **to_output** -- A function to convert the final ⟦3⟧ into the desired output format.\n- **before_step_hooks** -- A list of functions to be called before each step is executed.\n- **after_step_hooks** -- A list of functions to be called after each step is executed.⟦4⟧⟦5⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "`ProcessorStep`",
+    "`EnvTransition`",
+    "`EnvTransition`",
+    "</paramsdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 20,
+   "kind": "para",
+   "start": 7697,
+   "end": 7777,
+   "text": "A sequential pipeline for processing data, integrated with the Hugging Face Hub.",
+   "tokens": []
+  },
+  {
+   "id": 21,
+   "kind": "para",
+   "start": 7779,
+   "end": 8012,
+   "text": "This class chains together multiple ⟦0⟧ instances to form a complete\ndata processing workflow. It's generic, allowing for custom input and output types,\nwhich are handled by the ⟦1⟧ and ⟦2⟧ converters.",
+   "tokens": [
+    "`ProcessorStep`",
+    "`to_transition`",
+    "`to_output`"
+   ]
+  },
+  {
+   "id": 22,
+   "kind": "docfield",
+   "start": 8694,
+   "end": 9228,
+   "text": "⟦0⟧- **config** -- A config dictionary with the same structure as the saved processor JSON.\n- **state_dict** -- Optional in-memory pipeline state grouped by suffixless state key.\n- **overrides** -- Optional constructor overrides keyed by registry name or class name.\n- **to_transition** -- Optional converter from input data to ⟦1⟧.\n- **to_output** -- Optional converter from ⟦2⟧ to output data.⟦3⟧⟦4⟧A processor pipeline built from the config and optional state.⟦5⟧⟦6⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "`EnvTransition`",
+    "`EnvTransition`",
+    "</paramsdesc>",
+    "<retdesc>",
+    "</retdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 23,
+   "kind": "para",
+   "start": 9229,
+   "end": 9298,
+   "text": "Build a pipeline from an in-memory config and optional state tensors.",
+   "tokens": []
+  },
+  {
+   "id": 24,
+   "kind": "docfield",
+   "start": 10406,
+   "end": 11871,
+   "text": "⟦0⟧- **pretrained_model_name_or_path** -- The identifier of the repository on the Hugging Face Hub,\n  a path to a local directory, or a path to a single config file.\n- **config_filename** -- The name of the pipeline's JSON configuration file. Always required\n  to prevent ambiguity when multiple configs exist (e.g., preprocessor vs postprocessor).\n- **force_download** -- Whether to force (re)downloading the files.\n- **resume_download** -- Whether to resume a previously interrupted download.\n- **proxies** -- A dictionary of proxy servers to use.\n- **token** -- The token to use as HTTP bearer authorization for private Hub repositories.\n- **cache_dir** -- The path to a specific cache folder to store downloaded files.\n- **local_files_only** -- If True, avoid downloading files from the Hub.\n- **revision** -- The specific model version to use (e.g., a branch name, tag name, or commit id).\n- **overrides** -- A dictionary to override the configuration of specific steps. Keys should\n  match the step's class name or registry name.\n- **to_transition** -- A custom function to convert input data to ⟦1⟧.\n- **to_output** -- A custom function to convert the final ⟦2⟧ to the output format.\n- ****kwargs** -- Additional arguments (not used).⟦3⟧⟦4⟧An instance of ⟦5⟧ loaded with the specified configuration and state.⟦6⟧⟦7⟧- ⟦8⟧ -- If the config file cannot be found.",
+   "tokens": [
+    "<paramsdesc>",
+    "`EnvTransition`",
+    "`EnvTransition`",
+    "</paramsdesc>",
+    "<retdesc>",
+    "`DataProcessorPipeline`",
+    "</retdesc>",
+    "<raises>",
+    "``FileNotFoundError``"
+   ]
+  },
+  {
+   "id": 25,
+   "kind": "list",
+   "start": 11872,
+   "end": 11945,
+   "text": "- ⟦0⟧ -- If configuration is ambiguous or instantiation fails.",
+   "tokens": [
+    "``ValueError``"
+   ]
+  },
+  {
+   "id": 26,
+   "kind": "list",
+   "start": 11946,
+   "end": 12004,
+   "text": "- ⟦0⟧ -- If a step's class cannot be imported.",
+   "tokens": [
+    "``ImportError``"
+   ]
+  },
+  {
+   "id": 27,
+   "kind": "list",
+   "start": 12005,
+   "end": 12081,
+   "text": "- ⟦0⟧ -- If an override key doesn't match any step in the pipeline.",
+   "tokens": [
+    "``KeyError``"
+   ]
+  },
+  {
+   "id": 28,
+   "kind": "list",
+   "start": 12082,
+   "end": 12408,
+   "text": "- ⟦0⟧ -- If the model requires migration to processor format.⟦1⟧⟦2⟧⟦3⟧\nLoads a pipeline from a local directory, single file, or Hugging Face Hub repository.",
+   "tokens": [
+    "``ProcessorMigrationError``",
+    "</raises>",
+    "<raisederrors>``FileNotFoundError`` or ``ValueError`` or ``ImportError`` or ``KeyError`` or ``ProcessorMigrationError``</raisederrors>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 29,
+   "kind": "para",
+   "start": 12410,
+   "end": 12500,
+   "text": "This method implements a simplified loading pipeline with intelligent migration detection:",
+   "tokens": []
+  },
+  {
+   "id": 30,
+   "kind": "para",
+   "start": 12502,
+   "end": 12534,
+   "text": "**Simplified Loading Strategy**:",
+   "tokens": []
+  },
+  {
+   "id": 31,
+   "kind": "list",
+   "start": 12535,
+   "end": 12572,
+   "text": "1. **Config Loading** (_load_config):",
+   "tokens": []
+  },
+  {
+   "id": 32,
+   "kind": "list",
+   "start": 12573,
+   "end": 12638,
+   "text": "   - **Directory**: Load specified config_filename from directory",
+   "tokens": []
+  },
+  {
+   "id": 33,
+   "kind": "list",
+   "start": 12639,
+   "end": 12705,
+   "text": "   - **Single file**: Load file directly (config_filename ignored)",
+   "tokens": []
+  },
+  {
+   "id": 34,
+   "kind": "list",
+   "start": 12706,
+   "end": 12774,
+   "text": "   - **Hub repository**: Download specified config_filename from Hub",
+   "tokens": []
+  },
+  {
+   "id": 35,
+   "kind": "list",
+   "start": 12776,
+   "end": 12827,
+   "text": "2. **Config Validation** (_validate_loaded_config):",
+   "tokens": []
+  },
+  {
+   "id": 36,
+   "kind": "list",
+   "start": 12828,
+   "end": 12891,
+   "text": "   - Format validation: Ensure config is valid processor format",
+   "tokens": []
+  },
+  {
+   "id": 37,
+   "kind": "list",
+   "start": 12892,
+   "end": 12959,
+   "text": "   - Migration detection: Guide users to migrate old LeRobot models",
+   "tokens": []
+  },
+  {
+   "id": 38,
+   "kind": "list",
+   "start": 12960,
+   "end": 13012,
+   "text": "   - Clear errors: Provide actionable error messages",
+   "tokens": []
+  },
+  {
+   "id": 39,
+   "kind": "list",
+   "start": 13014,
+   "end": 13069,
+   "text": "3. **Step Construction** (_build_steps_with_overrides):",
+   "tokens": []
+  },
+  {
+   "id": 40,
+   "kind": "list",
+   "start": 13070,
+   "end": 13127,
+   "text": "   - Class resolution: Registry lookup or dynamic imports",
+   "tokens": []
+  },
+  {
+   "id": 41,
+   "kind": "list",
+   "start": 13128,
+   "end": 13188,
+   "text": "   - Override merging: User parameters override saved config",
+   "tokens": []
+  },
+  {
+   "id": 42,
+   "kind": "list",
+   "start": 13189,
+   "end": 13251,
+   "text": "   - State loading: Load .safetensors files for stateful steps",
+   "tokens": []
+  },
+  {
+   "id": 43,
+   "kind": "list",
+   "start": 13253,
+   "end": 13307,
+   "text": "4. **Override Validation** (_validate_overrides_used):",
+   "tokens": []
+  },
+  {
+   "id": 44,
+   "kind": "list",
+   "start": 13308,
+   "end": 13365,
+   "text": "   - Ensure all user overrides were applied (catch typos)",
+   "tokens": []
+  },
+  {
+   "id": 45,
+   "kind": "list",
+   "start": 13366,
+   "end": 13421,
+   "text": "   - Provide helpful error messages with available keys",
+   "tokens": []
+  },
+  {
+   "id": 46,
+   "kind": "para",
+   "start": 13423,
+   "end": 13447,
+   "text": "**Migration Detection**:",
+   "tokens": []
+  },
+  {
+   "id": 47,
+   "kind": "list",
+   "start": 13448,
+   "end": 13519,
+   "text": "- **Smart detection**: Analyzes JSON files to detect old LeRobot models",
+   "tokens": []
+  },
+  {
+   "id": 48,
+   "kind": "list",
+   "start": 13520,
+   "end": 13595,
+   "text": "- **Precise targeting**: Avoids false positives on other HuggingFace models",
+   "tokens": []
+  },
+  {
+   "id": 49,
+   "kind": "list",
+   "start": 13596,
+   "end": 13657,
+   "text": "- **Clear guidance**: Provides exact migration command to run",
+   "tokens": []
+  },
+  {
+   "id": 50,
+   "kind": "list",
+   "start": 13658,
+   "end": 13735,
+   "text": "- **Error mode**: Always raises ProcessorMigrationError for clear user action",
+   "tokens": []
+  },
+  {
+   "id": 51,
+   "kind": "para",
+   "start": 13830,
+   "end": 13851,
+   "text": "**Loading Examples**:",
+   "tokens": []
+  },
+  {
+   "id": 52,
+   "kind": "para",
+   "start": 14544,
+   "end": 14564,
+   "text": "**Override System**:",
+   "tokens": []
+  },
+  {
+   "id": 53,
+   "kind": "list",
+   "start": 14565,
+   "end": 14635,
+   "text": "- **Key matching**: Use registry names or class names as override keys",
+   "tokens": []
+  },
+  {
+   "id": 54,
+   "kind": "list",
+   "start": 14636,
+   "end": 14706,
+   "text": "- **Config merging**: User overrides take precedence over saved config",
+   "tokens": []
+  },
+  {
+   "id": 55,
+   "kind": "list",
+   "start": 14707,
+   "end": 14782,
+   "text": "- **Validation**: Ensure all override keys match actual steps (catch typos)",
+   "tokens": []
+  },
+  {
+   "id": 56,
+   "kind": "list",
+   "start": 14783,
+   "end": 14845,
+   "text": "- **Example**: overrides={\"NormalizeStep\": ⟦0⟧}",
+   "tokens": [
+    "{\"device\": \"cuda\"}"
+   ]
+  },
+  {
+   "id": 57,
+   "kind": "docfield",
+   "start": 15172,
+   "end": 15278,
+   "text": "⟦0⟧A dictionary with the same content that ⟦1⟧ writes as JSON.⟦2⟧⟦3⟧",
+   "tokens": [
+    "<retdesc>",
+    "`save_pretrained()`",
+    "</retdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 58,
+   "kind": "para",
+   "start": 15279,
+   "end": 15331,
+   "text": "Return the JSON-serializable pipeline configuration.",
+   "tokens": []
+  },
+  {
+   "id": 59,
+   "kind": "docfield",
+   "start": 15731,
+   "end": 16000,
+   "text": "⟦0⟧- **state_dict** -- A dictionary mapping suffixless state keys to step state dictionaries.⟦1⟧⟦2⟧- ⟦3⟧ -- If loading finds missing expected state or unexpected extra state.⟦4⟧⟦5⟧⟦6⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "</paramsdesc>",
+    "<raises>",
+    "``KeyError``",
+    "</raises>",
+    "<raisederrors>``KeyError``</raisederrors>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 60,
+   "kind": "para",
+   "start": 16001,
+   "end": 16053,
+   "text": "Load pipeline state tensors into the existing steps.",
+   "tokens": []
+  },
+  {
+   "id": 61,
+   "kind": "docfield",
+   "start": 16456,
+   "end": 16565,
+   "text": "⟦0⟧- **action** -- The action data.⟦1⟧⟦2⟧The processed action.⟦3⟧⟦4⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "</paramsdesc>",
+    "<retdesc>",
+    "</retdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 62,
+   "kind": "para",
+   "start": 16566,
+   "end": 16634,
+   "text": "Processes only the action part of a transition through the pipeline.",
+   "tokens": []
+  },
+  {
+   "id": 63,
+   "kind": "docfield",
+   "start": 17047,
+   "end": 17209,
+   "text": "⟦0⟧- **complementary_data** -- The complementary data dictionary.⟦1⟧⟦2⟧The processed complementary data dictionary.⟦3⟧⟦4⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "</paramsdesc>",
+    "<retdesc>",
+    "</retdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 64,
+   "kind": "para",
+   "start": 17210,
+   "end": 17290,
+   "text": "Processes only the complementary data part of a transition through the pipeline.",
+   "tokens": []
+  },
+  {
+   "id": 65,
+   "kind": "docfield",
+   "start": 17666,
+   "end": 17774,
+   "text": "⟦0⟧- **done** -- The done flag.⟦1⟧⟦2⟧The processed done flag.⟦3⟧⟦4⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "</paramsdesc>",
+    "<retdesc>",
+    "</retdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 66,
+   "kind": "para",
+   "start": 17775,
+   "end": 17841,
+   "text": "Processes only the done flag of a transition through the pipeline.",
+   "tokens": []
+  },
+  {
+   "id": 67,
+   "kind": "docfield",
+   "start": 18212,
+   "end": 18332,
+   "text": "⟦0⟧- **info** -- The info dictionary.⟦1⟧⟦2⟧The processed info dictionary.⟦3⟧⟦4⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "</paramsdesc>",
+    "<retdesc>",
+    "</retdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 68,
+   "kind": "para",
+   "start": 18333,
+   "end": 18405,
+   "text": "Processes only the info dictionary of a transition through the pipeline.",
+   "tokens": []
+  },
+  {
+   "id": 69,
+   "kind": "docfield",
+   "start": 18799,
+   "end": 18940,
+   "text": "⟦0⟧- **observation** -- The observation dictionary.⟦1⟧⟦2⟧The processed observation dictionary.⟦3⟧⟦4⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "</paramsdesc>",
+    "<retdesc>",
+    "</retdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 70,
+   "kind": "para",
+   "start": 18941,
+   "end": 19014,
+   "text": "Processes only the observation part of a transition through the pipeline.",
+   "tokens": []
+  },
+  {
+   "id": 71,
+   "kind": "docfield",
+   "start": 19397,
+   "end": 19507,
+   "text": "⟦0⟧- **reward** -- The reward value.⟦1⟧⟦2⟧The processed reward.⟦3⟧⟦4⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "</paramsdesc>",
+    "<retdesc>",
+    "</retdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 72,
+   "kind": "para",
+   "start": 19508,
+   "end": 19576,
+   "text": "Processes only the reward part of a transition through the pipeline.",
+   "tokens": []
+  },
+  {
+   "id": 73,
+   "kind": "docfield",
+   "start": 19967,
+   "end": 20090,
+   "text": "⟦0⟧- **truncated** -- The truncated flag.⟦1⟧⟦2⟧The processed truncated flag.⟦3⟧⟦4⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "</paramsdesc>",
+    "<retdesc>",
+    "</retdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 74,
+   "kind": "para",
+   "start": 20091,
+   "end": 20162,
+   "text": "Processes only the truncated flag of a transition through the pipeline.",
+   "tokens": []
+  },
+  {
+   "id": 75,
+   "kind": "docfield",
+   "start": 20577,
+   "end": 20692,
+   "text": "⟦0⟧- **fn** -- A callable that accepts the step index and the current transition.⟦1⟧⟦2⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "</paramsdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 76,
+   "kind": "para",
+   "start": 20693,
+   "end": 20743,
+   "text": "Registers a function to be called after each step.",
+   "tokens": []
+  },
+  {
+   "id": 77,
+   "kind": "docfield",
+   "start": 21158,
+   "end": 21273,
+   "text": "⟦0⟧- **fn** -- A callable that accepts the step index and the current transition.⟦1⟧⟦2⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "</paramsdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 78,
+   "kind": "para",
+   "start": 21274,
+   "end": 21325,
+   "text": "Registers a function to be called before each step.",
+   "tokens": []
+  },
+  {
+   "id": 79,
+   "kind": "para",
+   "start": 21637,
+   "end": 21705,
+   "text": "⟦0⟧\nResets the state of all stateful steps in the pipeline.",
+   "tokens": [
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 80,
+   "kind": "docfield",
+   "start": 22367,
+   "end": 23058,
+   "text": "⟦0⟧- **save_directory** -- The directory where the pipeline will be saved. If None, saves to\n  HF_LEROBOT_HOME/processors/⟦1⟧.\n- **repo_id** -- ID of your repository on the Hub. Used only if ⟦2⟧.\n- **push_to_hub** -- Whether or not to push your object to the Hugging Face Hub after saving it.\n- **card_kwargs** -- Additional arguments passed to the card template to customize the card.\n- **config_filename** -- The name of the JSON configuration file. If None, a name is\n  generated from the pipeline's ⟦3⟧ attribute.\n- ****push_to_hub_kwargs** -- Additional key word arguments passed along to the push_to_hub method.⟦4⟧⟦5⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "{sanitized_pipeline_name}",
+    "`push_to_hub=true`",
+    "`name`",
+    "</paramsdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 81,
+   "kind": "para",
+   "start": 23059,
+   "end": 23119,
+   "text": "Saves the pipeline's configuration and state to a directory.",
+   "tokens": []
+  },
+  {
+   "id": 82,
+   "kind": "para",
+   "start": 23121,
+   "end": 23315,
+   "text": "This method creates a JSON configuration file that defines the pipeline's structure\n(name and steps). For each stateful step, it also saves a ⟦0⟧ file\ncontaining its state dictionary.",
+   "tokens": [
+    "`.safetensors`"
+   ]
+  },
+  {
+   "id": 83,
+   "kind": "docfield",
+   "start": 23636,
+   "end": 23744,
+   "text": "⟦0⟧A dictionary mapping suffixless state keys to cloned step state dictionaries.⟦1⟧⟦2⟧",
+   "tokens": [
+    "<retdesc>",
+    "</retdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 84,
+   "kind": "para",
+   "start": 23745,
+   "end": 23796,
+   "text": "Return pipeline state tensors grouped by state key.",
+   "tokens": []
+  },
+  {
+   "id": 85,
+   "kind": "docfield",
+   "start": 24156,
+   "end": 24295,
+   "text": "⟦0⟧- **data** -- The input data.⟦1⟧⟦2⟧The ⟦3⟧ object, starting with the initial state and then after",
+   "tokens": [
+    "<paramsdesc>",
+    "</paramsdesc>",
+    "<yielddesc>",
+    "`EnvTransition`"
+   ]
+  },
+  {
+   "id": 86,
+   "kind": "para",
+   "start": 24296,
+   "end": 24409,
+   "text": "each processing step.⟦0⟧⟦1⟧\nProcesses data step-by-step, yielding the transition at each stage.",
+   "tokens": [
+    "</yielddesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 87,
+   "kind": "para",
+   "start": 24411,
+   "end": 24543,
+   "text": "This is a generator method useful for debugging and inspecting the intermediate\nstate of the data as it passes through the pipeline.",
+   "tokens": []
+  },
+  {
+   "id": 88,
+   "kind": "docfield",
+   "start": 24975,
+   "end": 25158,
+   "text": "⟦0⟧- **initial_features** -- A dictionary describing the initial features.⟦1⟧⟦2⟧The final feature description after all transformations.⟦3⟧⟦4⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "</paramsdesc>",
+    "<retdesc>",
+    "</retdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 89,
+   "kind": "para",
+   "start": 25159,
+   "end": 25219,
+   "text": "Applies feature transformations from all steps sequentially.",
+   "tokens": []
+  },
+  {
+   "id": 90,
+   "kind": "para",
+   "start": 25221,
+   "end": 25438,
+   "text": "This method propagates a feature description dictionary through each step's\n⟦0⟧ method, allowing the pipeline to statically determine\nthe output feature specification without processing any real data.",
+   "tokens": [
+    "`transform_features`"
+   ]
+  },
+  {
+   "id": 91,
+   "kind": "docfield",
+   "start": 25857,
+   "end": 26080,
+   "text": "⟦0⟧- **fn** -- The exact function object that was previously registered.⟦1⟧⟦2⟧- ⟦3⟧ -- If the hook is not found in the list.⟦4⟧⟦5⟧⟦6⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "</paramsdesc>",
+    "<raises>",
+    "``ValueError``",
+    "</raises>",
+    "<raisederrors>``ValueError``</raisederrors>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 92,
+   "kind": "para",
+   "start": 26081,
+   "end": 26114,
+   "text": "Unregisters an 'after_step' hook.",
+   "tokens": []
+  },
+  {
+   "id": 93,
+   "kind": "docfield",
+   "start": 26537,
+   "end": 26760,
+   "text": "⟦0⟧- **fn** -- The exact function object that was previously registered.⟦1⟧⟦2⟧- ⟦3⟧ -- If the hook is not found in the list.⟦4⟧⟦5⟧⟦6⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "</paramsdesc>",
+    "<raises>",
+    "``ValueError``",
+    "</raises>",
+    "<raisederrors>``ValueError``</raisederrors>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 94,
+   "kind": "para",
+   "start": 26761,
+   "end": 26794,
+   "text": "Unregisters a 'before_step' hook.",
+   "tokens": []
+  },
+  {
+   "id": 95,
+   "kind": "heading",
+   "start": 26817,
+   "end": 26886,
+   "text": "## PolicyProcessorPipeline⟦0⟧",
+   "tokens": [
+    "[[lerobot.processor.DataProcessorPipeline]]"
+   ]
+  }
+ ]
+}

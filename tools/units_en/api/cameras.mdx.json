@@ -1,0 +1,259 @@
+{
+ "file": "api/cameras.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1933,
+   "text": "# Cameras",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1935,
+   "end": 2139,
+   "text": "Cameras supply the image observations a policy sees. Every backend — OpenCV, Intel RealSense, Reachy 2 —\nimplements the ⟦0⟧ interface, so swapping hardware does not change the code that reads frames.",
+   "tokens": [
+    "`Camera`"
+   ]
+  },
+  {
+   "id": 2,
+   "kind": "para",
+   "start": 2141,
+   "end": 2309,
+   "text": "See the [Cameras guide](⟦0⟧) for choosing and configuring a camera, and\n[Third-Party Cameras & Sensors](⟦1⟧) for devices outside the core set.",
+   "tokens": [
+    "../cameras",
+    "../third_party_sensors"
+   ]
+  },
+  {
+   "id": 3,
+   "kind": "heading",
+   "start": 2311,
+   "end": 2346,
+   "text": "## Camera⟦0⟧",
+   "tokens": [
+    "[[lerobot.cameras.Camera]]"
+   ]
+  },
+  {
+   "id": 4,
+   "kind": "docfield",
+   "start": 2685,
+   "end": 2878,
+   "text": "⟦0⟧- **fps** (int | None) -- Configured frames per second\n- **width** (int | None) -- Frame width in pixels\n- **height** (int | None) -- Frame height in pixels⟦1⟧⟦2⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "</paramsdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 5,
+   "kind": "para",
+   "start": 2879,
+   "end": 2917,
+   "text": "Base class for camera implementations.",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "para",
+   "start": 2919,
+   "end": 3044,
+   "text": "Defines a standard interface for camera operations across different backends.\nSubclasses must implement all abstract methods.",
+   "tokens": []
+  },
+  {
+   "id": 7,
+   "kind": "para",
+   "start": 3046,
+   "end": 3116,
+   "text": "Manages basic camera properties (FPS, resolution) and core operations:",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "list",
+   "start": 3117,
+   "end": 3143,
+   "text": "- Connection/disconnection",
+   "tokens": []
+  },
+  {
+   "id": 9,
+   "kind": "list",
+   "start": 3144,
+   "end": 3179,
+   "text": "- Frame capture (sync/async/latest)",
+   "tokens": []
+  },
+  {
+   "id": 10,
+   "kind": "docfield",
+   "start": 3508,
+   "end": 3724,
+   "text": "⟦0⟧- **warmup** -- If True (default), captures a warmup frame before returning. Useful\n  for cameras that require time to adjust capture settings.\n  If False, skips the warmup frame.⟦1⟧⟦2⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "</paramsdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 11,
+   "kind": "para",
+   "start": 3725,
+   "end": 3760,
+   "text": "Establish connection to the camera.",
+   "tokens": []
+  },
+  {
+   "id": 12,
+   "kind": "para",
+   "start": 4060,
+   "end": 4122,
+   "text": "⟦0⟧\nDisconnect from the camera and release resources.",
+   "tokens": [
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 13,
+   "kind": "para",
+   "start": 4407,
+   "end": 4564,
+   "text": "⟦0⟧⟦1⟧Captured frame as a numpy array.⟦2⟧⟦3⟧\nCapture and return a single frame from the camera synchronously.",
+   "tokens": [
+    "<rettype>np.ndarray</rettype>",
+    "<retdesc>",
+    "</retdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 14,
+   "kind": "para",
+   "start": 4566,
+   "end": 4634,
+   "text": "This is a blocking call that will wait for the hardware and its SDK.",
+   "tokens": []
+  },
+  {
+   "id": 15,
+   "kind": "docfield",
+   "start": 4987,
+   "end": 5333,
+   "text": "⟦0⟧- **timeout_ms** -- Maximum time to wait for a new frame in milliseconds.\n  Defaults to 200ms (0.2s).⟦1⟧⟦2⟧⟦3⟧Captured frame as a numpy array.⟦4⟧⟦5⟧- ⟦6⟧ -- If no new frame arrives within ⟦7⟧.⟦8⟧⟦9⟧⟦10⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "</paramsdesc>",
+    "<rettype>np.ndarray</rettype>",
+    "<retdesc>",
+    "</retdesc>",
+    "<raises>",
+    "``TimeoutError``",
+    "`timeout_ms`",
+    "</raises>",
+    "<raisederrors>``TimeoutError``</raisederrors>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 16,
+   "kind": "para",
+   "start": 5334,
+   "end": 5367,
+   "text": "Return the most recent new frame.",
+   "tokens": []
+  },
+  {
+   "id": 17,
+   "kind": "para",
+   "start": 5369,
+   "end": 5551,
+   "text": "This method retrieves the latest frame captured by the background thread.\nIf a new frame is already available in the buffer (captured since the last call),\nit returns it immediately.",
+   "tokens": []
+  },
+  {
+   "id": 18,
+   "kind": "para",
+   "start": 5553,
+   "end": 5686,
+   "text": "It blocks up to ⟦0⟧ only if the buffer is empty or if the latest frame\nwas already consumed by a previous ⟦1⟧ call.",
+   "tokens": [
+    "`timeout_ms`",
+    "`async_read`"
+   ]
+  },
+  {
+   "id": 19,
+   "kind": "para",
+   "start": 5688,
+   "end": 5823,
+   "text": "Essentially, this method return the latest unconsumed frame, waiting if necessary\nfor a new one to arrive within the specified timeout.",
+   "tokens": []
+  },
+  {
+   "id": 20,
+   "kind": "para",
+   "start": 5825,
+   "end": 5831,
+   "text": "Usage:",
+   "tokens": []
+  },
+  {
+   "id": 21,
+   "kind": "list",
+   "start": 5832,
+   "end": 5971,
+   "text": "- Ideal for control loops where you want to ensure every processed frame\nis fresh, effectively synchronizing your loop to the camera's FPS.",
+   "tokens": []
+  },
+  {
+   "id": 22,
+   "kind": "list",
+   "start": 5972,
+   "end": 6088,
+   "text": "- Causes of a timeout usually include: very low camera FPS, heavy processing load,\nor if the camera is disconnected.",
+   "tokens": []
+  },
+  {
+   "id": 23,
+   "kind": "para",
+   "start": 6399,
+   "end": 6611,
+   "text": "⟦0⟧⟦1⟧A list of dictionaries,\nwhere each dictionary contains information about a detected camera.⟦2⟧⟦3⟧\nDetects available cameras connected to the system.",
+   "tokens": [
+    "<rettype>List[Dict[str, Any]]</rettype>",
+    "<retdesc>",
+    "</retdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 24,
+   "kind": "heading",
+   "start": 6631,
+   "end": 6678,
+   "text": "## CameraConfig⟦0⟧",
+   "tokens": [
+    "[[lerobot.cameras.CameraConfig]]"
+   ]
+  },
+  {
+   "id": 25,
+   "kind": "heading",
+   "start": 7154,
+   "end": 7227,
+   "text": "## make_cameras_from_configs⟦0⟧",
+   "tokens": [
+    "[[lerobot.cameras.make_cameras_from_configs]]"
+   ]
+  }
+ ]
+}

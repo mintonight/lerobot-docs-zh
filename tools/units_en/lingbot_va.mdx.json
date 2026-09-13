@@ -1,0 +1,667 @@
+{
+ "file": "lingbot_va.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1936,
+   "text": "# LingBot-VA",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1938,
+   "end": 2294,
+   "text": "LingBot-VA is an **autoregressive video-action world-model policy** built on the **Wan2.2**\nvideo-diffusion stack. It interleaves, in one autoregressive sequence, the prediction of\nfuture **video latents** and **robot actions** (\"VA\" = Video-Action). The LeRobot\nintegration wires LingBot-VA into the standard training, evaluation and processor\ninterfaces.",
+   "tokens": []
+  },
+  {
+   "id": 2,
+   "kind": "heading",
+   "start": 2296,
+   "end": 2313,
+   "text": "## Model Overview",
+   "tokens": []
+  },
+  {
+   "id": 3,
+   "kind": "para",
+   "start": 2315,
+   "end": 2567,
+   "text": "LingBot-VA is a **dual-stream \"mixture-of-transformers\"**: a video/latent stream\n(⟦0⟧) and an action stream\n(⟦1⟧) share the same 30 transformer blocks and\ntext conditioning.",
+   "tokens": [
+    "`patch_embedding_mlp → blocks → proj_out`",
+    "`action_embedder → blocks → action_proj_out`"
+   ]
+  },
+  {
+   "id": 4,
+   "kind": "table",
+   "start": 2569,
+   "end": 2685,
+   "text": "| Component                | Class                   | Role                                                        |",
+   "tokens": []
+  },
+  {
+   "id": 5,
+   "kind": "table",
+   "start": 2803,
+   "end": 2919,
+   "text": "| DiT backbone (trainable) | ⟦0⟧ | ~5B-param dual-stream transformer.                          |",
+   "tokens": [
+    "`WanTransformer3DModel`"
+   ]
+  },
+  {
+   "id": 6,
+   "kind": "table",
+   "start": 2920,
+   "end": 3036,
+   "text": "| VAE (frozen)             | ⟦0⟧      | Wan2.2 VAE, ⟦1⟧. Lazy-pulled from the source repo.   |",
+   "tokens": [
+    "`AutoencoderKLWan`",
+    "`z_dim=48`"
+   ]
+  },
+  {
+   "id": 7,
+   "kind": "table",
+   "start": 3037,
+   "end": 3153,
+   "text": "| Text encoder (frozen)    | ⟦0⟧      | UMT5-XXL, ⟦1⟧. Lazy-pulled from the source repo. |",
+   "tokens": [
+    "`UMT5EncoderModel`",
+    "`d_model=4096`"
+   ]
+  },
+  {
+   "id": 8,
+   "kind": "para",
+   "start": 3155,
+   "end": 3499,
+   "text": "At inference the policy runs an autoregressive loop per chunk: it denoises the video-latent\nstream (CFG, ~20 steps) and the action stream (~50 steps) with two independent\nflow-matching schedulers, maintaining a KV cache across chunks. Real observed keyframes are\nfed back into the KV cache as the chunk is executed (closed-loop world modeling).",
+   "tokens": []
+  },
+  {
+   "id": 9,
+   "kind": "heading",
+   "start": 3501,
+   "end": 3540,
+   "text": "### What the LeRobot Integration Covers",
+   "tokens": []
+  },
+  {
+   "id": 10,
+   "kind": "list",
+   "start": 3542,
+   "end": 3608,
+   "text": "- Standard ⟦0⟧ configuration through LeRobot.",
+   "tokens": [
+    "`policy.type=lingbot_va`"
+   ]
+  },
+  {
+   "id": 11,
+   "kind": "list",
+   "start": 3609,
+   "end": 3706,
+   "text": "- Ready-to-use LeRobot-format checkpoints on the Hub (converted from the released upstream ones).",
+   "tokens": []
+  },
+  {
+   "id": 12,
+   "kind": "list",
+   "start": 3707,
+   "end": 3843,
+   "text": "- Autoregressive dual-stream inference behind the standard ⟦0⟧ interface\n  (single-environment eval, ⟦1⟧).",
+   "tokens": [
+    "`select_action`",
+    "`--eval.batch_size=1`"
+   ]
+  },
+  {
+   "id": 13,
+   "kind": "list",
+   "start": 3844,
+   "end": 3931,
+   "text": "- Opt-in saving of the policy's **predicted (imagined) videos** during eval / training.",
+   "tokens": []
+  },
+  {
+   "id": 14,
+   "kind": "list",
+   "start": 3932,
+   "end": 3988,
+   "text": "- Evaluation with ⟦0⟧ on LIBERO and RoboTwin.",
+   "tokens": [
+    "`lerobot-eval`"
+   ]
+  },
+  {
+   "id": 15,
+   "kind": "list",
+   "start": 3989,
+   "end": 4083,
+   "text": "- Training / fine-tuning via the dual-stream flow-matching loss (⟦0⟧), see below.",
+   "tokens": [
+    "`policy.forward`"
+   ]
+  },
+  {
+   "id": 16,
+   "kind": "heading",
+   "start": 4085,
+   "end": 4100,
+   "text": "## Installation",
+   "tokens": []
+  },
+  {
+   "id": 17,
+   "kind": "list",
+   "start": 4102,
+   "end": 4175,
+   "text": "1. Install LeRobot by following the [Installation Guide](⟦0⟧).",
+   "tokens": [
+    "./installation"
+   ]
+  },
+  {
+   "id": 18,
+   "kind": "list",
+   "start": 4176,
+   "end": 4208,
+   "text": "2. Install the LingBot-VA extra:",
+   "tokens": []
+  },
+  {
+   "id": 19,
+   "kind": "heading",
+   "start": 4254,
+   "end": 4268,
+   "text": "## Checkpoints",
+   "tokens": []
+  },
+  {
+   "id": 20,
+   "kind": "para",
+   "start": 4270,
+   "end": 4364,
+   "text": "The released upstream checkpoints have been converted to LeRobot format and pushed to the Hub:",
+   "tokens": []
+  },
+  {
+   "id": 21,
+   "kind": "table",
+   "start": 4366,
+   "end": 4427,
+   "text": "| Variant                | LeRobot checkpoint               |",
+   "tokens": []
+  },
+  {
+   "id": 22,
+   "kind": "table",
+   "start": 4490,
+   "end": 4551,
+   "text": "| LIBERO-Long post-train | ⟦0⟧ |",
+   "tokens": [
+    "`lerobot/lingbot_va_libero_long`"
+   ]
+  },
+  {
+   "id": 23,
+   "kind": "table",
+   "start": 4552,
+   "end": 4613,
+   "text": "| RoboTwin post-train    | ⟦0⟧    |",
+   "tokens": [
+    "`lerobot/lingbot_va_robotwin`"
+   ]
+  },
+  {
+   "id": 24,
+   "kind": "table",
+   "start": 4614,
+   "end": 4675,
+   "text": "| Pretrained base        | ⟦0⟧        |",
+   "tokens": [
+    "`lerobot/lingbot_va_base`"
+   ]
+  },
+  {
+   "id": 25,
+   "kind": "para",
+   "start": 4677,
+   "end": 5040,
+   "text": "Only the trainable ~5B transformer is stored in the LeRobot\n⟦0⟧. The frozen VAE + UMT5 + tokenizer (~20 GB) are pulled from\n⟦1⟧ at load time (defaults to the source ⟦2⟧ repo). The\nUMT5-XXL text encoder runs on CPU by default (⟦3⟧) so the 5B\ntransformer + VAE fit on a single 24–32 GB GPU.",
+   "tokens": [
+    "`model.safetensors`",
+    "`config.wan_pretrained_path`",
+    "`robbyant/*`",
+    "`config.text_encoder_device`"
+   ]
+  },
+  {
+   "id": 26,
+   "kind": "heading",
+   "start": 5042,
+   "end": 5064,
+   "text": "## Evaluation (LIBERO)",
+   "tokens": []
+  },
+  {
+   "id": 27,
+   "kind": "para",
+   "start": 5375,
+   "end": 5518,
+   "text": "LingBot-VA's streaming inference (KV cache + observed-keyframe feedback) is implemented for\nsingle-environment eval; use ⟦0⟧.",
+   "tokens": [
+    "`--eval.batch_size=1`"
+   ]
+  },
+  {
+   "id": 28,
+   "kind": "heading",
+   "start": 5520,
+   "end": 5544,
+   "text": "## Evaluation (RoboTwin)",
+   "tokens": []
+  },
+  {
+   "id": 29,
+   "kind": "para",
+   "start": 5546,
+   "end": 6053,
+   "text": "RoboTwin 2.0 needs the SAPIEN + CuRobo simulator stack. You can use the benchmark Docker image\n(⟦0⟧, which also needs ⟦1⟧ and CuRobo built\nwith the GPU's compute capability in ⟦2⟧). RoboTwin uses **end-effector-pose\ncontrol**, so run with ⟦3⟧: the policy predicts per-arm ⟦4⟧\ndeltas (⟦5⟧ latent layout) that are composed onto the episode's initial eef pose and\nexecuted via CuRobo IK.",
+   "tokens": [
+    "`docker/Dockerfile.benchmark.robotwin`",
+    "`warp-lang==1.3.1`",
+    "`TORCH_CUDA_ARCH_LIST`",
+    "`--env.action_mode=ee`",
+    "`xyz+quaternion+gripper`",
+    "`robotwin_tshape`"
+   ]
+  },
+  {
+   "id": 30,
+   "kind": "heading",
+   "start": 6331,
+   "end": 6369,
+   "text": "### Saving predicted (imagined) videos",
+   "tokens": []
+  },
+  {
+   "id": 31,
+   "kind": "para",
+   "start": 6371,
+   "end": 6617,
+   "text": "Set ⟦0⟧ to additionally VAE-decode the predicted video\nlatents and write ⟦1⟧ next to the env-rendered ⟦2⟧ videos.\nThe same flag works for the periodic eval during ⟦3⟧.",
+   "tokens": [
+    "`--policy.save_predicted_video=true`",
+    "`pred_episode_*.mp4`",
+    "`eval_episode_*.mp4`",
+    "`lerobot-train`"
+   ]
+  },
+  {
+   "id": 32,
+   "kind": "heading",
+   "start": 6619,
+   "end": 6644,
+   "text": "## Training / fine-tuning",
+   "tokens": []
+  },
+  {
+   "id": 33,
+   "kind": "para",
+   "start": 6646,
+   "end": 7076,
+   "text": "⟦0⟧ implements the dual-stream **flow-matching** loss\n(⟦1⟧, timestep-weighted, action-masked) from the paper: it VAE-encodes\nthe camera clips into video latents, UMT5-encodes the task, noises both streams, runs the\ntransformer's block-causal training pass and returns ⟦2⟧. Optimizer preset is AdamW\nwith a linear-warmup-then-constant schedule (matching upstream).",
+   "tokens": [
+    "`LingBotVAPolicy.forward(batch)`",
+    "`latent_loss + action_loss`",
+    "`(loss, metrics)`"
+   ]
+  },
+  {
+   "id": 34,
+   "kind": "para",
+   "start": 7078,
+   "end": 7091,
+   "text": "Requirements:",
+   "tokens": []
+  },
+  {
+   "id": 35,
+   "kind": "list",
+   "start": 7093,
+   "end": 7261,
+   "text": "- The block-causal masks use PyTorch **flex-attention**, so build the policy with\n  ⟦0⟧ for training (the default ⟦1⟧ SDPA is inference-only).",
+   "tokens": [
+    "`--policy.attn_mode=flex`",
+    "`torch`"
+   ]
+  },
+  {
+   "id": 36,
+   "kind": "list",
+   "start": 7262,
+   "end": 7522,
+   "text": "- The full 5B DiT does not fit a single 24–32 GB GPU under AdamW; fine-tune with **LoRA**\n  (⟦0⟧) and/or optimizer offload. ⟦1⟧ returns only the\n  trainable (e.g. adapter) parameters; the VAE + UMT5 text encoder stay frozen.",
+   "tokens": [
+    "`--policy.use_peft=true`",
+    "`get_optim_params`"
+   ]
+  },
+  {
+   "id": 37,
+   "kind": "para",
+   "start": 7772,
+   "end": 7954,
+   "text": "The dataset must provide camera clips (a temporal window per camera, VAE-encoded to\n⟦0⟧ latent frames) and ⟦1⟧ action steps per item.",
+   "tokens": [
+    "`frame_chunk_size`",
+    "`frame_chunk_size * action_per_frame`"
+   ]
+  },
+  {
+   "id": 38,
+   "kind": "heading",
+   "start": 7956,
+   "end": 8003,
+   "text": "## Data format (action channels & camera order)",
+   "tokens": []
+  },
+  {
+   "id": 39,
+   "kind": "para",
+   "start": 8005,
+   "end": 8341,
+   "text": "LingBot-VA is an **end-effector (Cartesian) pose** policy, it predicts EEF poses + gripper, not\njoint positions. Actions live in a fixed multi-embodiment **30-dim** layout; map your robot's\naction dimensions into these channels and pad the rest with ⟦0⟧ (⟦1⟧ selects\nthe channels a given checkpoint actually uses):",
+   "tokens": [
+    "`0`",
+    "`used_action_channel_ids`"
+   ]
+  },
+  {
+   "id": 40,
+   "kind": "table",
+   "start": 8343,
+   "end": 8411,
+   "text": "| channels | meaning                                               |",
+   "tokens": []
+  },
+  {
+   "id": 41,
+   "kind": "table",
+   "start": 8481,
+   "end": 8549,
+   "text": "| 0–6      | Left-arm end-effector pose                            |",
+   "tokens": []
+  },
+  {
+   "id": 42,
+   "kind": "table",
+   "start": 8550,
+   "end": 8618,
+   "text": "| 7–13     | Right-arm end-effector pose                           |",
+   "tokens": []
+  },
+  {
+   "id": 43,
+   "kind": "table",
+   "start": 8619,
+   "end": 8687,
+   "text": "| 14–20    | Left-arm joints (unused by the released checkpoints)  |",
+   "tokens": []
+  },
+  {
+   "id": 44,
+   "kind": "table",
+   "start": 8688,
+   "end": 8756,
+   "text": "| 21–27    | Right-arm joints (unused by the released checkpoints) |",
+   "tokens": []
+  },
+  {
+   "id": 45,
+   "kind": "table",
+   "start": 8757,
+   "end": 8825,
+   "text": "| 28       | Left gripper                                          |",
+   "tokens": []
+  },
+  {
+   "id": 46,
+   "kind": "table",
+   "start": 8826,
+   "end": 8894,
+   "text": "| 29       | Right gripper                                         |",
+   "tokens": []
+  },
+  {
+   "id": 47,
+   "kind": "list",
+   "start": 8896,
+   "end": 8988,
+   "text": "- **LIBERO** uses channels ⟦0⟧: a 6-DoF EEF delta (xyz + rotation) + gripper (single arm).",
+   "tokens": [
+    "`0–6`"
+   ]
+  },
+  {
+   "id": 48,
+   "kind": "list",
+   "start": 8989,
+   "end": 9221,
+   "text": "- **RoboTwin** uses channels ⟦0⟧: left EEF (xyz + quaternion) + left gripper +\n  right EEF + right gripper (16 dims). The env converts these poses to joint trajectories via\n  CuRobo IK — joints are never predicted.",
+   "tokens": [
+    "`[0–6, 28, 7–13, 29]`"
+   ]
+  },
+  {
+   "id": 49,
+   "kind": "para",
+   "start": 9223,
+   "end": 9347,
+   "text": "Joint-space datasets (or a different EEF convention) must be remapped into this schema before\nfine-tuning these checkpoints.",
+   "tokens": []
+  },
+  {
+   "id": 50,
+   "kind": "para",
+   "start": 9349,
+   "end": 9523,
+   "text": "**Camera order is fixed and order-sensitive**, per-camera latents are concatenated spatially in\n⟦0⟧ order, so the physical camera→slot mapping must match training:",
+   "tokens": [
+    "`obs_cam_keys`"
+   ]
+  },
+  {
+   "id": 51,
+   "kind": "table",
+   "start": 9525,
+   "end": 9712,
+   "text": "| benchmark | ⟦0⟧ (in order)                                                                             | ⟦1⟧                                                     |",
+   "tokens": [
+    "`obs_cam_keys`",
+    "`camera_layout`"
+   ]
+  },
+  {
+   "id": 52,
+   "kind": "table",
+   "start": 9901,
+   "end": 10088,
+   "text": "| LIBERO    | ⟦0⟧ (agentview / 3rd-person), ⟦1⟧ (eye-in-hand wrist)  | ⟦2⟧ (latents concatenated on width)                      |",
+   "tokens": [
+    "`observation.images.image`",
+    "`observation.images.image2`",
+    "`width_concat`"
+   ]
+  },
+  {
+   "id": 53,
+   "kind": "table",
+   "start": 10089,
+   "end": 10276,
+   "text": "| RoboTwin  | ⟦0⟧, ⟦1⟧, ⟦2⟧ | ⟦3⟧ (full-res head below, two half-res wrists on top) |",
+   "tokens": [
+    "`observation.images.head_camera`",
+    "`observation.images.left_camera`",
+    "`observation.images.right_camera`",
+    "`robotwin_tshape`"
+   ]
+  },
+  {
+   "id": 54,
+   "kind": "para",
+   "start": 10278,
+   "end": 10350,
+   "text": "The first camera is the exterior/head view and the rest are wrist views.",
+   "tokens": []
+  },
+  {
+   "id": 55,
+   "kind": "heading",
+   "start": 10352,
+   "end": 10389,
+   "text": "## Inference Hyperparameters (LIBERO)",
+   "tokens": []
+  },
+  {
+   "id": 56,
+   "kind": "table",
+   "start": 10391,
+   "end": 10517,
+   "text": "| Key                                    | Value                                                                             |",
+   "tokens": []
+  },
+  {
+   "id": 57,
+   "kind": "table",
+   "start": 10645,
+   "end": 10771,
+   "text": "| height × width                         | 128 × 128                                                                         |",
+   "tokens": []
+  },
+  {
+   "id": 58,
+   "kind": "table",
+   "start": 10772,
+   "end": 10898,
+   "text": "| cameras                                | ⟦0⟧ (agentview), ⟦1⟧ (eye-in-hand) |",
+   "tokens": [
+    "`observation.images.image`",
+    "`observation.images.image2`"
+   ]
+  },
+  {
+   "id": 59,
+   "kind": "table",
+   "start": 10899,
+   "end": 11025,
+   "text": "| action channels used                   | 0–6 (7-DoF arm + gripper)                                                         |",
+   "tokens": []
+  },
+  {
+   "id": 60,
+   "kind": "table",
+   "start": 11026,
+   "end": 11152,
+   "text": "| action_per_frame / frame_chunk_size    | 4 / 4                                                                             |",
+   "tokens": []
+  },
+  {
+   "id": 61,
+   "kind": "table",
+   "start": 11153,
+   "end": 11279,
+   "text": "| attn_window                            | 30                                                                                |",
+   "tokens": []
+  },
+  {
+   "id": 62,
+   "kind": "table",
+   "start": 11280,
+   "end": 11406,
+   "text": "| video / action denoising steps         | 20 / 50                                                                           |",
+   "tokens": []
+  },
+  {
+   "id": 63,
+   "kind": "table",
+   "start": 11407,
+   "end": 11533,
+   "text": "| guidance_scale / action_guidance_scale | 5 / 1                                                                             |",
+   "tokens": []
+  },
+  {
+   "id": 64,
+   "kind": "table",
+   "start": 11534,
+   "end": 11660,
+   "text": "| snr_shift / action_snr_shift           | 5.0 / 0.05                                                                        |",
+   "tokens": []
+  },
+  {
+   "id": 65,
+   "kind": "para",
+   "start": 11662,
+   "end": 11754,
+   "text": "These are the defaults of ⟦0⟧; override any of them via ⟦1⟧.",
+   "tokens": [
+    "`LingBotVAConfig`",
+    "`--policy.<name>=...`"
+   ]
+  },
+  {
+   "id": 66,
+   "kind": "heading",
+   "start": 11756,
+   "end": 11764,
+   "text": "## Notes",
+   "tokens": []
+  },
+  {
+   "id": 67,
+   "kind": "list",
+   "start": 11766,
+   "end": 11938,
+   "text": "- **Attention backend:** inference uses the ⟦0⟧ SDPA backend (always available). The\n  ⟦1⟧ and ⟦2⟧ backends are optional; ⟦3⟧ is only needed for training.",
+   "tokens": [
+    "`torch`",
+    "`flashattn`",
+    "`flex`",
+    "`flex`"
+   ]
+  },
+  {
+   "id": 68,
+   "kind": "list",
+   "start": 11939,
+   "end": 12058,
+   "text": "- **Model size:** the DiT is ~5B params and the frozen VAE+UMT5 add ~20 GB; inference needs\n  roughly 18–24 GB of VRAM.",
+   "tokens": []
+  },
+  {
+   "id": 69,
+   "kind": "heading",
+   "start": 12060,
+   "end": 12070,
+   "text": "## License",
+   "tokens": []
+  },
+  {
+   "id": 70,
+   "kind": "para",
+   "start": 12072,
+   "end": 12183,
+   "text": "LingBot-VA is released under Apache-2.0. See the\n[upstream repository](⟦0⟧).",
+   "tokens": [
+    "https://github.com/Robbyant/lingbot-va"
+   ]
+  }
+ ]
+}

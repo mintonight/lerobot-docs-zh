@@ -1,0 +1,293 @@
+<script lang="ts">
+import {onMount} from "svelte";
+import Tip from "$lib/Tip.svelte";
+import CopyLLMTxtMenu from "$lib/CopyLLMTxtMenu.svelte";
+import Youtube from "$lib/Youtube.svelte";
+import Docstring from "$lib/Docstring.svelte";
+import CodeBlock from "$lib/CodeBlock.svelte";
+import CodeBlockFw from "$lib/CodeBlockFw.svelte";
+import DocNotebookDropdown from "$lib/DocNotebookDropdown.svelte";
+import CourseFloatingBanner from "$lib/CourseFloatingBanner.svelte";
+import IconCopyLink from "$lib/IconCopyLink.svelte";
+import FrameworkContent from "$lib/FrameworkContent.svelte";
+import Markdown from "$lib/Markdown.svelte";
+import Question from "$lib/Question.svelte";
+import FrameworkSwitchCourse from "$lib/FrameworkSwitchCourse.svelte";
+import InferenceApi from "$lib/InferenceApi.svelte";
+import TokenizersLanguageContent from "$lib/TokenizersLanguageContent.svelte";
+import ExampleCodeBlock from "$lib/ExampleCodeBlock.svelte";
+import Added from "$lib/Added.svelte";
+import Changed from "$lib/Changed.svelte";
+import Deprecated from "$lib/Deprecated.svelte";
+import PipelineIcon from "$lib/PipelineIcon.svelte";
+import PipelineTag from "$lib/PipelineTag.svelte";
+import Heading from "$lib/Heading.svelte";
+import HfOptions from "$lib/HfOptions.svelte";
+import HfOption from "$lib/HfOption.svelte";
+import EditOnGithub from "$lib/EditOnGithub.svelte";
+import InferenceSnippet from "$lib/InferenceSnippet/InferenceSnippet.svelte";
+import MermaidChart from "$lib/MermaidChart.svelte";
+let fw: "pt" | "tf" = "pt";
+onMount(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    fw = urlParams.get("fw") || "pt";
+});
+</script>
+<svelte:head>
+  <meta name="hf:doc:metadata" content={metadata} >
+</svelte:head>
+
+<!--HF DOCBUILD BODY START-->
+
+HF_DOC_BODY_START
+
+<CopyLLMTxtMenu containerStyle="float: right; margin-left: 10px; display: inline-flex; position: relative; z-index: 10;"></CopyLLMTxtMenu>
+
+# 相机
+
+LeRobot 提供了多种视频采集选项：
+
+| 类 | 支持的相机 |
+| ----------------- | ----------------------------------- |
+| `OpenCVCamera` | 手机、笔记本电脑内置摄像头、USB 网络摄像头 |
+| `ZMQCamera` | 联网相机 |
+| `RealSenseCamera` | Intel RealSense（带深度） |
+| `Reachy2Camera` | Reachy 2 机器人相机 |
+
+> [!TIP]
+> 有关 `OpenCVCamera` 的兼容性详细信息，请参阅 [Video I/O with OpenCV Overview](https://docs.opencv.org/4.x/d0/da7/videoio_overview.html)。
+
+### 找到你的相机
+
+每台相机在被实例化时都需要一个唯一标识符，使你可以区分多个连接的设备。
+
+`OpenCVCamera` 和 `RealSenseCamera` 支持自动发现。运行下面的命令来列出可用的设备及其标识符。请注意，根据你的操作系统，这些标识符在重启计算机或重新插拔相机后可能会改变。
+
+```bash
+lerobot-find-cameras opencv # or realsense for Intel Realsense cameras
+```
+
+如果你连接了两台相机，输出看起来会像这样：
+
+```bash
+--- Detected Cameras ---
+Camera #0:
+  Name: OpenCV Camera @ 0
+  Type: OpenCV
+  Id: 0
+  Backend api: AVFOUNDATION
+  Default stream profile:
+    Format: 16.0
+    Width: 1920
+    Height: 1080
+    Fps: 15.0
+--------------------
+(more cameras ...)
+```
+
+> [!WARNING]
+> 在 `macOS` 中使用 Intel RealSense 相机时，你可能会遇到这个 [错误](https://github.com/IntelRealSense/librealsense/issues/12307)：`Error finding RealSense cameras: failed to set power state`，可以通过使用 `sudo` 权限运行同一命令来解决。请注意，在 `macOS` 中使用 RealSense 相机不稳定。
+
+`ZMQCamera` 和 `Reachy2Camera` 不支持自动发现。必须通过提供它们的网络地址和端口或机器人 SDK 设置来手动配置。
+
+## 使用相机
+
+### 帧访问模式
+
+所有相机类都实现了三种用于采集帧的访问模式：
+
+| 方法 | 行为 | 会阻塞？ | 最适合 |
+| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------- | ---------------------------------------- |
+| `read()` | 等待相机硬件返回一帧。根据相机和 SDK 的不同，可能会长时间阻塞。 | 是 | 简单脚本、顺序采集 |
+| `async_read(timeout_ms)` | 从后台线程返回最新的未消费帧。只有在缓冲区为空时才会阻塞，最多 `timeout_ms`。如果没有帧到达，则抛出 `TimeoutError`。 | 带超时 | 与相机 FPS 同步的控制循环 |
+| `read_latest(max_age_ms)` | 窥视缓冲区中最近的帧（可能是过期的）。如果帧早于 `max_age_ms`，则抛出 `TimeoutError`。 | 否 | UI 可视化、日志、监控 |
+
+### 用法示例
+
+以下示例展示了如何使用相机 API 配置不同相机类型并采集帧。
+
+- **阻塞和非阻塞帧采集**：使用基于 OpenCV 的相机
+- **彩色和深度采集**：使用 Intel RealSense 相机
+
+> [!WARNING]
+> 未能干净地断开相机可能会造成资源泄漏。请使用上下文管理器协议来确保自动清理：
+>
+> ```python
+> with OpenCVCamera(config) as camera:
+>     ...
+> ```
+>
+> 你也可以手动调用 `connect()` 和 `disconnect()`，但对于后者，请始终使用 `finally` 块。
+
+<hfoptions id="shell_restart">
+<hfoption id="Open CV Camera">
+
+<!-- prettier-ignore-start -->
+```python
+from lerobot.cameras.opencv import OpenCVCamera, OpenCVCameraConfig
+from lerobot.cameras import ColorMode, Cv2Rotation
+
+# Construct an `OpenCVCameraConfig` with your desired FPS, resolution, color mode, and rotation.
+config = OpenCVCameraConfig(
+    index_or_path=0,
+    fps=15,
+    width=1920,
+    height=1080,
+    color_mode=ColorMode.RGB,
+    rotation=Cv2Rotation.NO_ROTATION
+)
+
+# Instantiate and connect an `OpenCVCamera`, performing a warm-up read (default).
+with OpenCVCamera(config) as camera:
+
+    # Read a frame synchronously — blocks until hardware delivers a new frame
+    frame = camera.read()
+    print(f"read() call returned frame with shape:", frame.shape)
+
+    # Read a frame asynchronously with a timeout — returns the latest unconsumed frame or waits up to timeout_ms for a new one
+    try:
+        for i in range(10):
+            frame = camera.async_read(timeout_ms=200)
+            print(f"async_read call returned frame {i} with shape:", frame.shape)
+    except TimeoutError as e:
+        print(f"No frame received within timeout: {e}")
+
+    # Instantly return a frame - returns the most recent frame captured by the camera
+    try:
+        initial_frame = camera.read_latest(max_age_ms=1000)
+        for i in range(10):
+            frame = camera.read_latest(max_age_ms=1000)
+            print(f"read_latest call returned frame {i} with shape:", frame.shape)
+            print(f"Was a new frame received by the camera? {not (initial_frame == frame).any()}")
+    except TimeoutError as e:
+        print(f"Frame too old: {e}")
+
+```
+<!-- prettier-ignore-end -->
+
+</hfoption>
+<hfoption id="Intel Realsense Camera">
+
+<!-- prettier-ignore-start -->
+```python
+from lerobot.cameras.realsense import RealSenseCamera, RealSenseCameraConfig
+from lerobot.cameras import ColorMode, Cv2Rotation
+
+# Create a `RealSenseCameraConfig` specifying your camera’s serial number and enabling depth.
+config = RealSenseCameraConfig(
+    serial_number_or_name="233522074606",
+    fps=15,
+    width=640,
+    height=480,
+    color_mode=ColorMode.RGB,
+    use_depth=True,
+    # Optional fixed color controls. Omit them to leave the current sensor settings unchanged.
+    exposure=120,
+    gain=64,
+    white_balance=4600,
+    rotation=Cv2Rotation.NO_ROTATION
+)
+
+# Instantiate and connect a `RealSenseCamera` with warm-up read (default).
+camera = RealSenseCamera(config)
+camera.connect()
+
+# Capture a color frame via `read()` and a depth map via `read_depth()`.
+try:
+    color_frame = camera.read()
+    depth_map = camera.read_depth()
+    print("Color frame shape:", color_frame.shape)
+    print("Depth map shape:", depth_map.shape)
+finally:
+    camera.disconnect()
+```
+<!-- prettier-ignore-end -->
+
+手动颜色控制会禁用相应的自动曝光或白平衡模式。它们
+支持的取值范围因相机型号而异；无效值会在连接时抛出错误，错误中
+包含传感器报告的取值范围。请求不支持的控件也会抛出错误。
+省略的控件会使传感器现有的自动或手动设置保持不变。这些选项
+需要 `use_rgb=True`。
+
+手动颜色控制需要专用的 RGB 模块。没有该模块的相机（例如 RealSense
+D405）不支持这些控制，会在连接时抛出错误。
+
+</hfoption>
+</hfoptions>
+
+### 使用深度
+
+Intel RealSense 和 Reachy 2 相机可以在同步 state 下同时采集彩色和深度。调用 `read()` 返回 **彩色** 帧，即 `(H, W, 3)` `uint8`。调用 `read_depth()` 返回 **深度图**，即 `(H, W, 1)` `uint16`，其中每个像素值是以 **毫米** 表示的到传感器的距离。像素值为 `0` 通常表示“无可用测量”（超出范围、被遮挡或置信度低）。
+
+录制期间，控制循环通过 `read_latest()`（彩色）和 `read_latest_depth()`（深度）以非阻塞方式窥视最新的缓冲帧，并将深度图添加为并列特征（例如 `front_depth` 紧挨着 `front`）。
+
+关于录制 dataset 时深度流的存储和编码方式，请参阅视频编码指南中的 [Depth streams](./video_encoding_parameters#depth-streams) 一节。
+
+## 使用手机的相机
+
+<hfoptions id="use phone">
+<hfoption id="iPhone & macOS">
+
+要在 macOS 上将 iPhone 用作相机，请启用连续互通相机（Continuity Camera）功能：
+
+- 确保你的 Mac 运行 macOS 13 或更高版本，iPhone 使用 iOS 16 或更高版本。
+- 使用同一个 Apple ID 登录两台设备。
+- 使用 USB 线连接你的设备，或者打开 Wi-Fi 和蓝牙进行无线连接。
+
+更多详细信息，请访问 [Apple 支持](https://support.apple.com/en-gb/guide/mac-help/mchl77879b8a/mac)。
+
+</hfoption>
+<hfoption id="OBS virtual camera">
+
+如果你想使用 OBS 将手机用作相机，请按照以下步骤设置虚拟相机。
+
+1. _（仅 Linux）安装 `v4l2loopback-dkms` 和 `v4l-utils`_。这些软件包会创建虚拟相机设备并验证其设置。使用以下命令安装：
+
+```bash
+sudo apt install v4l2loopback-dkms v4l-utils
+```
+
+2. _在手机上安装 [DroidCam 应用](https://droidcam.app)_。该应用可用于 iOS 和 Android。
+3. _下载并安装 [OBS Studio](https://obsproject.com)_。
+4. _下载并安装 [DroidCam OBS 插件](https://droidcam.app/obs)_。
+5. _启动 OBS Studio_。
+
+6. _将你的手机添加为源_。按照[此处](https://droidcam.app/obs/usage)的说明操作。务必将分辨率设置为 `640x480` 以避免水印。
+7. _调整分辨率设置_。在 OBS Studio 中，转到 `File > Settings > Video` 或 `OBS > Preferences... > Video`。手动输入，将 `Base(Canvas) Resolution` 和 `Output(Scaled) Resolution` 更改为 `640x480`。
+8. _启动虚拟相机_。在 OBS Studio 中，按照[此处](https://obsproject.com/kb/virtual-camera-guide)的说明操作。
+9. _验证虚拟相机的设置和分辨率_。
+   - **Linux**：使用 `v4l2-ctl` 列出设备并检查分辨率：
+     ```bash
+     v4l2-ctl --list-devices  # find VirtualCam and note its /dev/videoX path
+     v4l2-ctl -d /dev/videoX --get-fmt-video  # replace with your VirtualCam path
+     ```
+     你应该看到列出了 `VirtualCam`，并且分辨率为 `640x480`。
+   - **macOS**：打开 Photo Booth 或 FaceTime，然后选择 “OBS Virtual Camera” 作为输入。
+   - **Windows**：原生相机应用不支持虚拟相机。请使用视频会议应用（Zoom、Teams）或直接运行 `lerobot-find-cameras opencv` 来验证。
+
+<details>
+<summary><strong> 故障排查 </strong></summary>
+
+> 虚拟相机的分辨率不正确。
+
+删除虚拟相机源并重新创建它。分辨率在创建后无法更改。
+
+> Error reading frame in background thread for OpenCVCamera(X): OpenCVCamera(X) frame width=640 or height=480 do not match configured width=1920 or height=1080.
+
+此错误是由 OBS Virtual Camera 广告了 `1920x1080` 分辨率（尽管进行了缩放）导致的。目前唯一的解决方法是注释掉 `_postprocess_image()` 中的宽度和高度检查。
+
+</details>
+
+</hfoption>
+</hfoptions>
+
+如果一切设置正确，你的手机会以标准 OpenCV 相机的形式出现，并可与 `OpenCVCamera` 一起使用。
+
+
+
+<EditOnGithub source="https://github.com/huggingface/lerobot/blob/main/docs/source/cameras.mdx" />
+
+<!--HF DOCBUILD BODY END-->
+
+HF_DOC_BODY_END
+

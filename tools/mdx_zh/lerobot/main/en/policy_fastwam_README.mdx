@@ -1,0 +1,108 @@
+<script lang="ts">
+import {onMount} from "svelte";
+import Tip from "$lib/Tip.svelte";
+import CopyLLMTxtMenu from "$lib/CopyLLMTxtMenu.svelte";
+import Youtube from "$lib/Youtube.svelte";
+import Docstring from "$lib/Docstring.svelte";
+import CodeBlock from "$lib/CodeBlock.svelte";
+import CodeBlockFw from "$lib/CodeBlockFw.svelte";
+import DocNotebookDropdown from "$lib/DocNotebookDropdown.svelte";
+import CourseFloatingBanner from "$lib/CourseFloatingBanner.svelte";
+import IconCopyLink from "$lib/IconCopyLink.svelte";
+import FrameworkContent from "$lib/FrameworkContent.svelte";
+import Markdown from "$lib/Markdown.svelte";
+import Question from "$lib/Question.svelte";
+import FrameworkSwitchCourse from "$lib/FrameworkSwitchCourse.svelte";
+import InferenceApi from "$lib/InferenceApi.svelte";
+import TokenizersLanguageContent from "$lib/TokenizersLanguageContent.svelte";
+import ExampleCodeBlock from "$lib/ExampleCodeBlock.svelte";
+import Added from "$lib/Added.svelte";
+import Changed from "$lib/Changed.svelte";
+import Deprecated from "$lib/Deprecated.svelte";
+import PipelineIcon from "$lib/PipelineIcon.svelte";
+import PipelineTag from "$lib/PipelineTag.svelte";
+import Heading from "$lib/Heading.svelte";
+import HfOptions from "$lib/HfOptions.svelte";
+import HfOption from "$lib/HfOption.svelte";
+import EditOnGithub from "$lib/EditOnGithub.svelte";
+import InferenceSnippet from "$lib/InferenceSnippet/InferenceSnippet.svelte";
+import MermaidChart from "$lib/MermaidChart.svelte";
+let fw: "pt" | "tf" = "pt";
+onMount(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    fw = urlParams.get("fw") || "pt";
+});
+</script>
+<svelte:head>
+  <meta name="hf:doc:metadata" content={metadata} >
+</svelte:head>
+
+<!--HF DOCBUILD BODY START-->
+
+HF_DOC_BODY_START
+
+## 研究论文
+
+论文：https://arxiv.org/abs/2603.16666
+
+## 代码仓库
+
+代码：https://github.com/yuantianyuan01/FastWAM
+
+项目主页：https://yuantianyuan01.github.io/FastWAM/
+
+## 引用
+
+```bibtex
+@article{yuan2026fastwam,
+  title = {Fast-WAM: Do World Action Models Need Test-time Future Imagination?},
+  author = {Tianyuan Yuan and Zibin Dong and Yicheng Liu and Hang Zhao},
+  journal = {arXiv preprint arXiv:2603.16666},
+  year = {2026},
+  url = {https://arxiv.org/abs/2603.16666}
+}
+```
+
+## 其他资源
+
+基础视频模型：https://huggingface.co/Wan-AI/Wan2.2-TI2V-5B
+
+上游发布的 checkpoint：https://huggingface.co/yuanty/fastwam
+
+## 结果
+
+在 LIBERO 上使用 [`ZibinDong/fastwam_libero_uncond_2cam224`](https://huggingface.co/ZibinDong/fastwam_libero_uncond_2cam224) 进行评估：
+
+| 套件          | 成功率 | n_episodes |
+| -------------- | -----------: | ---------: |
+| libero_spatial |        97.6% |        500 |
+| libero_object  |        99.0% |        500 |
+| libero_goal    |        95.0% |        500 |
+| libero_10      |        94.0% |        500 |
+| **average**    |    **96.4%** |       2000 |
+
+复现：`lerobot-eval --policy.path=ZibinDong/fastwam_libero_uncond_2cam224 --policy.device=cuda --policy.torch_dtype=float32 --policy.n_action_steps=10 --env.type=libero --env.task=libero_spatial --env.observation_height=256 --env.observation_width=256 --eval.batch_size=1 --eval.n_episodes=50 --seed=0 --env.episode_length=300`。
+
+对于 LIBERO-10，使用 `--env.task=libero_10 --env.episode_length=600`：
+
+```bash
+lerobot-eval \
+    --policy.path=ZibinDong/fastwam_libero_uncond_2cam224 \
+    --policy.device=cuda \
+    --policy.torch_dtype=float32 \
+    --policy.n_action_steps=10 \
+    --env.type=libero \
+    --env.task=libero_10 --env.observation_height=256 --env.observation_width=256 \
+    --eval.batch_size=1 \
+    --eval.n_episodes=50 \
+    --seed=0 --env.episode_length=600
+```
+
+
+
+<EditOnGithub source="https://github.com/huggingface/lerobot/blob/main/docs/source/policy_fastwam_README.mdx" />
+
+<!--HF DOCBUILD BODY END-->
+
+HF_DOC_BODY_END
+

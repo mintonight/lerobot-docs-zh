@@ -1,0 +1,132 @@
+<script lang="ts">
+import {onMount} from "svelte";
+import Tip from "$lib/Tip.svelte";
+import CopyLLMTxtMenu from "$lib/CopyLLMTxtMenu.svelte";
+import Youtube from "$lib/Youtube.svelte";
+import Docstring from "$lib/Docstring.svelte";
+import CodeBlock from "$lib/CodeBlock.svelte";
+import CodeBlockFw from "$lib/CodeBlockFw.svelte";
+import DocNotebookDropdown from "$lib/DocNotebookDropdown.svelte";
+import CourseFloatingBanner from "$lib/CourseFloatingBanner.svelte";
+import IconCopyLink from "$lib/IconCopyLink.svelte";
+import FrameworkContent from "$lib/FrameworkContent.svelte";
+import Markdown from "$lib/Markdown.svelte";
+import Question from "$lib/Question.svelte";
+import FrameworkSwitchCourse from "$lib/FrameworkSwitchCourse.svelte";
+import InferenceApi from "$lib/InferenceApi.svelte";
+import TokenizersLanguageContent from "$lib/TokenizersLanguageContent.svelte";
+import ExampleCodeBlock from "$lib/ExampleCodeBlock.svelte";
+import Added from "$lib/Added.svelte";
+import Changed from "$lib/Changed.svelte";
+import Deprecated from "$lib/Deprecated.svelte";
+import PipelineIcon from "$lib/PipelineIcon.svelte";
+import PipelineTag from "$lib/PipelineTag.svelte";
+import Heading from "$lib/Heading.svelte";
+import HfOptions from "$lib/HfOptions.svelte";
+import HfOption from "$lib/HfOption.svelte";
+import EditOnGithub from "$lib/EditOnGithub.svelte";
+import InferenceSnippet from "$lib/InferenceSnippet/InferenceSnippet.svelte";
+import MermaidChart from "$lib/MermaidChart.svelte";
+let fw: "pt" | "tf" = "pt";
+onMount(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    fw = urlParams.get("fw") || "pt";
+});
+</script>
+<svelte:head>
+  <meta name="hf:doc:metadata" content={metadata} >
+</svelte:head>
+
+<!--HF DOCBUILD BODY START-->
+
+HF_DOC_BODY_START
+
+<CopyLLMTxtMenu containerStyle="float: right; margin-left: 10px; display: inline-flex; position: relative; z-index: 10;"></CopyLLMTxtMenu>
+
+# Environments
+
+Simulation environments are configured through `EnvConfig` and built by `make_env`. Each subclass
+declares its `gym_kwargs` and how to construct the vectorised environments.
+
+See [Environments from the Hub](../envhub) for using published environments and
+[Adding a New Benchmark](../adding_benchmarks) for contributing one.
+
+## EnvConfig[[lerobot.envs.EnvConfig]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.envs.EnvConfig"} anchor={"lerobot.envs.EnvConfig"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/envs/configs.py#L56"} parameters={[{"name": "task", "val": ": str | None = None"}, {"name": "fps", "val": ": int = 30"}, {"name": "features", "val": ": dict[str, PolicyFeature] = <factory>"}, {"name": "features_map", "val": ": dict[str, str] = <factory>"}, {"name": "max_parallel_tasks", "val": ": int = 1"}, {"name": "disable_env_checker", "val": ": bool = True"}]}>
+</Docstring>
+
+
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"create_envs"} anchor={"lerobot.envs.EnvConfig.create_envs"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/envs/configs.py#L83"} parameters={[{"name": "n_envs", "val": ": int"}, {"name": "use_async_envs", "val": ": bool = False"}]}>
+</Docstring>
+Create {suite: {task_id: VectorEnv}}.
+
+Default: single-task env via gym.make(). Multi-task benchmarks override.
+AsyncVectorEnv is the default for n_envs > 1; auto-downgraded to Sync for n_envs=1.
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"get_env_processors"} anchor={"lerobot.envs.EnvConfig.get_env_processors"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/envs/configs.py#L126"} parameters={[]}>
+</Docstring>
+Return (preprocessor, postprocessor) for this env. Default: identity.
+
+</div></div>
+
+## make_env[[lerobot.envs.make_env]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"lerobot.envs.make_env"} anchor={"lerobot.envs.make_env"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/envs/factory.py#L58"} parameters={[{"name": "cfg", "val": ": EnvConfig | str"}, {"name": "n_envs", "val": ": int = 1"}, {"name": "use_async_envs", "val": ": bool = False"}, {"name": "hub_cache_dir", "val": ": str | None = None"}, {"name": "trust_remote_code", "val": ": bool = False"}]}>
+<paramsdesc>- **cfg** (EnvConfig | str) -- Either an `EnvConfig` object describing the environment to build locally,
+  or a Hugging Face Hub repository identifier (e.g. `"username/repo"`). In the latter case,
+  the repo must include a Python file (usually `env.py`).
+- **n_envs** (int, optional) -- The number of parallelized env to return. Defaults to 1.
+- **use_async_envs** (bool, optional) -- Whether to return an AsyncVectorEnv or a SyncVectorEnv. Defaults to
+  False.
+- **hub_cache_dir** (str | None) -- Optional cache path for downloaded hub files.
+- **trust_remote_code** (bool) -- **Explicit consent** to execute remote code from the Hub.
+  Default False — must be set to True to import/exec hub `env.py`.</paramsdesc><rettype>dict[str, dict[int, gym.vector.VectorEnv]]</rettype><retdesc>A mapping from suite name to indexed vectorized environments.
+- For multi-task benchmarks (e.g., LIBERO): one entry per suite, and one vec env per task_id.
+- For single-task environments: a single suite entry (cfg.type) with task_id=0.</retdesc><raises>- ``ValueError`` -- if n_envs < 1
+- ``ModuleNotFoundError`` -- If the requested env package is not installed</raises><raisederrors>``ValueError`` or ``ModuleNotFoundError``</raisederrors></Docstring>
+Makes a gym vector environment according to the config or Hub reference.
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+
+## make_env_config[[lerobot.envs.make_env_config]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"lerobot.envs.make_env_config"} anchor={"lerobot.envs.make_env_config"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/envs/factory.py#L26"} parameters={[{"name": "env_type", "val": ": str"}, {"name": "**kwargs", "val": ""}]}>
+</Docstring>
+
+
+</div>
+
+<!--HF DOCBUILD BODY END-->
+
+HF_DOC_BODY_END
+

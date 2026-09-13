@@ -1,0 +1,129 @@
+{
+ "file": "rebot_b601.mdx",
+ "units": [
+  {
+   "id": 0,
+   "zh": "# reBot B601-DM"
+  },
+  {
+   "id": 1,
+   "zh": "[reBot B601-DM](⟦0⟧) 是 Seeed Studio 为具身 AI 和模仿学习设计的开源、低成本机械臂。它带有**follower arm**（⟦1⟧，一个由 Damiao CAN 电机驱动的 6 自由度手臂加 gripper）和用于 teleoperation 它的**leader arm**（⟦2⟧ / ⟦3⟧，由 FashionStar UART 智能舵机驱动）。"
+  },
+  {
+   "id": 2,
+   "zh": "本页涵盖单臂和双臂（双手）设置下的**calibration**和**teleoperation**。"
+  },
+  {
+   "id": 3,
+   "zh": "_左侧：处于零位的 B601-DM follower arm。右侧：处于零位的 reBot Arm 102 leader arm。图片由 [Seeed Studio](⟦0⟧) 提供。_"
+  },
+  {
+   "id": 4,
+   "zh": "## 安装 LeRobot 🤗"
+  },
+  {
+   "id": 5,
+   "zh": "按照我们的[安装指南](⟦0⟧)操作，然后安装 reBot 支持："
+  },
+  {
+   "id": 6,
+   "zh": "这会引入 ⟦0⟧（用于 B601-DM follower arm 的 CAN 电机控制）和 ⟦1⟧（用于 reBot Arm 102 leader arm 的 FashionStar UART 舵机）。"
+  },
+  {
+   "id": 7,
+   "zh": "## 已注册的设备类型"
+  },
+  {
+   "id": 8,
+   "zh": "| 类型                      | 类别                                         |"
+  },
+  {
+   "id": 9,
+   "zh": "| ⟦0⟧    | 单臂 B601-DM follower arm 机器人                       |"
+  },
+  {
+   "id": 10,
+   "zh": "| ⟦0⟧ | 双臂（双手）follower arm 机器人                        |"
+  },
+  {
+   "id": 11,
+   "zh": "| ⟦0⟧       | 单臂 reBot Arm 102 leader arm teleoperator            |"
+  },
+  {
+   "id": 12,
+   "zh": "| ⟦0⟧    | 双臂（双手）leader arm teleoperator                   |"
+  },
+  {
+   "id": 13,
+   "zh": "双臂类型由两个单臂实例组成，并使用 ⟦0⟧ / ⟦1⟧ 前缀为每只手臂的\nobservation/action 键命名空间。每只手臂的设置通过嵌套的\n⟦2⟧ / ⟦3⟧ 参数传递。"
+  },
+  {
+   "id": 14,
+   "zh": "## 查找 USB 端口"
+  },
+  {
+   "id": 15,
+   "zh": "对于每个设备，使用以下命令查找与其电机总线关联的 USB 端口："
+  },
+  {
+   "id": 16,
+   "zh": "⟦0⟧\n  在 Linux 上，卸载 ⟦1⟧（⟦2⟧），这样它就不会占用\n  leader arm 的 USB 串行端口。你可能还需要授予对串行\n  设备的访问权限：⟦3⟧。"
+  },
+  {
+   "id": 17,
+   "zh": "## calibration"
+  },
+  {
+   "id": 18,
+   "zh": "两只手臂都不会存储持久的硬件 calibration：每次连接时，电机都会根据手臂实际保持的位姿重新归零。calibration 只是记录该零位。当提示时，**手动将手臂移动到其零位**（如上所示的默认落坐位姿，gripper 完全闭合）并按 ⟦0⟧。"
+  },
+  {
+   "id": 19,
+   "zh": "### follower arm（B601-DM）"
+  },
+  {
+   "id": 20,
+   "zh": "连接双臂 follower arm；calibration 会先对左臂运行，再对右臂运行。"
+  },
+  {
+   "id": 21,
+   "zh": "每只手臂的 calibration 文件会在 id 上带有 ⟦0⟧ / ⟦1⟧ 后缀保存。"
+  },
+  {
+   "id": 22,
+   "zh": "### leader arm（reBot Arm 102）"
+  },
+  {
+   "id": 23,
+   "zh": "## teleoperation"
+  },
+  {
+   "id": 24,
+   "zh": "两只手臂都 calibration 完成后，就可以用 leader arm 驱动 follower arm。follower arm 通过 Damiao 串行桥接器（⟦0⟧，默认）或 SocketCAN 适配器（⟦1⟧）与其 CAN 总线通信。有关 SocketCAN 适配器配置的更多详细信息，请参阅 [OpenArm 页面](⟦2⟧)。"
+  },
+  {
+   "id": 25,
+   "zh": "双臂 leader arm 和 follower arm 复用单臂类；每只手臂通过嵌套的\n⟦0⟧ / ⟦1⟧ 参数进行配置，\n因此双臂 reBot Arm 102 leader arm 可以驱动双臂 B601-DM follower arm。"
+  },
+  {
+   "id": 26,
+   "zh": "⟦0⟧\n  leader arm 和 follower arm 共享相同的关节名称（`shoulder_pan,\n  shoulder_lift, elbow_flex, wrist_flex, wrist_yaw, wrist_roll, gripper`），因此\n  leader arm action 可以直接映射到 follower arm 上。"
+  },
+  {
+   "id": 27,
+   "zh": "如果某个关节的运动方向相反，请在 leader arm 的 ⟦0⟧ 中翻转其符号（gripper 还带有一个缩放系数，以将其范围扩展到 follower arm）："
+  },
+  {
+   "id": 28,
+   "zh": "## 录制 dataset"
+  },
+  {
+   "id": 29,
+   "zh": "将 ⟦0⟧ 换成 ⟦1⟧（使用相同的 ⟦2⟧ / ⟦3⟧ 参数，再加上 ⟦4⟧）即可录制用于训练的 demonstration。完整的流程请参阅[机器人的模仿学习](⟦5⟧)。"
+  },
+  {
+   "id": 30,
+   "zh": "有关硬件组装和接线，请参阅 [Seeed Studio reBot wiki](⟦0⟧)。"
+  }
+ ]
+}

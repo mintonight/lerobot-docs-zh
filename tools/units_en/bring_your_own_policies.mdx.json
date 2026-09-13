@@ -1,0 +1,1020 @@
+{
+ "file": "bring_your_own_policies.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1941,
+   "text": "# Adding a Policy",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1943,
+   "end": 2103,
+   "text": "This guide walks you through implementing a custom policy and getting it to work with LeRobot's training, evaluation, and deployment tools. There are two paths:",
+   "tokens": []
+  },
+  {
+   "id": 2,
+   "kind": "list",
+   "start": 2105,
+   "end": 2319,
+   "text": "- **Plugin (out-of-tree)** — ship your policy as a standalone ⟦0⟧ package. Faster, no PR required, easy to iterate. Right for experimentation, internal use, or when you want to publish independently.",
+   "tokens": [
+    "`lerobot_policy_*`"
+   ]
+  },
+  {
+   "id": 3,
+   "kind": "list",
+   "start": 2320,
+   "end": 2489,
+   "text": "- **In-tree (contributed to LeRobot)** — land your policy directly in ⟦0⟧. Requires a PR, but makes your policy a first-class citizen of the library.",
+   "tokens": [
+    "`src/lerobot/policies/`"
+   ]
+  },
+  {
+   "id": 4,
+   "kind": "para",
+   "start": 2491,
+   "end": 2652,
+   "text": "The plugin route is usually the right starting point — promote to in-tree once the policy has stabilized and there's clear value in shipping it with the library.",
+   "tokens": []
+  },
+  {
+   "id": 5,
+   "kind": "para",
+   "start": 2654,
+   "end": 2953,
+   "text": "Either way, the building blocks are the same: a configuration class, a policy class, and a processor factory. The first half of this guide covers those shared pieces; the second half covers the path-specific scaffolding ([Path A](⟦0⟧), [Path B](⟦1⟧)).",
+   "tokens": [
+    "#path-a-out-of-tree-plugin",
+    "#path-b-contributing-in-tree"
+   ]
+  },
+  {
+   "id": 6,
+   "kind": "para",
+   "start": 2955,
+   "end": 3334,
+   "text": "A note on tone: robot-learning is an actively evolving field, and \"what a policy looks like\" can shift with each new architecture. The conventions described here exist because they let ⟦0⟧ and ⟦1⟧ work uniformly across very different models. When a new policy genuinely doesn't fit them, raise it (in your PR, or an issue) — the conventions are not sacred.",
+   "tokens": [
+    "`lerobot-train`",
+    "`lerobot-eval`"
+   ]
+  },
+  {
+   "id": 7,
+   "kind": "heading",
+   "start": 3341,
+   "end": 3363,
+   "text": "## Anatomy of a policy",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "para",
+   "start": 3365,
+   "end": 3713,
+   "text": "Three building blocks make up every policy. The names below use ⟦0⟧ as a placeholder — replace with your policy's name. That name is load-bearing: it must match the string you pass to ⟦1⟧, the ⟦2⟧ class attribute, and the ⟦3⟧ factory function (more on each below).",
+   "tokens": [
+    "`my_policy`",
+    "`@PreTrainedConfig.register_subclass`",
+    "`MyPolicy.name`",
+    "`make_<name>_pre_post_processors`"
+   ]
+  },
+  {
+   "id": 9,
+   "kind": "heading",
+   "start": 3715,
+   "end": 3738,
+   "text": "### Configuration class",
+   "tokens": []
+  },
+  {
+   "id": 10,
+   "kind": "para",
+   "start": 3740,
+   "end": 4012,
+   "text": "Inherit from [⟦0⟧](⟦1⟧) and register your policy type. Here is a template — customize the parameters and methods as needed for your policy's architecture and training requirements.",
+   "tokens": [
+    "`PreTrainedConfig`",
+    "https://github.com/huggingface/lerobot/blob/main/src/lerobot/configs/policies.py"
+   ]
+  },
+  {
+   "id": 11,
+   "kind": "para",
+   "start": 6421,
+   "end": 6666,
+   "text": "The string you pass to ⟦0⟧ must match ⟦1⟧ (next section) and is what users supply as ⟦2⟧ on the CLI. Default to ⟦3⟧ from ⟦4⟧ for ⟦5⟧ unless you genuinely need otherwise.",
+   "tokens": [
+    "`@register_subclass`",
+    "`MyPolicy.name`",
+    "`--policy.type`",
+    "`AdamW`",
+    "`lerobot.optim`",
+    "`get_optimizer_preset`"
+   ]
+  },
+  {
+   "id": 12,
+   "kind": "heading",
+   "start": 6668,
+   "end": 6684,
+   "text": "### Policy class",
+   "tokens": []
+  },
+  {
+   "id": 13,
+   "kind": "para",
+   "start": 6686,
+   "end": 6876,
+   "text": "Inherit from [⟦0⟧](⟦1⟧) and set two class attributes — both are checked by ⟦2⟧:",
+   "tokens": [
+    "`PreTrainedPolicy`",
+    "https://github.com/huggingface/lerobot/blob/main/src/lerobot/policies/pretrained.py",
+    "`__init_subclass__`"
+   ]
+  },
+  {
+   "id": 14,
+   "kind": "para",
+   "start": 8926,
+   "end": 8969,
+   "text": "The methods called by the train/eval loops:",
+   "tokens": []
+  },
+  {
+   "id": 15,
+   "kind": "table",
+   "start": 8971,
+   "end": 9347,
+   "text": "| Method                                                            | Used by           | What it does                                                                                                                                                                                                                                                                                 |",
+   "tokens": []
+  },
+  {
+   "id": 16,
+   "kind": "table",
+   "start": 9725,
+   "end": 10101,
+   "text": "| ⟦0⟧                                                 | ⟦1⟧    | Clear per-episode state at the start of each episode.                                                                                                                                                                                                                                        |",
+   "tokens": [
+    "`reset() -> None`",
+    "`lerobot-eval`"
+   ]
+  },
+  {
+   "id": 17,
+   "kind": "table",
+   "start": 10102,
+   "end": 10478,
+   "text": "| ⟦0⟧                        | ⟦1⟧    | Return the next action ⟦2⟧. Called every step.                                                                                                                                                                                                                                 |",
+   "tokens": [
+    "`select_action(batch, **kwargs) -> Tensor`",
+    "`lerobot-eval`",
+    "`(B, action_dim)`"
+   ]
+  },
+  {
+   "id": 18,
+   "kind": "table",
+   "start": 10479,
+   "end": 10855,
+   "text": "| ⟦0⟧                 | the policy itself | Return an action chunk ⟦1⟧. Currently abstract on the base class — raise ⟦2⟧ if your policy doesn't chunk.                                                                                                                                       |",
+   "tokens": [
+    "`predict_action_chunk(batch, **kwargs) -> Tensor`",
+    "`(B, chunk_size, action_dim)`",
+    "`NotImplementedError`"
+   ]
+  },
+  {
+   "id": 19,
+   "kind": "table",
+   "start": 10856,
+   "end": 11232,
+   "text": "| ⟦0⟧ | ⟦1⟧   | Return ⟦2⟧. Accept ⟦3⟧ if you want to support per-sample weighting.                                                                                                                                                                                         |",
+   "tokens": [
+    "`forward(batch, reduction=\"mean\") -> tuple[Tensor, dict \\| None]`",
+    "`lerobot-train`",
+    "`(loss, output_dict)`",
+    "`reduction=\"none\"`"
+   ]
+  },
+  {
+   "id": 20,
+   "kind": "table",
+   "start": 11233,
+   "end": 11609,
+   "text": "| ⟦0⟧                                      | the optimizer     | Return ⟦1⟧ for simple policies; return a named parameter dict for multi-optimizer policies (see ⟦2⟧ in [⟦3⟧](⟦4⟧) for a per-group learning-rate example). |",
+   "tokens": [
+    "`get_optim_params() -> dict`",
+    "`self.parameters()`",
+    "`get_optim_params`",
+    "`modeling_act.py`",
+    "https://github.com/huggingface/lerobot/blob/main/src/lerobot/policies/act/modeling_act.py"
+   ]
+  },
+  {
+   "id": 21,
+   "kind": "table",
+   "start": 11610,
+   "end": 11986,
+   "text": "| ⟦0⟧ _(optional)_                                   | ⟦1⟧   | Called after each optimizer step _if defined_. Use for EMA, target nets, replay buffers (TDMPC uses this).                                                                                                                                                                                   |",
+   "tokens": [
+    "`update() -> None`",
+    "`lerobot-train`"
+   ]
+  },
+  {
+   "id": 22,
+   "kind": "para",
+   "start": 11988,
+   "end": 12322,
+   "text": "Batches are flat dictionaries keyed by the constants in [⟦0⟧](⟦1⟧): ⟦2⟧ (⟦3⟧), ⟦4⟧ (⟦5⟧), ⟦6⟧, ⟦7⟧, etc. Reuse the constants — don't invent new prefixes.",
+   "tokens": [
+    "`lerobot.utils.constants`",
+    "https://github.com/huggingface/lerobot/blob/main/src/lerobot/utils/constants.py",
+    "`OBS_STATE`",
+    "`observation.state.<motor>`",
+    "`OBS_IMAGES`",
+    "`observation.images.<camera>`",
+    "`OBS_LANGUAGE`",
+    "`ACTION`"
+   ]
+  },
+  {
+   "id": 23,
+   "kind": "para",
+   "start": 12324,
+   "end": 12522,
+   "text": "If your model is large enough to warrant [sharded multi-GPU training](⟦0⟧), also declare its FSDP wrap units — the repeated block classes sharding operates on:",
+   "tokens": [
+    "./multi_gpu_training#sharded-training-fsdp"
+   ]
+  },
+  {
+   "id": 24,
+   "kind": "para",
+   "start": 12629,
+   "end": 12854,
+   "text": "With this one declaration, ⟦0⟧ works out of the box for your policy (users can still override it with ⟦1⟧). Without any wrap source, sharded runs fail at startup by design.",
+   "tokens": [
+    "`--parallelism.dp_shard=N`",
+    "`--accelerator.fsdp.wrap_modules`"
+   ]
+  },
+  {
+   "id": 25,
+   "kind": "heading",
+   "start": 12856,
+   "end": 12879,
+   "text": "### Processor functions",
+   "tokens": []
+  },
+  {
+   "id": 26,
+   "kind": "para",
+   "start": 12881,
+   "end": 13263,
+   "text": "LeRobot uses ⟦0⟧s to normalize inputs and de-normalize outputs around your policy. For a concrete reference, see [⟦1⟧](⟦2⟧) or [⟦3⟧](⟦4⟧).",
+   "tokens": [
+    "`PolicyProcessorPipeline`",
+    "`processor_act.py`",
+    "https://github.com/huggingface/lerobot/blob/main/src/lerobot/policies/act/processor_act.py",
+    "`processor_diffusion.py`",
+    "https://github.com/huggingface/lerobot/blob/main/src/lerobot/policies/diffusion/processor_diffusion.py"
+   ]
+  },
+  {
+   "id": 27,
+   "kind": "para",
+   "start": 13265,
+   "end": 13733,
+   "text": "Pay close attention here: processors are the most common reproducibility pain point. A mismatch in normalization mode (⟦0⟧ vs ⟦1⟧ vs ⟦2⟧ vs ⟦3⟧/⟦4⟧) or in which features get normalized will train and eval without erroring, yet silently wreck results. Make sure the modes match how the checkpoint was trained, that the required stats exist (e.g. ⟦5⟧ needs ⟦6⟧/⟦7⟧), and that the pre- and post-processors stay consistent.",
+   "tokens": [
+    "`IDENTITY`",
+    "`MEAN_STD`",
+    "`MIN_MAX`",
+    "`QUANTILES`",
+    "`QUANTILE10`",
+    "`QUANTILES`",
+    "`q01`",
+    "`q99`"
+   ]
+  },
+  {
+   "id": 28,
+   "kind": "para",
+   "start": 14322,
+   "end": 14544,
+   "text": "**Important — function naming:** LeRobot discovers your processor by name. The function **must** be called ⟦0⟧ (matching the string you passed to ⟦1⟧).",
+   "tokens": [
+    "`make_{policy_name}_pre_post_processors`",
+    "`@PreTrainedConfig.register_subclass`"
+   ]
+  },
+  {
+   "id": 29,
+   "kind": "heading",
+   "start": 14546,
+   "end": 14571,
+   "text": "### Text-capable policies",
+   "tokens": []
+  },
+  {
+   "id": 30,
+   "kind": "para",
+   "start": 14573,
+   "end": 14642,
+   "text": "Language policies share recipe rendering between two processor steps:",
+   "tokens": []
+  },
+  {
+   "id": 31,
+   "kind": "list",
+   "start": 14644,
+   "end": 14736,
+   "text": "- ⟦0⟧ converts dataset language annotations into rendered messages.",
+   "tokens": [
+    "`RenderTrainingMessagesStep`"
+   ]
+  },
+  {
+   "id": 32,
+   "kind": "list",
+   "start": 14737,
+   "end": 14812,
+   "text": "- ⟦0⟧ converts user prompts into rendered messages.",
+   "tokens": [
+    "`RenderRuntimeMessagesStep`"
+   ]
+  },
+  {
+   "id": 33,
+   "kind": "para",
+   "start": 14814,
+   "end": 14885,
+   "text": "Policy-specific processors then apply chat formatting and tokenization.",
+   "tokens": []
+  },
+  {
+   "id": 34,
+   "kind": "para",
+   "start": 14887,
+   "end": 15394,
+   "text": "The policy config stores the resolved ⟦0⟧ (from\n⟦1⟧). An optional ⟦2⟧ can load a YAML recipe;\nresolve it before constructing processors. A resolved recipe enables recipe\ntraining, and ⟦3⟧ makes the training renderer a no-op. Serialize the resolved\nrecipe in the config and processor so deployment does not depend on a local YAML path.\nRecipe-backed rendering requires the ⟦4⟧ extra because recipes currently\nlive under ⟦5⟧.",
+   "tokens": [
+    "`recipe: TrainingRecipe | None`",
+    "`lerobot.datasets.recipe`",
+    "`recipe_path`",
+    "`None`",
+    "`dataset`",
+    "`lerobot.datasets`"
+   ]
+  },
+  {
+   "id": 35,
+   "kind": "para",
+   "start": 15396,
+   "end": 15469,
+   "text": "Put both renderers before policy-native chat formatting and tokenization:",
+   "tokens": []
+  },
+  {
+   "id": 36,
+   "kind": "para",
+   "start": 15725,
+   "end": 16175,
+   "text": "The same pipeline is saved and loaded for training and inference. Runtime\nrendering runs only for an explicit ⟦0⟧. Training rendering skips\nruntime queries and, when a recipe is configured, processes samples with raw\nannotations or action targets. Ordinary observation-only inputs pass through. Annotated text-only training is\nsupported without an action tensor. Training without annotations needs action\ntargets to enable the task fallback.",
+   "tokens": [
+    "`query_kind`"
+   ]
+  },
+  {
+   "id": 37,
+   "kind": "para",
+   "start": 16177,
+   "end": 16741,
+   "text": "The shared factory only constructs or loads processors. Language-recipe\nfine-tuning constructs them from the active config and dataset statistics so a\nsaved processor cannot override the new recipe. Resume and inference load saved\npipelines, including their recipe and statistics. Non-language training retains\nits existing construction and checkpoint-loading behavior.\nFresh factories derive normalization and relative-action settings themselves.\nFresh factories use the configured device; the existing dataset batch\npreprocessing applies the training rename map.",
+   "tokens": []
+  },
+  {
+   "id": 38,
+   "kind": "para",
+   "start": 16743,
+   "end": 16947,
+   "text": "⟦0⟧ contains recipe-expanded semantic messages, before native\nchat formatting or tokenization. The training sidecars index this same list.\nMessage helpers live in ⟦1⟧.",
+   "tokens": [
+    "`messages_rendered`",
+    "`lerobot.utils.language`"
+   ]
+  },
+  {
+   "id": 39,
+   "kind": "para",
+   "start": 16949,
+   "end": 17036,
+   "text": "The interactive rollout adds ⟦0⟧ and ⟦1⟧. Runtime rendering supports:",
+   "tokens": [
+    "`query_kind`",
+    "`query_text`"
+   ]
+  },
+  {
+   "id": 40,
+   "kind": "list",
+   "start": 17038,
+   "end": 17096,
+   "text": "- ⟦0⟧: preserve the caller's question as a user message.",
+   "tokens": [
+    "`vqa`"
+   ]
+  },
+  {
+   "id": 41,
+   "kind": "list",
+   "start": 17097,
+   "end": 17216,
+   "text": "- ⟦0⟧: render the checkpoint recipe up to, but not including, the\n  assistant turn supervising ⟦1⟧.",
+   "tokens": [
+    "`next_subtask`",
+    "`${subtask}`"
+   ]
+  },
+  {
+   "id": 42,
+   "kind": "para",
+   "start": 17218,
+   "end": 17286,
+   "text": "The policy then exposes its decoder through the existing policy API:",
+   "tokens": []
+  },
+  {
+   "id": 43,
+   "kind": "para",
+   "start": 17572,
+   "end": 17951,
+   "text": "⟦0⟧ consumes model-ready processor output; it must not rebuild or\nretokenize the caller's prompt. During training, the policy-native tokenizer\nuses ⟦1⟧ to supervise only the selected assistant spans.\nStore the recipe in the language policy's config so it is serialized with the\ncheckpoint and deployment reconstructs the prompt used for training.",
+   "tokens": [
+    "`generate_text`",
+    "`target_message_indices`"
+   ]
+  },
+  {
+   "id": 44,
+   "kind": "heading",
+   "start": 17958,
+   "end": 17987,
+   "text": "## Path A: Out-of-tree plugin",
+   "tokens": []
+  },
+  {
+   "id": 45,
+   "kind": "para",
+   "start": 17989,
+   "end": 18200,
+   "text": "The fastest way to ship a policy: package it as a standalone Python distribution and install it alongside LeRobot. No PR required, you own the release cycle, and you can publish to PyPI under your own namespace.",
+   "tokens": []
+  },
+  {
+   "id": 46,
+   "kind": "heading",
+   "start": 18202,
+   "end": 18223,
+   "text": "### Package structure",
+   "tokens": []
+  },
+  {
+   "id": 47,
+   "kind": "para",
+   "start": 18225,
+   "end": 18318,
+   "text": "Create a package with the prefix ⟦0⟧ (IMPORTANT!) followed by your policy name:",
+   "tokens": [
+    "`lerobot_policy_`"
+   ]
+  },
+  {
+   "id": 48,
+   "kind": "heading",
+   "start": 18821,
+   "end": 18846,
+   "text": "### Package ⟦0⟧",
+   "tokens": [
+    "`__init__.py`"
+   ]
+  },
+  {
+   "id": 49,
+   "kind": "para",
+   "start": 18848,
+   "end": 18935,
+   "text": "Expose your classes in the package's ⟦0⟧ and guard against missing ⟦1⟧:",
+   "tokens": [
+    "`__init__.py`",
+    "`lerobot`"
+   ]
+  },
+  {
+   "id": 50,
+   "kind": "heading",
+   "start": 19439,
+   "end": 19458,
+   "text": "### Install and use",
+   "tokens": []
+  },
+  {
+   "id": 51,
+   "kind": "para",
+   "start": 19592,
+   "end": 19690,
+   "text": "Once installed, your policy automatically integrates with LeRobot's training and evaluation tools:",
+   "tokens": []
+  },
+  {
+   "id": 52,
+   "kind": "heading",
+   "start": 19798,
+   "end": 19829,
+   "text": "## Path B: Contributing in-tree",
+   "tokens": []
+  },
+  {
+   "id": 53,
+   "kind": "para",
+   "start": 19831,
+   "end": 20326,
+   "text": "When your policy has stabilized and there's clear value in shipping it with the library, you can land it directly in LeRobot. Read the general [contribution guide](⟦0⟧) and the [PR template](⟦1⟧) first — that's where you'll find the testing/quality expectations every PR has to meet (⟦2⟧, ⟦3⟧, the community-review rule, etc.). What's below is the policy-specific layer on top of that.",
+   "tokens": [
+    "./contributing",
+    "https://github.com/huggingface/lerobot/blob/main/.github/PULL_REQUEST_TEMPLATE.md",
+    "`pre-commit run -a`",
+    "`pytest`"
+   ]
+  },
+  {
+   "id": 54,
+   "kind": "heading",
+   "start": 20328,
+   "end": 20346,
+   "text": "### In-tree layout",
+   "tokens": []
+  },
+  {
+   "id": 55,
+   "kind": "para",
+   "start": 20782,
+   "end": 20792,
+   "text": "Two notes:",
+   "tokens": []
+  },
+  {
+   "id": 56,
+   "kind": "list",
+   "start": 20794,
+   "end": 21092,
+   "text": "- The ⟦0⟧ next to the source is a **symlink** into ⟦1⟧ — the actual file lives under ⟦2⟧. Existing policies (act, smolvla, diffusion, …) all do this; copy one of those symlinks. The policy README is conventionally minimal: paper link + BibTeX citation.",
+   "tokens": [
+    "`README.md`",
+    "`docs/source/policy_<name>_README.md`",
+    "`docs/`"
+   ]
+  },
+  {
+   "id": 57,
+   "kind": "list",
+   "start": 21093,
+   "end": 21293,
+   "text": "- The user-facing tutorial — what to install, how to train, hyperparameters, benchmark numbers — lives separately at ⟦0⟧ and is registered in ⟦1⟧ under \"Policies\".",
+   "tokens": [
+    "`docs/source/<my_policy>.mdx`",
+    "`_toctree.yml`"
+   ]
+  },
+  {
+   "id": 58,
+   "kind": "para",
+   "start": 21295,
+   "end": 21458,
+   "text": "The file names are load-bearing: the factory does lazy imports by name, and the processor is discovered by the ⟦0⟧ convention.",
+   "tokens": [
+    "`make_<policy_name>_pre_post_processors`"
+   ]
+  },
+  {
+   "id": 59,
+   "kind": "heading",
+   "start": 21460,
+   "end": 21470,
+   "text": "### Wiring",
+   "tokens": []
+  },
+  {
+   "id": 60,
+   "kind": "para",
+   "start": 21472,
+   "end": 21527,
+   "text": "Two places need to know about your policy. All by name.",
+   "tokens": []
+  },
+  {
+   "id": 61,
+   "kind": "list",
+   "start": 21529,
+   "end": 21886,
+   "text": "1. **⟦0⟧** — re-export ⟦1⟧ and add it to ⟦2⟧. This import is what registers your policy: ⟦3⟧ runs, and from then on the factory resolves everything by convention. **Don't** re-export the modeling class; it loads lazily through the factory (so ⟦4⟧ stays fast).",
+   "tokens": [
+    "`policies/__init__.py`",
+    "`MyPolicyConfig`",
+    "`__all__`",
+    "`@PreTrainedConfig.register_subclass(\"my_policy\")`",
+    "`import lerobot`"
+   ]
+  },
+  {
+   "id": 62,
+   "kind": "list",
+   "start": 21887,
+   "end": 22390,
+   "text": "2. **⟦0⟧ and the root ⟦1⟧** — the template is what the end-of-training publisher renders into the model card of every checkpoint trained with your policy: add a one-line description of your policy in the ⟦2⟧ branches, map it in ⟦3⟧ so cards link to your MDX guide, and optionally add an architecture image to ⟦4⟧. Then add your policy to the models table in the root ⟦5⟧, under the right category, linking to your doc page.",
+   "tokens": [
+    "`templates/lerobot_modelcard_template.md`",
+    "`README.md`",
+    "`model_name`",
+    "`policy_docs`",
+    "`diagrams`",
+    "`README.md`"
+   ]
+  },
+  {
+   "id": 63,
+   "kind": "para",
+   "start": 22392,
+   "end": 22474,
+   "text": "Mirror an existing policy that's structurally similar to yours; the diff is small.",
+   "tokens": []
+  },
+  {
+   "id": 64,
+   "kind": "heading",
+   "start": 22476,
+   "end": 22509,
+   "text": "### Heavy / optional dependencies",
+   "tokens": []
+  },
+  {
+   "id": 65,
+   "kind": "para",
+   "start": 22511,
+   "end": 22725,
+   "text": "Most policies need a heavy backbone (transformers, diffusers, a specific VLM SDK). Wherever one exists, prefer loading it e.g from ⟦0⟧ or ⟦1⟧ rather than re-implementing the architecture in-tree.",
+   "tokens": [
+    "`transformers`",
+    "`diffusers`"
+   ]
+  },
+  {
+   "id": 66,
+   "kind": "para",
+   "start": 22727,
+   "end": 23028,
+   "text": "The convention is **two-step gating**: a ⟦0⟧-guarded import at module top, and a ⟦1⟧ runtime check in the constructor. [⟦2⟧](⟦3⟧) is the canonical reference:",
+   "tokens": [
+    "`TYPE_CHECKING`",
+    "`require_package`",
+    "`modeling_diffusion.py`",
+    "https://github.com/huggingface/lerobot/blob/main/src/lerobot/policies/diffusion/modeling_diffusion.py"
+   ]
+  },
+  {
+   "id": 67,
+   "kind": "para",
+   "start": 23515,
+   "end": 23524,
+   "text": "This way:",
+   "tokens": []
+  },
+  {
+   "id": 68,
+   "kind": "list",
+   "start": 23526,
+   "end": 23633,
+   "text": "- ⟦0⟧ keeps working without the extra installed (the symbol is just bound to ⟦1⟧).",
+   "tokens": [
+    "`import lerobot.policies`",
+    "`None`"
+   ]
+  },
+  {
+   "id": 69,
+   "kind": "list",
+   "start": 23634,
+   "end": 23670,
+   "text": "- Type checkers see the real symbol.",
+   "tokens": []
+  },
+  {
+   "id": 70,
+   "kind": "list",
+   "start": 23671,
+   "end": 23792,
+   "text": "- Instantiating the policy without the extra raises a clear ⟦0⟧ pointing at ⟦1⟧.",
+   "tokens": [
+    "`ImportError`",
+    "`pip install 'lerobot[diffusion]'`"
+   ]
+  },
+  {
+   "id": 71,
+   "kind": "para",
+   "start": 23794,
+   "end": 24030,
+   "text": "Add a matching extra to [⟦0⟧](⟦1⟧) ⟦2⟧ and include it in the ⟦3⟧ extra so ⟦4⟧ keeps installing everything.",
+   "tokens": [
+    "`pyproject.toml`",
+    "https://github.com/huggingface/lerobot/blob/main/pyproject.toml",
+    "`[project.optional-dependencies]`",
+    "`all`",
+    "`pip install 'lerobot[all]'`"
+   ]
+  },
+  {
+   "id": 72,
+   "kind": "heading",
+   "start": 24032,
+   "end": 24079,
+   "text": "### Avoid copying a modeling file — subclass it",
+   "tokens": []
+  },
+  {
+   "id": 73,
+   "kind": "para",
+   "start": 24081,
+   "end": 25062,
+   "text": "If your policy needs to modify a backbone that already exists in ⟦0⟧ (custom conditioning, extra inputs, a swapped sub-module), **do not vendor a copy of its ⟦1⟧**. Instead, subclass the smallest upstream unit and override only what changes. [⟦2⟧](⟦3⟧) is the canonical reference: it injects AdaRMS conditioning into PaliGemma/Gemma in ~370 lines by subclassing ⟦4⟧/⟦5⟧ and overriding the decoder-layer forward, instead of forking the ~2,000-line modeling file. Model surgery on a _loaded_ native model is also fine (layer truncation, tokenizer expansion, hidden-state capture — see ⟦6⟧, ⟦7⟧, ⟦8⟧ for working examples). Reviewers will ask for this pattern when a PR arrives with a copied modeling file; the only accepted exception is a model that does not exist in ⟦9⟧ at all.",
+   "tokens": [
+    "`transformers`",
+    "`modeling_*.py`",
+    "`pi_gemma.py`",
+    "https://github.com/huggingface/lerobot/blob/main/src/lerobot/policies/pi_gemma.py",
+    "`GemmaModel`",
+    "`PaliGemmaModel`",
+    "`evo1/internvl3_embedder.py`",
+    "`eo1/modeling_eo1.py`",
+    "`groot/groot_n1_7.py`",
+    "`transformers`"
+   ]
+  },
+  {
+   "id": 74,
+   "kind": "heading",
+   "start": 25064,
+   "end": 25105,
+   "text": "### Benchmarks and a published checkpoint",
+   "tokens": []
+  },
+  {
+   "id": 75,
+   "kind": "para",
+   "start": 25107,
+   "end": 25251,
+   "text": "A new policy is much easier to review — and far more useful — when it ships with a working checkpoint and at least one number you can reproduce.",
+   "tokens": []
+  },
+  {
+   "id": 76,
+   "kind": "para",
+   "start": 25253,
+   "end": 25657,
+   "text": "**Pick at least one in-tree benchmark.** LeRobot ships sim benchmarks with per-benchmark Docker images (LIBERO, LIBERO-plus, Meta-World, RoboTwin 2.0, RoboCasa365, RoboCerebra, RoboMME, VLABench and more). Pick the one that matches your policy's modality — VLAs usually go to LIBERO or VLABench; image-only BC to LIBERO or Meta-World. The full list lives under [Benchmarks](⟦0⟧) in the docs sidebar.",
+   "tokens": [
+    "./libero"
+   ]
+  },
+  {
+   "id": 77,
+   "kind": "para",
+   "start": 25659,
+   "end": 26224,
+   "text": "**Push the checkpoint & processors** to the Hub under ⟦0⟧ (or your namespace if you don't have write access; a maintainer can mirror it). The easiest way is training with ⟦1⟧ and ⟦2⟧: ⟦3⟧ publishes the model, both processors, and a model card at the end of the run. To publish an existing checkpoint after the fact, upload its ⟦4⟧ directory (e.g. ⟦5⟧), or use ⟦6⟧ for sharded-format checkpoints.",
+   "tokens": [
+    "`lerobot/<policy>_<benchmark>`",
+    "`--policy.repo_id=<namespace>/<repo>`",
+    "`--policy.push_to_hub=true`",
+    "`lerobot-train`",
+    "`pretrained_model/`",
+    "`huggingface-cli upload`",
+    "`lerobot-convert-dcp --push_to_hub=...`"
+   ]
+  },
+  {
+   "id": 78,
+   "kind": "para",
+   "start": 26226,
+   "end": 26339,
+   "text": "**Report results in your policy's MDX**, with the exact ⟦0⟧ command and hardware so anyone can re-run:",
+   "tokens": [
+    "`lerobot-eval`"
+   ]
+  },
+  {
+   "id": 79,
+   "kind": "para",
+   "start": 26899,
+   "end": 26965,
+   "text": "Use ⟦0⟧ per suite for stable success-rate estimates.",
+   "tokens": [
+    "`n_episodes ≥ 50`"
+   ]
+  },
+  {
+   "id": 80,
+   "kind": "para",
+   "start": 26967,
+   "end": 27225,
+   "text": "If your policy is real-robot-only and no sim benchmark applies, swap the sim eval for: a public training dataset on the Hub, the ⟦0⟧ command, the checkpoint, and a real-robot success rate over ≥10 episodes via ⟦1⟧.",
+   "tokens": [
+    "`lerobot-train`",
+    "`lerobot-rollout --policy.path=...`"
+   ]
+  },
+  {
+   "id": 81,
+   "kind": "heading",
+   "start": 27227,
+   "end": 27243,
+   "text": "### PR checklist",
+   "tokens": []
+  },
+  {
+   "id": 82,
+   "kind": "para",
+   "start": 27245,
+   "end": 27510,
+   "text": "The general expectations are in [⟦0⟧](⟦1⟧) and the [PR template](⟦2⟧). On top of those, reviewers will look for:",
+   "tokens": [
+    "`CONTRIBUTING.md`",
+    "https://github.com/huggingface/lerobot/blob/main/CONTRIBUTING.md",
+    "https://github.com/huggingface/lerobot/blob/main/.github/PULL_REQUEST_TEMPLATE.md"
+   ]
+  },
+  {
+   "id": 83,
+   "kind": "list",
+   "start": 27512,
+   "end": 27613,
+   "text": "- [ ] ⟦0⟧ and ⟦1⟧ cover the surface above; ⟦2⟧ accepts the class.",
+   "tokens": [
+    "`MyPolicy`",
+    "`MyPolicyConfig`",
+    "`__init_subclass__`"
+   ]
+  },
+  {
+   "id": 84,
+   "kind": "list",
+   "start": 27614,
+   "end": 27755,
+   "text": "- [ ] ⟦0⟧ re-exports the config (this registers the policy; the factory resolves modeling/processor by naming convention).",
+   "tokens": [
+    "`policies/__init__.py`"
+   ]
+  },
+  {
+   "id": 85,
+   "kind": "list",
+   "start": 27756,
+   "end": 27829,
+   "text": "- [ ] ⟦0⟧ follows the naming convention.",
+   "tokens": [
+    "`make_my_policy_pre_post_processors`"
+   ]
+  },
+  {
+   "id": 86,
+   "kind": "list",
+   "start": 27830,
+   "end": 27952,
+   "text": "- [ ] Optional deps live behind a ⟦0⟧ extra and the ⟦1⟧ guard.",
+   "tokens": [
+    "`[project.optional-dependencies]`",
+    "`TYPE_CHECKING + require_package`"
+   ]
+  },
+  {
+   "id": 87,
+   "kind": "list",
+   "start": 27953,
+   "end": 28045,
+   "text": "- [ ] ⟦0⟧ updated; backward-compat artifact committed & policy-specific tests.",
+   "tokens": [
+    "`tests/policies/`"
+   ]
+  },
+  {
+   "id": 88,
+   "kind": "list",
+   "start": 28046,
+   "end": 28219,
+   "text": "- [ ] ⟦0⟧ symlinked into ⟦1⟧; user-facing ⟦2⟧ written and added to ⟦3⟧.",
+   "tokens": [
+    "`src/lerobot/policies/<name>/README.md`",
+    "`docs/source/policy_<name>_README.md`",
+    "`docs/source/<name>.mdx`",
+    "`_toctree.yml`"
+   ]
+  },
+  {
+   "id": 89,
+   "kind": "list",
+   "start": 28220,
+   "end": 28397,
+   "text": "- [ ] ⟦0⟧ runs end-to-end for at least a few steps + save a checkpoint that can be loaded and run by ⟦1⟧ or ⟦2⟧.",
+   "tokens": [
+    "`lerobot-train --policy.type my_policy ...`",
+    "`lerobot-eval`",
+    "`lerobot-rollout`"
+   ]
+  },
+  {
+   "id": 90,
+   "kind": "list",
+   "start": 28398,
+   "end": 28511,
+   "text": "- [ ] ⟦0⟧ has a description entry and a ⟦1⟧ link for your policy.",
+   "tokens": [
+    "`templates/lerobot_modelcard_template.md`",
+    "`policy_docs`"
+   ]
+  },
+  {
+   "id": 91,
+   "kind": "list",
+   "start": 28512,
+   "end": 28625,
+   "text": "- [ ] The models table in the root ⟦0⟧ lists your policy in the right category, linking to your doc page.",
+   "tokens": [
+    "`README.md`"
+   ]
+  },
+  {
+   "id": 92,
+   "kind": "list",
+   "start": 28626,
+   "end": 28771,
+   "text": "- [ ] At least one reproducible benchmark eval in the policy MDX with a published checkpoint (sim benchmark, or real-robot dataset + checkpoint).",
+   "tokens": []
+  },
+  {
+   "id": 93,
+   "kind": "para",
+   "start": 28773,
+   "end": 29097,
+   "text": "The fastest way to get a clean PR is to copy the directory of the existing policy closest to yours, rename, and replace contents method by method. Don't wait until everything is polished — open a draft PR early and iterate with us; reviewers would much rather give feedback on a half-finished branch than a fully-merged one.",
+   "tokens": []
+  },
+  {
+   "id": 94,
+   "kind": "heading",
+   "start": 29104,
+   "end": 29143,
+   "text": "## Examples and community contributions",
+   "tokens": []
+  },
+  {
+   "id": 95,
+   "kind": "para",
+   "start": 29145,
+   "end": 29192,
+   "text": "Check out these example policy implementations:",
+   "tokens": []
+  },
+  {
+   "id": 96,
+   "kind": "list",
+   "start": 29194,
+   "end": 29444,
+   "text": "- [DiTFlow Policy](⟦0⟧) — Diffusion Transformer policy with flow-matching objective. Try it out in this example: [DiTFlow Example](⟦1⟧)",
+   "tokens": [
+    "https://github.com/danielsanjosepro/lerobot_policy_ditflow",
+    "https://github.com/danielsanjosepro/test_lerobot_policy_ditflow"
+   ]
+  },
+  {
+   "id": 97,
+   "kind": "para",
+   "start": 29446,
+   "end": 29772,
+   "text": "Thanks for taking the time to bring a new policy into LeRobot. Every architecture that lands in ⟦0⟧ — and every plugin published by the community — makes the library a little more useful for the next person, and a little more representative of where robot learning is going. We're looking forward to seeing what you ship. 🤗",
+   "tokens": [
+    "`main`"
+   ]
+  }
+ ]
+}

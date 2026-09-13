@@ -1,0 +1,53 @@
+{
+ "file": "policy_vla_jepa_README.mdx",
+ "units": [
+  {
+   "id": 0,
+   "zh": "# VLA-JEPA"
+  },
+  {
+   "id": 1,
+   "zh": "本仓库包含 **VLA-JEPA** 的 LeRobot 移植版，这是一个视觉-语言-action 模型，将 Qwen3-VL 语言骨干网络与自监督视频世界模型（V-JEPA2）以及流匹配 DiT action 头相结合。"
+  },
+  {
+   "id": 2,
+   "zh": "从 [ginwind/VLA-JEPA](⟦0⟧) 转换而来。"
+  },
+  {
+   "id": 3,
+   "zh": "## 架构概览"
+  },
+  {
+   "id": 4,
+   "zh": "| 组件                    | 模块                              | 作用                                                    |"
+  },
+  {
+   "id": 5,
+   "zh": "| **Qwen3-VL 骨干**       | ⟦0⟧                | 将图像与语言指令融合为上下文 token |"
+  },
+  {
+   "id": 6,
+   "zh": "| **DiT-B action 头**        | ⟦0⟧               | 在 action chunk 上进行流匹配扩散           |"
+  },
+  {
+   "id": 7,
+   "zh": "| **V-JEPA2 世界模型**    | ⟦0⟧ | 自监督视频预测损失（仅训练时）   |"
+  },
+  {
+   "id": 8,
+   "zh": "inference 时只使用 Qwen 骨干和 action 头；不需要世界模型。"
+  },
+  {
+   "id": 9,
+   "zh": "## 引用"
+  },
+  {
+   "id": 10,
+   "zh": "## 许可证"
+  },
+  {
+   "id": 11,
+   "zh": "权重按原始 [ginwind/VLA-JEPA](⟦0⟧) 仓库的许可条款分发（**Apache 2.0 License**）。LeRobot 集成代码遵循 **Apache 2.0 License**。"
+  }
+ ]
+}

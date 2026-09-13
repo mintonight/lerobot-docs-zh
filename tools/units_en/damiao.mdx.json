@@ -1,0 +1,353 @@
+{
+ "file": "damiao.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1951,
+   "text": "# Damiao Motors and CAN Bus",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1953,
+   "end": 2043,
+   "text": "This guide covers setup and usage of Damiao motors with LeRobot via CAN bus communication.",
+   "tokens": []
+  },
+  {
+   "id": 2,
+   "kind": "para",
+   "start": 2045,
+   "end": 2136,
+   "text": "Currently, only Linux is supported, as the OpenArms CAN adapter only has drivers for Linux.",
+   "tokens": []
+  },
+  {
+   "id": 3,
+   "kind": "heading",
+   "start": 2138,
+   "end": 2156,
+   "text": "## Linux CAN Setup",
+   "tokens": []
+  },
+  {
+   "id": 4,
+   "kind": "para",
+   "start": 2158,
+   "end": 2244,
+   "text": "Before using Damiao motors, you need to set up the CAN interface on your Linux system.",
+   "tokens": []
+  },
+  {
+   "id": 5,
+   "kind": "heading",
+   "start": 2246,
+   "end": 2271,
+   "text": "### Install CAN Utilities",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "heading",
+   "start": 2317,
+   "end": 2353,
+   "text": "### Configure CAN Interface (Manual)",
+   "tokens": []
+  },
+  {
+   "id": 7,
+   "kind": "para",
+   "start": 2355,
+   "end": 2402,
+   "text": "For standard CAN FD (recommended for OpenArms):",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "para",
+   "start": 2539,
+   "end": 2569,
+   "text": "For standard CAN (without FD):",
+   "tokens": []
+  },
+  {
+   "id": 9,
+   "kind": "heading",
+   "start": 2683,
+   "end": 2726,
+   "text": "### Configure CAN Interface (Using LeRobot)",
+   "tokens": []
+  },
+  {
+   "id": 10,
+   "kind": "para",
+   "start": 2728,
+   "end": 2795,
+   "text": "LeRobot provides a utility script to setup and test CAN interfaces:",
+   "tokens": []
+  },
+  {
+   "id": 11,
+   "kind": "heading",
+   "start": 2936,
+   "end": 2966,
+   "text": "## Debugging CAN Communication",
+   "tokens": []
+  },
+  {
+   "id": 12,
+   "kind": "para",
+   "start": 2968,
+   "end": 3025,
+   "text": "Use the built-in debug tools to test motor communication:",
+   "tokens": []
+  },
+  {
+   "id": 13,
+   "kind": "para",
+   "start": 3200,
+   "end": 3297,
+   "text": "The test mode will scan for motors (IDs 0x01-0x08) and report which ones respond. Example output:",
+   "tokens": []
+  },
+  {
+   "id": 14,
+   "kind": "heading",
+   "start": 3500,
+   "end": 3508,
+   "text": "## Usage",
+   "tokens": []
+  },
+  {
+   "id": 15,
+   "kind": "heading",
+   "start": 3510,
+   "end": 3525,
+   "text": "### Basic Setup",
+   "tokens": []
+  },
+  {
+   "id": 16,
+   "kind": "heading",
+   "start": 4029,
+   "end": 4053,
+   "text": "### Reading Motor States",
+   "tokens": []
+  },
+  {
+   "id": 17,
+   "kind": "heading",
+   "start": 4491,
+   "end": 4517,
+   "text": "### Writing Motor Commands",
+   "tokens": []
+  },
+  {
+   "id": 18,
+   "kind": "heading",
+   "start": 4822,
+   "end": 4846,
+   "text": "## Configuration Options",
+   "tokens": []
+  },
+  {
+   "id": 19,
+   "kind": "table",
+   "start": 4848,
+   "end": 4940,
+   "text": "| Parameter      | Default   | Description                                                 |",
+   "tokens": []
+  },
+  {
+   "id": 20,
+   "kind": "table",
+   "start": 5034,
+   "end": 5126,
+   "text": "| ⟦0⟧         | -         | CAN interface (⟦1⟧) or serial port (⟦2⟧) |",
+   "tokens": [
+    "`port`",
+    "`can0`",
+    "`/dev/cu.usbmodem*`"
+   ]
+  },
+  {
+   "id": 21,
+   "kind": "table",
+   "start": 5127,
+   "end": 5219,
+   "text": "| ⟦0⟧   | ⟦1⟧    | Enable CAN FD for higher data rates                         |",
+   "tokens": [
+    "`use_can_fd`",
+    "`True`"
+   ]
+  },
+  {
+   "id": 22,
+   "kind": "table",
+   "start": 5220,
+   "end": 5312,
+   "text": "| ⟦0⟧      | ⟦1⟧ | Nominal bitrate (1 Mbps)                                    |",
+   "tokens": [
+    "`bitrate`",
+    "`1000000`"
+   ]
+  },
+  {
+   "id": 23,
+   "kind": "table",
+   "start": 5313,
+   "end": 5405,
+   "text": "| ⟦0⟧ | ⟦1⟧ | CAN FD data bitrate (5 Mbps)                                |",
+   "tokens": [
+    "`data_bitrate`",
+    "`5000000`"
+   ]
+  },
+  {
+   "id": 24,
+   "kind": "heading",
+   "start": 5407,
+   "end": 5429,
+   "text": "## Motor Configuration",
+   "tokens": []
+  },
+  {
+   "id": 25,
+   "kind": "para",
+   "start": 5431,
+   "end": 5451,
+   "text": "Each motor requires:",
+   "tokens": []
+  },
+  {
+   "id": 26,
+   "kind": "list",
+   "start": 5453,
+   "end": 5488,
+   "text": "- ⟦0⟧: CAN ID for sending commands",
+   "tokens": [
+    "`id`"
+   ]
+  },
+  {
+   "id": 27,
+   "kind": "list",
+   "start": 5489,
+   "end": 5568,
+   "text": "- ⟦0⟧: One of the supported motor types (e.g., ⟦1⟧, ⟦2⟧)",
+   "tokens": [
+    "`motor_type`",
+    "`\"dm8009\"`",
+    "`\"dm4340\"`"
+   ]
+  },
+  {
+   "id": 28,
+   "kind": "list",
+   "start": 5569,
+   "end": 5612,
+   "text": "- ⟦0⟧: CAN ID for receiving responses",
+   "tokens": [
+    "`recv_id`"
+   ]
+  },
+  {
+   "id": 29,
+   "kind": "para",
+   "start": 5614,
+   "end": 5717,
+   "text": "OpenArms default IDs follow the pattern: send ID ⟦0⟧, receive ID ⟦1⟧ where N is the joint number.",
+   "tokens": [
+    "`0x0N`",
+    "`0x1N`"
+   ]
+  },
+  {
+   "id": 30,
+   "kind": "heading",
+   "start": 5719,
+   "end": 5737,
+   "text": "## Troubleshooting",
+   "tokens": []
+  },
+  {
+   "id": 31,
+   "kind": "heading",
+   "start": 5739,
+   "end": 5766,
+   "text": "### No Response from Motors",
+   "tokens": []
+  },
+  {
+   "id": 32,
+   "kind": "list",
+   "start": 5768,
+   "end": 5786,
+   "text": "1. **Check power**",
+   "tokens": []
+  },
+  {
+   "id": 33,
+   "kind": "list",
+   "start": 5787,
+   "end": 5852,
+   "text": "2. **Verify CAN wiring**: Check CAN-H, CAN-L, and GND connections",
+   "tokens": []
+  },
+  {
+   "id": 34,
+   "kind": "list",
+   "start": 5853,
+   "end": 5927,
+   "text": "3. **Check motor IDs**: Use Damiao Debugging Tools to verify/configure IDs",
+   "tokens": []
+  },
+  {
+   "id": 35,
+   "kind": "list",
+   "start": 5928,
+   "end": 6011,
+   "text": "4. **Test CAN interface**: Run ⟦0⟧ to see if messages are being received",
+   "tokens": [
+    "`candump can0`"
+   ]
+  },
+  {
+   "id": 36,
+   "kind": "list",
+   "start": 6012,
+   "end": 6085,
+   "text": "5. **Run diagnostics**: ⟦0⟧",
+   "tokens": [
+    "`lerobot-setup-can --mode=test --interfaces=can0`"
+   ]
+  },
+  {
+   "id": 37,
+   "kind": "heading",
+   "start": 6087,
+   "end": 6114,
+   "text": "### Motor Timeout Parameter",
+   "tokens": []
+  },
+  {
+   "id": 38,
+   "kind": "para",
+   "start": 6116,
+   "end": 6249,
+   "text": "If motors were configured with timeout=0, they won't respond to commands. Use Damiao Debugging Tools to set a non-zero timeout value.",
+   "tokens": []
+  },
+  {
+   "id": 39,
+   "kind": "heading",
+   "start": 6251,
+   "end": 6275,
+   "text": "### Verify CAN FD Status",
+   "tokens": []
+  }
+ ]
+}

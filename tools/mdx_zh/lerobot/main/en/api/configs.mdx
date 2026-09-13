@@ -1,0 +1,126 @@
+<script lang="ts">
+import {onMount} from "svelte";
+import Tip from "$lib/Tip.svelte";
+import CopyLLMTxtMenu from "$lib/CopyLLMTxtMenu.svelte";
+import Youtube from "$lib/Youtube.svelte";
+import Docstring from "$lib/Docstring.svelte";
+import CodeBlock from "$lib/CodeBlock.svelte";
+import CodeBlockFw from "$lib/CodeBlockFw.svelte";
+import DocNotebookDropdown from "$lib/DocNotebookDropdown.svelte";
+import CourseFloatingBanner from "$lib/CourseFloatingBanner.svelte";
+import IconCopyLink from "$lib/IconCopyLink.svelte";
+import FrameworkContent from "$lib/FrameworkContent.svelte";
+import Markdown from "$lib/Markdown.svelte";
+import Question from "$lib/Question.svelte";
+import FrameworkSwitchCourse from "$lib/FrameworkSwitchCourse.svelte";
+import InferenceApi from "$lib/InferenceApi.svelte";
+import TokenizersLanguageContent from "$lib/TokenizersLanguageContent.svelte";
+import ExampleCodeBlock from "$lib/ExampleCodeBlock.svelte";
+import Added from "$lib/Added.svelte";
+import Changed from "$lib/Changed.svelte";
+import Deprecated from "$lib/Deprecated.svelte";
+import PipelineIcon from "$lib/PipelineIcon.svelte";
+import PipelineTag from "$lib/PipelineTag.svelte";
+import Heading from "$lib/Heading.svelte";
+import HfOptions from "$lib/HfOptions.svelte";
+import HfOption from "$lib/HfOption.svelte";
+import EditOnGithub from "$lib/EditOnGithub.svelte";
+import InferenceSnippet from "$lib/InferenceSnippet/InferenceSnippet.svelte";
+import MermaidChart from "$lib/MermaidChart.svelte";
+let fw: "pt" | "tf" = "pt";
+onMount(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    fw = urlParams.get("fw") || "pt";
+});
+</script>
+<svelte:head>
+  <meta name="hf:doc:metadata" content={metadata} >
+</svelte:head>
+
+<!--HF DOCBUILD BODY START-->
+
+HF_DOC_BODY_START
+
+<CopyLLMTxtMenu containerStyle="float: right; margin-left: 10px; display: inline-flex; position: relative; z-index: 10;"></CopyLLMTxtMenu>
+
+# 配置
+
+LeRobot 配置是由 [draccus](https://github.com/dlwh/draccus) 解析的普通 dataclass，因此每个
+字段都可以从 CLI 设置。`TrainPipelineConfig` 是 `lerobot-train` 的顶层对象。
+
+多态配置（policy、机器人、环境）使用 `draccus.ChoiceRegistry`：子类通过 `@register_subclass("name")` 注册
+自身，然后就可以在命令行上按该名称选择。
+
+## TrainPipelineConfig [[lerobot.configs.train.TrainPipelineConfig]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.configs.train.TrainPipelineConfig"} anchor={"lerobot.configs.train.TrainPipelineConfig"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/configs/train.py#L110"} parameters={[{"name": "dataset", "val": ": DatasetConfig"}, {"name": "env", "val": ": lerobot.envs.configs.EnvConfig | None = None"}, {"name": "policy", "val": ": lerobot.configs.policies.PreTrainedConfig | None = None"}, {"name": "reward_model", "val": ": lerobot.configs.rewards.RewardModelConfig | None = None"}, {"name": "output_dir", "val": ": pathlib.Path | None = None"}, {"name": "job_name", "val": ": str | None = None"}, {"name": "resume", "val": ": bool = False"}, {"name": "seed", "val": ": int | None = 1000"}, {"name": "cudnn_deterministic", "val": ": bool = False"}, {"name": "num_workers", "val": ": int = 4"}, {"name": "batch_size", "val": ": int = 8"}, {"name": "prefetch_factor", "val": ": int = 4"}, {"name": "persistent_workers", "val": ": bool = True"}, {"name": "dataloader_multiprocessing_context", "val": ": str | None = 'spawn'"}, {"name": "steps", "val": ": int = 100000"}, {"name": "env_eval_freq", "val": ": int = 20000"}, {"name": "log_freq", "val": ": int = 200"}, {"name": "eval_steps", "val": ": int = 0"}, {"name": "max_eval_samples", "val": ": int = 0"}, {"name": "tolerance_s", "val": ": float = 0.0001"}, {"name": "save_checkpoint", "val": ": bool = True"}, {"name": "save_freq", "val": ": int = 20000"}, {"name": "checkpoint_format", "val": ": CheckpointFormat = <CheckpointFormat.SAFETENSORS: 'safetensors'>"}, {"name": "use_policy_training_preset", "val": ": bool = True"}, {"name": "optimizer", "val": ": lerobot.optim.optimizers.OptimizerConfig | None = None"}, {"name": "scheduler", "val": ": lerobot.optim.schedulers.LRSchedulerConfig | None = None"}, {"name": "parallelism", "val": ": ParallelismConfig = <factory>"}, {"name": "accelerator", "val": ": AcceleratorConfig = <factory>"}, {"name": "eval", "val": ": EvalConfig = <factory>"}, {"name": "ema", "val": ": EMAConfig = <factory>"}, {"name": "wandb", "val": ": WandBConfig = <factory>"}, {"name": "peft", "val": ": lerobot.configs.default.PeftConfig | None = None"}, {"name": "job", "val": ": JobConfig = <factory>"}, {"name": "save_checkpoint_to_hub", "val": ": bool = False"}, {"name": "sample_weighting", "val": ": lerobot.utils.sample_weighting.SampleWeightingConfig | None = None"}, {"name": "rename_map", "val": ": dict = <factory>"}]}>
+</Docstring>
+
+
+</div>
+
+## PreTrainedConfig [[lerobot.configs.PreTrainedConfig]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.configs.PreTrainedConfig"} anchor={"lerobot.configs.PreTrainedConfig"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/configs/policies.py#L41"} parameters={[{"name": "n_obs_steps", "val": ": int = 1"}, {"name": "input_features", "val": ": dict[str, lerobot.configs.types.PolicyFeature] | None = <factory>"}, {"name": "output_features", "val": ": dict[str, lerobot.configs.types.PolicyFeature] | None = <factory>"}, {"name": "device", "val": ": str | None = None"}, {"name": "use_amp", "val": ": bool = False"}, {"name": "use_peft", "val": ": bool = False"}, {"name": "push_to_hub", "val": ": bool = True"}, {"name": "repo_id", "val": ": str | None = None"}, {"name": "private", "val": ": bool | None = None"}, {"name": "tags", "val": ": list[str] | None = None"}, {"name": "license", "val": ": str | None = None"}, {"name": "pretrained_path", "val": ": pathlib.Path | None = None"}, {"name": "pretrained_revision", "val": ": str | None = None"}]}>
+<paramsdesc>- **n_obs_steps** -- 传递给 policy 的 observation 所对应的环境步数（取
+  当前步及其之前的额外步）。
+- **input_features** -- 定义 policy 输入数据 PolicyFeature 的字典。键表示
+  输入数据名称，值是 PolicyFeature，由 FeatureType 和 shape 属性组成。
+- **output_features** -- 定义 policy 输出数据 PolicyFeature 的字典。键表示
+  输出数据名称，值是 PolicyFeature，由 FeatureType 和 shape 属性组成。
+- **normalization_mapping** -- 一个字典，将 FeatureType 的 str 值（例如 “STATE”、“VISUAL”）映射到
+  相应的 NormalizationMode（例如 NormalizationMode.MIN_MAX）</paramsdesc></Docstring>
+
+policy 模型的基类配置类。
+
+
+
+
+</div>
+
+## DatasetConfig [[lerobot.configs.DatasetConfig]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.configs.DatasetConfig"} anchor={"lerobot.configs.DatasetConfig"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/configs/default.py#L29"} parameters={[{"name": "repo_id", "val": ": str"}, {"name": "repo_type", "val": ": str = 'dataset'"}, {"name": "root", "val": ": str | None = None"}, {"name": "episodes", "val": ": list[int] | None = None"}, {"name": "exclude_episodes", "val": ": list[int] | None = None"}, {"name": "image_transforms", "val": ": ImageTransformsConfig = <factory>"}, {"name": "revision", "val": ": str | None = None"}, {"name": "use_imagenet_stats", "val": ": bool = True"}, {"name": "video_backend", "val": ": str = <factory>"}, {"name": "return_uint8", "val": ": bool = False"}, {"name": "depth_output_unit", "val": ": str = 'mm'"}, {"name": "streaming", "val": ": bool = False"}, {"name": "eval_split", "val": ": float = 0.0"}]}>
+</Docstring>
+
+
+</div>
+
+## EvalConfig [[lerobot.configs.EvalConfig]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.configs.EvalConfig"} anchor={"lerobot.configs.EvalConfig"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/configs/default.py#L108"} parameters={[{"name": "n_episodes", "val": ": int = 50"}, {"name": "batch_size", "val": ": int = 0"}, {"name": "use_async_envs", "val": ": bool = True"}, {"name": "recording", "val": ": bool = False"}, {"name": "recording_repo_id", "val": ": str | None = None"}, {"name": "recording_private", "val": ": bool = False"}]}>
+</Docstring>
+
+
+</div>
+
+## WandBConfig [[lerobot.configs.WandBConfig]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.configs.WandBConfig"} anchor={"lerobot.configs.WandBConfig"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/configs/default.py#L91"} parameters={[{"name": "enable", "val": ": bool = False"}, {"name": "disable_artifact", "val": ": bool = False"}, {"name": "project", "val": ": str = 'lerobot'"}, {"name": "entity", "val": ": str | None = None"}, {"name": "notes", "val": ": str | None = None"}, {"name": "run_id", "val": ": str | None = None"}, {"name": "resume", "val": ": str | None = None"}, {"name": "mode", "val": ": str | None = None"}, {"name": "console", "val": ": str = 'wrap'"}, {"name": "console_multipart", "val": ": bool = False"}, {"name": "console_chunk_max_seconds", "val": ": int = 0"}, {"name": "add_tags", "val": ": bool = True"}]}>
+</Docstring>
+
+
+</div>
+
+
+<EditOnGithub source="https://github.com/huggingface/lerobot/blob/main/docs/source/api/configs.mdx" />
+
+<!--HF DOCBUILD BODY END-->
+
+HF_DOC_BODY_END
+

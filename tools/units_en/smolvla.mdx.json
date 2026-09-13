@@ -1,0 +1,206 @@
+{
+ "file": "smolvla.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1933,
+   "text": "# SmolVLA",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1935,
+   "end": 2092,
+   "text": "SmolVLA is Hugging Face’s lightweight foundation model for robotics. Designed for easy fine-tuning on LeRobot datasets, it helps accelerate your development!",
+   "tokens": []
+  },
+  {
+   "id": 2,
+   "kind": "para",
+   "start": 2297,
+   "end": 2569,
+   "text": "  ⟦0⟧\n    Figure 1. SmolVLA takes as input (i) multiple cameras views, (ii) the\n    robot’s current sensorimotor state, and (iii) a natural language\n    instruction, encoded into contextual features used to condition the action\n    expert when generating an action chunk.",
+   "tokens": [
+    "<em>"
+   ]
+  },
+  {
+   "id": 3,
+   "kind": "heading",
+   "start": 2584,
+   "end": 2610,
+   "text": "## Set Up Your Environment",
+   "tokens": []
+  },
+  {
+   "id": 4,
+   "kind": "list",
+   "start": 2612,
+   "end": 2685,
+   "text": "1. Install LeRobot by following our [Installation Guide](⟦0⟧).",
+   "tokens": [
+    "./installation"
+   ]
+  },
+  {
+   "id": 5,
+   "kind": "list",
+   "start": 2686,
+   "end": 2729,
+   "text": "2. Install SmolVLA dependencies by running:",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "heading",
+   "start": 2781,
+   "end": 2801,
+   "text": "## Collect a dataset",
+   "tokens": []
+  },
+  {
+   "id": 7,
+   "kind": "para",
+   "start": 2803,
+   "end": 3048,
+   "text": "SmolVLA is a base model, so fine-tuning on your own data is required for optimal performance in your setup.\nWe recommend recording ~50 episodes of your task as a starting point. Follow our guide to get started: [Recording a Dataset](⟦0⟧)",
+   "tokens": [
+    "./il_robots"
+   ]
+  },
+  {
+   "id": 8,
+   "kind": "para",
+   "start": 3057,
+   "end": 3221,
+   "text": "In your dataset, make sure to have enough demonstrations per each variation (e.g. the cube position on the table if it is cube pick-place task) you are introducing.",
+   "tokens": []
+  },
+  {
+   "id": 9,
+   "kind": "para",
+   "start": 3223,
+   "end": 3367,
+   "text": "We recommend checking out the dataset linked below for reference that was used in the [SmolVLA paper](⟦0⟧):",
+   "tokens": [
+    "https://huggingface.co/papers/2506.01844"
+   ]
+  },
+  {
+   "id": 10,
+   "kind": "para",
+   "start": 3369,
+   "end": 3501,
+   "text": "🔗 [SVLA SO100 PickPlace](⟦0⟧)",
+   "tokens": [
+    "https://huggingface.co/spaces/lerobot/visualize_dataset?path=%2Flerobot%2Fsvla_so100_pickplace%2Fepisode_0"
+   ]
+  },
+  {
+   "id": 11,
+   "kind": "para",
+   "start": 3503,
+   "end": 4031,
+   "text": "In this dataset, we recorded 50 episodes across 5 distinct cube positions. For each position, we collected 10 episodes of pick-and-place interactions. This structure, repeating each variation several times, helped the model generalize better. We tried similar dataset with 25 episodes, and it was not enough leading to a bad performance. So, the data quality and quantity is definitely a key.\nAfter you have your dataset available on the Hub, you are good to go to use our finetuning script to adapt SmolVLA to your application.",
+   "tokens": []
+  },
+  {
+   "id": 12,
+   "kind": "heading",
+   "start": 4041,
+   "end": 4073,
+   "text": "## Finetune SmolVLA on your data",
+   "tokens": []
+  },
+  {
+   "id": 13,
+   "kind": "para",
+   "start": 4075,
+   "end": 4346,
+   "text": "Use [⟦0⟧](⟦1⟧), our pretrained 450M model, and fine-tune it on your data.\nTraining the model for 20k steps will roughly take ~4 hrs on a single A100 GPU. You should tune the number of steps based on performance and your use-case.",
+   "tokens": [
+    "`smolvla_base`",
+    "https://hf.co/lerobot/smolvla_base"
+   ]
+  },
+  {
+   "id": 14,
+   "kind": "para",
+   "start": 4348,
+   "end": 4596,
+   "text": "If you don't have a gpu device, you can train using our notebook on [⟦0⟧](⟦1⟧)",
+   "tokens": [
+    "![Google Colab](https://colab.research.google.com/assets/colab-badge.svg)",
+    "https://colab.research.google.com/github/huggingface/notebooks/blob/main/lerobot/training-smolvla.ipynb"
+   ]
+  },
+  {
+   "id": 15,
+   "kind": "para",
+   "start": 4598,
+   "end": 4843,
+   "text": "Pass your dataset to the training script using ⟦0⟧. If you want to test your installation, run the following command where we use one of the datasets we collected for the [SmolVLA Paper](⟦1⟧).",
+   "tokens": [
+    "`--dataset.repo_id`",
+    "https://huggingface.co/papers/2506.01844"
+   ]
+  },
+  {
+   "id": 16,
+   "kind": "para",
+   "start": 5132,
+   "end": 5271,
+   "text": "⟦0⟧\n  You can start with a small batch size and increase it incrementally, if the\n  GPU allows it, as long as loading times remain short.",
+   "tokens": [
+    "<Tip>"
+   ]
+  },
+  {
+   "id": 17,
+   "kind": "para",
+   "start": 5280,
+   "end": 5361,
+   "text": "Fine-tuning is an art. For a complete overview of the options for finetuning, run",
+   "tokens": []
+  },
+  {
+   "id": 18,
+   "kind": "para",
+   "start": 5624,
+   "end": 5914,
+   "text": "  ⟦0⟧\n    Figure 2: Comparison of SmolVLA across task variations. From left to right:\n    (1) pick-place cube counting, (2) pick-place cube counting, (3) pick-place\n    cube counting under perturbations, and (4) generalization on pick-and-place\n    of the lego block with real-world SO101.",
+   "tokens": [
+    "<em>"
+   ]
+  },
+  {
+   "id": 19,
+   "kind": "heading",
+   "start": 5929,
+   "end": 5984,
+   "text": "## Evaluate the finetuned model and run it in real-time",
+   "tokens": []
+  },
+  {
+   "id": 20,
+   "kind": "para",
+   "start": 5986,
+   "end": 6251,
+   "text": "Similarly for when recording an episode, it is recommended that you are logged in to the HuggingFace Hub. You can follow the corresponding steps: [Record a dataset](⟦0⟧).\nOnce you are logged in, you can run inference in your setup by doing:",
+   "tokens": [
+    "./il_robots#record-a-dataset"
+   ]
+  },
+  {
+   "id": 21,
+   "kind": "para",
+   "start": 7200,
+   "end": 7330,
+   "text": "Depending on your evaluation setup, you can configure the duration and the number of episodes to record for your evaluation suite.",
+   "tokens": []
+  }
+ ]
+}

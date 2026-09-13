@@ -1,0 +1,1069 @@
+{
+ "file": "envhub.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1959,
+   "text": "# Loading Environments from the Hub",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1961,
+   "end": 2287,
+   "text": "The **EnvHub** feature allows you to load simulation environments directly from the Hugging Face Hub with a single line of code. This unlocks a powerful new model for collaboration: instead of environments being locked away inside monolithic libraries, anyone can publish custom environments and share them with the community.",
+   "tokens": []
+  },
+  {
+   "id": 2,
+   "kind": "heading",
+   "start": 2289,
+   "end": 2307,
+   "text": "## What is EnvHub?",
+   "tokens": []
+  },
+  {
+   "id": 3,
+   "kind": "para",
+   "start": 2309,
+   "end": 2482,
+   "text": "EnvHub lets you create custom robotics simulation environments with your own robot models and scenarios, and make them easily usable by anyone through the LeRobot framework.",
+   "tokens": []
+  },
+  {
+   "id": 4,
+   "kind": "para",
+   "start": 2484,
+   "end": 2646,
+   "text": "EnvHub packages are stored on the Hugging Face Hub, and can be seamlessly pulled and used in your AI robotics projects through LeRobot with a single line of code.",
+   "tokens": []
+  },
+  {
+   "id": 5,
+   "kind": "para",
+   "start": 2648,
+   "end": 2674,
+   "text": "Thanks to EnvHub, you can:",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "list",
+   "start": 2676,
+   "end": 2828,
+   "text": "1. **Create and publish environments** to the Hugging Face Hub as Git repositories, and distribute complex physics simulations without packaging hassles",
+   "tokens": []
+  },
+  {
+   "id": 7,
+   "kind": "list",
+   "start": 2829,
+   "end": 2902,
+   "text": "2. **Load environments** dynamically, without installing them as packages",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "list",
+   "start": 2903,
+   "end": 2967,
+   "text": "3. **Version and track** environment changes using Git semantics",
+   "tokens": []
+  },
+  {
+   "id": 9,
+   "kind": "list",
+   "start": 2968,
+   "end": 3028,
+   "text": "4. **Discover** new simulation tasks shared by the community",
+   "tokens": []
+  },
+  {
+   "id": 10,
+   "kind": "para",
+   "start": 3030,
+   "end": 3276,
+   "text": "This design means you can go from discovering an interesting environment on the Hub to running experiments in seconds, or create your own custom robot and environment without worrying about dependency conflicts or complex installation procedures.",
+   "tokens": []
+  },
+  {
+   "id": 11,
+   "kind": "para",
+   "start": 3278,
+   "end": 3581,
+   "text": "When you create an EnvHub package, you can build anything you want inside it and use any simulation tool you like: this is your own space to play with. The only requirement is that the package contains an ⟦0⟧ file that defines the environment and allows LeRobot to load and use your EnvHub package.",
+   "tokens": [
+    "`env.py`"
+   ]
+  },
+  {
+   "id": 12,
+   "kind": "para",
+   "start": 3583,
+   "end": 3908,
+   "text": "This ⟦0⟧ file needs to expose a small API so LeRobot can load and run it. In particular, you must provide a ⟦1⟧ or ⟦2⟧ function, which is the main entry point for LeRobot. It should return one of:",
+   "tokens": [
+    "`env.py`",
+    "`make_env(n_envs: int = 1, use_async_envs: bool = False)`",
+    "`make_env(n_envs: int = 1, use_async_envs: bool = False, cfg: EnvConfig)`"
+   ]
+  },
+  {
+   "id": 13,
+   "kind": "list",
+   "start": 3910,
+   "end": 3950,
+   "text": "- A ⟦0⟧ (most common)",
+   "tokens": [
+    "`gym.vector.VectorEnv`"
+   ]
+  },
+  {
+   "id": 14,
+   "kind": "list",
+   "start": 3951,
+   "end": 4003,
+   "text": "- A single ⟦0⟧ (will be automatically wrapped)",
+   "tokens": [
+    "`gym.Env`"
+   ]
+  },
+  {
+   "id": 15,
+   "kind": "list",
+   "start": 4004,
+   "end": 4085,
+   "text": "- A dict mapping ⟦0⟧ (for multi-task benchmarks)",
+   "tokens": [
+    "`{suite_name: {task_id: VectorEnv}}`"
+   ]
+  },
+  {
+   "id": 16,
+   "kind": "para",
+   "start": 4087,
+   "end": 4275,
+   "text": "You can also pass an ⟦0⟧ object to ⟦1⟧ to configure the environment (e.g. the number of environments, task, camera name, initial states, control mode, episode length, etc.).",
+   "tokens": [
+    "`EnvConfig`",
+    "`make_env`"
+   ]
+  },
+  {
+   "id": 17,
+   "kind": "para",
+   "start": 4277,
+   "end": 4432,
+   "text": "Finally, your environment must implement the standard ⟦0⟧ interface so it works with LeRobot, including methods like ⟦1⟧ and ⟦2⟧.",
+   "tokens": [
+    "`gym.vector.VectorEnv`",
+    "`reset`",
+    "`step`"
+   ]
+  },
+  {
+   "id": 18,
+   "kind": "heading",
+   "start": 4434,
+   "end": 4448,
+   "text": "## Quick Start",
+   "tokens": []
+  },
+  {
+   "id": 19,
+   "kind": "para",
+   "start": 4450,
+   "end": 4502,
+   "text": "Loading an environment from the Hub is as simple as:",
+   "tokens": []
+  },
+  {
+   "id": 20,
+   "kind": "para",
+   "start": 4689,
+   "end": 4977,
+   "text": "⟦0⟧\n  **Security Notice**: Loading environments from the Hub executes Python code\n  from third-party repositories. Only use ⟦1⟧ with\n  repositories you trust. We strongly recommend pinning to a specific commit\n  hash for reproducibility and security.",
+   "tokens": [
+    "<Tip warning={true}>",
+    "`trust_remote_code=True`"
+   ]
+  },
+  {
+   "id": 21,
+   "kind": "heading",
+   "start": 4986,
+   "end": 5009,
+   "text": "## Repository Structure",
+   "tokens": []
+  },
+  {
+   "id": 22,
+   "kind": "para",
+   "start": 5011,
+   "end": 5099,
+   "text": "To make your environment loadable from the Hub, your repository must contain at minimum:",
+   "tokens": []
+  },
+  {
+   "id": 23,
+   "kind": "heading",
+   "start": 5101,
+   "end": 5119,
+   "text": "### Required Files",
+   "tokens": []
+  },
+  {
+   "id": 24,
+   "kind": "para",
+   "start": 5121,
+   "end": 5157,
+   "text": "**⟦0⟧** (or custom Python file)",
+   "tokens": [
+    "`env.py`"
+   ]
+  },
+  {
+   "id": 25,
+   "kind": "list",
+   "start": 5159,
+   "end": 5229,
+   "text": "- Must expose a ⟦0⟧ function",
+   "tokens": [
+    "`make_env(n_envs: int, use_async_envs: bool)`"
+   ]
+  },
+  {
+   "id": 26,
+   "kind": "list",
+   "start": 5230,
+   "end": 5267,
+   "text": "- This function should return one of:",
+   "tokens": []
+  },
+  {
+   "id": 27,
+   "kind": "list",
+   "start": 5268,
+   "end": 5310,
+   "text": "  - A ⟦0⟧ (most common)",
+   "tokens": [
+    "`gym.vector.VectorEnv`"
+   ]
+  },
+  {
+   "id": 28,
+   "kind": "list",
+   "start": 5311,
+   "end": 5365,
+   "text": "  - A single ⟦0⟧ (will be automatically wrapped)",
+   "tokens": [
+    "`gym.Env`"
+   ]
+  },
+  {
+   "id": 29,
+   "kind": "list",
+   "start": 5366,
+   "end": 5449,
+   "text": "  - A dict mapping ⟦0⟧ (for multi-task benchmarks)",
+   "tokens": [
+    "`{suite_name: {task_id: VectorEnv}}`"
+   ]
+  },
+  {
+   "id": 30,
+   "kind": "heading",
+   "start": 5451,
+   "end": 5469,
+   "text": "### Optional Files",
+   "tokens": []
+  },
+  {
+   "id": 31,
+   "kind": "list",
+   "start": 5495,
+   "end": 5552,
+   "text": "- List any additional dependencies your environment needs",
+   "tokens": []
+  },
+  {
+   "id": 32,
+   "kind": "list",
+   "start": 5553,
+   "end": 5628,
+   "text": "- Users will need to install these manually before loading your environment",
+   "tokens": []
+  },
+  {
+   "id": 33,
+   "kind": "list",
+   "start": 5647,
+   "end": 5741,
+   "text": "- Document your environment: what task it implements, observation/action spaces, rewards, etc.",
+   "tokens": []
+  },
+  {
+   "id": 34,
+   "kind": "list",
+   "start": 5742,
+   "end": 5801,
+   "text": "- Include usage examples and any special setup instructions",
+   "tokens": []
+  },
+  {
+   "id": 35,
+   "kind": "list",
+   "start": 5821,
+   "end": 5869,
+   "text": "- Exclude unnecessary files from your repository",
+   "tokens": []
+  },
+  {
+   "id": 36,
+   "kind": "heading",
+   "start": 5871,
+   "end": 5903,
+   "text": "### Example Repository Structure",
+   "tokens": []
+  },
+  {
+   "id": 37,
+   "kind": "heading",
+   "start": 6276,
+   "end": 6315,
+   "text": "## Creating Your Environment Repository",
+   "tokens": []
+  },
+  {
+   "id": 38,
+   "kind": "heading",
+   "start": 6317,
+   "end": 6352,
+   "text": "### Step 1: Define Your Environment",
+   "tokens": []
+  },
+  {
+   "id": 39,
+   "kind": "para",
+   "start": 6354,
+   "end": 6405,
+   "text": "Create an ⟦0⟧ file with a ⟦1⟧ function:",
+   "tokens": [
+    "`env.py`",
+    "`make_env`"
+   ]
+  },
+  {
+   "id": 40,
+   "kind": "heading",
+   "start": 7166,
+   "end": 7190,
+   "text": "### Step 2: Test Locally",
+   "tokens": []
+  },
+  {
+   "id": 41,
+   "kind": "para",
+   "start": 7192,
+   "end": 7240,
+   "text": "Before uploading, test your environment locally:",
+   "tokens": []
+  },
+  {
+   "id": 42,
+   "kind": "heading",
+   "start": 7755,
+   "end": 7784,
+   "text": "### Step 3: Upload to the Hub",
+   "tokens": []
+  },
+  {
+   "id": 43,
+   "kind": "para",
+   "start": 7786,
+   "end": 7825,
+   "text": "Upload your repository to Hugging Face:",
+   "tokens": []
+  },
+  {
+   "id": 44,
+   "kind": "para",
+   "start": 8193,
+   "end": 8245,
+   "text": "Alternatively, use the ⟦0⟧ Python API:",
+   "tokens": [
+    "`huggingface_hub`"
+   ]
+  },
+  {
+   "id": 45,
+   "kind": "heading",
+   "start": 8517,
+   "end": 8553,
+   "text": "## Loading Environments from the Hub",
+   "tokens": []
+  },
+  {
+   "id": 46,
+   "kind": "heading",
+   "start": 8555,
+   "end": 8570,
+   "text": "### Basic Usage",
+   "tokens": []
+  },
+  {
+   "id": 47,
+   "kind": "heading",
+   "start": 8983,
+   "end": 9025,
+   "text": "### Advanced: Pinning to Specific Versions",
+   "tokens": []
+  },
+  {
+   "id": 48,
+   "kind": "para",
+   "start": 9027,
+   "end": 9092,
+   "text": "For reproducibility and security, pin to a specific Git revision:",
+   "tokens": []
+  },
+  {
+   "id": 49,
+   "kind": "heading",
+   "start": 9416,
+   "end": 9437,
+   "text": "### Custom File Paths",
+   "tokens": []
+  },
+  {
+   "id": 50,
+   "kind": "para",
+   "start": 9439,
+   "end": 9489,
+   "text": "If your environment definition is not in ⟦0⟧:",
+   "tokens": [
+    "`env.py`"
+   ]
+  },
+  {
+   "id": 51,
+   "kind": "heading",
+   "start": 9714,
+   "end": 9736,
+   "text": "### Async Environments",
+   "tokens": []
+  },
+  {
+   "id": 52,
+   "kind": "para",
+   "start": 9738,
+   "end": 9788,
+   "text": "For better performance with multiple environments:",
+   "tokens": []
+  },
+  {
+   "id": 53,
+   "kind": "heading",
+   "start": 9963,
+   "end": 9986,
+   "text": "## URL Format Reference",
+   "tokens": []
+  },
+  {
+   "id": 54,
+   "kind": "para",
+   "start": 9988,
+   "end": 10033,
+   "text": "The hub URL format supports several patterns:",
+   "tokens": []
+  },
+  {
+   "id": 55,
+   "kind": "table",
+   "start": 10035,
+   "end": 10133,
+   "text": "| Pattern              | Description                    | Example                                |",
+   "tokens": []
+  },
+  {
+   "id": 56,
+   "kind": "table",
+   "start": 10233,
+   "end": 10331,
+   "text": "| ⟦0⟧          | Load ⟦1⟧ from main branch | ⟦2⟧        |",
+   "tokens": [
+    "`user/repo`",
+    "`env.py`",
+    "`make_env(\"lerobot/pusht-env\")`"
+   ]
+  },
+  {
+   "id": 57,
+   "kind": "table",
+   "start": 10332,
+   "end": 10430,
+   "text": "| ⟦0⟧ | Load from specific revision    | ⟦1⟧   |",
+   "tokens": [
+    "`user/repo@revision`",
+    "`make_env(\"lerobot/pusht-env@main\")`"
+   ]
+  },
+  {
+   "id": 58,
+   "kind": "table",
+   "start": 10431,
+   "end": 10529,
+   "text": "| ⟦0⟧     | Load custom file               | ⟦1⟧    |",
+   "tokens": [
+    "`user/repo:path`",
+    "`make_env(\"lerobot/envs:pusht.py\")`"
+   ]
+  },
+  {
+   "id": 59,
+   "kind": "table",
+   "start": 10530,
+   "end": 10628,
+   "text": "| ⟦0⟧ | Revision + custom file         | ⟦1⟧ |",
+   "tokens": [
+    "`user/repo@rev:path`",
+    "`make_env(\"lerobot/envs@v1:pusht.py\")`"
+   ]
+  },
+  {
+   "id": 60,
+   "kind": "heading",
+   "start": 10630,
+   "end": 10656,
+   "text": "## Multi-Task Environments",
+   "tokens": []
+  },
+  {
+   "id": 61,
+   "kind": "para",
+   "start": 10658,
+   "end": 10735,
+   "text": "For benchmarks with multiple tasks (like LIBERO), return a nested dictionary:",
+   "tokens": []
+  },
+  {
+   "id": 62,
+   "kind": "heading",
+   "start": 11275,
+   "end": 11301,
+   "text": "## Security Considerations",
+   "tokens": []
+  },
+  {
+   "id": 63,
+   "kind": "para",
+   "start": 11303,
+   "end": 11462,
+   "text": "⟦0⟧\n  **Important**: The ⟦1⟧ flag is required to execute\n  environment code from the Hub. This is by design for security.",
+   "tokens": [
+    "<Tip warning={true}>",
+    "`trust_remote_code=True`"
+   ]
+  },
+  {
+   "id": 64,
+   "kind": "para",
+   "start": 11471,
+   "end": 11510,
+   "text": "When loading environments from the Hub:",
+   "tokens": []
+  },
+  {
+   "id": 65,
+   "kind": "list",
+   "start": 11512,
+   "end": 11598,
+   "text": "1. **Review the code first**: Visit the repository and inspect ⟦0⟧ before loading",
+   "tokens": [
+    "`env.py`"
+   ]
+  },
+  {
+   "id": 66,
+   "kind": "list",
+   "start": 11599,
+   "end": 11668,
+   "text": "2. **Pin to commits**: Use specific commit hashes for reproducibility",
+   "tokens": []
+  },
+  {
+   "id": 67,
+   "kind": "list",
+   "start": 11669,
+   "end": 11745,
+   "text": "3. **Check dependencies**: Review ⟦0⟧ for suspicious packages",
+   "tokens": [
+    "`requirements.txt`"
+   ]
+  },
+  {
+   "id": 68,
+   "kind": "list",
+   "start": 11746,
+   "end": 11829,
+   "text": "4. **Use trusted sources**: Prefer official organizations or well-known researchers",
+   "tokens": []
+  },
+  {
+   "id": 69,
+   "kind": "list",
+   "start": 11830,
+   "end": 11917,
+   "text": "5. **Sandbox if needed**: Run untrusted code in isolated environments (containers, VMs)",
+   "tokens": []
+  },
+  {
+   "id": 70,
+   "kind": "para",
+   "start": 11919,
+   "end": 11941,
+   "text": "Example of safe usage:",
+   "tokens": []
+  },
+  {
+   "id": 71,
+   "kind": "heading",
+   "start": 12303,
+   "end": 12336,
+   "text": "## Example: CartPole from the Hub",
+   "tokens": []
+  },
+  {
+   "id": 72,
+   "kind": "para",
+   "start": 12338,
+   "end": 12405,
+   "text": "Here's a complete example using the reference CartPole environment:",
+   "tokens": []
+  },
+  {
+   "id": 73,
+   "kind": "heading",
+   "start": 13078,
+   "end": 13099,
+   "text": "## Benefits of EnvHub",
+   "tokens": []
+  },
+  {
+   "id": 74,
+   "kind": "heading",
+   "start": 13101,
+   "end": 13128,
+   "text": "### For Environment Authors",
+   "tokens": []
+  },
+  {
+   "id": 75,
+   "kind": "list",
+   "start": 13130,
+   "end": 13181,
+   "text": "- **Easy distribution**: No PyPI packaging required",
+   "tokens": []
+  },
+  {
+   "id": 76,
+   "kind": "list",
+   "start": 13182,
+   "end": 13239,
+   "text": "- **Version control**: Use Git for environment versioning",
+   "tokens": []
+  },
+  {
+   "id": 77,
+   "kind": "list",
+   "start": 13240,
+   "end": 13285,
+   "text": "- **Rapid iteration**: Push updates instantly",
+   "tokens": []
+  },
+  {
+   "id": 78,
+   "kind": "list",
+   "start": 13286,
+   "end": 13337,
+   "text": "- **Documentation**: Hub README renders beautifully",
+   "tokens": []
+  },
+  {
+   "id": 79,
+   "kind": "list",
+   "start": 13338,
+   "end": 13383,
+   "text": "- **Community**: Reach LeRobot users directly",
+   "tokens": []
+  },
+  {
+   "id": 80,
+   "kind": "heading",
+   "start": 13385,
+   "end": 13404,
+   "text": "### For Researchers",
+   "tokens": []
+  },
+  {
+   "id": 81,
+   "kind": "list",
+   "start": 13406,
+   "end": 13463,
+   "text": "- **Quick experiments**: Load any environment in one line",
+   "tokens": []
+  },
+  {
+   "id": 82,
+   "kind": "list",
+   "start": 13464,
+   "end": 13510,
+   "text": "- **Reproducibility**: Pin to specific commits",
+   "tokens": []
+  },
+  {
+   "id": 83,
+   "kind": "list",
+   "start": 13511,
+   "end": 13558,
+   "text": "- **Discovery**: Browse environments on the Hub",
+   "tokens": []
+  },
+  {
+   "id": 84,
+   "kind": "list",
+   "start": 13559,
+   "end": 13618,
+   "text": "- **No conflicts**: No need to install conflicting packages",
+   "tokens": []
+  },
+  {
+   "id": 85,
+   "kind": "heading",
+   "start": 13620,
+   "end": 13641,
+   "text": "### For the Community",
+   "tokens": []
+  },
+  {
+   "id": 86,
+   "kind": "list",
+   "start": 13643,
+   "end": 13697,
+   "text": "- **Growing ecosystem**: More diverse simulation tasks",
+   "tokens": []
+  },
+  {
+   "id": 87,
+   "kind": "list",
+   "start": 13698,
+   "end": 13742,
+   "text": "- **Standardization**: Common ⟦0⟧ API",
+   "tokens": [
+    "`make_env`"
+   ]
+  },
+  {
+   "id": 88,
+   "kind": "list",
+   "start": 13743,
+   "end": 13802,
+   "text": "- **Collaboration**: Fork and improve existing environments",
+   "tokens": []
+  },
+  {
+   "id": 89,
+   "kind": "list",
+   "start": 13803,
+   "end": 13857,
+   "text": "- **Accessibility**: Lower barrier to sharing research",
+   "tokens": []
+  },
+  {
+   "id": 90,
+   "kind": "heading",
+   "start": 13859,
+   "end": 13877,
+   "text": "## Troubleshooting",
+   "tokens": []
+  },
+  {
+   "id": 91,
+   "kind": "heading",
+   "start": 13879,
+   "end": 13916,
+   "text": "### \"Refusing to execute remote code\"",
+   "tokens": []
+  },
+  {
+   "id": 92,
+   "kind": "para",
+   "start": 13918,
+   "end": 13968,
+   "text": "You must explicitly pass ⟦0⟧:",
+   "tokens": [
+    "`trust_remote_code=True`"
+   ]
+  },
+  {
+   "id": 93,
+   "kind": "heading",
+   "start": 14037,
+   "end": 14061,
+   "text": "### \"Module X not found\"",
+   "tokens": []
+  },
+  {
+   "id": 94,
+   "kind": "para",
+   "start": 14063,
+   "end": 14120,
+   "text": "The hub environment has dependencies you need to install:",
+   "tokens": []
+  },
+  {
+   "id": 95,
+   "kind": "heading",
+   "start": 14224,
+   "end": 14258,
+   "text": "### \"make_env not found in module\"",
+   "tokens": []
+  },
+  {
+   "id": 96,
+   "kind": "para",
+   "start": 14260,
+   "end": 14308,
+   "text": "Your ⟦0⟧ must expose a ⟦1⟧ function:",
+   "tokens": [
+    "`env.py`",
+    "`make_env`"
+   ]
+  },
+  {
+   "id": 97,
+   "kind": "heading",
+   "start": 14409,
+   "end": 14443,
+   "text": "### Environment returns wrong type",
+   "tokens": []
+  },
+  {
+   "id": 98,
+   "kind": "para",
+   "start": 14445,
+   "end": 14481,
+   "text": "The ⟦0⟧ function must return:",
+   "tokens": [
+    "`make_env`"
+   ]
+  },
+  {
+   "id": 99,
+   "kind": "list",
+   "start": 14483,
+   "end": 14513,
+   "text": "- A ⟦0⟧, or",
+   "tokens": [
+    "`gym.vector.VectorEnv`"
+   ]
+  },
+  {
+   "id": 100,
+   "kind": "list",
+   "start": 14514,
+   "end": 14538,
+   "text": "- A single ⟦0⟧, or",
+   "tokens": [
+    "`gym.Env`"
+   ]
+  },
+  {
+   "id": 101,
+   "kind": "list",
+   "start": 14539,
+   "end": 14584,
+   "text": "- A dict ⟦0⟧",
+   "tokens": [
+    "`{suite_name: {task_id: VectorEnv}}`"
+   ]
+  },
+  {
+   "id": 102,
+   "kind": "heading",
+   "start": 14586,
+   "end": 14603,
+   "text": "## Best Practices",
+   "tokens": []
+  },
+  {
+   "id": 103,
+   "kind": "list",
+   "start": 14605,
+   "end": 14745,
+   "text": "1. **Document your environment**: Include observation/action space descriptions, reward structure, and termination conditions in your README",
+   "tokens": []
+  },
+  {
+   "id": 104,
+   "kind": "list",
+   "start": 14746,
+   "end": 14810,
+   "text": "2. **Add requirements.txt**: List all dependencies with versions",
+   "tokens": []
+  },
+  {
+   "id": 105,
+   "kind": "list",
+   "start": 14811,
+   "end": 14887,
+   "text": "3. **Test thoroughly**: Verify your environment works locally before pushing",
+   "tokens": []
+  },
+  {
+   "id": 106,
+   "kind": "list",
+   "start": 14888,
+   "end": 14953,
+   "text": "4. **Use semantic versioning**: Tag releases with version numbers",
+   "tokens": []
+  },
+  {
+   "id": 107,
+   "kind": "list",
+   "start": 14954,
+   "end": 15012,
+   "text": "5. **Add examples**: Include usage examples in your README",
+   "tokens": []
+  },
+  {
+   "id": 108,
+   "kind": "list",
+   "start": 15013,
+   "end": 15071,
+   "text": "6. **Keep it simple**: Minimize dependencies when possible",
+   "tokens": []
+  },
+  {
+   "id": 109,
+   "kind": "list",
+   "start": 15072,
+   "end": 15139,
+   "text": "7. **License your work**: Add a LICENSE file to clarify usage terms",
+   "tokens": []
+  },
+  {
+   "id": 110,
+   "kind": "heading",
+   "start": 15141,
+   "end": 15161,
+   "text": "## Future Directions",
+   "tokens": []
+  },
+  {
+   "id": 111,
+   "kind": "para",
+   "start": 15163,
+   "end": 15215,
+   "text": "The EnvHub ecosystem enables exciting possibilities:",
+   "tokens": []
+  },
+  {
+   "id": 112,
+   "kind": "list",
+   "start": 15217,
+   "end": 15284,
+   "text": "- **GPU-accelerated physics**: Share Isaac Gym or Brax environments",
+   "tokens": []
+  },
+  {
+   "id": 113,
+   "kind": "list",
+   "start": 15285,
+   "end": 15363,
+   "text": "- **Photorealistic rendering**: Distribute environments with advanced graphics",
+   "tokens": []
+  },
+  {
+   "id": 114,
+   "kind": "list",
+   "start": 15364,
+   "end": 15418,
+   "text": "- **Multi-agent scenarios**: Complex interaction tasks",
+   "tokens": []
+  },
+  {
+   "id": 115,
+   "kind": "list",
+   "start": 15419,
+   "end": 15480,
+   "text": "- **Real-world simulators**: Digital twins of physical setups",
+   "tokens": []
+  },
+  {
+   "id": 116,
+   "kind": "list",
+   "start": 15481,
+   "end": 15534,
+   "text": "- **Procedural generation**: Infinite task variations",
+   "tokens": []
+  },
+  {
+   "id": 117,
+   "kind": "list",
+   "start": 15535,
+   "end": 15590,
+   "text": "- **Domain randomization**: Pre-configured DR pipelines",
+   "tokens": []
+  },
+  {
+   "id": 118,
+   "kind": "para",
+   "start": 15592,
+   "end": 15752,
+   "text": "As more researchers and developers contribute, the diversity and quality of available environments will grow, benefiting the entire robotics learning community.",
+   "tokens": []
+  },
+  {
+   "id": 119,
+   "kind": "heading",
+   "start": 15754,
+   "end": 15765,
+   "text": "## See Also",
+   "tokens": []
+  },
+  {
+   "id": 120,
+   "kind": "list",
+   "start": 15767,
+   "end": 15843,
+   "text": "- [Hugging Face Hub Documentation](⟦0⟧)",
+   "tokens": [
+    "https://huggingface.co/docs/hub/en/index"
+   ]
+  },
+  {
+   "id": 121,
+   "kind": "list",
+   "start": 15844,
+   "end": 15912,
+   "text": "- [Gymnasium Documentation](⟦0⟧)",
+   "tokens": [
+    "https://gymnasium.farama.org/index.html"
+   ]
+  },
+  {
+   "id": 122,
+   "kind": "list",
+   "start": 15913,
+   "end": 15985,
+   "text": "- [Example Hub Environment](⟦0⟧)",
+   "tokens": [
+    "https://huggingface.co/lerobot/cartpole-env"
+   ]
+  }
+ ]
+}

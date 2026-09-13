@@ -1,0 +1,747 @@
+{
+ "file": "implement_your_own_processor.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1960,
+   "text": "# Implement your own Robot Processor",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1962,
+   "end": 2285,
+   "text": "In this tutorial, you'll learn how to implement your own Robot Processor.\nIt begins by exploring the need for a custom processor, then uses the ⟦0⟧ as the running example to explain how to implement, configure, and serialize a processor. Finally, it lists all helper processors that ship with LeRobot.",
+   "tokens": [
+    "`NormalizerProcessorStep`"
+   ]
+  },
+  {
+   "id": 2,
+   "kind": "heading",
+   "start": 2287,
+   "end": 2328,
+   "text": "## Why would you need a custom processor?",
+   "tokens": []
+  },
+  {
+   "id": 3,
+   "kind": "para",
+   "start": 2330,
+   "end": 2584,
+   "text": "In most cases, when reading raw data from sensors or when models output actions, you need to process this data to make it compatible with your target system. For example, a common need is normalizing data ranges to make them suitable for neural networks.",
+   "tokens": []
+  },
+  {
+   "id": 4,
+   "kind": "para",
+   "start": 2586,
+   "end": 2648,
+   "text": "LeRobot's ⟦0⟧ handles this crucial task:",
+   "tokens": [
+    "`NormalizerProcessorStep`"
+   ]
+  },
+  {
+   "id": 5,
+   "kind": "para",
+   "start": 2974,
+   "end": 3012,
+   "text": "Other common processing needs include:",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "list",
+   "start": 3014,
+   "end": 3094,
+   "text": "- **Device placement**: Moving tensors between CPU/GPU and converting data types",
+   "tokens": []
+  },
+  {
+   "id": 7,
+   "kind": "list",
+   "start": 3095,
+   "end": 3166,
+   "text": "- **Format conversion**: Transforming between different data structures",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "list",
+   "start": 3167,
+   "end": 3239,
+   "text": "- **Batching**: Adding/removing batch dimensions for model compatibility",
+   "tokens": []
+  },
+  {
+   "id": 9,
+   "kind": "list",
+   "start": 3240,
+   "end": 3299,
+   "text": "- **Safety constraints**: Applying limits to robot commands",
+   "tokens": []
+  },
+  {
+   "id": 10,
+   "kind": "para",
+   "start": 3606,
+   "end": 3818,
+   "text": "LeRobot provides a pipeline mechanism to implement sequences of processing steps for both input data and output actions, making it easy to compose these transformations in the right order for optimal performance.",
+   "tokens": []
+  },
+  {
+   "id": 11,
+   "kind": "heading",
+   "start": 3820,
+   "end": 3859,
+   "text": "## How to implement your own processor?",
+   "tokens": []
+  },
+  {
+   "id": 12,
+   "kind": "para",
+   "start": 3861,
+   "end": 4077,
+   "text": "We'll use the ⟦0⟧ as our main example because it demonstrates essential processor patterns including state management, configuration serialization, and tensor handling that you'll commonly need.",
+   "tokens": [
+    "`NormalizerProcessorStep`"
+   ]
+  },
+  {
+   "id": 13,
+   "kind": "para",
+   "start": 4079,
+   "end": 4214,
+   "text": "Prepare the sequence of processing steps necessary for your problem. A processor step is a class that implements the following methods:",
+   "tokens": []
+  },
+  {
+   "id": 14,
+   "kind": "list",
+   "start": 4216,
+   "end": 4286,
+   "text": "- ⟦0⟧: implements the processing step for the input transition.",
+   "tokens": [
+    "`__call__`"
+   ]
+  },
+  {
+   "id": 15,
+   "kind": "list",
+   "start": 4287,
+   "end": 4348,
+   "text": "- ⟦0⟧: gets the configuration of the processor step.",
+   "tokens": [
+    "`get_config`"
+   ]
+  },
+  {
+   "id": 16,
+   "kind": "list",
+   "start": 4349,
+   "end": 4402,
+   "text": "- ⟦0⟧: gets the state of the processor step.",
+   "tokens": [
+    "`state_dict`"
+   ]
+  },
+  {
+   "id": 17,
+   "kind": "list",
+   "start": 4403,
+   "end": 4462,
+   "text": "- ⟦0⟧: loads the state of the processor step.",
+   "tokens": [
+    "`load_state_dict`"
+   ]
+  },
+  {
+   "id": 18,
+   "kind": "list",
+   "start": 4463,
+   "end": 4513,
+   "text": "- ⟦0⟧: resets the state of the processor step.",
+   "tokens": [
+    "`reset`"
+   ]
+  },
+  {
+   "id": 19,
+   "kind": "list",
+   "start": 4514,
+   "end": 4609,
+   "text": "- ⟦0⟧: displays the modification to the feature space during the processor step.",
+   "tokens": [
+    "`feature_contract`"
+   ]
+  },
+  {
+   "id": 20,
+   "kind": "heading",
+   "start": 4611,
+   "end": 4646,
+   "text": "### Implement the ⟦0⟧ method",
+   "tokens": [
+    "`__call__`"
+   ]
+  },
+  {
+   "id": 21,
+   "kind": "para",
+   "start": 4648,
+   "end": 4821,
+   "text": "The ⟦0⟧ method is the core of your processor step. It takes an ⟦1⟧ and returns a modified ⟦2⟧. Here's how the ⟦3⟧ works:",
+   "tokens": [
+    "`__call__`",
+    "`EnvTransition`",
+    "`EnvTransition`",
+    "`NormalizerProcessorStep`"
+   ]
+  },
+  {
+   "id": 22,
+   "kind": "para",
+   "start": 5717,
+   "end": 5816,
+   "text": "See the full implementation in ⟦0⟧ for complete details.",
+   "tokens": [
+    "`src/lerobot/processor/normalize_processor.py`"
+   ]
+  },
+  {
+   "id": 23,
+   "kind": "para",
+   "start": 5818,
+   "end": 5837,
+   "text": "**Key principles:**",
+   "tokens": []
+  },
+  {
+   "id": 24,
+   "kind": "list",
+   "start": 5839,
+   "end": 5897,
+   "text": "- **Always use ⟦0⟧** to avoid side effects",
+   "tokens": [
+    "`transition.copy()`"
+   ]
+  },
+  {
+   "id": 25,
+   "kind": "list",
+   "start": 5898,
+   "end": 5953,
+   "text": "- **Handle both observations and actions** consistently",
+   "tokens": []
+  },
+  {
+   "id": 26,
+   "kind": "list",
+   "start": 5954,
+   "end": 6067,
+   "text": "- **Separate config from state**: ⟦0⟧ returns JSON-serializable params, ⟦1⟧ returns tensors",
+   "tokens": [
+    "`get_config()`",
+    "`state_dict()`"
+   ]
+  },
+  {
+   "id": 27,
+   "kind": "list",
+   "start": 6068,
+   "end": 6145,
+   "text": "- **Convert stats to tensors** in ⟦0⟧ for efficient computation",
+   "tokens": [
+    "`__post_init__()`"
+   ]
+  },
+  {
+   "id": 28,
+   "kind": "heading",
+   "start": 6147,
+   "end": 6185,
+   "text": "### Configuration and State Management",
+   "tokens": []
+  },
+  {
+   "id": 29,
+   "kind": "para",
+   "start": 6187,
+   "end": 6437,
+   "text": "Processors support serialization through three methods that separate configuration from tensor state. The ⟦0⟧ demonstrates this perfectly - it carries dataset statistics (tensors) in its state, and hyperparameters in its config:",
+   "tokens": [
+    "`NormalizerProcessorStep`"
+   ]
+  },
+  {
+   "id": 30,
+   "kind": "para",
+   "start": 7600,
+   "end": 7610,
+   "text": "**Usage:**",
+   "tokens": []
+  },
+  {
+   "id": 31,
+   "kind": "heading",
+   "start": 7921,
+   "end": 7943,
+   "text": "### Transform features",
+   "tokens": []
+  },
+  {
+   "id": 32,
+   "kind": "para",
+   "start": 7945,
+   "end": 8096,
+   "text": "The ⟦0⟧ method defines how your processor transforms feature names and shapes. This is crucial for policy configuration and debugging.",
+   "tokens": [
+    "`transform_features`"
+   ]
+  },
+  {
+   "id": 33,
+   "kind": "para",
+   "start": 8098,
+   "end": 8221,
+   "text": "For ⟦0⟧, features are typically preserved unchanged since normalization doesn't alter keys or shapes:",
+   "tokens": [
+    "`NormalizerProcessorStep`"
+   ]
+  },
+  {
+   "id": 34,
+   "kind": "para",
+   "start": 8510,
+   "end": 8667,
+   "text": "When your processor renames or reshapes data, implement this method to reflect the mapping for downstream components. For example, a simple rename processor:",
+   "tokens": []
+  },
+  {
+   "id": 35,
+   "kind": "para",
+   "start": 9151,
+   "end": 9170,
+   "text": "**Key principles:**",
+   "tokens": []
+  },
+  {
+   "id": 36,
+   "kind": "list",
+   "start": 9172,
+   "end": 9235,
+   "text": "- Use ⟦0⟧ to remove and get the old feature",
+   "tokens": [
+    "`features.pop(old_key)`"
+   ]
+  },
+  {
+   "id": 37,
+   "kind": "list",
+   "start": 9236,
+   "end": 9302,
+   "text": "- Use ⟦0⟧ to add the renamed feature",
+   "tokens": [
+    "`features[new_key] = old_feature`"
+   ]
+  },
+  {
+   "id": 38,
+   "kind": "list",
+   "start": 9303,
+   "end": 9351,
+   "text": "- Always return the modified features dictionary",
+   "tokens": []
+  },
+  {
+   "id": 39,
+   "kind": "list",
+   "start": 9352,
+   "end": 9403,
+   "text": "- Document transformations clearly in the docstring",
+   "tokens": []
+  },
+  {
+   "id": 40,
+   "kind": "heading",
+   "start": 9405,
+   "end": 9424,
+   "text": "### Using overrides",
+   "tokens": []
+  },
+  {
+   "id": 41,
+   "kind": "para",
+   "start": 9426,
+   "end": 9649,
+   "text": "You can override step parameters at load-time using ⟦0⟧. This is handy for non-serializable objects or site-specific settings. It works both in policy factories and with ⟦1⟧.",
+   "tokens": [
+    "`overrides`",
+    "`DataProcessorPipeline.from_pretrained(...)`"
+   ]
+  },
+  {
+   "id": 42,
+   "kind": "para",
+   "start": 9651,
+   "end": 9941,
+   "text": "**Foundational model adaptation**: This is particularly useful when working with foundational pretrained policies where you rarely have access to the original training statistics. You can inject your own dataset statistics to adapt the normalizer to your specific robot or environment data.",
+   "tokens": []
+  },
+  {
+   "id": 43,
+   "kind": "para",
+   "start": 9943,
+   "end": 10166,
+   "text": "Example: during policy evaluation on the robot, override the device and rename map.\nUse this to run a policy trained on CUDA on a CPU-only robot, or to remap camera keys when the robot uses different names than the dataset.",
+   "tokens": []
+  },
+  {
+   "id": 44,
+   "kind": "para",
+   "start": 10168,
+   "end": 10204,
+   "text": "Direct usage with ⟦0⟧:",
+   "tokens": [
+    "`from_pretrained`"
+   ]
+  },
+  {
+   "id": 45,
+   "kind": "heading",
+   "start": 10912,
+   "end": 10929,
+   "text": "## Best Practices",
+   "tokens": []
+  },
+  {
+   "id": 46,
+   "kind": "para",
+   "start": 10931,
+   "end": 11031,
+   "text": "Based on analysis of all LeRobot processor implementations, here are the key patterns and practices:",
+   "tokens": []
+  },
+  {
+   "id": 47,
+   "kind": "heading",
+   "start": 11033,
+   "end": 11062,
+   "text": "### 1. **Safe Data Handling**",
+   "tokens": []
+  },
+  {
+   "id": 48,
+   "kind": "para",
+   "start": 11064,
+   "end": 11309,
+   "text": "Always create copies of input data to avoid unintended side effects. Use ⟦0⟧ and ⟦1⟧ rather than modifying data in-place. This prevents your processor from accidentally affecting other components in the pipeline.",
+   "tokens": [
+    "`transition.copy()`",
+    "`observation.copy()`"
+   ]
+  },
+  {
+   "id": 49,
+   "kind": "para",
+   "start": 11311,
+   "end": 11606,
+   "text": "Check for required data before processing and handle missing data gracefully. If your processor expects certain keys (like ⟦0⟧ for image processing), validate their presence first. For optional data, use safe access patterns like ⟦1⟧ and handle ⟦2⟧ values appropriately.",
+   "tokens": [
+    "`\"pixels\"`",
+    "`transition.get()`",
+    "`None`"
+   ]
+  },
+  {
+   "id": 50,
+   "kind": "para",
+   "start": 11608,
+   "end": 11738,
+   "text": "When data validation fails, provide clear, actionable error messages that help users understand what went wrong and how to fix it.",
+   "tokens": []
+  },
+  {
+   "id": 51,
+   "kind": "heading",
+   "start": 11740,
+   "end": 11782,
+   "text": "### 2. **Choose Appropriate Base Classes**",
+   "tokens": []
+  },
+  {
+   "id": 52,
+   "kind": "para",
+   "start": 11784,
+   "end": 12082,
+   "text": "LeRobot provides specialized base classes that reduce boilerplate code and ensure consistency. Use ⟦0⟧ when you only need to modify observations, ⟦1⟧ for action-only processing, and ⟦2⟧ specifically for dictionary-based robot actions.",
+   "tokens": [
+    "`ObservationProcessorStep`",
+    "`ActionProcessorStep`",
+    "`RobotActionProcessorStep`"
+   ]
+  },
+  {
+   "id": 53,
+   "kind": "para",
+   "start": 12084,
+   "end": 12341,
+   "text": "Only inherit directly from ⟦0⟧ when you need full control over the entire transition or when processing multiple transition components simultaneously. The specialized base classes handle the transition management for you and provide type safety.",
+   "tokens": [
+    "`ProcessorStep`"
+   ]
+  },
+  {
+   "id": 54,
+   "kind": "heading",
+   "start": 12343,
+   "end": 12377,
+   "text": "### 3. **Registration and Naming**",
+   "tokens": []
+  },
+  {
+   "id": 55,
+   "kind": "para",
+   "start": 12379,
+   "end": 12700,
+   "text": "Register your processors with descriptive, namespaced names using ⟦0⟧. Use organization prefixes like ⟦1⟧ or ⟦2⟧ to avoid naming conflicts. Avoid generic names like ⟦3⟧ or ⟦4⟧ that could clash with other implementations.",
+   "tokens": [
+    "`@ProcessorStepRegistry.register()`",
+    "`\"robotics_lab/safety_clipper\"`",
+    "`\"acme_corp/vision_enhancer\"`",
+    "`\"processor\"`",
+    "`\"step\"`"
+   ]
+  },
+  {
+   "id": 56,
+   "kind": "para",
+   "start": 12702,
+   "end": 12837,
+   "text": "Good registration makes your processors discoverable and enables clean serialization/deserialization when saving and loading pipelines.",
+   "tokens": []
+  },
+  {
+   "id": 57,
+   "kind": "heading",
+   "start": 12839,
+   "end": 12875,
+   "text": "### 4. **State Management Patterns**",
+   "tokens": []
+  },
+  {
+   "id": 58,
+   "kind": "para",
+   "start": 12877,
+   "end": 13124,
+   "text": "Distinguish between configuration parameters (JSON-serializable values) and internal state (tensors, buffers). Use dataclass fields with ⟦0⟧ for internal state that shouldn't appear in the constructor or string representation.",
+   "tokens": [
+    "`init=False, repr=False`"
+   ]
+  },
+  {
+   "id": 59,
+   "kind": "para",
+   "start": 13126,
+   "end": 13312,
+   "text": "Implement the ⟦0⟧ method to clear internal state between episodes. This is crucial for stateful processors that accumulate data over time, like moving averages or temporal filters.",
+   "tokens": [
+    "`reset()`"
+   ]
+  },
+  {
+   "id": 60,
+   "kind": "para",
+   "start": 13314,
+   "end": 13448,
+   "text": "Remember that ⟦0⟧ should only return JSON-serializable configuration, while ⟦1⟧ handles tensor state separately.",
+   "tokens": [
+    "`get_config()`",
+    "`state_dict()`"
+   ]
+  },
+  {
+   "id": 61,
+   "kind": "heading",
+   "start": 13450,
+   "end": 13496,
+   "text": "### 5. **Input Validation and Error Handling**",
+   "tokens": []
+  },
+  {
+   "id": 62,
+   "kind": "para",
+   "start": 13498,
+   "end": 13758,
+   "text": "Validate input types and shapes before processing. Check tensor properties like ⟦0⟧ and dimensions to ensure compatibility with your algorithms. For robot actions, verify that required pose components or joint values are present and within expected ranges.",
+   "tokens": [
+    "`dtype`"
+   ]
+  },
+  {
+   "id": 63,
+   "kind": "para",
+   "start": 13760,
+   "end": 13968,
+   "text": "Use early returns for edge cases where no processing is needed. Provide clear, descriptive error messages that include the expected vs. actual data types or shapes. This makes debugging much easier for users.",
+   "tokens": []
+  },
+  {
+   "id": 64,
+   "kind": "heading",
+   "start": 13970,
+   "end": 14007,
+   "text": "### 6. **Device and Dtype Awareness**",
+   "tokens": []
+  },
+  {
+   "id": 65,
+   "kind": "para",
+   "start": 14009,
+   "end": 14284,
+   "text": "Design your processors to automatically adapt to the device and dtype of input tensors. Internal tensors (like normalization statistics) should match the input tensor's device and dtype to ensure compatibility with multi-GPU training, mixed precision, and distributed setups.",
+   "tokens": []
+  },
+  {
+   "id": 66,
+   "kind": "para",
+   "start": 14286,
+   "end": 14587,
+   "text": "Implement a ⟦0⟧ method that moves your processor's internal state to the specified device. Check device/dtype compatibility at runtime and automatically migrate internal state when needed. This pattern enables seamless operation across different hardware configurations without manual intervention.",
+   "tokens": [
+    "`to()`"
+   ]
+  },
+  {
+   "id": 67,
+   "kind": "heading",
+   "start": 14589,
+   "end": 14602,
+   "text": "## Conclusion",
+   "tokens": []
+  },
+  {
+   "id": 68,
+   "kind": "para",
+   "start": 14604,
+   "end": 14692,
+   "text": "You now have all the tools to implement custom processors in LeRobot! The key steps are:",
+   "tokens": []
+  },
+  {
+   "id": 69,
+   "kind": "list",
+   "start": 14694,
+   "end": 14854,
+   "text": "1. **Define your processor** as a dataclass with the required methods (⟦0⟧, ⟦1⟧, ⟦2⟧, ⟦3⟧, ⟦4⟧, ⟦5⟧)",
+   "tokens": [
+    "`__call__`",
+    "`get_config`",
+    "`state_dict`",
+    "`load_state_dict`",
+    "`reset`",
+    "`transform_features`"
+   ]
+  },
+  {
+   "id": 70,
+   "kind": "list",
+   "start": 14855,
+   "end": 14941,
+   "text": "2. **Register it** using ⟦0⟧ for discoverability",
+   "tokens": [
+    "`@ProcessorStepRegistry.register(\"name\")`"
+   ]
+  },
+  {
+   "id": 71,
+   "kind": "list",
+   "start": 14942,
+   "end": 15020,
+   "text": "3. **Integrate it** into a ⟦0⟧ with other processing steps",
+   "tokens": [
+    "`DataProcessorPipeline`"
+   ]
+  },
+  {
+   "id": 72,
+   "kind": "list",
+   "start": 15021,
+   "end": 15112,
+   "text": "4. **Use base classes** like ⟦0⟧ when possible to reduce boilerplate",
+   "tokens": [
+    "`ObservationProcessorStep`"
+   ]
+  },
+  {
+   "id": 73,
+   "kind": "list",
+   "start": 15113,
+   "end": 15200,
+   "text": "5. **Implement device/dtype awareness** to support multi-GPU and mixed precision setups",
+   "tokens": []
+  },
+  {
+   "id": 74,
+   "kind": "para",
+   "start": 15202,
+   "end": 15574,
+   "text": "The processor system is designed to be modular and composable, allowing you to build complex data processing pipelines from simple, focused components. Whether you're preprocessing sensor data for training or post-processing model outputs for robot execution, custom processors give you the flexibility to handle any data transformation your robotics application requires.",
+   "tokens": []
+  },
+  {
+   "id": 75,
+   "kind": "para",
+   "start": 15576,
+   "end": 15613,
+   "text": "Key principles for robust processors:",
+   "tokens": []
+  },
+  {
+   "id": 76,
+   "kind": "list",
+   "start": 15615,
+   "end": 15689,
+   "text": "- **Device/dtype adaptation**: Internal tensors should match input tensors",
+   "tokens": []
+  },
+  {
+   "id": 77,
+   "kind": "list",
+   "start": 15690,
+   "end": 15755,
+   "text": "- **Clear error messages**: Help users understand what went wrong",
+   "tokens": []
+  },
+  {
+   "id": 78,
+   "kind": "list",
+   "start": 15756,
+   "end": 15835,
+   "text": "- **Base class usage**: Leverage specialized base classes to reduce boilerplate",
+   "tokens": []
+  },
+  {
+   "id": 79,
+   "kind": "list",
+   "start": 15836,
+   "end": 15919,
+   "text": "- **Feature contracts**: Declare data structure changes with ⟦0⟧",
+   "tokens": [
+    "`transform_features()`"
+   ]
+  },
+  {
+   "id": 80,
+   "kind": "para",
+   "start": 15921,
+   "end": 16036,
+   "text": "Start simple, test thoroughly, and ensure your processors work seamlessly across different hardware configurations!",
+   "tokens": []
+  }
+ ]
+}

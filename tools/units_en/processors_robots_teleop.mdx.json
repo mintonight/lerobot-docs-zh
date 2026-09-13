@@ -1,0 +1,433 @@
+{
+ "file": "processors_robots_teleop.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1965,
+   "text": "# Processors for Robots and Teleoperators",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1967,
+   "end": 2235,
+   "text": "This guide shows how to build and modify processing pipelines that connect teleoperators (e.g., phone) to robots and datasets. Pipelines standardize conversions between different action/observation spaces so you can swap teleops and robots without rewriting glue code.",
+   "tokens": []
+  },
+  {
+   "id": 2,
+   "kind": "para",
+   "start": 2237,
+   "end": 2344,
+   "text": "We use the Phone to SO‑100 follower examples for concreteness, but the same patterns apply to other robots.",
+   "tokens": []
+  },
+  {
+   "id": 3,
+   "kind": "para",
+   "start": 2346,
+   "end": 2367,
+   "text": "**What you'll learn**",
+   "tokens": []
+  },
+  {
+   "id": 4,
+   "kind": "list",
+   "start": 2369,
+   "end": 2466,
+   "text": "- Absolute vs. relative EE control: What each means, trade‑offs, and how to choose for your task.",
+   "tokens": []
+  },
+  {
+   "id": 5,
+   "kind": "list",
+   "start": 2467,
+   "end": 2601,
+   "text": "- Three-pipeline pattern: How to map teleop actions → dataset actions → robot commands, and robot observations → dataset observations.",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "list",
+   "start": 2602,
+   "end": 2724,
+   "text": "- Adapters (⟦0⟧ / ⟦1⟧): How these convert raw dicts to ⟦2⟧ and back to reduce boilerplate.",
+   "tokens": [
+    "`to_transition`",
+    "`to_output`",
+    "`EnvTransition`"
+   ]
+  },
+  {
+   "id": 7,
+   "kind": "list",
+   "start": 2725,
+   "end": 2858,
+   "text": "- Dataset feature contracts: How steps declare features via ⟦0⟧, and how to aggregate/merge them for recording.",
+   "tokens": [
+    "`transform_features(...)`"
+   ]
+  },
+  {
+   "id": 8,
+   "kind": "list",
+   "start": 2859,
+   "end": 2981,
+   "text": "- Choosing a representation: When to store joints, absolute EE poses, or relative EE deltas—and how that affects training.",
+   "tokens": []
+  },
+  {
+   "id": 9,
+   "kind": "list",
+   "start": 2982,
+   "end": 3113,
+   "text": "- Pipeline customization guidance: How to swap robots/URDFs safely and tune bounds, step sizes, and options like IK initialization.",
+   "tokens": []
+  },
+  {
+   "id": 10,
+   "kind": "heading",
+   "start": 3115,
+   "end": 3150,
+   "text": "### Absolute vs relative EE control",
+   "tokens": []
+  },
+  {
+   "id": 11,
+   "kind": "para",
+   "start": 3152,
+   "end": 3346,
+   "text": "The examples in this guide use absolute end effector (EE) poses because they are easy to reason about. In practice, relative EE deltas or joint position are often preferred as learning features.",
+   "tokens": []
+  },
+  {
+   "id": 12,
+   "kind": "para",
+   "start": 3348,
+   "end": 3601,
+   "text": "With processors, you choose the learning features you want to use for your policy. This could be joints positions/velocities, absolute EE, or relative EE positions. You can also choose to store other features, such as joint torques, motor currents, etc.",
+   "tokens": []
+  },
+  {
+   "id": 13,
+   "kind": "heading",
+   "start": 3603,
+   "end": 3621,
+   "text": "## Three pipelines",
+   "tokens": []
+  },
+  {
+   "id": 14,
+   "kind": "para",
+   "start": 3623,
+   "end": 3897,
+   "text": "We often compose three pipelines. Depending on your setup, some can be empty if action and observation spaces already match.\nEach of these pipelines handles different conversions between different action and observation spaces. Below is a quick explanation of each pipeline.",
+   "tokens": []
+  },
+  {
+   "id": 15,
+   "kind": "list",
+   "start": 3899,
+   "end": 3982,
+   "text": "1. Pipeline 1: Teleop action space → dataset action space (phone pose → EE targets)",
+   "tokens": []
+  },
+  {
+   "id": 16,
+   "kind": "list",
+   "start": 3983,
+   "end": 4062,
+   "text": "2. Pipeline 2: Dataset action space → robot command space (EE targets → joints)",
+   "tokens": []
+  },
+  {
+   "id": 17,
+   "kind": "list",
+   "start": 4063,
+   "end": 4148,
+   "text": "3. Pipeline 3: Robot observation space → dataset observation space (joints → EE pose)",
+   "tokens": []
+  },
+  {
+   "id": 18,
+   "kind": "para",
+   "start": 4150,
+   "end": 4246,
+   "text": "Below is an example of the three pipelines that we use in the phone to SO-100 follower examples:",
+   "tokens": []
+  },
+  {
+   "id": 19,
+   "kind": "heading",
+   "start": 5627,
+   "end": 5659,
+   "text": "## Why to_transition / to_output",
+   "tokens": []
+  },
+  {
+   "id": 20,
+   "kind": "para",
+   "start": 5661,
+   "end": 6024,
+   "text": "To convert from robot/teleoperator to pipeline and back, we use the ⟦0⟧ and ⟦1⟧ pipeline adapters.\nThey standardize conversions to reduce boilerplate code, and form the bridge between the robot and teleoperators raw dictionaries and the pipeline’s ⟦2⟧ format.\nIn the phone to SO-100 follower examples we use the following adapters:",
+   "tokens": [
+    "`to_transition`",
+    "`to_output`",
+    "`EnvTransition`"
+   ]
+  },
+  {
+   "id": 21,
+   "kind": "list",
+   "start": 6026,
+   "end": 6117,
+   "text": "- ⟦0⟧: transforms the teleop action dict to a pipeline transition.",
+   "tokens": [
+    "`robot_action_to_transition`"
+   ]
+  },
+  {
+   "id": 22,
+   "kind": "list",
+   "start": 6118,
+   "end": 6208,
+   "text": "- ⟦0⟧: transforms the pipeline transition to a robot action dict.",
+   "tokens": [
+    "`transition_to_robot_action`"
+   ]
+  },
+  {
+   "id": 23,
+   "kind": "list",
+   "start": 6209,
+   "end": 6303,
+   "text": "- ⟦0⟧: transforms the robot observation dict to a pipeline transition.",
+   "tokens": [
+    "`observation_to_transition`"
+   ]
+  },
+  {
+   "id": 24,
+   "kind": "list",
+   "start": 6304,
+   "end": 6393,
+   "text": "- ⟦0⟧: transforms the pipeline transition to an observation dict.",
+   "tokens": [
+    "`transition_to_observation`"
+   ]
+  },
+  {
+   "id": 25,
+   "kind": "para",
+   "start": 6395,
+   "end": 6546,
+   "text": "Check out [src/lerobot/processor/converters.py](⟦0⟧) for more details.",
+   "tokens": [
+    "https://github.com/huggingface/lerobot/blob/main/src/lerobot/processor/converters.py"
+   ]
+  },
+  {
+   "id": 26,
+   "kind": "heading",
+   "start": 6548,
+   "end": 6576,
+   "text": "## Dataset feature contracts",
+   "tokens": []
+  },
+  {
+   "id": 27,
+   "kind": "para",
+   "start": 6578,
+   "end": 6935,
+   "text": "Dataset features are determined by the keys saved in the dataset. Each step can declare what features it modifies in a contract called ⟦0⟧. Once you build a processor, the processor can then aggregate all of these features with ⟦1⟧ and merge multiple feature dicts with ⟦2⟧.",
+   "tokens": [
+    "`transform_features(...)`",
+    "`aggregate_pipeline_dataset_features()`",
+    "`combine_feature_dicts(...)`"
+   ]
+  },
+  {
+   "id": 28,
+   "kind": "para",
+   "start": 6937,
+   "end": 7062,
+   "text": "Below is an example of how we declare features with the ⟦0⟧ method in the phone to SO-100 follower examples:",
+   "tokens": [
+    "`transform_features`"
+   ]
+  },
+  {
+   "id": 29,
+   "kind": "para",
+   "start": 7767,
+   "end": 7971,
+   "text": "Here we declare what PolicyFeatures we modify in this step, so we know what features we can expect when we run the processor. These features can then be aggregated and used to create the dataset features.",
+   "tokens": []
+  },
+  {
+   "id": 30,
+   "kind": "para",
+   "start": 7973,
+   "end": 8070,
+   "text": "Below is an example of how we aggregate and merge features in the phone to SO-100 record example:",
+   "tokens": []
+  },
+  {
+   "id": 31,
+   "kind": "para",
+   "start": 9058,
+   "end": 9071,
+   "text": "How it works:",
+   "tokens": []
+  },
+  {
+   "id": 32,
+   "kind": "list",
+   "start": 9073,
+   "end": 9291,
+   "text": "- ⟦0⟧: applies ⟦1⟧ across the pipeline and filters by patterns (images included when ⟦2⟧, and state features included when ⟦3⟧ is specified).",
+   "tokens": [
+    "`aggregate_pipeline_dataset_features(...)`",
+    "`transform_features`",
+    "`use_videos=True`",
+    "`patterns`"
+   ]
+  },
+  {
+   "id": 33,
+   "kind": "list",
+   "start": 9292,
+   "end": 9355,
+   "text": "- ⟦0⟧: combine multiple feature dicts.",
+   "tokens": [
+    "`combine_feature_dicts(...)`"
+   ]
+  },
+  {
+   "id": 34,
+   "kind": "list",
+   "start": 9356,
+   "end": 9539,
+   "text": "- Recording with ⟦0⟧ uses ⟦1⟧ to build frames consistent with ⟦2⟧ before we call ⟦3⟧ to add the frame to the dataset.",
+   "tokens": [
+    "`record_loop(...)`",
+    "`build_dataset_frame(...)`",
+    "`dataset.features`",
+    "`add_frame(...)`"
+   ]
+  },
+  {
+   "id": 35,
+   "kind": "heading",
+   "start": 9541,
+   "end": 9585,
+   "text": "## Guidance when customizing robot pipelines",
+   "tokens": []
+  },
+  {
+   "id": 36,
+   "kind": "para",
+   "start": 9587,
+   "end": 9664,
+   "text": "You can store any of the following features as your action/observation space:",
+   "tokens": []
+  },
+  {
+   "id": 37,
+   "kind": "list",
+   "start": 9666,
+   "end": 9683,
+   "text": "- Joint positions",
+   "tokens": []
+  },
+  {
+   "id": 38,
+   "kind": "list",
+   "start": 9684,
+   "end": 9703,
+   "text": "- Absolute EE poses",
+   "tokens": []
+  },
+  {
+   "id": 39,
+   "kind": "list",
+   "start": 9704,
+   "end": 9724,
+   "text": "- Relative EE deltas",
+   "tokens": []
+  },
+  {
+   "id": 40,
+   "kind": "list",
+   "start": 9725,
+   "end": 9772,
+   "text": "- Other features: joint velocity, torques, etc.",
+   "tokens": []
+  },
+  {
+   "id": 41,
+   "kind": "para",
+   "start": 9774,
+   "end": 9902,
+   "text": "Pick what you want to use for your policy action and observation space and configure/modify the pipelines and steps accordingly.",
+   "tokens": []
+  },
+  {
+   "id": 42,
+   "kind": "heading",
+   "start": 9904,
+   "end": 9924,
+   "text": "### Different robots",
+   "tokens": []
+  },
+  {
+   "id": 43,
+   "kind": "list",
+   "start": 9926,
+   "end": 10215,
+   "text": "- You can easily reuse pipelines, for example to use another robot with phone teleop, modify the examples and swap the robot ⟦0⟧ (URDF) and ⟦1⟧ to use your own robot with Phone teleop. Additionally you should ensure ⟦2⟧ points to your gripper/wrist.",
+   "tokens": [
+    "`RobotKinematics`",
+    "`motor_names`",
+    "`target_frame_name`"
+   ]
+  },
+  {
+   "id": 44,
+   "kind": "heading",
+   "start": 10217,
+   "end": 10233,
+   "text": "### Safety first",
+   "tokens": []
+  },
+  {
+   "id": 45,
+   "kind": "list",
+   "start": 10235,
+   "end": 10340,
+   "text": "- When changing pipelines, start with tight bounds, implement safety steps when working with real robots.",
+   "tokens": []
+  },
+  {
+   "id": 46,
+   "kind": "list",
+   "start": 10341,
+   "end": 10415,
+   "text": "- Its advised to start with simulation first and then move to real robots.",
+   "tokens": []
+  },
+  {
+   "id": 47,
+   "kind": "para",
+   "start": 10417,
+   "end": 10633,
+   "text": "Thats it! We hope this guide helps you get started with customizing your robot pipelines, If you run into any issues at any point, jump into our [Discord community](⟦0⟧) for support.",
+   "tokens": [
+    "https://discord.com/invite/s3KuuzsPFb"
+   ]
+  }
+ ]
+}

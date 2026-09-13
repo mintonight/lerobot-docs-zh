@@ -1,0 +1,192 @@
+<script lang="ts">
+import {onMount} from "svelte";
+import Tip from "$lib/Tip.svelte";
+import CopyLLMTxtMenu from "$lib/CopyLLMTxtMenu.svelte";
+import Youtube from "$lib/Youtube.svelte";
+import Docstring from "$lib/Docstring.svelte";
+import CodeBlock from "$lib/CodeBlock.svelte";
+import CodeBlockFw from "$lib/CodeBlockFw.svelte";
+import DocNotebookDropdown from "$lib/DocNotebookDropdown.svelte";
+import CourseFloatingBanner from "$lib/CourseFloatingBanner.svelte";
+import IconCopyLink from "$lib/IconCopyLink.svelte";
+import FrameworkContent from "$lib/FrameworkContent.svelte";
+import Markdown from "$lib/Markdown.svelte";
+import Question from "$lib/Question.svelte";
+import FrameworkSwitchCourse from "$lib/FrameworkSwitchCourse.svelte";
+import InferenceApi from "$lib/InferenceApi.svelte";
+import TokenizersLanguageContent from "$lib/TokenizersLanguageContent.svelte";
+import ExampleCodeBlock from "$lib/ExampleCodeBlock.svelte";
+import Added from "$lib/Added.svelte";
+import Changed from "$lib/Changed.svelte";
+import Deprecated from "$lib/Deprecated.svelte";
+import PipelineIcon from "$lib/PipelineIcon.svelte";
+import PipelineTag from "$lib/PipelineTag.svelte";
+import Heading from "$lib/Heading.svelte";
+import HfOptions from "$lib/HfOptions.svelte";
+import HfOption from "$lib/HfOption.svelte";
+import EditOnGithub from "$lib/EditOnGithub.svelte";
+import InferenceSnippet from "$lib/InferenceSnippet/InferenceSnippet.svelte";
+import MermaidChart from "$lib/MermaidChart.svelte";
+let fw: "pt" | "tf" = "pt";
+onMount(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    fw = urlParams.get("fw") || "pt";
+});
+</script>
+<svelte:head>
+  <meta name="hf:doc:metadata" content={metadata} >
+</svelte:head>
+
+<!--HF DOCBUILD BODY START-->
+
+HF_DOC_BODY_START
+
+## 研究论文
+
+GR00T N1 技术报告（涵盖 GR00T N1.x 系列，包括 N1.7）：https://arxiv.org/abs/2503.14734
+
+GR00T N1.7 模型卡：https://huggingface.co/nvidia/GR00T-N1.7-3B
+
+GR00T N1.5 研究页面（早期版本）：https://research.nvidia.com/labs/gear/gr00t-n1_5/
+
+> GR00T N1.5 的支持已从 LeRobot 中移除；最后一个支持它的版本发布是 `lerobot==0.5.1`。
+> 当前版本发布仅支持 GR00T N1.7。
+
+## 仓库
+
+代码：https://github.com/NVIDIA/Isaac-GR00T
+
+## 引用
+
+```bibtex
+@inproceedings{gr00tn1_2025,
+  archivePrefix = {arxiv},
+  eprint     = {2503.14734},
+  title      = {{GR00T} {N1}: An Open Foundation Model for Generalist Humanoid Robots},
+  author     = {NVIDIA and Johan Bjorck andFernando Castañeda, Nikita Cherniadev and Xingye Da and Runyu Ding and Linxi "Jim" Fan and Yu Fang and Dieter Fox and Fengyuan Hu and Spencer Huang and Joel Jang and Zhenyu Jiang and Jan Kautz and Kaushil Kundalia and Lawrence Lao and Zhiqi Li and Zongyu Lin and Kevin Lin and Guilin Liu and Edith Llontop and Loic Magne and Ajay Mandlekar and Avnish Narayan and Soroush Nasiriany and Scott Reed and You Liang Tan and Guanzhi Wang and Zu Wang and Jing Wang and Qi Wang and Jiannan Xiang and Yuqi Xie and Yinzhen Xu and Zhenjia Xu and Seonghyeon Ye and Zhiding Yu and Ao Zhang and Hao Zhang and Yizhou Zhao and Ruijie Zheng and Yuke Zhu},
+  month      = {March},
+  year       = {2025},
+  booktitle  = {ArXiv Preprint},
+}
+```
+
+## 其他资源
+
+博客：https://developer.nvidia.com/isaac/gr00t
+
+Hugging Face 模型：
+
+- GR00T N1.7：https://huggingface.co/nvidia/GR00T-N1.7-3B
+- GR00T N1.7 LIBERO checkpoint：https://huggingface.co/nvidia/GR00T-N1.7-LIBERO
+
+<details>
+<summary><b> 原始版与 LeRobot 一致性测试 </b></summary>
+
+## 原始版与 LeRobot 一致性测试
+
+`tests/policies/groot/test_groot_vs_original.py` 使用两种比较来验证这个 LeRobot
+对 GR00T N1.7（Qwen3-VL 主干网络 + flow-matching action 头）的重新实现
+是否与 NVIDIA 的原始 `gr00t` 包一致，每种比较都以
+checkpoint 中存在的每个 embodiment 标签为参数：
+
+1. **模型一致性** — 给定字节完全相同的预处理输入和相同的
+   flow-matching 种子（记录在每个工件中），两个实现必须产生
+   **相同的原始模型输出**（`get_action(...)["action_pred"]`，归一化后的
+   flow-matching 预测）。输出形状必须完全匹配；任何 action 视野
+   或 action 维度不匹配都会使测试失败。
+2. **预处理器一致性** — 给定相同的原始 observation（各相机
+   的帧、state vector、语言指令），LeRobot 自己的预处理流水线
+   （真实的 Qwen3-VL 聊天模板 / tokenizer / 图像打包 + checkpoint 驱动的
+   state 归一化，不使用 mock）必须产生与原始包的处理器相同的**对齐后的模型输入**
+   （`input_ids`、`attention_mask`、`pixel_values`、`image_grid_thw`、`state`、
+   `embodiment_id`）。
+
+### 为什么需要两个环境
+
+原始 `gr00t` 包固定使用 `transformers==4.57.3`（Python 3.10）；此
+集成需要 `transformers>=5.x`（Qwen3-VL）。在 5.x 下，`PretrainedConfig`
+本身是一个带默认值的 dataclass，因此原始配置 dataclass 无法导入
+（`non-default argument follows default argument`）。因此，两种实现
+**不能在同一 Python 进程中导入**。
+
+因此，该测试使用跨两个虚拟环境的 **生产者 / 消费者** 拆分：
+
+1. **生产者** — `tests/policies/groot/utils/dump_original_n1_7.py`，在 _原始_
+   gr00t 虚拟环境中运行。对于每个 embodiment，它根据 checkpoint 元数据
+   通用地构建虚拟输入（state 维度来自 `statistics.json`；相机/语言键来自
+   处理器模态配置），运行原始模型，并为每个标签保存一个 `.npz`：
+   原始 observation（`raw::` 键）、精确的对齐输入
+   （`in::` 键）、种子以及原始 `action_pred`。
+2. **消费者** — 上面的 pytest，在 _LeRobot_ 虚拟环境中运行。它会发现每个
+   `.npz`；模型一致性案例将字节完全相同的对齐输入通过
+   LeRobot 模型重放（使用记录的种子）并断言输出匹配；
+   预处理器一致性案例将原始 observation 通过 LeRobot 的完整
+   预处理流水线重放，并断言对齐后的张量匹配。
+
+> 由旧版 dump 脚本生成的工件不包含 `raw::`
+> 字段；此时预处理器一致性案例会**跳过**，并给出重新生成的提示。
+> 重新运行生产者以刷新它们。
+
+### 公平性控制
+
+- **相同的预处理输入（模型一致性）** — 原始处理器的 `input_ids`、
+  `pixel_values`、`image_grid_thw`、`attention_mask`、`state`、`embodiment_id` 会
+  原样输入到 LeRobot 模型（不重新分词 / 不重新归一化），因此
+  模型比较隔离了模型本身。LeRobot 自己的分词 / 图像打包由
+  预处理器一致性案例单独覆盖，该案例将其输出与来自相同原始 observation 的
+  那些相同的对齐张量进行比较。
+- **相同的精度 + 注意力内核** — 双方都运行 **fp32 + SDPA**。原始版本
+  默认使用 `use_flash_attention=True`（flash_attention_2 + bf16）；
+  生产者强制使用 SDPA + fp32。（使用默认值时差距约为 3e-2——纯粹是
+  内核/舍入噪声，而不是实现差异。）
+- **相同的 flow-matching 种子** — 在采样前在两侧固定；
+  生产者将其记录在每个工件中（`--seed`，默认 42），消费者
+  重放记录的值。
+
+### 如何运行
+
+```bash
+<CopyLLMTxtMenu containerStyle="float: right; margin-left: 10px; display: inline-flex; position: relative; z-index: 10;"></CopyLLMTxtMenu>
+
+# Resolve a local checkpoint (GR00T-N1.7-LIBERO / libero_10)
+CKPT=$(python - <<'PY'
+import os
+from huggingface_hub import snapshot_download
+print(os.path.join(snapshot_download("nvidia/GR00T-N1.7-LIBERO",
+      allow_patterns=["libero_10/*"]), "libero_10"))
+PY
+)
+
+# 1) Produce the original-side artifacts for all embodiments (original gr00t venv, CUDA)
+CUDA_VISIBLE_DEVICES=0 /path/to/Isaac-GR00T/.venv-original/bin/python \
+    tests/policies/groot/utils/dump_original_n1_7.py \
+    --ckpt "$CKPT" --out-dir tests/policies/groot/artifacts --device cuda --seed 42
+
+# 2) Run the parity test (LeRobot venv) — one parametrized case per embodiment
+CUDA_VISIBLE_DEVICES=0 GROOT_PARITY_DEVICE=cuda \
+    uv run pytest tests/policies/groot/test_groot_vs_original.py -v -s
+```
+
+`.npz` 工件仅保存在本地（已 gitignore，每个约 6–10 MB），并由
+生产者重新生成；它们从不被提交。在 CI 上或
+当 checkpoint / 工件不存在时，测试会**跳过**（不会失败）。
+
+#### 环境变量调节（全部可选）
+
+| 变量 | 默认值 | 用途 |
+| ----------------------------------------- | -------------------------------- | ------------------------------------- |
+| `GROOT_N1_7_PARITY_DIR` | `tests/policies/groot/artifacts` | 每个标签的 `.npz` 工件目录 |
+| `GROOT_N1_7_LIBERO_CKPT` | auto（HF 缓存） | 覆盖 checkpoint 目录 |
+| `GROOT_PARITY_DEVICE` | 如果可用则为 `cuda` | `cpu` 或 `cuda` |
+| `GROOT_PARITY_ATOL` / `GROOT_PARITY_RTOL` | `1e-3` | 比较容差 |
+
+</details>
+
+
+
+<EditOnGithub source="https://github.com/huggingface/lerobot/blob/main/docs/source/policy_groot_README.mdx" />
+
+<!--HF DOCBUILD BODY END-->
+
+HF_DOC_BODY_END
+

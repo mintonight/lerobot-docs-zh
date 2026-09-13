@@ -1,0 +1,319 @@
+{
+ "file": "walloss.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1934,
+   "text": "# WALL-OSS",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1936,
+   "end": 2233,
+   "text": "WALL-OSS is an open-source foundation model for embodied intelligence, proposed by the [XSquare Robot](⟦0⟧) team in 2025. The LeRobot implementation is adapted from their open-source [WallX](⟦1⟧) repository.",
+   "tokens": [
+    "https://x2robot.com/en/research/68bc2cde8497d7f238dde690",
+    "https://github.com/X-Square-Robot/wall-x"
+   ]
+  },
+  {
+   "id": 2,
+   "kind": "para",
+   "start": 2235,
+   "end": 2740,
+   "text": "X Square Robot’s WALL-OSS is now integrated into Hugging Face’s LeRobot ecosystem. This is an exciting collaborative project between the LeRobot and X Square Robot teams. You can now post-train, evaluate, and deploy WALL-OSS directly through LeRobot. With this, we’re aiming to make it easier for the open-source robotics community to customize and deploy WALL-OSS foundation models. Read and explore WALL-OSS [paper](⟦0⟧) and [code](⟦1⟧).",
+   "tokens": [
+    "https://arxiv.org/pdf/2509.11766",
+    "https://github.com/X-Square-Robot/wall-x"
+   ]
+  },
+  {
+   "id": 3,
+   "kind": "heading",
+   "start": 2742,
+   "end": 2759,
+   "text": "## Model Overview",
+   "tokens": []
+  },
+  {
+   "id": 4,
+   "kind": "para",
+   "start": 2761,
+   "end": 3188,
+   "text": "The WALL-OSS team is building the embodied foundation model to capture and compress the world's most valuable data: the continuous, high-fidelity stream of physical interaction. By creating a direct feedback loop between the model's decisions and the body's lived experience, the emergence of a truly generalizable intelligence is enabled—one that understands not just how the world works, but how to act effectively within it.",
+   "tokens": []
+  },
+  {
+   "id": 5,
+   "kind": "para",
+   "start": 3365,
+   "end": 3726,
+   "text": "Technically, WALL-OSS introduces a tightly coupled multimodal architecture (tightly-coupled MoE structure) that integrates both discrete and continuous action modeling strategies. Through a two-stage training pipeline (Inspiration → Integration), the model gradually unifies semantic reasoning and high-frequency action generation. Its core innovations include:",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "list",
+   "start": 3728,
+   "end": 3909,
+   "text": "- **Embodied perception–enhanced multimodal pretraining**: Large-scale training on unified vision–language–action data to strengthen spatial, causal, and manipulation understanding.",
+   "tokens": []
+  },
+  {
+   "id": 7,
+   "kind": "list",
+   "start": 3910,
+   "end": 4167,
+   "text": "- **Unified Cross-Level Chain-of-Thought (Uni-CoT)**: A single differentiable framework that unifies high-level instruction reasoning, sub-task decomposition, and fine-grained action synthesis, forming a continuous chain from “understanding” to “execution.”",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "list",
+   "start": 4168,
+   "end": 4355,
+   "text": "- **Mixture-of-Experts (MoE) action heads**: Dynamically activating experts depending on the task phase and modeling actions in discrete or continuous space to maintain stable VLM priors.",
+   "tokens": []
+  },
+  {
+   "id": 9,
+   "kind": "list",
+   "start": 4356,
+   "end": 4390,
+   "text": "- **Two-stage training paradigm**:",
+   "tokens": []
+  },
+  {
+   "id": 10,
+   "kind": "list",
+   "start": 4391,
+   "end": 4517,
+   "text": "  - **Inspiration stage**: Injecting discrete action priors to strengthen spatial understanding and semantic-action alignment.",
+   "tokens": []
+  },
+  {
+   "id": 11,
+   "kind": "list",
+   "start": 4518,
+   "end": 4610,
+   "text": "  - **Integration stage**: Using flow matching to achieve high-frequency continuous control.",
+   "tokens": []
+  },
+  {
+   "id": 12,
+   "kind": "heading",
+   "start": 4612,
+   "end": 4640,
+   "text": "## Installation Requirements",
+   "tokens": []
+  },
+  {
+   "id": 13,
+   "kind": "list",
+   "start": 4642,
+   "end": 4715,
+   "text": "1. Install LeRobot by following our [Installation Guide](⟦0⟧).",
+   "tokens": [
+    "./installation"
+   ]
+  },
+  {
+   "id": 14,
+   "kind": "list",
+   "start": 4716,
+   "end": 4757,
+   "text": "2. Install WallX dependencies by running:",
+   "tokens": []
+  },
+  {
+   "id": 15,
+   "kind": "heading",
+   "start": 4807,
+   "end": 4815,
+   "text": "## Usage",
+   "tokens": []
+  },
+  {
+   "id": 16,
+   "kind": "para",
+   "start": 4817,
+   "end": 4869,
+   "text": "To use WallX in LeRobot, specify the policy type as:",
+   "tokens": []
+  },
+  {
+   "id": 17,
+   "kind": "heading",
+   "start": 4905,
+   "end": 4916,
+   "text": "## Training",
+   "tokens": []
+  },
+  {
+   "id": 18,
+   "kind": "para",
+   "start": 4918,
+   "end": 5022,
+   "text": "For training WallX, you can use the standard LeRobot training script with the appropriate configuration:",
+   "tokens": []
+  },
+  {
+   "id": 19,
+   "kind": "heading",
+   "start": 5445,
+   "end": 5467,
+   "text": "### Training Arguments",
+   "tokens": []
+  },
+  {
+   "id": 20,
+   "kind": "table",
+   "start": 5469,
+   "end": 5663,
+   "text": "| Argument                       | Description                                                                                                                                                   |",
+   "tokens": []
+  },
+  {
+   "id": 21,
+   "kind": "table",
+   "start": 5859,
+   "end": 6053,
+   "text": "| ⟦0⟧            | The Hugging Face Hub repository ID for your training dataset (e.g., ⟦1⟧)                                                      |",
+   "tokens": [
+    "`--dataset.repo_id`",
+    "`lerobot/aloha_sim_insertion_human`"
+   ]
+  },
+  {
+   "id": 22,
+   "kind": "table",
+   "start": 6054,
+   "end": 6248,
+   "text": "| ⟦0⟧                | Specifies using the WallX policy architecture                                                                                                                 |",
+   "tokens": [
+    "`--policy.type`"
+   ]
+  },
+  {
+   "id": 23,
+   "kind": "table",
+   "start": 6249,
+   "end": 6443,
+   "text": "| ⟦0⟧                 | Local directory where training checkpoints and logs will be saved                                                                                             |",
+   "tokens": [
+    "`--output_dir`"
+   ]
+  },
+  {
+   "id": 24,
+   "kind": "table",
+   "start": 6444,
+   "end": 6638,
+   "text": "| ⟦0⟧                   | A name identifier for this training run (used in logging/tracking)                                                                                            |",
+   "tokens": [
+    "`--job_name`"
+   ]
+  },
+  {
+   "id": 25,
+   "kind": "table",
+   "start": 6639,
+   "end": 6833,
+   "text": "| ⟦0⟧             | Your Hugging Face Hub repo ID where the trained model will be pushed                                                                                          |",
+   "tokens": [
+    "`--policy.repo_id`"
+   ]
+  },
+  {
+   "id": 26,
+   "kind": "table",
+   "start": 6834,
+   "end": 7028,
+   "text": "| ⟦0⟧     | Path to pretrained WallX weights to initialize from (the official WALL-OSS checkpoint)                                                                        |",
+   "tokens": [
+    "`--policy.pretrained_path`"
+   ]
+  },
+  {
+   "id": 27,
+   "kind": "table",
+   "start": 7029,
+   "end": 7223,
+   "text": "| ⟦0⟧     | The action prediction strategy: ⟦1⟧ or ⟦2⟧ - ⟦3⟧ uses iterative denoising for action generation, ⟦4⟧ uses next token prediction instead |",
+   "tokens": [
+    "`--policy.prediction_mode`",
+    "`diffusion`",
+    "`fast`",
+    "`diffusion`",
+    "`fast`"
+   ]
+  },
+  {
+   "id": 28,
+   "kind": "table",
+   "start": 7224,
+   "end": 7418,
+   "text": "| ⟦0⟧ | Attention implementation backend - ⟦1⟧ uses standard PyTorch attention (alternatives include ⟦2⟧ or ⟦3⟧)                               |",
+   "tokens": [
+    "`--policy.attn_implementation`",
+    "`eager`",
+    "`flash_attention_2`",
+    "`sdpa`"
+   ]
+  },
+  {
+   "id": 29,
+   "kind": "table",
+   "start": 7419,
+   "end": 7613,
+   "text": "| ⟦0⟧                      | Total number of training steps to run                                                                                                                         |",
+   "tokens": [
+    "`--steps`"
+   ]
+  },
+  {
+   "id": 30,
+   "kind": "table",
+   "start": 7614,
+   "end": 7808,
+   "text": "| ⟦0⟧              | Device to train on (⟦1⟧ for GPU, ⟦2⟧ for CPU)                                                                                                            |",
+   "tokens": [
+    "`--policy.device`",
+    "`cuda`",
+    "`cpu`"
+   ]
+  },
+  {
+   "id": 31,
+   "kind": "table",
+   "start": 7809,
+   "end": 8003,
+   "text": "| ⟦0⟧                 | Number of samples per training batch                                                                                                                          |",
+   "tokens": [
+    "`--batch_size`"
+   ]
+  },
+  {
+   "id": 32,
+   "kind": "heading",
+   "start": 8005,
+   "end": 8015,
+   "text": "## License",
+   "tokens": []
+  },
+  {
+   "id": 33,
+   "kind": "para",
+   "start": 8017,
+   "end": 8154,
+   "text": "This model follows the **Apache 2.0 License**, consistent with the original [WallX repository](⟦0⟧).",
+   "tokens": [
+    "https://github.com/X-Square-Robot/wall-x"
+   ]
+  }
+ ]
+}

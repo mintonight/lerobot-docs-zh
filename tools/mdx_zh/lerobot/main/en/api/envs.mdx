@@ -1,0 +1,135 @@
+<script lang="ts">
+import {onMount} from "svelte";
+import Tip from "$lib/Tip.svelte";
+import CopyLLMTxtMenu from "$lib/CopyLLMTxtMenu.svelte";
+import Youtube from "$lib/Youtube.svelte";
+import Docstring from "$lib/Docstring.svelte";
+import CodeBlock from "$lib/CodeBlock.svelte";
+import CodeBlockFw from "$lib/CodeBlockFw.svelte";
+import DocNotebookDropdown from "$lib/DocNotebookDropdown.svelte";
+import CourseFloatingBanner from "$lib/CourseFloatingBanner.svelte";
+import IconCopyLink from "$lib/IconCopyLink.svelte";
+import FrameworkContent from "$lib/FrameworkContent.svelte";
+import Markdown from "$lib/Markdown.svelte";
+import Question from "$lib/Question.svelte";
+import FrameworkSwitchCourse from "$lib/FrameworkSwitchCourse.svelte";
+import InferenceApi from "$lib/InferenceApi.svelte";
+import TokenizersLanguageContent from "$lib/TokenizersLanguageContent.svelte";
+import ExampleCodeBlock from "$lib/ExampleCodeBlock.svelte";
+import Added from "$lib/Added.svelte";
+import Changed from "$lib/Changed.svelte";
+import Deprecated from "$lib/Deprecated.svelte";
+import PipelineIcon from "$lib/PipelineIcon.svelte";
+import PipelineTag from "$lib/PipelineTag.svelte";
+import Heading from "$lib/Heading.svelte";
+import HfOptions from "$lib/HfOptions.svelte";
+import HfOption from "$lib/HfOption.svelte";
+import EditOnGithub from "$lib/EditOnGithub.svelte";
+import InferenceSnippet from "$lib/InferenceSnippet/InferenceSnippet.svelte";
+import MermaidChart from "$lib/MermaidChart.svelte";
+let fw: "pt" | "tf" = "pt";
+onMount(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    fw = urlParams.get("fw") || "pt";
+});
+</script>
+<svelte:head>
+  <meta name="hf:doc:metadata" content={metadata} >
+</svelte:head>
+
+<!--HF DOCBUILD BODY START-->
+
+HF_DOC_BODY_START
+
+<CopyLLMTxtMenu containerStyle="float: right; margin-left: 10px; display: inline-flex; position: relative; z-index: 10;"></CopyLLMTxtMenu>
+
+# 环境
+
+simulation environment 通过 `EnvConfig` 配置，并由 `make_env` 构建。每个子类
+声明其 `gym_kwargs` 以及如何构造向量化环境。
+
+使用已发布的环境，请参见 [Hub 中的环境](../envhub)；
+贡献新 benchmark，请参见[添加新 benchmark](../adding_benchmarks)。
+
+## EnvConfig [[lerobot.envs.EnvConfig]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.envs.EnvConfig"} anchor={"lerobot.envs.EnvConfig"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/envs/configs.py#L56"} parameters={[{"name": "task", "val": ": str | None = None"}, {"name": "fps", "val": ": int = 30"}, {"name": "features", "val": ": dict[str, PolicyFeature] = <factory>"}, {"name": "features_map", "val": ": dict[str, str] = <factory>"}, {"name": "max_parallel_tasks", "val": ": int = 1"}, {"name": "disable_env_checker", "val": ": bool = True"}]}>
+</Docstring>
+
+
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"create_envs"} anchor={"lerobot.envs.EnvConfig.create_envs"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/envs/configs.py#L83"} parameters={[{"name": "n_envs", "val": ": int"}, {"name": "use_async_envs", "val": ": bool = False"}]}>
+</Docstring>
+创建 {suite: {task_id: VectorEnv}}。
+
+默认：通过 gym.make() 创建单任务环境。多任务 benchmark 会覆盖此行为。
+AsyncVectorEnv 是 n_envs > 1 时的默认选择；n_envs=1 时自动降级为 Sync。
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"get_env_processors"} anchor={"lerobot.envs.EnvConfig.get_env_processors"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/envs/configs.py#L126"} parameters={[]}>
+</Docstring>
+返回此环境的（预处理器、后处理器）。默认为恒等。
+
+</div></div>
+
+## make_env [[lerobot.envs.make_env]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"lerobot.envs.make_env"} anchor={"lerobot.envs.make_env"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/envs/factory.py#L58"} parameters={[{"name": "cfg", "val": ": EnvConfig | str"}, {"name": "n_envs", "val": ": int = 1"}, {"name": "use_async_envs", "val": ": bool = False"}, {"name": "hub_cache_dir", "val": ": str | None = None"}, {"name": "trust_remote_code", "val": ": bool = False"}]}>
+<paramsdesc>- **cfg**（EnvConfig | str）-- 描述要在本地构建的环境的 `EnvConfig` 对象，
+  或 Hugging Face Hub 仓库标识符（例如 `"username/repo"`）。在后一种情况下，
+  仓库必须包含一个 Python 文件（通常为 `env.py`）。
+- **n_envs**（int，可选）-- 要返回的并行环境数量。默认为 1。
+- **use_async_envs**（bool，可选）-- 是否返回 AsyncVectorEnv 或 SyncVectorEnv。默认为
+  False。
+- **hub_cache_dir**（str | None）-- 已下载 Hub 文件的可选缓存路径。
+- **trust_remote_code**（bool）-- **明确同意**执行来自 Hub 的远程代码。
+  默认 False —— 必须设置为 True 才能导入/执行 hub 的 `env.py`。</paramsdesc><rettype>dict[str, dict[int, gym.vector.VectorEnv]]</rettype><retdesc> 从套件名称到带索引的向量化环境的映射。
+- 对于多任务 benchmark（例如 LIBERO）：每个套件一个条目，每个 task_id 一个向量化环境。
+- 对于单任务环境：一个 task_id=0 的单一套件条目（cfg.type）。</retdesc><raises>- ``ValueError`` -- 如果 n_envs < 1
+- ``ModuleNotFoundError`` -- 当请求的环境包未安装时 </raises><raisederrors>``ValueError`` or ``ModuleNotFoundError``</raisederrors></Docstring>
+根据配置或 Hub 引用创建一个 gym 向量环境。
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+
+## make_env_config [[lerobot.envs.make_env_config]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"lerobot.envs.make_env_config"} anchor={"lerobot.envs.make_env_config"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/envs/factory.py#L26"} parameters={[{"name": "env_type", "val": ": str"}, {"name": "**kwargs", "val": ""}]}>
+</Docstring>
+
+
+</div>
+
+
+<EditOnGithub source="https://github.com/huggingface/lerobot/blob/main/docs/source/api/envs.mdx" />
+
+<!--HF DOCBUILD BODY END-->
+
+HF_DOC_BODY_END
+

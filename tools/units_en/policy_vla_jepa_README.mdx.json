@@ -1,0 +1,111 @@
+{
+ "file": "policy_vla_jepa_README.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1934,
+   "text": "# VLA-JEPA",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1936,
+   "end": 2156,
+   "text": "This repository contains the LeRobot port of **VLA-JEPA**, a Vision-Language-Action model that combines a Qwen3-VL language backbone with a self-supervised video world model (V-JEPA2) and a flow-matching DiT action head.",
+   "tokens": []
+  },
+  {
+   "id": 2,
+   "kind": "para",
+   "start": 2158,
+   "end": 2233,
+   "text": "Converted from [ginwind/VLA-JEPA](⟦0⟧).",
+   "tokens": [
+    "https://huggingface.co/ginwind/VLA-JEPA"
+   ]
+  },
+  {
+   "id": 3,
+   "kind": "heading",
+   "start": 2240,
+   "end": 2264,
+   "text": "## Architecture Overview",
+   "tokens": []
+  },
+  {
+   "id": 4,
+   "kind": "table",
+   "start": 2266,
+   "end": 2387,
+   "text": "| Component               | Module                            | Role                                                    |",
+   "tokens": []
+  },
+  {
+   "id": 5,
+   "kind": "table",
+   "start": 2510,
+   "end": 2631,
+   "text": "| **Qwen3-VL backbone**   | ⟦0⟧                | Fuses images + language instruction into context tokens |",
+   "tokens": [
+    "`Qwen3VLInterface`"
+   ]
+  },
+  {
+   "id": 6,
+   "kind": "table",
+   "start": 2632,
+   "end": 2753,
+   "text": "| **DiT-B action head**   | ⟦0⟧               | Flow-matching diffusion over the action chunk           |",
+   "tokens": [
+    "`VLAJEPAActionHead`"
+   ]
+  },
+  {
+   "id": 7,
+   "kind": "table",
+   "start": 2754,
+   "end": 2875,
+   "text": "| **V-JEPA2 world model** | ⟦0⟧ | Self-supervised video prediction loss (training only)   |",
+   "tokens": [
+    "`ActionConditionedVideoPredictor`"
+   ]
+  },
+  {
+   "id": 8,
+   "kind": "para",
+   "start": 2877,
+   "end": 2974,
+   "text": "At inference time only the Qwen backbone and action head are used; the world model is not needed.",
+   "tokens": []
+  },
+  {
+   "id": 9,
+   "kind": "heading",
+   "start": 2981,
+   "end": 2992,
+   "text": "## Citation",
+   "tokens": []
+  },
+  {
+   "id": 10,
+   "kind": "heading",
+   "start": 3486,
+   "end": 3496,
+   "text": "## License",
+   "tokens": []
+  },
+  {
+   "id": 11,
+   "kind": "para",
+   "start": 3498,
+   "end": 3723,
+   "text": "Weights are distributed under the license terms of the original [ginwind/VLA-JEPA](⟦0⟧) repository (**Apache 2.0 License**). The LeRobot integration code follows the **Apache 2.0 License**.",
+   "tokens": [
+    "https://huggingface.co/ginwind/VLA-JEPA"
+   ]
+  }
+ ]
+}

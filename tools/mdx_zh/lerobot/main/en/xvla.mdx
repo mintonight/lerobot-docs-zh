@@ -1,0 +1,582 @@
+<script lang="ts">
+import {onMount} from "svelte";
+import Tip from "$lib/Tip.svelte";
+import CopyLLMTxtMenu from "$lib/CopyLLMTxtMenu.svelte";
+import Youtube from "$lib/Youtube.svelte";
+import Docstring from "$lib/Docstring.svelte";
+import CodeBlock from "$lib/CodeBlock.svelte";
+import CodeBlockFw from "$lib/CodeBlockFw.svelte";
+import DocNotebookDropdown from "$lib/DocNotebookDropdown.svelte";
+import CourseFloatingBanner from "$lib/CourseFloatingBanner.svelte";
+import IconCopyLink from "$lib/IconCopyLink.svelte";
+import FrameworkContent from "$lib/FrameworkContent.svelte";
+import Markdown from "$lib/Markdown.svelte";
+import Question from "$lib/Question.svelte";
+import FrameworkSwitchCourse from "$lib/FrameworkSwitchCourse.svelte";
+import InferenceApi from "$lib/InferenceApi.svelte";
+import TokenizersLanguageContent from "$lib/TokenizersLanguageContent.svelte";
+import ExampleCodeBlock from "$lib/ExampleCodeBlock.svelte";
+import Added from "$lib/Added.svelte";
+import Changed from "$lib/Changed.svelte";
+import Deprecated from "$lib/Deprecated.svelte";
+import PipelineIcon from "$lib/PipelineIcon.svelte";
+import PipelineTag from "$lib/PipelineTag.svelte";
+import Heading from "$lib/Heading.svelte";
+import HfOptions from "$lib/HfOptions.svelte";
+import HfOption from "$lib/HfOption.svelte";
+import EditOnGithub from "$lib/EditOnGithub.svelte";
+import InferenceSnippet from "$lib/InferenceSnippet/InferenceSnippet.svelte";
+import MermaidChart from "$lib/MermaidChart.svelte";
+let fw: "pt" | "tf" = "pt";
+onMount(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    fw = urlParams.get("fw") || "pt";
+});
+</script>
+<svelte:head>
+  <meta name="hf:doc:metadata" content={metadata} >
+</svelte:head>
+
+<!--HF DOCBUILD BODY START-->
+
+HF_DOC_BODY_START
+
+<CopyLLMTxtMenu containerStyle="float: right; margin-left: 10px; display: inline-flex; position: relative; z-index: 10;"></CopyLLMTxtMenu>
+
+# X-VLA：首个适用于任意机器人、任意任务的软提示机器人基础模型
+
+## 概览
+
+多年来，机器人技术一直渴望构建能够遵循自然人类指令并在多种环境和机器人本体上灵巧操作的智能体。LLM 和 VLM 的最新突破指出了一条前进道路：通过将基础模型架构锚定到 action 上，将其扩展到具身控制。这促成了视觉-语言-action（VLA）模型的兴起，人们希望单一通用模型能够将广泛的语义理解与稳健的操作技能结合起来。
+
+但训练此类模型并不容易。机器人数据分散在各个平台、传感器、本体和采集协议中。异质性无处不在：不同的机械臂配置、不同的 action space、不同的相机设置、不同的视觉域以及不同的任务分布。这些不一致造成了显著的分布偏移，使预训练不稳定、适配不可靠。
+
+受元学习和提示学习启发，我们提出：**“如果 VLA 模型能像 LLM 学习任务那样，通过提示来学习每个机器人和 dataset 的结构，会怎样？”**
+
+**X-VLA** 是一个软提示、流匹配的 VLA 框架，它将每个硬件设置视为一个“任务”，并使用一小组可学习的嵌入对其进行编码。这些**软提示**捕捉本体和域特定的变化，从多模态融合的最早阶段引导 Transformer。借助这一机制，X-VLA 可以在单一统一架构内协调多样的机器人形态、数据类型和传感器设置。
+
+<p align="center">
+  <img
+    src="https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/lerobot/xvla-architecture.png"
+    alt="XVLA Architecture"
+    style="max-width: 100%; height: auto; width: 800px;"
+  />
+</p>
+
+X-VLA 完全由纯 Transformer 编码器构建，能够随模型规模和 dataset 多样性自然扩展。在 6 个 simulation benchmark 和 3 个真实机器人上，软提示在处理硬件和域差异方面始终优于现有方法。X-VLA-0.9B 在涵盖七个机器人平台的 290K 个 episode 上训练，在第一阶段学习一个与本体无关的通用 policy，并在第二阶段仅通过学习一组新的提示来高效适配新机器人，同时保持骨干网络冻结。
+
+<p align="center">
+  <img
+    src="https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/lerobot/xvla-architecture2.png"
+    alt="XVLA Architecture 2"
+    style="width: 60%; height: auto;"
+  />
+</p>
+
+仅以 1% 的参数（9M）进行调优，X-VLA-0.9B 就在 LIBERO 和 Simpler-WidowX 上达到了接近 π₀ 的性能，尽管使用的**可训练参数少了 300 倍**。它还在极少 demonstration 的情况下展现出强大的真实世界灵巧性，包括在两分钟内折叠布料。
+
+<p align="center">
+  <img
+    src="https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/lerobot/xvla-fold.png"
+    alt="XVLA fold visualization"
+    style="width: 95%; max-width: 1100px; height: auto;"
+  />
+</p>
+
+X-VLA 表明，通用机器人智能并不需要越来越复杂的架构，只需要以正确的方式吸收异质性。软提示提供了一种简单、可扩展的机制来统一多样的机器人数据，为实现可适配、跨本体的机器人基础模型铺平了道路。
+
+## 安装
+
+安装 LeRobot 后，安装 X-VLA 依赖项：
+
+```bash
+pip install -e .[xvla]
+```
+
+在新版本发布后，你将能够执行以下操作：
+
+```bash
+pip install lerobot[xvla]
+```
+
+## 快速开始
+
+### 基本用法
+
+要在 LeRobot 配置中使用 X-VLA，请将 policy 类型指定为：
+
+```bash
+policy.type=xvla
+```
+
+### 评估预训练 checkpoint
+
+使用 LIBERO 的评估示例：
+
+```bash
+lerobot-eval \
+  --policy.path="lerobot/xvla-libero" \
+  --env.type=libero \
+  --env.task=libero_spatial,libero_goal,libero_10 \
+  --env.control_mode=absolute \
+  --eval.batch_size=1 \
+  --eval.n_episodes=1 \
+  --env.episode_length=800 \
+  --seed=142
+```
+
+## 可用 checkpoint
+
+### 🎯 基础模型
+
+**[lerobot/xvla-base](https://huggingface.co/lerobot/xvla-base)**
+
+X-VLA 的 0.9B 参数实例，使用精心设计的数据处理和学习配方训练。训练流水线由两个阶段组成：
+
+- **第一阶段：预训练** - 在来自 Droid、Robomind 和 Agibot 的 290K 个 episode 上预训练，涵盖七个平台和五种机械臂类型（从单臂到双臂设置）。通过利用软提示吸收本体特定的变化，模型学习到一个与本体无关的通用 policy。
+
+- **第二阶段：域适配** - 适配为目标域的可部署 policy。引入并优化一组新的软提示以编码新域的硬件配置，同时预训练骨干保持冻结。
+
+### simulation checkpoint
+
+**[lerobot/xvla-libero](https://huggingface.co/lerobot/xvla-libero)**
+
+在 LIBERO benchmark 上达到 93% 的成功率。从基础模型 fine-tune 用于 simulation 任务。
+
+**[lerobot/xvla-widowx](https://huggingface.co/lerobot/xvla-widowx)**
+
+在 BridgeData 上 fine-tune，用于紧凑 WidowX 平台上的拾取放置实验。展现出稳健的操作能力。
+
+### 🤖 真实世界 checkpoint
+
+**[lerobot/xvla-folding](https://huggingface.co/lerobot/xvla-folding)**
+
+一个在高质量 Soft-FOLD 布料折叠 dataset 上 fine-tune 的灵巧操作模型。在 2 小时的连续布料折叠中达到 100% 的成功率。
+
+**[lerobot/xvla-agibot-world](https://huggingface.co/lerobot/xvla-agibot-world)**
+
+针对 AgileX 机器人灵巧操作任务进行了优化。
+
+**[lerobot/xvla-google-robot](https://huggingface.co/lerobot/xvla-google-robot)**
+
+适配 Google Robot 平台。
+
+## 训练 X-VLA
+
+### 推荐的训练配置
+
+为新本体或任务 fine-tune X-VLA 时，我们建议不要冻结 VLM，并设置 `policy.dtype=bfloat16` 以避免出现 OOM 错误。
+
+```bash
+lerobot-train \
+  --dataset.repo_id=YOUR_DATASET \
+  --output_dir=./outputs/xvla_training \
+  --job_name=xvla_training \
+  --policy.path="lerobot/xvla-base" \
+  --policy.repo_id="HF_USER/xvla-your-robot" \
+  --policy.dtype=bfloat16 \
+  --policy.action_mode=auto \
+  --steps=20000 \
+  --policy.device=cuda \
+  --policy.freeze_vision_encoder=false \
+  --policy.freeze_language_encoder=false \
+  --policy.train_policy_transformer=true \
+  --policy.train_soft_prompts=true \
+```
+
+### 训练参数说明
+
+| 参数                        | 默认值  | 描述                                           |
+| -------------------------- | ------- | ---------------------------------------------- |
+| `freeze_vision_encoder`    | `false` | 不冻结 VLM 视觉编码器权重                      |
+| `freeze_language_encoder`  | `false` | 不冻结 VLM 语言编码器权重                      |
+| `train_policy_transformer` | `true`  | 允许训练 policy Transformer 层                    |
+| `train_soft_prompts`       | `true`  | 允许训练软提示                                 |
+
+**💡 最佳实践**：对于新本体的第二阶段适配，不要冻结 VLM 编码器，并训练 policy Transformer 和软提示。
+
+### 示例：在双臂机器人上训练
+
+```bash
+lerobot-train \
+  --dataset.repo_id=<USER>/bimanual-so100-handover-cube \
+  --output_dir=./outputs/xvla_bimanual \
+  --job_name=xvla_so101_training \
+  --policy.path="lerobot/xvla-base" \
+  --policy.dtype=bfloat16 \
+  --policy.repo_id="YOUR_USERNAME/xvla-biso101" \
+  --steps=3000 \
+  --policy.device=cuda \
+  --policy.action_mode=so101_bimanual \
+  --policy.freeze_vision_encoder=false \
+  --policy.freeze_language_encoder=false \
+  --policy.train_policy_transformer=true \
+  --policy.train_soft_prompts=true
+```
+
+💡 **最佳性能：** 如果你有足够的计算资源并希望获得最佳的 X-VLA fine-tune 性能，应遵循官方 fine-tune policy：
+
+**🔥 使用自定义学习率方案全量 fine-tune 所有组件**
+
+为确保优化稳定，视觉-语言模型（VLM）必须以基础学习率的 1/10 进行训练，而所有其他组件使用完整学习率。
+这一学习率比例对于获得强大且稳定的 fine-tune 性能至关重要。默认情况下已为你完成此设置。
+❕注意
+
+要完全匹配官方报告的性能，可能需要为软提示增加额外的预热学习率调度，这可以带来少量提升。
+我们鼓励你在自定义训练流水线中实现它，以获得最佳结果。
+
+## 核心概念
+
+### 1. action 模式
+
+X-VLA 使用 **Action Registry** 系统来处理不同的 action space 和本体。`action_mode` 参数定义了 action 如何处理、使用什么损失函数以及预测如何后处理。
+
+#### 可用的 action 模式
+
+| action 模式         | action 维度                | 描述                                        | 使用场景                             |
+| ---------------- | ----------------------- | ------------------------------------------- | ------------------------------------ |
+| `ee6d`           | 20                      | 带 xyz、6D 旋转、gripper 的 end-effector          | 具有空间控制的双臂设置               |
+| `joint`          | 14                      | 带 gripper 的关节空间                            | 直接关节控制机器人                   |
+| `agibot_ee6d`    | 20                      | 使用 MSE 损失的 AGI-bot 变体                | AGI-bot 平台                         |
+| `so101_bimanual` | 20（模型），12（真实）  | SO101 双臂机器人                            | 双臂操作任务                         |
+| `auto`           | 20（模型），auto（真实） | 从 dataset 自动检测 action 维度                    | 新机器人**推荐**使用                 |
+
+#### 为什么 action 模式很重要
+
+当你有一个像 `lerobot/xvla-base` 这样使用 `action_dim=20` 训练的预训练 checkpoint，而你想在 action 维度不同的 dataset（例如，双臂机械臂的 14）上训练时，你不能简单地裁剪 action 维度。action 模式负责协调：
+
+1. **损失计算**：不同 action 组件使用不同的损失函数（关节用 MSE、gripper 用 BCE 等）
+2. **预处理**：将 gripper 通道置零、填充维度
+3. **后处理**：对 gripper logits 应用 sigmoid、裁剪填充
+
+#### 示例：BimanualSO101 action space
+
+`so101_bimanual` action 模式处理模型输出（20D）与真实机器人控制（12D）之间的不匹配：
+
+```python
+# Model outputs 20 dimensions for compatibility
+dim_action = 20
+
+# Real robot only needs 12 dimensions
+# [left_arm (6), right_arm (6)] = [joints (5) + gripper (1)] × 2
+REAL_DIM = 12
+
+# Preprocessing: Pad 12D actions to 20D for training
+# Postprocessing: Trim 20D predictions to 12D for deployment
+```
+
+详情请参阅 [action_hub.py](https://github.com/huggingface/lerobot/blob/main/src/lerobot/policies/xvla/action_hub.py) 实现。
+
+#### 自动 action 模式（推荐）
+
+`auto` action 模式是使用 X-VLA 搭配任意机器人最简单的方式。它会自动检测 dataset 的 action 维度并处理填充/裁剪：
+
+```bash
+lerobot-train \
+  --policy.path="lerobot/xvla-base" \
+  --policy.action_mode=auto \
+  --policy.max_action_dim=20 \
+  ...
+```
+
+**工作原理：**
+
+- 从 dataset 读取 `action_feature.shape[-1]`（例如，Franka 为 7）
+- 模型输出 `max_action_dim`（默认 20）以保持预训练兼容性
+- 损失**仅在真实维度上**计算：`MSE(pred[:,:,:real_dim], target[:,:,:real_dim])`
+- 后处理将输出裁剪回 `real_dim` 以用于机器人控制
+
+这样就不必为大多数机器人创建自定义 action 模式。
+
+### 2. 域 ID
+
+域 ID 是用于不同机器人配置和相机设置的可学习标识符。它们让 X-VLA 能够区分：
+
+- 不同的机器人（机器人 1 与机器人 2）
+- 不同的相机配置（cam1 与 cam2）
+- 不同的组合（Robot1-cam1-cam2 与 Robot1-cam1 与 Robot2-cam1）
+
+#### 设置域 ID
+
+**训练期间**：默认情况下，domain_id 设置为 0 以进行通用训练。
+
+**评估期间**：指定与 checkpoint 训练配置匹配的 domain_id。
+
+```python
+# Example: LIBERO checkpoint uses domain_id=3
+domain_id = 3
+```
+
+domain_id 由预处理流水线中的 `XVLAAddDomainIdProcessorStep` 自动添加到 observation 中。
+
+`lerobot/xvla-base` 模型已在以下域 ID 上训练。建议选择与你的机器人/配置最相似的一个：
+
+#### fine-tune dataset
+
+| dataset 名称       | 域 ID     |
+| ---------------- | --------- |
+| Bridge           | 0         |
+| RT1              | 1         |
+| Calvin           | 2         |
+| libero           | 3         |
+| widowx-air       | 4         |
+| AIR-AGILEX-HQ    | 5         |
+| robotwin2_abs_ee | 6         |
+| robotwin2_clean  | 6         |
+| robocasa-human   | 7         |
+| VLABench         | 8         |
+| AGIBOT-challenge | 9         |
+| AIR-AGILEX       | 10        |
+| AIRBOT           | 18        |
+
+### 3. 处理器步骤
+
+X-VLA 需要特定的预处理和后处理步骤才能正常运行。
+
+#### 必需的预处理步骤
+
+1. **XVLAImageToFloatProcessorStep**：将图像从 [0, 255] 转换为 [0, 1] 范围
+2. **XVLAImageNetNormalizeProcessorStep**：应用 ImageNet 归一化（VLM 骨干所需）
+3. **XVLAAddDomainIdProcessorStep**：向 observation 添加 domain_id
+
+#### 自定义处理器示例
+
+对于 LIBERO 环境，自定义处理器处理特定的 observation 格式：
+
+```python
+from lerobot.policies.xvla.processor_xvla import LiberoProcessorStep
+
+processor = LiberoProcessorStep()
+# Handles robot_state dictionary, converts rotation matrices to 6D representation
+# Applies 180° image rotation for camera convention
+```
+
+### 4. 配置参数
+
+X-VLA 的关键配置参数：
+
+```python
+# Observation and action
+n_obs_steps: int = 1          # Number of observation timesteps
+chunk_size: int = 32           # Action sequence length
+n_action_steps: int = 32       # Number of action steps to execute
+
+# Model architecture
+hidden_size: int = 1024        # Transformer hidden dimension
+depth: int = 24                # Number of transformer layers
+num_heads: int = 16            # Number of attention heads
+num_domains: int = 30          # Maximum number of domain IDs
+len_soft_prompts: int = 32     # Length of soft prompt embeddings
+
+# Action space
+action_mode: str = "ee6d"      # Action space type (use "auto" for auto-detection)
+use_proprio: bool = True       # Use proprioceptive state
+max_state_dim: int = 32        # Maximum state dimension
+max_action_dim: int = 20       # Max action dim for padding (used by "auto" mode)
+
+# Vision
+num_image_views: int | None    # Number of camera views
+resize_imgs_with_padding: tuple[int, int] | None  # Target image size with padding
+
+# Training
+num_denoising_steps: int = 10  # Flow matching denoising steps
+```
+
+## 创建自定义 action 模式
+
+如果你的机器人有独特的 action space，可以创建自定义 action 模式：
+
+### 步骤 1：定义你的 action space
+
+```python
+from lerobot.policies.xvla.action_hub import BaseActionSpace, register_action
+import torch.nn as nn
+
+@register_action("my_custom_robot")
+class MyCustomActionSpace(BaseActionSpace):
+    """Custom action space for my robot."""
+
+    dim_action = 15  # Your robot's action dimension
+    gripper_idx = (7, 14)  # Gripper channel indices
+
+    def __init__(self):
+        super().__init__()
+        self.mse = nn.MSELoss()
+        self.bce = nn.BCEWithLogitsLoss()
+
+    def compute_loss(self, pred, target):
+        """Define your loss computation."""
+        # Example: MSE for joints, BCE for grippers
+        joints_loss = self.mse(pred[:, :, :7], target[:, :, :7])
+        gripper_loss = self.bce(pred[:, :, self.gripper_idx],
+                                target[:, :, self.gripper_idx])
+
+        return {
+            "joints_loss": joints_loss,
+            "gripper_loss": gripper_loss,
+        }
+
+    def preprocess(self, proprio, action, mode="train"):
+        """Preprocess actions before training."""
+        # Example: Zero out grippers in proprioception
+        proprio_m = proprio.clone()
+        action_m = action.clone() if action is not None else None
+        proprio_m[..., self.gripper_idx] = 0.0
+        if action_m is not None:
+            action_m[..., self.gripper_idx] = 0.0
+        return proprio_m, action_m
+
+    def postprocess(self, action):
+        """Post-process predictions for deployment."""
+        # Example: Apply sigmoid to gripper logits
+        action[..., self.gripper_idx] = torch.sigmoid(action[..., self.gripper_idx])
+        return action
+```
+
+### 步骤 2：使用你的自定义 action 模式
+
+```bash
+lerobot-train \
+  --policy.action_mode=my_custom_robot \
+  --dataset.repo_id=YOUR_DATASET \
+  --policy.path="lerobot/xvla-base" \
+  ...
+```
+
+## 高级主题
+
+### 多相机支持
+
+X-VLA 通过 `num_image_views` 参数支持多个相机视图：
+
+```python
+# Configure for 3 camera views
+policy.num_image_views=3
+
+# Add empty cameras if you have fewer physical cameras
+policy.empty_cameras=1  # Adds 1 zero-padded camera view
+```
+
+### 自定义预处理流水线
+
+为你的环境创建自定义预处理流水线：
+
+```python
+from lerobot.processor import PolicyProcessorPipeline
+from lerobot.policies.xvla import (
+    XVLAImageToFloatProcessorStep,
+    XVLAImageNetNormalizeProcessorStep,
+    XVLAAddDomainIdProcessorStep,
+)
+
+# Build custom pipeline
+preprocessor = PolicyProcessorPipeline(
+    steps=[
+        YourCustomProcessorStep(),  # Your custom processing
+        XVLAImageToFloatProcessorStep(),  # Required: convert to float
+        XVLAImageNetNormalizeProcessorStep(),  # Required: ImageNet norm
+        XVLAAddDomainIdProcessorStep(domain_id=5),  # Your domain ID
+    ]
+)
+```
+
+### 处理不同的 action 维度
+
+当你的 dataset 的 action 维度少于预训练模型时：
+
+**选项 1（推荐）**：使用 `auto` action 模式
+
+```bash
+# Automatically detects your dataset's action dimension
+# Works with any robot without custom code
+policy.action_mode=auto
+policy.max_action_dim=20  # Match pretrained model
+```
+
+**选项 2**：使用带内置填充的预定义 action 模式
+
+```python
+# Model expects 20D, dataset has 12D
+# Action mode handles padding internally
+action_mode = "so101_bimanual"  # Pads 12 → 20
+```
+
+**选项 2**：创建显式映射维度的自定义 action 模式
+
+```python
+@register_action("my_mapped_action")
+class MappedActionSpace(BaseActionSpace):
+    dim_action = 20
+    REAL_DIM = 12
+
+    def _pad_to_model_dim(self, x):
+        # Custom padding logic
+        ...
+```
+
+## 故障排查
+
+### 常见问题
+
+**问题**：“action 维度不匹配”
+
+- **解决方案**：检查你的 `action_mode` 是否与机器人的 action space 匹配。如有需要，创建自定义 action 模式。
+
+**问题**：“图像值超出 [0, 1] 范围”
+
+- **解决方案**：确保图像在归一化之前使用 `XVLAImageToFloatProcessorStep` 进行预处理。
+
+**问题**：“找不到域 ID”
+
+- **解决方案**：确保预处理流水线中包含 `XVLAAddDomainIdProcessorStep`，并使用正确的 domain_id。
+
+**问题**：“新本体上的成功率低”
+
+- **解决方案**：
+  1. 验证你的 action_mode 是否正确
+  2. 检查软提示是否正在训练（`train_soft_prompts=True`）
+  3. 确保正确的预处理（ImageNet 归一化、domain_id）
+  4. 考虑增加训练步数
+
+**问题**：“训练期间内存不足”
+
+- **解决方案**：
+  1. 减小 `chunk_size`（例如，从 32 到 16）
+  2. 启用梯度 checkpoint
+  3. 减小批次大小
+  4. 冻结更多组件
+
+## 引用
+
+如果你在研究中使用 X-VLA，请引用：
+
+```bibtex
+@article{zheng2025x,
+  title   = {X-VLA: Soft-Prompted Transformer as Scalable Cross-Embodiment Vision-Language-Action Model},
+  author  = {Zheng, Jinliang and Li, Jianxiong and Wang, Zhihao and Liu, Dongxiu and Kang, Xirui
+             and Feng, Yuchun and Zheng, Yinan and Zou, Jiayin and Chen, Yilun and Zeng, Jia and others},
+  journal = {arXiv preprint arXiv:2510.10274},
+  year    = {2025}
+}
+```
+
+## 其他资源
+
+- [X-VLA 论文](https://arxiv.org/pdf/2510.10274)
+- [LeRobot 文档](https://github.com/huggingface/lerobot)
+- [Action Registry 实现](https://github.com/huggingface/lerobot/blob/main/src/lerobot/policies/xvla/action_hub.py)
+- [处理器实现](https://github.com/huggingface/lerobot/blob/main/src/lerobot/policies/xvla/processor_xvla.py)
+- [模型配置](https://github.com/huggingface/lerobot/blob/main/src/lerobot/policies/xvla/configuration_xvla.py)
+
+## 贡献
+
+我们欢迎贡献！如果你为自己的机器人实现了新的 action 模式或处理器，请考虑提交 PR 以帮助社区。
+
+
+
+<EditOnGithub source="https://github.com/huggingface/lerobot/blob/main/docs/source/xvla.mdx" />
+
+<!--HF DOCBUILD BODY END-->
+
+HF_DOC_BODY_END
+

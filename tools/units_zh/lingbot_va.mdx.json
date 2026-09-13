@@ -1,0 +1,289 @@
+{
+ "file": "lingbot_va.mdx",
+ "units": [
+  {
+   "id": 0,
+   "zh": "# LingBot-VA"
+  },
+  {
+   "id": 1,
+   "zh": "LingBot-VA 是一个基于 **Wan2.2**\n视频扩散技术栈构建的**自回归视频-action 世界模型 policy**。它在一个自回归序列中交错预测\n未来的**视频潜变量**和**机器人 action**（\"VA\" = Video-Action）。LeRobot\n集成将 LingBot-VA 接入标准的训练、评估和处理器\n接口。"
+  },
+  {
+   "id": 2,
+   "zh": "## 模型概述"
+  },
+  {
+   "id": 3,
+   "zh": "LingBot-VA 是一个**双流\"Transformer 混合\"架构**：视频/潜变量流\n（⟦0⟧）和 action 流\n（⟦1⟧）共享相同的 30 个 Transformer 块和\n文本条件。"
+  },
+  {
+   "id": 4,
+   "zh": "| 组件                      | 类别                    | 作用                                                       |"
+  },
+  {
+   "id": 5,
+   "zh": "| DiT 骨干网络（可训练）     | ⟦0⟧ | 约 5B 参数的双流 Transformer。                            |"
+  },
+  {
+   "id": 6,
+   "zh": "| VAE（冻结）               | ⟦0⟧      | Wan2.2 VAE，⟦1⟧。从源仓库按需拉取。                    |"
+  },
+  {
+   "id": 7,
+   "zh": "| 文本编码器（冻结）         | ⟦0⟧      | UMT5-XXL，⟦1⟧。从源仓库按需拉取。               |"
+  },
+  {
+   "id": 8,
+   "zh": "在 inference 时，policy 为每个块运行一个自回归循环：它使用两个独立的流匹配调度器对视频潜变量流\n（CFG，约 20 步）和 action 流（约 50 步）进行去噪，并在各块之间维护 KV 缓存。在执行块时，\n真实观测到的关键帧会被反馈回 KV 缓存中（闭环世界建模）。"
+  },
+  {
+   "id": 9,
+   "zh": "### LeRobot 集成涵盖的内容"
+  },
+  {
+   "id": 10,
+   "zh": "- 通过 LeRobot 进行标准的 ⟦0⟧ 配置。"
+  },
+  {
+   "id": 11,
+   "zh": "- Hub 上开箱即用的 LeRobot 格式 checkpoint（由上游发布的 checkpoint 转换而来）。"
+  },
+  {
+   "id": 12,
+   "zh": "- 在标准 ⟦0⟧ 接口背后进行自回归双流 inference\n  （单环境评估，⟦1⟧）。"
+  },
+  {
+   "id": 13,
+   "zh": "- 可选择在评估/训练期间保存 policy 的**预测（想象）视频**。"
+  },
+  {
+   "id": 14,
+   "zh": "- 使用 ⟦0⟧ 在 LIBERO 和 RoboTwin 上进行评估。"
+  },
+  {
+   "id": 15,
+   "zh": "- 通过双流流匹配损失（⟦0⟧）进行训练/fine-tune，见下文。"
+  },
+  {
+   "id": 16,
+   "zh": "## 安装"
+  },
+  {
+   "id": 17,
+   "zh": "1. 按照[安装指南](⟦0⟧)安装 LeRobot。"
+  },
+  {
+   "id": 18,
+   "zh": "2. 安装 LingBot-VA 额外扩展："
+  },
+  {
+   "id": 19,
+   "zh": "## checkpoint"
+  },
+  {
+   "id": 20,
+   "zh": "上游发布的 checkpoint 已转换为 LeRobot 格式并推送到 Hub："
+  },
+  {
+   "id": 21,
+   "zh": "| 变体                     | LeRobot checkpoint                   |"
+  },
+  {
+   "id": 22,
+   "zh": "| LIBERO-Long 后训练       | ⟦0⟧ |"
+  },
+  {
+   "id": 23,
+   "zh": "| RoboTwin 后训练          | ⟦0⟧    |"
+  },
+  {
+   "id": 24,
+   "zh": "| 预训练基础模型            | ⟦0⟧        |"
+  },
+  {
+   "id": 25,
+   "zh": "LeRobot 的\n⟦0⟧ 中只存储可训练的约 5B Transformer。冻结的 VAE + UMT5 + tokenizer（约 20 GB）在加载时从\n⟦1⟧ 拉取（默认为源 ⟦2⟧ 仓库）。\nUMT5-XXL 文本编码器默认在 CPU 上运行（⟦3⟧），因此 5B\nTransformer + VAE 可以装入单个 24–32 GB 的 GPU。"
+  },
+  {
+   "id": 26,
+   "zh": "## 评估（LIBERO）"
+  },
+  {
+   "id": 27,
+   "zh": "LingBot-VA 的流式 inference（KV 缓存 + observation 关键帧反馈）已为\n单环境评估实现；请使用 ⟦0⟧。"
+  },
+  {
+   "id": 28,
+   "zh": "## 评估（RoboTwin）"
+  },
+  {
+   "id": 29,
+   "zh": "RoboTwin 2.0 需要 SAPIEN + CuRobo simulation 器技术栈。你可以使用 benchmark Docker 镜像\n（⟦0⟧，这也需要 ⟦1⟧，以及使用 ⟦2⟧ 中的\nGPU 计算能力构建的 CuRobo）。RoboTwin 采用**end-effector 位姿\n控制**，因此使用 ⟦3⟧ 运行：policy 预测每只手臂的 ⟦4⟧\n增量（⟦5⟧ 潜变量布局），这些增量叠加到 episode 的初始 end-effector 位姿上，并通过 CuRobo IK 执行。"
+  },
+  {
+   "id": 30,
+   "zh": "### 保存预测（想象）视频"
+  },
+  {
+   "id": 31,
+   "zh": "设置 ⟦0⟧ 可额外将预测的视频\n潜变量进行 VAE 解码，并在环境渲染的 ⟦2⟧ 视频旁边写入 ⟦1⟧。\n在 ⟦3⟧ 期间的周期性评估中，该标志同样适用。"
+  },
+  {
+   "id": 32,
+   "zh": "## 训练/fine-tune"
+  },
+  {
+   "id": 33,
+   "zh": "⟦0⟧ 实现了论文中的双流**流匹配**损失\n（⟦1⟧，按时间步加权，action 掩码）：它将相机片段 VAE 编码为视频潜变量，将任务 UMT5 编码，为两个流添加噪声，运行\nTransformer 的块因果训练过程并返回 ⟦2⟧。优化器预设为 AdamW，\n采用线性预热后恒定的调度（与上游一致）。"
+  },
+  {
+   "id": 34,
+   "zh": "要求："
+  },
+  {
+   "id": 35,
+   "zh": "- 块因果掩码使用 PyTorch 的 **flex-attention**，因此训练时应使用\n  ⟦0⟧ 构建 policy（默认的 ⟦1⟧ SDPA 仅用于 inference）。"
+  },
+  {
+   "id": 36,
+   "zh": "- 完整的 5B DiT 在 AdamW 下无法装入单个 24–32 GB GPU；请使用 **LoRA**\n（⟦0⟧）和/或优化器卸载进行 fine-tune。⟦1⟧ 只返回\n  可训练（例如适配器）参数；VAE + UMT5 文本编码器保持冻结。"
+  },
+  {
+   "id": 37,
+   "zh": "dataset 必须提供相机片段（每个相机的时间窗口，VAE 编码为\n⟦0⟧ 个潜变量帧）以及每个样本的 ⟦1⟧ 个 action 步。"
+  },
+  {
+   "id": 38,
+   "zh": "## 数据格式（action 通道与相机顺序）"
+  },
+  {
+   "id": 39,
+   "zh": "LingBot-VA 是一个**end-effector（笛卡尔）位姿**policy，它预测 EEF 位姿 + gripper，而非\n关节位置。action 位于固定的多形态 **30 维**布局中；将你的机器人的 action 维度映射到这些通道中，并用 ⟦0⟧ 填充其余部分（⟦1⟧ 会选择\n某个给定 checkpoint 实际使用的通道）："
+  },
+  {
+   "id": 40,
+   "zh": "| 通道      | 含义                                                   |"
+  },
+  {
+   "id": 41,
+   "zh": "| 0–6      | 左臂 end-effector 位姿                                     |"
+  },
+  {
+   "id": 42,
+   "zh": "| 7–13     | 右臂 end-effector 位姿                                     |"
+  },
+  {
+   "id": 43,
+   "zh": "| 14–20    | 左臂关节（已发布的 checkpoint 未使用）                        |"
+  },
+  {
+   "id": 44,
+   "zh": "| 21–27    | 右臂关节（已发布的 checkpoint 未使用）                       |"
+  },
+  {
+   "id": 45,
+   "zh": "| 28       | 左 gripper                                                  |"
+  },
+  {
+   "id": 46,
+   "zh": "| 29       | 右 gripper                                                 |"
+  },
+  {
+   "id": 47,
+   "zh": "- **LIBERO** 使用通道 ⟦0⟧：6 自由度 EEF 增量（xyz + 旋转）+ gripper（单臂）。"
+  },
+  {
+   "id": 48,
+   "zh": "- **RoboTwin** 使用通道 ⟦0⟧：左 EEF（xyz + 四元数）+ 左 gripper +\n  右 EEF + 右 gripper（16 维）。环境通过\n  CuRobo IK 将这些位姿转换为关节轨迹——永远不预测关节。"
+  },
+  {
+   "id": 49,
+   "zh": "在 fine-tune 这些 checkpoint 之前，关节空间 dataset（或不同的 EEF 约定）必须重新映射到此模式中。"
+  },
+  {
+   "id": 50,
+   "zh": "**相机顺序是固定且对顺序敏感的**，每个相机的潜变量按\n⟦0⟧ 顺序在空间上拼接，因此物理相机→槽位的映射必须与训练匹配："
+  },
+  {
+   "id": 51,
+   "zh": "| benchmark   | ⟦0⟧（按顺序）                                                                             | ⟦1⟧                                                     |"
+  },
+  {
+   "id": 52,
+   "zh": "| LIBERO    | ⟦0⟧（agentview / 第三人称），⟦1⟧（手眼腕部相机）  | ⟦2⟧（潜变量在宽度方向上拼接）                            |"
+  },
+  {
+   "id": 53,
+   "zh": "| RoboTwin  | ⟦0⟧、⟦1⟧、⟦2⟧ | ⟦3⟧（下方为全分辨率头部相机，上方为两个半分辨率腕部相机） |"
+  },
+  {
+   "id": 54,
+   "zh": "第一个相机是外部/头部视角，其余为腕部视角。"
+  },
+  {
+   "id": 55,
+   "zh": "## inference 超参数（LIBERO）"
+  },
+  {
+   "id": 56,
+   "zh": "| 键                                      | 值                                                                                 |"
+  },
+  {
+   "id": 57,
+   "zh": "| 高度 × 宽度                             | 128 × 128                                                                         |"
+  },
+  {
+   "id": 58,
+   "zh": "| 相机                                    | ⟦0⟧（agentview），⟦1⟧（手眼相机） |"
+  },
+  {
+   "id": 59,
+   "zh": "| 使用的 action 通道                           | 0–6（7 自由度手臂 + gripper）                                                        |"
+  },
+  {
+   "id": 60,
+   "zh": "| action_per_frame / frame_chunk_size      | 4 / 4                                                                             |"
+  },
+  {
+   "id": 61,
+   "zh": "| attn_window                             | 30                                                                                |"
+  },
+  {
+   "id": 62,
+   "zh": "| 视频/action 去噪步数                         | 20 / 50                                                                           |"
+  },
+  {
+   "id": 63,
+   "zh": "| guidance_scale / action_guidance_scale  | 5 / 1                                                                             |"
+  },
+  {
+   "id": 64,
+   "zh": "| snr_shift / action_snr_shift            | 5.0 / 0.05                                                                        |"
+  },
+  {
+   "id": 65,
+   "zh": "这些是 ⟦0⟧ 的默认值；你可以通过 ⟦1⟧ 覆盖其中任何一个。"
+  },
+  {
+   "id": 66,
+   "zh": "## 备注"
+  },
+  {
+   "id": 67,
+   "zh": "- **注意力后端：** inference 使用 ⟦0⟧ SDPA 后端（始终可用）。\n  ⟦1⟧ 和 ⟦2⟧ 后端是可选的；⟦3⟧ 仅在训练时需要。"
+  },
+  {
+   "id": 68,
+   "zh": "- **模型大小：** DiT 约有 5B 参数，冻结的 VAE+UMT5 再增加约 20 GB；inference 大约需要\n  18–24 GB 的显存。"
+  },
+  {
+   "id": 69,
+   "zh": "## 许可证"
+  },
+  {
+   "id": 70,
+   "zh": "LingBot-VA 在 Apache-2.0 许可下发布。请参阅\n[上游仓库](⟦0⟧)。"
+  }
+ ]
+}

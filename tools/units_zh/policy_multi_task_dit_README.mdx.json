@@ -1,0 +1,17 @@
+{
+ "file": "policy_multi_task_dit_README.mdx",
+ "units": [
+  {
+   "id": 0,
+   "zh": "# Multitask DiT policy"
+  },
+  {
+   "id": 1,
+   "zh": "## 引用"
+  },
+  {
+   "id": 2,
+   "zh": "如果你使用本工作，请引用以下工作："
+  }
+ ]
+}

@@ -1,0 +1,845 @@
+{
+ "file": "isaac_teleop.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1938,
+   "text": "# Isaac Teleop",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1940,
+   "end": 2234,
+   "text": "Control your robot with NVIDIA [Isaac Teleop](⟦0⟧), a\nmulti-modal teleoperation framework. Isaac Teleop drives a single ⟦1⟧ from a range\nof input devices — XR (VR) controllers, hand tracking, full-body tracking, Manus gloves, foot\npedals, and more.",
+   "tokens": [
+    "https://github.com/NVIDIA/IsaacTeleop",
+    "`TeleopSession`"
+   ]
+  },
+  {
+   "id": 2,
+   "kind": "para",
+   "start": 2236,
+   "end": 2915,
+   "text": "In LeRobot, Isaac Teleop ships as a self-contained example under\n[⟦0⟧](⟦1⟧).\nEach Isaac Teleop input device is its own ⟦2⟧ subclass in the example's\n⟦3⟧ package, sharing one session lifecycle (see ⟦4⟧). The\ndevices available today are the **XR controller** (⟦5⟧) and a back-drivable\n**SO-101 leader arm** (⟦6⟧); Manus gloves and hand/full-body tracking are the\nnatural next devices. This guide focuses on the XR controller; the SO-101 leader is summarized\nunder [Run the example](⟦7⟧).",
+   "tokens": [
+    "`examples/isaac_teleop_to_so101/`",
+    "https://github.com/huggingface/lerobot/tree/main/examples/isaac_teleop_to_so101",
+    "`Teleoperator`",
+    "`isaac_teleop`",
+    "`IsaacTeleopTeleoperator`",
+    "`XRController`",
+    "`SO101LeaderArm`",
+    "#step-3-run-the-example"
+   ]
+  },
+  {
+   "id": 3,
+   "kind": "para",
+   "start": 2917,
+   "end": 2948,
+   "text": "**In this guide you'll learn:**",
+   "tokens": []
+  },
+  {
+   "id": 4,
+   "kind": "list",
+   "start": 2950,
+   "end": 3018,
+   "text": "- How an Isaac Teleop device drives a robot end‑effector (EE) target",
+   "tokens": []
+  },
+  {
+   "id": 5,
+   "kind": "list",
+   "start": 3019,
+   "end": 3119,
+   "text": "- How the _clutch_ (squeeze/grip on the XR controller) engages teleoperation without jerking the arm",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "list",
+   "start": 3120,
+   "end": 3196,
+   "text": "- How to run the SO‑101 teleoperation example and tune motion / gripper / IK",
+   "tokens": []
+  },
+  {
+   "id": 7,
+   "kind": "heading",
+   "start": 3198,
+   "end": 3213,
+   "text": "## Installation",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "para",
+   "start": 3215,
+   "end": 3542,
+   "text": "The example lives in the LeRobot repository (it is not part of the ⟦0⟧ pip package), so\nclone the repo and install from source. The canonical, always-up-to-date install and usage\nreference is the example's\n[⟦1⟧](⟦2⟧);\nin short:",
+   "tokens": [
+    "`lerobot`",
+    "`README.md`",
+    "https://github.com/huggingface/lerobot/tree/main/examples/isaac_teleop_to_so101/README.md"
+   ]
+  },
+  {
+   "id": 9,
+   "kind": "para",
+   "start": 3772,
+   "end": 4209,
+   "text": "⟦0⟧ is published on public PyPI (Linux only). The ⟦1⟧ extra brings the CloudXR\nruntime bindings; ⟦2⟧ is the scipy-based retargeter path that resolves on both\nx86_64 and ARM (on aarch64 — e.g. a DGX Spark — the full ⟦3⟧ extra does not resolve\nbecause of its ⟦4⟧/⟦5⟧ pins, which is why it is not the default here). On\nx86_64 you can additionally install the full retargeter stack:",
+   "tokens": [
+    "`isaacteleop`",
+    "`cloudxr`",
+    "`retargeters-lite`",
+    "`retargeters`",
+    "`dex-retargeting`",
+    "`nlopt`"
+   ]
+  },
+  {
+   "id": 10,
+   "kind": "heading",
+   "start": 4275,
+   "end": 4315,
+   "text": "### Set up CloudXR and connect a headset",
+   "tokens": []
+  },
+  {
+   "id": 11,
+   "kind": "para",
+   "start": 4317,
+   "end": 4904,
+   "text": "Isaac Teleop streams the headset to your machine over **NVIDIA CloudXR**, which provides the\nOpenXR runtime the session connects to. By default LeTeleop **auto-launches the CloudXR runtime\nfor you** when you call ⟦0⟧ — you no longer have to run `python -m\nisaacteleop.cloudxr⟦1⟧source cloudxr.env` in a separate shell. All you need is a supported\nheadset connected and the CloudXR firewall ports open. Follow the Isaac Teleop\n[Quick Start](⟦2⟧) for the\nheadset-pairing and firewall details.",
+   "tokens": [
+    "`teleop_device.connect()`",
+    "` and `",
+    "https://nvidia.github.io/IsaacTeleop/main/getting_started/quick_start.html"
+   ]
+  },
+  {
+   "id": 12,
+   "kind": "para",
+   "start": 4906,
+   "end": 5134,
+   "text": "**First run (EULA).** The very first launch must accept the NVIDIA CloudXR EULA. The auto-launch\nprompts for it **on stdin**, so on a headless machine it will hang waiting for input. Bootstrap\nthe EULA once, interactively, with:",
+   "tokens": []
+  },
+  {
+   "id": 13,
+   "kind": "para",
+   "start": 5231,
+   "end": 5353,
+   "text": "After that, ⟦0⟧ launches the runtime non-interactively. The launch **blocks for ~30s**\nwhile the runtime comes up.",
+   "tokens": [
+    "`connect()`"
+   ]
+  },
+  {
+   "id": 14,
+   "kind": "para",
+   "start": 5355,
+   "end": 5446,
+   "text": "**Configuration.** Two fields on ⟦0⟧ (shared by every device) control this:",
+   "tokens": [
+    "`IsaacTeleopConfig`"
+   ]
+  },
+  {
+   "id": 15,
+   "kind": "list",
+   "start": 5448,
+   "end": 5588,
+   "text": "- ⟦0⟧ (default ⟦1⟧) — whether ⟦2⟧ starts the runtime. Set ⟦3⟧\n  when CloudXR is already running externally.",
+   "tokens": [
+    "`auto_launch_cloudxr`",
+    "`True`",
+    "`connect()`",
+    "`False`"
+   ]
+  },
+  {
+   "id": 16,
+   "kind": "list",
+   "start": 5589,
+   "end": 6060,
+   "text": "- ⟦0⟧ (default ⟦1⟧) — an optional CloudXR device-profile ⟦2⟧ selecting the\n  headset transport (e.g. an Apple Vision Pro profile). This is launcher **input**; it is not the\n  ⟦3⟧ **output** file the old manual flow told you to ⟦4⟧. ⟦5⟧\n  keeps the default auto-WebRTC profile — though the SO-101 example overrides it to the\n  ⟦6⟧ shipped next to ⟦7⟧ unless you pass ⟦8⟧.",
+   "tokens": [
+    "`cloudxr_env_file`",
+    "`None`",
+    "`.env`",
+    "`~/.cloudxr/run/cloudxr.env`",
+    "`source`",
+    "`None`",
+    "`default.env`",
+    "`teleoperate.py`",
+    "`--teleop.cloudxr_env_file`"
+   ]
+  },
+  {
+   "id": 17,
+   "kind": "para",
+   "start": 6062,
+   "end": 6178,
+   "text": "**Opting out.** To skip the auto-launch (CloudXR already running), either set\n⟦0⟧ or export:",
+   "tokens": [
+    "`auto_launch_cloudxr=False`"
+   ]
+  },
+  {
+   "id": 18,
+   "kind": "para",
+   "start": 6234,
+   "end": 6521,
+   "text": "The **env var takes precedence over the config field**: if ⟦0⟧ is\nset, the auto-launch is skipped even when ⟦1⟧. This variable is\n**independent** of Isaac Lab's ⟦2⟧ — setting one does not affect the\nother.",
+   "tokens": [
+    "`LEROBOT_CLOUDXR_SKIP_AUTOLAUNCH=1`",
+    "`auto_launch_cloudxr=True`",
+    "`ISAACLAB_CXR_SKIP_AUTOLAUNCH`"
+   ]
+  },
+  {
+   "id": 19,
+   "kind": "para",
+   "start": 6523,
+   "end": 6686,
+   "text": "**One teleoperator per process.** The CloudXR runtime configures the environment process-wide (a\nsingleton), so run a single Isaac Teleop teleoperator per process.",
+   "tokens": []
+  },
+  {
+   "id": 20,
+   "kind": "para",
+   "start": 6688,
+   "end": 7145,
+   "text": "**Shutting down.** Always call ⟦0⟧ on exit — including on Ctrl-C. Wrap\nyour teleoperation loop in ⟦1⟧ and call ⟦2⟧ in the ⟦3⟧. This tears down\nthe OpenXR session **before** the CloudXR runtime, which is the required order; the launcher's\n⟦4⟧ hook only reaps the runtime and does not run the session's ⟦5⟧, so without an\nexplicit ⟦6⟧ an interrupted run shuts down in the wrong order.",
+   "tokens": [
+    "`teleop_device.disconnect()`",
+    "`try/finally`",
+    "`disconnect()`",
+    "`finally`",
+    "`atexit`",
+    "`__exit__`",
+    "`disconnect()`"
+   ]
+  },
+  {
+   "id": 21,
+   "kind": "para",
+   "start": 7325,
+   "end": 7478,
+   "text": "See [System Requirements](⟦0⟧)\nfor supported OS / GPU / CloudXR versions and headsets.",
+   "tokens": [
+    "https://nvidia.github.io/IsaacTeleop/main/references/requirements.html"
+   ]
+  },
+  {
+   "id": 22,
+   "kind": "heading",
+   "start": 7480,
+   "end": 7495,
+   "text": "## How it works",
+   "tokens": []
+  },
+  {
+   "id": 23,
+   "kind": "para",
+   "start": 7497,
+   "end": 8350,
+   "text": "The XR controller is one Isaac Teleop **input** device. ⟦0⟧ is a deliberately thin\nreader: it exposes the **raw** controller grip pose — already statically rebased into the robot\nbase frame — plus the squeeze and trigger analog values. It has **no** retargeters and **no**\nclutch logic of its own. The clutch (engage latch + delta rebasing onto the EE) and the gripper\nmapping live downstream in the example loop, which then feeds LeRobot's existing closed‑loop\nCartesian IK pipeline — the same one the phone teleoperator uses. The device‑specific pieces are\n⟦1⟧, the loop's ⟦2⟧, and ⟦3⟧; everything downstream\n(⟦4⟧, ⟦5⟧) is shared, and a future device (e.g. Manus\ngloves) would swap in its own ⟦6⟧ + processor while reusing the rest.",
+   "tokens": [
+    "`XRController`",
+    "`XRController`",
+    "`Clutch`",
+    "`MapXRControllerActionToRobotAction`",
+    "`EEBoundsAndSafety`",
+    "`InverseKinematicsEEToJoints`",
+    "`teleop_<device>.py`"
+   ]
+  },
+  {
+   "id": 24,
+   "kind": "para",
+   "start": 8352,
+   "end": 8737,
+   "text": "⟦0⟧ wires Isaac Teleop's ⟦1⟧ — statically rebased into\nthe robot base frame by the native ⟦2⟧ (⟦3⟧) — and exposes the\ntransformed controller stream verbatim. ⟦4⟧ reads the grip pose, squeeze, and trigger\nstraight off it; the session is always stepped ⟦5⟧ (there is no clutch retargeter to gate).",
+   "tokens": [
+    "`XRController._build_pipeline`",
+    "`ControllersSource`",
+    "`ControllerTransform`",
+    "`base_T_anchor`",
+    "`get_action()`",
+    "`RUNNING`"
+   ]
+  },
+  {
+   "id": 25,
+   "kind": "para",
+   "start": 8739,
+   "end": 8957,
+   "text": "The ⟦0⟧ class (in ⟦1⟧, driven by the\nloop in ⟦2⟧) mirrors Isaac Teleop's ⟦3⟧, but lives in-loop so the\ndevice can stay a thin reader:",
+   "tokens": [
+    "`Clutch`",
+    "`examples/isaac_teleop_to_so101/isaac_teleop/clutch.py`",
+    "`common.py`",
+    "`SO101ClutchRetargeter`"
+   ]
+  },
+  {
+   "id": 26,
+   "kind": "list",
+   "start": 8959,
+   "end": 9327,
+   "text": "- It latches its engage origin on the squeeze **engage edge** (the frame the squeeze first crosses\n  ⟦0⟧) and rebases both position and orientation around it, so engaging does not\n  teleport the arm. ⟦1⟧ returns the absolute base-frame target as a ⟦2⟧\n  pair, which the loop concatenates into the 7D ⟦3⟧ fed to the processor.",
+   "tokens": [
+    "`clutch_threshold`",
+    "`Clutch.rebase`",
+    "`(pos, quat)`",
+    "`ee_pose`"
+   ]
+  },
+  {
+   "id": 27,
+   "kind": "list",
+   "start": 9328,
+   "end": 9516,
+   "text": "- The analog trigger becomes a gripper ⟦0⟧ in ⟦1⟧ (0 = open, 1 = closed),\n  proportional to the trigger pull, which ⟦2⟧ maps to a jaw target.",
+   "tokens": [
+    "`closedness`",
+    "`[0, 1]`",
+    "`MapXRControllerActionToRobotAction`"
+   ]
+  },
+  {
+   "id": 28,
+   "kind": "para",
+   "start": 9518,
+   "end": 9783,
+   "text": "See the Isaac Teleop\n[Retargeting interface](⟦0⟧)\nand [architecture overview](⟦1⟧)\nfor how source nodes and retargeters compose.",
+   "tokens": [
+    "https://nvidia.github.io/IsaacTeleop/main/references/retargeting/index.html",
+    "https://nvidia.github.io/IsaacTeleop/main/overview/architecture.html"
+   ]
+  },
+  {
+   "id": 29,
+   "kind": "heading",
+   "start": 10754,
+   "end": 10795,
+   "text": "### The clutch: owned by the example loop",
+   "tokens": []
+  },
+  {
+   "id": 30,
+   "kind": "para",
+   "start": 10797,
+   "end": 11178,
+   "text": "Unlike the phone pipeline (which splits the clutch across ⟦0⟧ and\n⟦1⟧), the XR clutch lives entirely in the example loop's ⟦2⟧ class. It emits\nan **absolute** EE pose, so there is no ⟦3⟧ stage and no delta accumulation in the\nprocessor — ⟦4⟧ is a pure, stateless per‑frame mapping.",
+   "tokens": [
+    "`MapPhoneActionToRobotAction`",
+    "`EEReferenceAndDelta`",
+    "`Clutch`",
+    "`EEReferenceAndDelta`",
+    "`MapXRControllerActionToRobotAction`"
+   ]
+  },
+  {
+   "id": 31,
+   "kind": "para",
+   "start": 11180,
+   "end": 11878,
+   "text": "The clutch latches its engage origin on the squeeze **engage edge** (the moment the squeeze crosses\n⟦0⟧) and drives the EE from the motion _relative_ to that origin, so the arm does not\nteleport on engage. On **every** engage — startup and mid‑task re‑clutch alike — the home\n_position_ is latched from forward kinematics on the arm's **measured joints**, so the home equals\nwhere the arm physically is even if it moved while disengaged, and the engage is jump‑free. The\nhome _orientation_ keeps the last commanded rotation: the 5‑DOF arm tracks orientation only\nsoftly, so latching the measured wrist orientation would inject its tracking offset into the\ncommand on every re‑clutch.",
+   "tokens": [
+    "`clutch_threshold`"
+   ]
+  },
+  {
+   "id": 32,
+   "kind": "heading",
+   "start": 11880,
+   "end": 11891,
+   "text": "## Controls",
+   "tokens": []
+  },
+  {
+   "id": 33,
+   "kind": "list",
+   "start": 11893,
+   "end": 12161,
+   "text": "- **Squeeze / grip** — the **clutch** (deadman). Hold it past ⟦0⟧ to engage\n  teleoperation; release to pause. Each engage re‑captures the origin, so you can reposition\n  your hand while paused and re‑engage without the arm jumping (index/clutch style).",
+   "tokens": [
+    "`clutch_threshold`"
+   ]
+  },
+  {
+   "id": 34,
+   "kind": "list",
+   "start": 12162,
+   "end": 12416,
+   "text": "- **Trigger** — the **gripper**, controlled **analog**. The jaw tracks the trigger\n  proportionally — a half‑pressed trigger leaves the jaw half‑closed — via a closedness in\n  ⟦0⟧ (0 = open, 1 = closed) that maps to an absolute gripper joint target.",
+   "tokens": [
+    "`[0, 1]`"
+   ]
+  },
+  {
+   "id": 35,
+   "kind": "list",
+   "start": 12417,
+   "end": 12721,
+   "text": "- **Controller orientation** — the **wrist**. The clutch rebases the controller orientation\n  (engage‑relative, base‑frame) into a soft IK orientation target the wrist tracks alongside\n  position. On the 5‑DOF SO‑101 the wrist follows the hand only partially by design — see\n  ⟦0⟧ below.",
+   "tokens": [
+    "`orientation_weight`"
+   ]
+  },
+  {
+   "id": 36,
+   "kind": "heading",
+   "start": 12723,
+   "end": 12737,
+   "text": "## Get started",
+   "tokens": []
+  },
+  {
+   "id": 37,
+   "kind": "heading",
+   "start": 12739,
+   "end": 12774,
+   "text": "### Step 1: Create the teleoperator",
+   "tokens": []
+  },
+  {
+   "id": 38,
+   "kind": "para",
+   "start": 13163,
+   "end": 13577,
+   "text": "⟦0⟧ returns the **raw** base‑frame controller pose, not a clutch‑rebased\ntarget: ⟦1⟧ (3,) ⟦2⟧ [m] and ⟦3⟧ (4,) ⟦4⟧ in the robot base\nframe, plus scalar ⟦5⟧ and ⟦6⟧ analog values in ⟦7⟧. The example loop's ⟦8⟧\nturns these into the absolute ⟦9⟧, and the squeeze is thresholded by the loop against\n⟦10⟧ to engage.",
+   "tokens": [
+    "`XRController.get_action()`",
+    "`grip_pos`",
+    "`[x, y, z]`",
+    "`grip_quat`",
+    "`[qx, qy, qz, qw]`",
+    "`squeeze`",
+    "`trigger`",
+    "`[0, 1]`",
+    "`Clutch`",
+    "`ee_pose`",
+    "`clutch_threshold`"
+   ]
+  },
+  {
+   "id": 39,
+   "kind": "heading",
+   "start": 13579,
+   "end": 13598,
+   "text": "### Step 2: Connect",
+   "tokens": []
+  },
+  {
+   "id": 40,
+   "kind": "para",
+   "start": 13600,
+   "end": 14295,
+   "text": "Calling ⟦0⟧ first auto-launches the CloudXR runtime (unless you opted out —\nsee [Set up CloudXR and connect a headset](⟦1⟧); this blocks for\n~30s and on the first run prompts for the EULA on stdin), then starts the Isaac Teleop\n[⟦2⟧](⟦3⟧)\n(opens the OpenXR session and discovers the controllers). XR controllers are self‑calibrating, so\nthere is no manual calibration step — the clutch handles re‑centering each time you engage. Pair\n⟦4⟧ with a ⟦5⟧ that calls ⟦6⟧ so the session tears down before the\nruntime on exit/Ctrl-C.",
+   "tokens": [
+    "`teleop_device.connect()`",
+    "#set-up-cloudxr-and-connect-a-headset",
+    "`TeleopSession`",
+    "https://nvidia.github.io/IsaacTeleop/main/getting_started/teleop_session.html",
+    "`connect()`",
+    "`try/finally`",
+    "`disconnect()`"
+   ]
+  },
+  {
+   "id": 41,
+   "kind": "heading",
+   "start": 14297,
+   "end": 14324,
+   "text": "### Step 3: Run the example",
+   "tokens": []
+  },
+  {
+   "id": 42,
+   "kind": "para",
+   "start": 14326,
+   "end": 14422,
+   "text": "The example assumes you configured your robot (SO‑101 follower) and set the correct serial port.",
+   "tokens": []
+  },
+  {
+   "id": 43,
+   "kind": "para",
+   "start": 14424,
+   "end": 14776,
+   "text": "The **robot URDF and its meshes are fetched automatically** on first run: the XR device downloads\nthe SO-101 URDF from the\n[⟦0⟧ Hugging Face bucket](⟦1⟧)\ninto the LeRobot cache (⟦2⟧) and reuses it after, so there is no\nseparate download step :",
+   "tokens": [
+    "`lerobot/robot-urdfs`",
+    "https://huggingface.co/buckets/lerobot/robot-urdfs/tree/so101",
+    "`HF_LEROBOT_HOME/robot-urdfs/so101/`"
+   ]
+  },
+  {
+   "id": 44,
+   "kind": "para",
+   "start": 14962,
+   "end": 15573,
+   "text": "The CLI is ⟦0⟧-style (draccus): ⟦1⟧ configures the SO-101 follower and\n⟦2⟧ selects the Isaac input device (⟦3⟧ | ⟦4⟧), with\n⟦5⟧ its device knobs. ⟦6⟧ runs the XR-controller path described\nabove. The startup safety contract: by default it slews all joints to a default reset pose over\n⟦7⟧ seconds (⟦8⟧ keeps the arm where it is), then seeds the\nclutch home from the arm's measured pose so the first engage is jump-free; the follower is\ncommanded only while the clutch is engaged.",
+   "tokens": [
+    "`lerobot-teleoperate`",
+    "`--robot.*`",
+    "`--teleop.type`",
+    "`xr_controller`",
+    "`so101_leader`",
+    "`--teleop.*`",
+    "`--teleop.type=xr_controller`",
+    "`--reset_duration`",
+    "`--reset_to_origin=false`"
+   ]
+  },
+  {
+   "id": 45,
+   "kind": "para",
+   "start": 15575,
+   "end": 16307,
+   "text": "**Customizing the reset pose.** The reset pose ships as a built-in default (a comfortable mid-range\npose) and works out of the box — you do **not** need to record anything. To tailor it to your setup,\nback-drive the arm to the pose you want and run\n⟦0⟧; it writes the\ncurrent joints to a per-arm file in the LeRobot cache\n(⟦1⟧, keyed like calibration), which then takes\npriority over the built-in default on the next run. Because it lives in the user-local cache (not\nthe repo), your override stays on your machine, and both ⟦2⟧ and ⟦3⟧ honor it\nwhen launched with the same ⟦4⟧.",
+   "tokens": [
+    "`python -m examples.isaac_teleop_to_so101.override_reset_pose --id <robot.id>`",
+    "`HF_LEROBOT_HOME/reset_poses/<robot.name>/<robot.id>.json`",
+    "`teleoperate`",
+    "`record`",
+    "`--robot.id`"
+   ]
+  },
+  {
+   "id": 46,
+   "kind": "para",
+   "start": 16309,
+   "end": 16569,
+   "text": "The other device, ⟦0⟧, mirrors the follower 1:1 from a back-drivable\nSO-101 _leader arm_ whose joints are streamed by Isaac Teleop's native ⟦1⟧ plugin (no\nclutch, no IK — the leader and follower share the SO-101 kinematics).",
+   "tokens": [
+    "`--teleop.type=so101_leader`",
+    "`so101_leader`"
+   ]
+  },
+  {
+   "id": 47,
+   "kind": "para",
+   "start": 16571,
+   "end": 17244,
+   "text": "The ⟦0⟧ binary is a C++ plugin that is **not** part of the ⟦1⟧ pip\npackage — you build it from the Isaac Teleop source tree. Follow\n[Build Isaac Teleop from source](⟦2⟧)\n(in short, from your Isaac Teleop checkout: `cmake -B build && cmake --build build --parallel &&\ncmake --install build⟦3⟧⟦4⟧/install/plugins/`, so\nthe binary lands at ⟦5⟧ — the ⟦6⟧ path\nbelow. See the plugin's own ⟦7⟧ (next to the binary) for its serial/calibration details.",
+   "tokens": [
+    "`so101_leader_plugin`",
+    "`isaacteleop`",
+    "https://nvidia.github.io/IsaacTeleop/main/getting_started/build_from_source/index.html",
+    "`); the build installs the plugins under `",
+    "<IsaacTeleop>",
+    "`install/plugins/so101_leader/so101_leader_plugin`",
+    "`--launch_plugin`",
+    "`README.md`"
+   ]
+  },
+  {
+   "id": 48,
+   "kind": "para",
+   "start": 17246,
+   "end": 17397,
+   "text": "Point ⟦0⟧ at the physical leader's serial port and ⟦1⟧ at that plugin\nbinary to have the script spawn it after CloudXR is up:",
+   "tokens": [
+    "`--teleop.port`",
+    "`--launch_plugin`"
+   ]
+  },
+  {
+   "id": 49,
+   "kind": "para",
+   "start": 17728,
+   "end": 18675,
+   "text": "(Note ⟦0⟧ here is the _Isaac_ leader, resolved against the Isaac Teleop device\nregistry, distinct from ⟦1⟧'s serial ⟦2⟧.) When a ⟦3⟧ is\nset, the plugin's tick→radian calibration is inferred from ⟦4⟧ and passed to the plugin\nas its third positional arg — the LeRobot-format JSON at\n⟦5⟧, the same file the serial SO-101 leader\nuses (⟦6⟧). If it is missing the script\nwarns and the plugin uses built-in defaults. Run ⟦7⟧ for all flags. Its\nstartup safety contract: by default the follower is\nslewed to the leader's first reading over ⟦8⟧ seconds (⟦9⟧ to skip) so\nthe arm does not snap when the mirror begins, and while the leader stream is stale the follower is\nheld at its measured pose.",
+   "tokens": [
+    "`so101_leader`",
+    "`lerobot-teleoperate`",
+    "`so101_leader`",
+    "`--teleop.port`",
+    "`--teleop.id`",
+    "`HF_LEROBOT_CALIBRATION/teleoperators/so_leader/<id>.json`",
+    "`lerobot-calibrate --teleop.type=so101_leader --teleop.id=<id>`",
+    "`python -m examples.isaac_teleop_to_so101.teleoperate --help`",
+    "`--align_duration`",
+    "`--align=false`"
+   ]
+  },
+  {
+   "id": 50,
+   "kind": "para",
+   "start": 18677,
+   "end": 18916,
+   "text": "The URDF fetch uses ⟦0⟧ (already a LeRobot dependency) against the public\n⟦1⟧ bucket, so it needs no login. It is cached under\n⟦2⟧; delete that folder to force a re‑download.",
+   "tokens": [
+    "`huggingface_hub`",
+    "`lerobot/robot-urdfs`",
+    "`HF_LEROBOT_HOME/robot-urdfs/so101/`"
+   ]
+  },
+  {
+   "id": 51,
+   "kind": "para",
+   "start": 18918,
+   "end": 19129,
+   "text": "Then, in your headset: squeeze and hold the grip to engage, move the controller to drive the\narm, twist/tilt it to orient the wrist, and press the trigger to close the gripper\n(proportionally — release to open).",
+   "tokens": []
+  },
+  {
+   "id": 52,
+   "kind": "para",
+   "start": 19131,
+   "end": 19531,
+   "text": "To record a dataset (not just teleoperate), use ⟦0⟧ in the same folder. It dispatches on\n⟦1⟧ (⟦2⟧ | ⟦3⟧) exactly like ⟦4⟧, so either device\ncan drive the follower, and it saves the commanded joints to a LeRobot dataset (⟦5⟧-style\n⟦6⟧ flags). See its module docstring for the full CLI and the keyboard recording shortcuts.",
+   "tokens": [
+    "`record.py`",
+    "`--teleop.type`",
+    "`xr_controller`",
+    "`so101_leader`",
+    "`teleoperate.py`",
+    "`lerobot-record`",
+    "`--dataset.*`"
+   ]
+  },
+  {
+   "id": 53,
+   "kind": "heading",
+   "start": 19533,
+   "end": 19572,
+   "text": "## Important pipeline steps and options",
+   "tokens": []
+  },
+  {
+   "id": 54,
+   "kind": "para",
+   "start": 19574,
+   "end": 19771,
+   "text": "The clutch already produces an absolute base‑frame pose, so the processor side is a thin\n**absolute‑pose** path — there is no frame remap, no delta accumulation, and no\n⟦0⟧ stage.",
+   "tokens": [
+    "`EEReferenceAndDelta`"
+   ]
+  },
+  {
+   "id": 55,
+   "kind": "list",
+   "start": 19773,
+   "end": 20050,
+   "text": "- ⟦0⟧ is a stateless per‑frame mapping from the device output to\n  the IK input contract. It writes the absolute base‑frame position, encodes the absolute\n  orientation as a rotvec target, and inverts the closedness into a motor gripper target:",
+   "tokens": [
+    "`MapXRControllerActionToRobotAction`"
+   ]
+  },
+  {
+   "id": 56,
+   "kind": "para",
+   "start": 20360,
+   "end": 20515,
+   "text": "  The gripper polarity (⟦0⟧) is a hardware‑calibration convention in the source — flip it there if the jaw opens when it should close.",
+   "tokens": [
+    "`100 = open, 0 = closed`"
+   ]
+  },
+  {
+   "id": 57,
+   "kind": "list",
+   "start": 20517,
+   "end": 21007,
+   "text": "- ⟦0⟧ clamps the EE to a workspace and rate‑limits per‑frame jumps. The clutch's\n  no‑teleport keeps frames small, so ⟦1⟧ mostly catches transient controller tracking\n  glitches. The z floor is ⟦2⟧ (the table plane) so a stray target cannot drive the EE below the\n  table; x/y stay at the loose ⟦3⟧ m box. Set ⟦4⟧ so an over‑limit frame is\n  **clamped and warned** instead of raising — a crash mid‑loop would leave the arm uncontrolled:",
+   "tokens": [
+    "`EEBoundsAndSafety`",
+    "`max_ee_step_m`",
+    "`0.0`",
+    "`[-1, 1]`",
+    "`raise_on_jump=False`"
+   ]
+  },
+  {
+   "id": 58,
+   "kind": "list",
+   "start": 21184,
+   "end": 21983,
+   "text": "- ⟦0⟧ solves\n  closed‑loop Placo IK. SO‑101 is a 5‑DOF arm, so the IK is position‑dominant; the small\n  ⟦1⟧ lets it softly track the orientation target carried in ⟦2⟧ so the wrist\n  follows the hand, while the under‑determined roll stays partial by design. There is **no**\n  ⟦3⟧: the absolute ⟦4⟧ is passed straight to ⟦5⟧.\n  ⟦6⟧ warm‑starts each solve from the **previous IK solution**\n  rather than re‑seeding from the measured joints, so the joint trajectory stays continuous\n  frame‑to‑frame. Tune ⟦7⟧ on hardware — too high fights position tracking, too\n  low ignores the orientation command.",
+   "tokens": [
+    "`InverseKinematicsEEToJoints(initial_guess_current_joints=False, orientation_weight=0.01)`",
+    "`orientation_weight`",
+    "`ee.w*`",
+    "`GripperVelocityToJoint`",
+    "`ee.gripper_pos`",
+    "`gripper.pos`",
+    "`initial_guess_current_joints=False`",
+    "`orientation_weight`"
+   ]
+  },
+  {
+   "id": 59,
+   "kind": "para",
+   "start": 21985,
+   "end": 22301,
+   "text": "The example also gates safety at the loop level: after the startup reset slew (on by default —\npass ⟦0⟧ to keep the arm where it is), it commands the robot **only while\nthe clutch is engaged**, and re‑sends the measured joints while disengaged, so releasing the\nclutch freezes the arm in place.",
+   "tokens": [
+    "`--reset_to_origin=false`"
+   ]
+  },
+  {
+   "id": 60,
+   "kind": "para",
+   "start": 22303,
+   "end": 22437,
+   "text": "See the [Processors for Robots and Teleoperators](⟦0⟧) guide for more on\nadapting the pipeline to other robots.",
+   "tokens": [
+    "./processors_robots_teleop"
+   ]
+  },
+  {
+   "id": 61,
+   "kind": "heading",
+   "start": 22439,
+   "end": 22457,
+   "text": "## Troubleshooting",
+   "tokens": []
+  },
+  {
+   "id": 62,
+   "kind": "list",
+   "start": 22459,
+   "end": 22695,
+   "text": "- **⟦0⟧** — the ⟦1⟧ package is not installed in the\n  active environment. Re-run the install command at the top of this guide:\n  ⟦2⟧.",
+   "tokens": [
+    "`ModuleNotFoundError: isaacteleop`",
+    "`isaacteleop`",
+    "`uv pip install \"isaacteleop[cloudxr,retargeters-lite]~=1.3.131\"`"
+   ]
+  },
+  {
+   "id": 63,
+   "kind": "list",
+   "start": 22696,
+   "end": 23033,
+   "text": "- **No controllers found** — make sure the CloudXR runtime is running, the firewall ports are\n  whitelisted, and the headset is connected (see\n  [Set up CloudXR and connect a headset](⟦0⟧) and the Isaac\n  Teleop [Quick Start](⟦1⟧)).",
+   "tokens": [
+    "#set-up-cloudxr-and-connect-a-headset",
+    "https://nvidia.github.io/IsaacTeleop/main/getting_started/quick_start.html"
+   ]
+  },
+  {
+   "id": 64,
+   "kind": "list",
+   "start": 23034,
+   "end": 23536,
+   "text": "- **CloudXR auto-launch failed** — ⟦0⟧ raises a ⟦1⟧ if the runtime does not\n  come up within its startup timeout. Check the launcher logs under ⟦2⟧. Common\n  causes: the EULA was never accepted (run ⟦3⟧ once,\n  interactively — the auto-launch prompts on stdin and hangs headless), or the runtime is already\n  running externally (set ⟦4⟧ or ⟦5⟧ to\n  skip the auto-launch).",
+   "tokens": [
+    "`connect()`",
+    "`RuntimeError`",
+    "`~/.cloudxr/logs`",
+    "`python -m isaacteleop.cloudxr --accept-eula`",
+    "`LEROBOT_CLOUDXR_SKIP_AUTOLAUNCH=1`",
+    "`auto_launch_cloudxr=False`"
+   ]
+  },
+  {
+   "id": 65,
+   "kind": "list",
+   "start": 23537,
+   "end": 23714,
+   "text": "- **Arm does not move** — the clutch is a deadman: you must hold the squeeze/grip past\n  ⟦0⟧. Lower the threshold if your controller's squeeze is reported softly.",
+   "tokens": [
+    "`clutch_threshold`"
+   ]
+  },
+  {
+   "id": 66,
+   "kind": "list",
+   "start": 23715,
+   "end": 24002,
+   "text": "- **Motion feels misaligned** — confirm the headset/play space orientation. The controller stream\n  is rebased into the robot base frame by the ⟦0⟧ transform on ⟦1⟧\n  (default: standard OpenXR → robot axis convention); adjust it if your anchor frame differs.",
+   "tokens": [
+    "`base_T_anchor`",
+    "`XRControllerConfig`"
+   ]
+  },
+  {
+   "id": 67,
+   "kind": "heading",
+   "start": 24004,
+   "end": 24017,
+   "text": "## Learn more",
+   "tokens": []
+  },
+  {
+   "id": 68,
+   "kind": "para",
+   "start": 24019,
+   "end": 24155,
+   "text": "NVIDIA Isaac Teleop documentation ([docs home](⟦0⟧),\n[GitHub](⟦1⟧)):",
+   "tokens": [
+    "https://nvidia.github.io/IsaacTeleop/",
+    "https://github.com/NVIDIA/IsaacTeleop"
+   ]
+  },
+  {
+   "id": 69,
+   "kind": "list",
+   "start": 24157,
+   "end": 24326,
+   "text": "- [Quick Start](⟦0⟧) —\n  install, run the CloudXR server, connect a headset, run a teleop example.",
+   "tokens": [
+    "https://nvidia.github.io/IsaacTeleop/main/getting_started/quick_start.html"
+   ]
+  },
+  {
+   "id": 70,
+   "kind": "list",
+   "start": 24327,
+   "end": 24465,
+   "text": "- [TeleopSession](⟦0⟧) —\n  the session API ⟦1⟧ wraps.",
+   "tokens": [
+    "https://nvidia.github.io/IsaacTeleop/main/getting_started/teleop_session.html",
+    "`XRController`"
+   ]
+  },
+  {
+   "id": 71,
+   "kind": "list",
+   "start": 24466,
+   "end": 24730,
+   "text": "- [Retargeting interface](⟦0⟧)\n  and [architecture overview](⟦1⟧) —\n  how source nodes and retargeters compose into a pipeline.",
+   "tokens": [
+    "https://nvidia.github.io/IsaacTeleop/main/references/retargeting/index.html",
+    "https://nvidia.github.io/IsaacTeleop/main/overview/architecture.html"
+   ]
+  },
+  {
+   "id": 72,
+   "kind": "list",
+   "start": 24731,
+   "end": 24959,
+   "text": "- [Build from source](⟦0⟧) —\n  build ⟦1⟧ (and its C++ plugins, including the ⟦2⟧ plugin used above) from a\n  local checkout.",
+   "tokens": [
+    "https://nvidia.github.io/IsaacTeleop/main/getting_started/build_from_source/index.html",
+    "`isaacteleop`",
+    "`so101_leader`"
+   ]
+  },
+  {
+   "id": 73,
+   "kind": "list",
+   "start": 24960,
+   "end": 25199,
+   "text": "- [System Requirements](⟦0⟧) and\n  the [CloudXR SDK docs](⟦1⟧) — supported platforms, GPUs,\n  CloudXR/OpenXR runtime versions, and headsets.",
+   "tokens": [
+    "https://nvidia.github.io/IsaacTeleop/main/references/requirements.html",
+    "https://docs.nvidia.com/cloudxr-sdk"
+   ]
+  }
+ ]
+}

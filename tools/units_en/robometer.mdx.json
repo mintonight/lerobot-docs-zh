@@ -1,0 +1,599 @@
+{
+ "file": "robometer.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1935,
+   "text": "# ROBOMETER",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1937,
+   "end": 2125,
+   "text": "ROBOMETER is a **general-purpose video-language robotic reward model**. It predicts dense, frame-level task progress and frame-level success from a trajectory video and a task description.",
+   "tokens": []
+  },
+  {
+   "id": 2,
+   "kind": "para",
+   "start": 2127,
+   "end": 2498,
+   "text": "**Paper**: [ROBOMETER: Scaling General-Purpose Robotic Reward Models via Trajectory Comparisons](⟦0⟧)\n**Project**: [robometer.github.io](⟦1⟧)\n**Original code**: [github.com/robometer/robometer](⟦2⟧)\n**Checkpoint**: [lerobot/Robometer-4B](⟦3⟧)",
+   "tokens": [
+    "https://arxiv.org/abs/2603.02115",
+    "https://robometer.github.io/",
+    "https://github.com/robometer/robometer",
+    "https://huggingface.co/lerobot/Robometer-4B"
+   ]
+  },
+  {
+   "id": 3,
+   "kind": "heading",
+   "start": 2500,
+   "end": 2511,
+   "text": "## Overview",
+   "tokens": []
+  },
+  {
+   "id": 4,
+   "kind": "para",
+   "start": 2513,
+   "end": 2605,
+   "text": "ROBOMETER builds on ⟦0⟧ and adds three lightweight prediction heads:",
+   "tokens": [
+    "`Qwen/Qwen3-VL-4B-Instruct`"
+   ]
+  },
+  {
+   "id": 5,
+   "kind": "list",
+   "start": 2607,
+   "end": 2673,
+   "text": "- **Progress head**: predicts per-frame task progress in ⟦0⟧.",
+   "tokens": [
+    "`[0, 1]`"
+   ]
+  },
+  {
+   "id": 6,
+   "kind": "list",
+   "start": 2674,
+   "end": 2738,
+   "text": "- **Success head**: predicts per-frame task success probability.",
+   "tokens": []
+  },
+  {
+   "id": 7,
+   "kind": "list",
+   "start": 2739,
+   "end": 2839,
+   "text": "- **Preference head**: predicts which of two trajectories better completes the task during training.",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "para",
+   "start": 2841,
+   "end": 2895,
+   "text": "The paper trains ROBOMETER with a composite objective:",
+   "tokens": []
+  },
+  {
+   "id": 9,
+   "kind": "para",
+   "start": 2939,
+   "end": 3167,
+   "text": "The LeRobot integration is currently **inference-only**. It preserves the preference head so that the published ⟦0⟧ checkpoint loads without remapping, but ⟦1⟧ queries the progress or success head only.",
+   "tokens": [
+    "`Robometer-4B`",
+    "`compute_reward()`"
+   ]
+  },
+  {
+   "id": 10,
+   "kind": "heading",
+   "start": 3169,
+   "end": 3207,
+   "text": "## What the LeRobot Integration Covers",
+   "tokens": []
+  },
+  {
+   "id": 11,
+   "kind": "list",
+   "start": 3209,
+   "end": 3280,
+   "text": "- Standard ⟦0⟧ configuration through LeRobot.",
+   "tokens": [
+    "`reward_model.type=robometer`"
+   ]
+  },
+  {
+   "id": 12,
+   "kind": "list",
+   "start": 3281,
+   "end": 3361,
+   "text": "- Qwen3-VL image and text preprocessing through ⟦0⟧.",
+   "tokens": [
+    "`RobometerEncoderProcessorStep`"
+   ]
+  },
+  {
+   "id": 13,
+   "kind": "list",
+   "start": 3362,
+   "end": 3432,
+   "text": "- LeRobot reward-model save/load APIs through ⟦0⟧.",
+   "tokens": [
+    "`PreTrainedRewardModel`"
+   ]
+  },
+  {
+   "id": 14,
+   "kind": "list",
+   "start": 3433,
+   "end": 3498,
+   "text": "- Dense, frame-level progress and success predictions internally.",
+   "tokens": []
+  },
+  {
+   "id": 15,
+   "kind": "list",
+   "start": 3499,
+   "end": 3586,
+   "text": "- A scalar reward through ⟦0⟧ for downstream LeRobot reward-model usage.",
+   "tokens": [
+    "`compute_reward()`"
+   ]
+  },
+  {
+   "id": 16,
+   "kind": "para",
+   "start": 3588,
+   "end": 3754,
+   "text": "This page focuses on using the published ROBOMETER checkpoint as a zero-shot reward model. Training ROBOMETER from scratch is outside the current LeRobot integration.",
+   "tokens": []
+  },
+  {
+   "id": 17,
+   "kind": "heading",
+   "start": 3756,
+   "end": 3784,
+   "text": "## Installation Requirements",
+   "tokens": []
+  },
+  {
+   "id": 18,
+   "kind": "list",
+   "start": 3786,
+   "end": 3859,
+   "text": "1. Install LeRobot by following the [Installation Guide](⟦0⟧).",
+   "tokens": [
+    "./installation"
+   ]
+  },
+  {
+   "id": 19,
+   "kind": "list",
+   "start": 3860,
+   "end": 3898,
+   "text": "2. Install the ROBOMETER dependencies:",
+   "tokens": []
+  },
+  {
+   "id": 20,
+   "kind": "para",
+   "start": 3943,
+   "end": 3991,
+   "text": "If you use ⟦0⟧ directly from a source checkout:",
+   "tokens": [
+    "`uv`"
+   ]
+  },
+  {
+   "id": 21,
+   "kind": "para",
+   "start": 4032,
+   "end": 4112,
+   "text": "ROBOMETER uses a Qwen3-VL-4B backbone, so GPU inference is strongly recommended.",
+   "tokens": []
+  },
+  {
+   "id": 22,
+   "kind": "heading",
+   "start": 4114,
+   "end": 4141,
+   "text": "## Model Inputs and Outputs",
+   "tokens": []
+  },
+  {
+   "id": 23,
+   "kind": "para",
+   "start": 4143,
+   "end": 4161,
+   "text": "ROBOMETER expects:",
+   "tokens": []
+  },
+  {
+   "id": 24,
+   "kind": "list",
+   "start": 4163,
+   "end": 4206,
+   "text": "- A trajectory video or sequence of frames.",
+   "tokens": []
+  },
+  {
+   "id": 25,
+   "kind": "list",
+   "start": 4207,
+   "end": 4245,
+   "text": "- A natural-language task description.",
+   "tokens": []
+  },
+  {
+   "id": 26,
+   "kind": "para",
+   "start": 4247,
+   "end": 4291,
+   "text": "In LeRobot datasets, the preprocessor reads:",
+   "tokens": []
+  },
+  {
+   "id": 27,
+   "kind": "table",
+   "start": 4293,
+   "end": 4405,
+   "text": "| Config field              | Default                  | Meaning                                               |",
+   "tokens": []
+  },
+  {
+   "id": 28,
+   "kind": "table",
+   "start": 4519,
+   "end": 4631,
+   "text": "| ⟦0⟧  | ⟦1⟧ | Camera/video observation used by ROBOMETER            |",
+   "tokens": [
+    "`reward_model.image_key`",
+    "`observation.images.top`"
+   ]
+  },
+  {
+   "id": 29,
+   "kind": "table",
+   "start": 4632,
+   "end": 4744,
+   "text": "| ⟦0⟧   | ⟦1⟧                   | Key in complementary data that stores the task string |",
+   "tokens": [
+    "`reward_model.task_key`",
+    "`task`"
+   ]
+  },
+  {
+   "id": 30,
+   "kind": "table",
+   "start": 4745,
+   "end": 4857,
+   "text": "| ⟦0⟧ | ⟦1⟧                      | Maximum number of frames passed to ROBOMETER          |",
+   "tokens": [
+    "`reward_model.max_frames`",
+    "`8`"
+   ]
+  },
+  {
+   "id": 31,
+   "kind": "para",
+   "start": 4859,
+   "end": 4972,
+   "text": "The model predicts per-frame progress and success internally. The LeRobot reward API returns a scalar per sample:",
+   "tokens": []
+  },
+  {
+   "id": 32,
+   "kind": "list",
+   "start": 4974,
+   "end": 5066,
+   "text": "- ⟦0⟧ (default): return the last-frame progress, clamped to ⟦1⟧.",
+   "tokens": [
+    "`reward_output=\"progress\"`",
+    "`[0, 1]`"
+   ]
+  },
+  {
+   "id": 33,
+   "kind": "list",
+   "start": 5067,
+   "end": 5193,
+   "text": "- ⟦0⟧: return ⟦1⟧ if the last-frame success probability is above ⟦2⟧, otherwise ⟦3⟧.",
+   "tokens": [
+    "`reward_output=\"success\"`",
+    "`1.0`",
+    "`success_threshold`",
+    "`0.0`"
+   ]
+  },
+  {
+   "id": 34,
+   "kind": "heading",
+   "start": 5195,
+   "end": 5203,
+   "text": "## Usage",
+   "tokens": []
+  },
+  {
+   "id": 35,
+   "kind": "heading",
+   "start": 5205,
+   "end": 5239,
+   "text": "### Load the Reward Model Directly",
+   "tokens": []
+  },
+  {
+   "id": 36,
+   "kind": "heading",
+   "start": 5536,
+   "end": 5574,
+   "text": "### Encode Frames and Compute a Reward",
+   "tokens": []
+  },
+  {
+   "id": 37,
+   "kind": "para",
+   "start": 5576,
+   "end": 5679,
+   "text": "For a direct Python call, provide frames as ⟦0⟧ arrays with shape ⟦1⟧ and a task string:",
+   "tokens": [
+    "`uint8`",
+    "`(T, H, W, C)`"
+   ]
+  },
+  {
+   "id": 38,
+   "kind": "para",
+   "start": 6335,
+   "end": 6381,
+   "text": "⟦0⟧ is a tensor of shape ⟦1⟧.",
+   "tokens": [
+    "`reward`",
+    "`(batch_size,)`"
+   ]
+  },
+  {
+   "id": 39,
+   "kind": "heading",
+   "start": 6383,
+   "end": 6409,
+   "text": "### Use the Reward Factory",
+   "tokens": []
+  },
+  {
+   "id": 40,
+   "kind": "para",
+   "start": 6411,
+   "end": 6473,
+   "text": "You can also instantiate ROBOMETER through the reward factory:",
+   "tokens": []
+  },
+  {
+   "id": 41,
+   "kind": "para",
+   "start": 6855,
+   "end": 6993,
+   "text": "The preprocessor writes Qwen-VL tensors under the ⟦0⟧ namespace, and ⟦1⟧ reads those encoded tensors.",
+   "tokens": [
+    "`observation.robometer.*`",
+    "`compute_reward()`"
+   ]
+  },
+  {
+   "id": 42,
+   "kind": "heading",
+   "start": 6995,
+   "end": 7017,
+   "text": "## Configuration Notes",
+   "tokens": []
+  },
+  {
+   "id": 43,
+   "kind": "heading",
+   "start": 7019,
+   "end": 7046,
+   "text": "### Backbone and Vocabulary",
+   "tokens": []
+  },
+  {
+   "id": 44,
+   "kind": "para",
+   "start": 7048,
+   "end": 7171,
+   "text": "The published checkpoint uses a Qwen3-VL-4B backbone. ROBOMETER adds five special tokens to the tokenizer in a fixed order:",
+   "tokens": []
+  },
+  {
+   "id": 45,
+   "kind": "para",
+   "start": 7263,
+   "end": 7581,
+   "text": "⟦0⟧ is inserted after each frame and is the hidden-state position used for per-frame progress and success prediction. ⟦1⟧ and ⟦2⟧ are used by the paper's pairwise trajectory preference objective. ⟦3⟧ and ⟦4⟧ are preserved for checkpoint compatibility.",
+   "tokens": [
+    "`<|prog_token|>`",
+    "`<|split_token|>`",
+    "`<|pref_token|>`",
+    "`<|reward_token|>`",
+    "`<|sim_token|>`"
+   ]
+  },
+  {
+   "id": 46,
+   "kind": "para",
+   "start": 7583,
+   "end": 7904,
+   "text": "The LeRobot config stores a serialized ⟦0⟧ with the post-resize vocabulary so the model can reload from ⟦1⟧ without downloading the base Qwen weights first. For ⟦2⟧, the tokenizer length is ⟦3⟧, and the five ROBOMETER tokens produce the checkpoint vocabulary size ⟦4⟧.",
+   "tokens": [
+    "`vlm_config`",
+    "`config.json`",
+    "`Qwen/Qwen3-VL-4B-Instruct`",
+    "`151669`",
+    "`151674`"
+   ]
+  },
+  {
+   "id": 47,
+   "kind": "heading",
+   "start": 7906,
+   "end": 7929,
+   "text": "### Progress Prediction",
+   "tokens": []
+  },
+  {
+   "id": 48,
+   "kind": "para",
+   "start": 7931,
+   "end": 8258,
+   "text": "In the published checkpoint, progress is discrete. The progress head outputs logits over ⟦0⟧ uniformly spaced bin centers in ⟦1⟧. LeRobot converts these logits into a continuous value by applying a softmax and taking the expectation over bin centers, matching the upstream ROBOMETER implementation.",
+   "tokens": [
+    "`progress_discrete_bins=10`",
+    "`[0, 1]`"
+   ]
+  },
+  {
+   "id": 49,
+   "kind": "heading",
+   "start": 8260,
+   "end": 8282,
+   "text": "### Success Prediction",
+   "tokens": []
+  },
+  {
+   "id": 50,
+   "kind": "para",
+   "start": 8284,
+   "end": 8509,
+   "text": "The success head outputs raw logits per frame. LeRobot converts them to probabilities with ⟦0⟧. When ⟦1⟧, ⟦2⟧ thresholds the last-frame success probability using ⟦3⟧.",
+   "tokens": [
+    "`sigmoid`",
+    "`reward_output=\"success\"`",
+    "`compute_reward()`",
+    "`success_threshold`"
+   ]
+  },
+  {
+   "id": 51,
+   "kind": "heading",
+   "start": 8511,
+   "end": 8525,
+   "text": "## Limitations",
+   "tokens": []
+  },
+  {
+   "id": 52,
+   "kind": "list",
+   "start": 8527,
+   "end": 8649,
+   "text": "- The current LeRobot integration is inference-only; it does not implement ROBOMETER training or preference-pair training.",
+   "tokens": []
+  },
+  {
+   "id": 53,
+   "kind": "list",
+   "start": 8650,
+   "end": 8806,
+   "text": "- ⟦0⟧ returns a scalar per sample for the LeRobot reward-model API, even though ROBOMETER predicts per-frame progress and success internally.",
+   "tokens": [
+    "`compute_reward()`"
+   ]
+  },
+  {
+   "id": 54,
+   "kind": "list",
+   "start": 8807,
+   "end": 8922,
+   "text": "- ROBOMETER is video-language based; it does not use privileged robot state such as contact forces or object poses.",
+   "tokens": []
+  },
+  {
+   "id": 55,
+   "kind": "heading",
+   "start": 8924,
+   "end": 8937,
+   "text": "## References",
+   "tokens": []
+  },
+  {
+   "id": 56,
+   "kind": "list",
+   "start": 8939,
+   "end": 8990,
+   "text": "- [ROBOMETER project](⟦0⟧)",
+   "tokens": [
+    "https://robometer.github.io/"
+   ]
+  },
+  {
+   "id": 57,
+   "kind": "list",
+   "start": 8991,
+   "end": 9044,
+   "text": "- [ROBOMETER paper](⟦0⟧)",
+   "tokens": [
+    "https://arxiv.org/abs/2603.02115"
+   ]
+  },
+  {
+   "id": 58,
+   "kind": "list",
+   "start": 9045,
+   "end": 9112,
+   "text": "- [Original ROBOMETER code](⟦0⟧)",
+   "tokens": [
+    "https://github.com/robometer/robometer"
+   ]
+  },
+  {
+   "id": 59,
+   "kind": "list",
+   "start": 9113,
+   "end": 9195,
+   "text": "- [Published ROBOMETER-4B checkpoint](⟦0⟧)",
+   "tokens": [
+    "https://huggingface.co/lerobot/Robometer-4B"
+   ]
+  },
+  {
+   "id": 60,
+   "kind": "list",
+   "start": 9196,
+   "end": 9270,
+   "text": "- [Qwen3-VL-4B-Instruct](⟦0⟧)",
+   "tokens": [
+    "https://huggingface.co/Qwen/Qwen3-VL-4B-Instruct"
+   ]
+  },
+  {
+   "id": 61,
+   "kind": "heading",
+   "start": 9272,
+   "end": 9283,
+   "text": "## Citation",
+   "tokens": []
+  },
+  {
+   "id": 62,
+   "kind": "heading",
+   "start": 9785,
+   "end": 9795,
+   "text": "## License",
+   "tokens": []
+  },
+  {
+   "id": 63,
+   "kind": "para",
+   "start": 9797,
+   "end": 9997,
+   "text": "This LeRobot integration follows the **Apache 2.0 License** used by LeRobot. Check the upstream ROBOMETER code and model pages for the licenses of the original implementation and released checkpoints.",
+   "tokens": []
+  }
+ ]
+}

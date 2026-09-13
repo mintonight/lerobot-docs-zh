@@ -1,0 +1,505 @@
+{
+ "file": "index.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1933,
+   "text": "# LeRobot",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 2241,
+   "end": 2302,
+   "text": "**State-of-the-art machine learning for real-world robotics**",
+   "tokens": []
+  },
+  {
+   "id": 2,
+   "kind": "para",
+   "start": 2304,
+   "end": 2720,
+   "text": "🤗 LeRobot provides a hardware-agnostic, Python-native interface for controlling real robots - from affordable arms like the SO-ARM101 to full humanoids. Plus the tools to record, store, and share the datasets they generate. Every dataset uses the standardized **LeRobotDataset** format (synchronized video + action/state data) and can be streamed directly from the [Hugging Face Hub](⟦0⟧).",
+   "tokens": [
+    "https://huggingface.co/lerobot"
+   ]
+  },
+  {
+   "id": 3,
+   "kind": "para",
+   "start": 2722,
+   "end": 2984,
+   "text": "🤗 On top of that data, LeRobot implements state-of-the-art policies - from lightweight imitation-learning models like ACT to large vision-language-action models like π₀ and SmolVLA - all trainable, shareable, and deployable with the same handful of CLI commands.",
+   "tokens": []
+  },
+  {
+   "id": 4,
+   "kind": "para",
+   "start": 2986,
+   "end": 3129,
+   "text": "The goal: lower the barrier to entry for robotics, so that everyone can contribute to, and benefit from, shared datasets and pretrained models.",
+   "tokens": []
+  },
+  {
+   "id": 5,
+   "kind": "heading",
+   "start": 4004,
+   "end": 4019,
+   "text": "## How It Works",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "para",
+   "start": 4021,
+   "end": 4062,
+   "text": "**Teleoperate → Record → Train → Deploy**",
+   "tokens": []
+  },
+  {
+   "id": 7,
+   "kind": "list",
+   "start": 4064,
+   "end": 4188,
+   "text": "1. **Teleoperate** - control the robot yourself (with a leader arm, keyboard, or phone) so it can learn from your movements.",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "list",
+   "start": 4189,
+   "end": 4299,
+   "text": "2. **Record** - each demonstration is saved as a dataset: synchronized camera video plus the actions you took.",
+   "tokens": []
+  },
+  {
+   "id": 9,
+   "kind": "list",
+   "start": 4300,
+   "end": 4411,
+   "text": "3. **Train** - a policy (the neural network that will control the robot) learns to imitate your demonstrations.",
+   "tokens": []
+  },
+  {
+   "id": 10,
+   "kind": "list",
+   "start": 4412,
+   "end": 4506,
+   "text": "4. **Deploy** - run the trained policy on the robot and watch it complete the task on its own.",
+   "tokens": []
+  },
+  {
+   "id": 11,
+   "kind": "heading",
+   "start": 4508,
+   "end": 4522,
+   "text": "## Get Started",
+   "tokens": []
+  },
+  {
+   "id": 12,
+   "kind": "para",
+   "start": 4524,
+   "end": 4589,
+   "text": "New here? [Install LeRobot](⟦0⟧), then pick your path:",
+   "tokens": [
+    "./installation"
+   ]
+  },
+  {
+   "id": 13,
+   "kind": "para",
+   "start": 4648,
+   "end": 4780,
+   "text": "  ⟦0⟧\n    ⟦1⟧🔧 I have a robot⟦2⟧",
+   "tokens": [
+    "<div class=\"border dark:border-gray-700 rounded-lg p-4 shadow\">",
+    "<div class=\"text-lg font-semibold mb-2\">",
+    "</div>"
+   ]
+  },
+  {
+   "id": 14,
+   "kind": "para",
+   "start": 4781,
+   "end": 4915,
+   "text": "    ⟦0⟧\n      LeRobot supports a wide range of arms and mobile robots. Popular picks:",
+   "tokens": [
+    "<p class=\"text-gray-700 dark:text-gray-300 text-sm\">"
+   ]
+  },
+  {
+   "id": 15,
+   "kind": "para",
+   "start": 5003,
+   "end": 5079,
+   "text": "      ⟦0⟧\n        ⟦1⟧SO-101⟦2⟧ - our flagship, low-cost arm",
+   "tokens": [
+    "<li>",
+    "<a href=\"./so101\">",
+    "</a>"
+   ]
+  },
+  {
+   "id": 16,
+   "kind": "para",
+   "start": 5092,
+   "end": 5175,
+   "text": "      ⟦0⟧\n        ⟦1⟧LeKiwi⟦2⟧ - a mobile base with an arm on top",
+   "tokens": [
+    "<li>",
+    "<a href=\"./lekiwi\">",
+    "</a>"
+   ]
+  },
+  {
+   "id": 17,
+   "kind": "para",
+   "start": 5188,
+   "end": 5270,
+   "text": "      ⟦0⟧\n        ⟦1⟧Koch v1.1⟦2⟧ - a long-time community favorite",
+   "tokens": [
+    "<li>",
+    "<a href=\"./koch\">",
+    "</a>"
+   ]
+  },
+  {
+   "id": 18,
+   "kind": "para",
+   "start": 5283,
+   "end": 5360,
+   "text": "      ⟦0⟧\n        or find yours under ⟦1⟧Robots⟦2⟧ in the sidebar",
+   "tokens": [
+    "<li>",
+    "<strong>",
+    "</strong>"
+   ]
+  },
+  {
+   "id": 19,
+   "kind": "para",
+   "start": 5383,
+   "end": 5705,
+   "text": "    ⟦0⟧\n      Once it's assembled and calibrated, record a dataset and train your first\n      policy with the ⟦1⟧imitation learning tutorial⟦2⟧ - or\n      skip the CLI entirely with ⟦3⟧LeLab⟦4⟧, a browser GUI for\n      the same workflow.",
+   "tokens": [
+    "<p class=\"text-gray-700 dark:text-gray-300 text-sm\">",
+    "<a href=\"./il_robots\">",
+    "</a>",
+    "<a href=\"./lelab\">",
+    "</a>"
+   ]
+  },
+  {
+   "id": 20,
+   "kind": "para",
+   "start": 5724,
+   "end": 5857,
+   "text": "  ⟦0⟧\n    ⟦1⟧💻 No hardware yet⟦2⟧",
+   "tokens": [
+    "<div class=\"border dark:border-gray-700 rounded-lg p-4 shadow\">",
+    "<div class=\"text-lg font-semibold mb-2\">",
+    "</div>"
+   ]
+  },
+  {
+   "id": 21,
+   "kind": "para",
+   "start": 5858,
+   "end": 5986,
+   "text": "    ⟦0⟧\n      You can still train and evaluate policies without owning a robot:",
+   "tokens": [
+    "<p class=\"text-gray-700 dark:text-gray-300 text-sm\">"
+   ]
+  },
+  {
+   "id": 22,
+   "kind": "para",
+   "start": 6074,
+   "end": 6113,
+   "text": "      ⟦0⟧\n        train on an existing",
+   "tokens": [
+    "<li>"
+   ]
+  },
+  {
+   "id": 23,
+   "kind": "para",
+   "start": 6114,
+   "end": 6204,
+   "text": "        ⟦0⟧\n          LeRobot dataset",
+   "tokens": [
+    "<a href=\"https://huggingface.co/datasets?other=LeRobot\">"
+   ]
+  },
+  {
+   "id": 24,
+   "kind": "para",
+   "start": 6205,
+   "end": 6238,
+   "text": "        ⟦0⟧\n        from the Hub",
+   "tokens": [
+    "</a>"
+   ]
+  },
+  {
+   "id": 25,
+   "kind": "para",
+   "start": 6251,
+   "end": 6369,
+   "text": "      ⟦0⟧\n        evaluate in ⟦1⟧simulation⟦2⟧, against benchmarks like\n        LIBERO or Meta-World",
+   "tokens": [
+    "<li>",
+    "<a href=\"./envhub\">",
+    "</a>"
+   ]
+  },
+  {
+   "id": 26,
+   "kind": "para",
+   "start": 6382,
+   "end": 6484,
+   "text": "      ⟦0⟧\n        try the free ⟦1⟧Colab notebooks⟦2⟧ - nothing to\n        install",
+   "tokens": [
+    "<li>",
+    "<a href=\"./notebooks\">",
+    "</a>"
+   ]
+  },
+  {
+   "id": 27,
+   "kind": "para",
+   "start": 6516,
+   "end": 6654,
+   "text": "  ⟦0⟧\n    ⟦1⟧🤝 I want to contribute⟦2⟧",
+   "tokens": [
+    "<div class=\"border dark:border-gray-700 rounded-lg p-4 shadow\">",
+    "<div class=\"text-lg font-semibold mb-2\">",
+    "</div>"
+   ]
+  },
+  {
+   "id": 28,
+   "kind": "para",
+   "start": 6655,
+   "end": 6918,
+   "text": "    ⟦0⟧\n      Start with the ⟦1⟧Contributing guide⟦2⟧, then\n      ⟦3⟧add a new policy⟦4⟧ or\n      ⟦5⟧bring your own hardware⟦6⟧.",
+   "tokens": [
+    "<p class=\"text-gray-700 dark:text-gray-300 text-sm\">",
+    "<a href=\"./contributing\">",
+    "</a>",
+    "<a href=\"./bring_your_own_policies\">",
+    "</a>",
+    "<a href=\"./integrate_hardware\">",
+    "</a>"
+   ]
+  },
+  {
+   "id": 29,
+   "kind": "heading",
+   "start": 6945,
+   "end": 6964,
+   "text": "## Explore the Docs",
+   "tokens": []
+  },
+  {
+   "id": 30,
+   "kind": "para",
+   "start": 6966,
+   "end": 7204,
+   "text": "⟦0⟧\n  ⟦1⟧\n    ⟦2⟧📋 Cheat Sheet⟦3⟧",
+   "tokens": [
+    "<div class=\"grid grid-cols-1 md:grid-cols-3 gap-4 my-6\">",
+    "<a\n    class=\"!no-underline border dark:border-gray-700 rounded-lg p-4 shadow hover:shadow-lg\"\n    href=\"./cheat-sheet\"\n  >",
+    "<div class=\"font-semibold mb-1\">",
+    "</div>"
+   ]
+  },
+  {
+   "id": 31,
+   "kind": "para",
+   "start": 7205,
+   "end": 7312,
+   "text": "    ⟦0⟧\n      Every LeRobot CLI command, copy-paste ready.",
+   "tokens": [
+    "<p class=\"text-gray-700 dark:text-gray-300 text-sm\">"
+   ]
+  },
+  {
+   "id": 32,
+   "kind": "para",
+   "start": 7322,
+   "end": 7527,
+   "text": "  ⟦0⟧\n  ⟦1⟧\n    ⟦2⟧🖥️ Compute & Hardware Guide⟦3⟧",
+   "tokens": [
+    "</a>",
+    "<a\n    class=\"!no-underline border dark:border-gray-700 rounded-lg p-4 shadow hover:shadow-lg\"\n    href=\"./hardware_guide\"\n  >",
+    "<div class=\"font-semibold mb-1\">",
+    "</div>"
+   ]
+  },
+  {
+   "id": 33,
+   "kind": "para",
+   "start": 7528,
+   "end": 7647,
+   "text": "    ⟦0⟧\n      Which policy fits your GPU, and how long training takes.",
+   "tokens": [
+    "<p class=\"text-gray-700 dark:text-gray-300 text-sm\">"
+   ]
+  },
+  {
+   "id": 34,
+   "kind": "para",
+   "start": 7657,
+   "end": 7856,
+   "text": "  ⟦0⟧\n  ⟦1⟧\n    ⟦2⟧🗂️ LeRobotDataset⟦3⟧",
+   "tokens": [
+    "</a>",
+    "<a\n    class=\"!no-underline border dark:border-gray-700 rounded-lg p-4 shadow hover:shadow-lg\"\n    href=\"./lerobot-dataset-v3\"\n  >",
+    "<div class=\"font-semibold mb-1\">",
+    "</div>"
+   ]
+  },
+  {
+   "id": 35,
+   "kind": "para",
+   "start": 7857,
+   "end": 7976,
+   "text": "    ⟦0⟧\n      Load, stream, and visualize robot datasets from the Hub.",
+   "tokens": [
+    "<p class=\"text-gray-700 dark:text-gray-300 text-sm\">"
+   ]
+  },
+  {
+   "id": 36,
+   "kind": "para",
+   "start": 7986,
+   "end": 8162,
+   "text": "  ⟦0⟧\n  ⟦1⟧\n    ⟦2⟧🖼 LeLab⟦3⟧",
+   "tokens": [
+    "</a>",
+    "<a\n    class=\"!no-underline border dark:border-gray-700 rounded-lg p-4 shadow hover:shadow-lg\"\n    href=\"./lelab\"\n  >",
+    "<div class=\"font-semibold mb-1\">",
+    "</div>"
+   ]
+  },
+  {
+   "id": 37,
+   "kind": "para",
+   "start": 8163,
+   "end": 8299,
+   "text": "    ⟦0⟧\n      A browser GUI for calibrating, recording, and training - no CLI required.",
+   "tokens": [
+    "<p class=\"text-gray-700 dark:text-gray-300 text-sm\">"
+   ]
+  },
+  {
+   "id": 38,
+   "kind": "para",
+   "start": 8309,
+   "end": 8486,
+   "text": "  ⟦0⟧\n  ⟦1⟧\n    ⟦2⟧🧠 Policies⟦3⟧",
+   "tokens": [
+    "</a>",
+    "<a\n    class=\"!no-underline border dark:border-gray-700 rounded-lg p-4 shadow hover:shadow-lg\"\n    href=\"./act\"\n  >",
+    "<div class=\"font-semibold mb-1\">",
+    "</div>"
+   ]
+  },
+  {
+   "id": 39,
+   "kind": "para",
+   "start": 8487,
+   "end": 8650,
+   "text": "    ⟦0⟧\n      Start with ACT, our recommended first policy - or browse SmolVLA, π₀, and\n      more in the sidebar.",
+   "tokens": [
+    "<p class=\"text-gray-700 dark:text-gray-300 text-sm\">"
+   ]
+  },
+  {
+   "id": 40,
+   "kind": "para",
+   "start": 8660,
+   "end": 8855,
+   "text": "  ⟦0⟧\n  ⟦1⟧\n    ⟦2⟧🎮 Simulation & Benchmarks⟦3⟧",
+   "tokens": [
+    "</a>",
+    "<a\n    class=\"!no-underline border dark:border-gray-700 rounded-lg p-4 shadow hover:shadow-lg\"\n    href=\"./envhub\"\n  >",
+    "<div class=\"font-semibold mb-1\">",
+    "</div>"
+   ]
+  },
+  {
+   "id": 41,
+   "kind": "para",
+   "start": 8856,
+   "end": 9000,
+   "text": "    ⟦0⟧\n      Train and evaluate in simulated environments before touching real\n      hardware.",
+   "tokens": [
+    "<p class=\"text-gray-700 dark:text-gray-300 text-sm\">"
+   ]
+  },
+  {
+   "id": 42,
+   "kind": "heading",
+   "start": 9025,
+   "end": 9043,
+   "text": "## Common Problems",
+   "tokens": []
+  },
+  {
+   "id": 43,
+   "kind": "para",
+   "start": 9045,
+   "end": 9098,
+   "text": "Running into issues? A few of the most frequent ones:",
+   "tokens": []
+  },
+  {
+   "id": 44,
+   "kind": "list",
+   "start": 9100,
+   "end": 9216,
+   "text": "- **Blurry or unusable camera footage** - lighting matters more than resolution. See the [Cameras](⟦0⟧) guide.",
+   "tokens": [
+    "./cameras"
+   ]
+  },
+  {
+   "id": 45,
+   "kind": "list",
+   "start": 9217,
+   "end": 9367,
+   "text": "- **Build or install errors** (⟦0⟧, ⟦1⟧, CUDA) - see the Troubleshooting section of the [Installation guide](⟦2⟧).",
+   "tokens": [
+    "`cmake`",
+    "`ffmpeg`",
+    "./installation#troubleshooting"
+   ]
+  },
+  {
+   "id": 46,
+   "kind": "list",
+   "start": 9368,
+   "end": 9467,
+   "text": "- **Not sure which policy fits your GPU** - check the [Compute & Hardware Guide](⟦0⟧).",
+   "tokens": [
+    "./hardware_guide"
+   ]
+  },
+  {
+   "id": 47,
+   "kind": "list",
+   "start": 9468,
+   "end": 9591,
+   "text": "- **Still stuck?** Ask on [Discord](⟦0⟧) - the community (and the LeRobot team) is there to help.",
+   "tokens": [
+    "https://discord.gg/s3KuuzsPFb"
+   ]
+  }
+ ]
+}

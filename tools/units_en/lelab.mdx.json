@@ -1,0 +1,136 @@
+{
+ "file": "lelab.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1947,
+   "text": "# LeLab - LeRobot Guide",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1949,
+   "end": 2516,
+   "text": "LeLab is a graphical user interface built on top of the LeRobot library, designed to make robotics accessible without needing to memorize CLI commands. From a single app you can configure your robot, teleoperate it, collect datasets, train policies locally or on cloud GPUs via HF Jobs, and deploy trained models back onto your robot. It's the easiest way to go from an unboxed SO-101 to a working policy, and a great companion for anyone learning the LeRobot workflow. Source code and issues live on GitHub: [huggingface/leLab](⟦0⟧).",
+   "tokens": [
+    "https://github.com/huggingface/leLab"
+   ]
+  },
+  {
+   "id": 2,
+   "kind": "quote",
+   "start": 2518,
+   "end": 2576,
+   "text": "> [!TIP]\n> For now LeLab is compatible only with SO-ARM101",
+   "tokens": []
+  },
+  {
+   "id": 3,
+   "kind": "heading",
+   "start": 2608,
+   "end": 2624,
+   "text": "### Installation",
+   "tokens": []
+  },
+  {
+   "id": 4,
+   "kind": "para",
+   "start": 2626,
+   "end": 2734,
+   "text": "Requires [⟦0⟧](⟦1⟧). Install and launch in one command:",
+   "tokens": [
+    "`uv`",
+    "https://docs.astral.sh/uv/getting-started/installation/"
+   ]
+  },
+  {
+   "id": 5,
+   "kind": "para",
+   "start": 2815,
+   "end": 2886,
+   "text": "After install, run ⟦0⟧ from your terminal anytime to start the app.",
+   "tokens": [
+    "`lelab`"
+   ]
+  },
+  {
+   "id": 6,
+   "kind": "heading",
+   "start": 2888,
+   "end": 2900,
+   "text": "### Features",
+   "tokens": []
+  },
+  {
+   "id": 7,
+   "kind": "list",
+   "start": 2902,
+   "end": 3022,
+   "text": "- **Add robots** — Select arm type (leader/follower), calibrate each joint from the middle position, and attach cameras.",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "list",
+   "start": 3023,
+   "end": 3130,
+   "text": "- **Teleoperation** — Control the follower arm with the leader and see a live 3D visualization of the arms.",
+   "tokens": []
+  },
+  {
+   "id": 9,
+   "kind": "list",
+   "start": 3131,
+   "end": 3302,
+   "text": "- **Dataset recording** — Define a task description, number of episodes, and episode/reset durations. Press spacebar to advance between episodes. 30+ episodes recommended.",
+   "tokens": []
+  },
+  {
+   "id": 10,
+   "kind": "list",
+   "start": 3303,
+   "end": 3435,
+   "text": "- **Local training** — Train a policy directly on your own machine with a selected dataset, policy type, batch size, and step count.",
+   "tokens": []
+  },
+  {
+   "id": 11,
+   "kind": "list",
+   "start": 3436,
+   "end": 3694,
+   "text": "- **Cloud training with HF Jobs** — Train on powerful GPUs via [HF Jobs](⟦0⟧) with transparent pricing. Run ⟦1⟧ first. See the [Compute HW Guide](⟦2⟧) for hardware/batch size tips.",
+   "tokens": [
+    "https://huggingface.co/docs/huggingface_hub/en/guides/jobs",
+    "`hf auth login`",
+    "hardware_guide"
+   ]
+  },
+  {
+   "id": 12,
+   "kind": "list",
+   "start": 3695,
+   "end": 3795,
+   "text": "- **Training visualization** — Watch progress live in the app, with checkpoints saved automatically.",
+   "tokens": []
+  },
+  {
+   "id": 13,
+   "kind": "list",
+   "start": 3796,
+   "end": 3907,
+   "text": "- **Run trained policies** — Pick any model from your jobs list and run inference on your robot with one click.",
+   "tokens": []
+  },
+  {
+   "id": 14,
+   "kind": "list",
+   "start": 3908,
+   "end": 4023,
+   "text": "- **Use community datasets** — Provide any Hugging Face dataset ID to train on datasets you didn't record yourself.",
+   "tokens": []
+  }
+ ]
+}

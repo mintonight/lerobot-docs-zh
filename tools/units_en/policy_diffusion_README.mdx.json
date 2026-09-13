@@ -1,0 +1,57 @@
+{
+ "file": "policy_diffusion_README.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1784,
+   "end": 1792,
+   "text": "## Paper",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "heading",
+   "start": 1836,
+   "end": 1847,
+   "text": "## Training",
+   "tokens": []
+  },
+  {
+   "id": 2,
+   "kind": "para",
+   "start": 1849,
+   "end": 2053,
+   "text": "The reference implementation maintains an exponential moving average (EMA) of the policy weights during training and evaluates the EMA weights. To reproduce this behavior, enable the trainer's EMA shadow:",
+   "tokens": []
+  },
+  {
+   "id": 3,
+   "kind": "para",
+   "start": 2140,
+   "end": 2252,
+   "text": "Checkpoints then contain a directly loadable copy of the EMA weights next to the live ones, e.g. for evaluation:",
+   "tokens": []
+  },
+  {
+   "id": 4,
+   "kind": "para",
+   "start": 2354,
+   "end": 2587,
+   "text": "The EMA decay schedule (⟦0⟧, ⟦1⟧, ...) defaults to the reference implementation's values. For a constant decay instead of the warmup schedule (e.g. to match openpi's pi0/pi05 training), set ⟦2⟧.",
+   "tokens": [
+    "`--ema.inv_gamma`",
+    "`--ema.power`",
+    "`--ema.decay=0.99`"
+   ]
+  },
+  {
+   "id": 5,
+   "kind": "heading",
+   "start": 2589,
+   "end": 2600,
+   "text": "## Citation",
+   "tokens": []
+  }
+ ]
+}

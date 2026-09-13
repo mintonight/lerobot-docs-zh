@@ -1,0 +1,263 @@
+<script lang="ts">
+import {onMount} from "svelte";
+import Tip from "$lib/Tip.svelte";
+import CopyLLMTxtMenu from "$lib/CopyLLMTxtMenu.svelte";
+import Youtube from "$lib/Youtube.svelte";
+import Docstring from "$lib/Docstring.svelte";
+import CodeBlock from "$lib/CodeBlock.svelte";
+import CodeBlockFw from "$lib/CodeBlockFw.svelte";
+import DocNotebookDropdown from "$lib/DocNotebookDropdown.svelte";
+import CourseFloatingBanner from "$lib/CourseFloatingBanner.svelte";
+import IconCopyLink from "$lib/IconCopyLink.svelte";
+import FrameworkContent from "$lib/FrameworkContent.svelte";
+import Markdown from "$lib/Markdown.svelte";
+import Question from "$lib/Question.svelte";
+import FrameworkSwitchCourse from "$lib/FrameworkSwitchCourse.svelte";
+import InferenceApi from "$lib/InferenceApi.svelte";
+import TokenizersLanguageContent from "$lib/TokenizersLanguageContent.svelte";
+import ExampleCodeBlock from "$lib/ExampleCodeBlock.svelte";
+import Added from "$lib/Added.svelte";
+import Changed from "$lib/Changed.svelte";
+import Deprecated from "$lib/Deprecated.svelte";
+import PipelineIcon from "$lib/PipelineIcon.svelte";
+import PipelineTag from "$lib/PipelineTag.svelte";
+import Heading from "$lib/Heading.svelte";
+import HfOptions from "$lib/HfOptions.svelte";
+import HfOption from "$lib/HfOption.svelte";
+import EditOnGithub from "$lib/EditOnGithub.svelte";
+import InferenceSnippet from "$lib/InferenceSnippet/InferenceSnippet.svelte";
+import MermaidChart from "$lib/MermaidChart.svelte";
+let fw: "pt" | "tf" = "pt";
+onMount(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    fw = urlParams.get("fw") || "pt";
+});
+</script>
+<svelte:head>
+  <meta name="hf:doc:metadata" content={metadata} >
+</svelte:head>
+
+<!--HF DOCBUILD BODY START-->
+
+HF_DOC_BODY_START
+
+<CopyLLMTxtMenu containerStyle="float: right; margin-left: 10px; display: inline-flex; position: relative; z-index: 10;"></CopyLLMTxtMenu>
+
+# 工具
+
+LeRobot v3.1 支持 policy 中的**工具调用**——助手消息可以
+发出诸如 `say(text="OK, starting now")` 之类的结构化调用，运行时
+会将其分派给真实的实现（TTS、控制器、日志记录器等…）。
+
+本页涵盖：
+
+1. 工具目录存放的位置。
+2. 标注流水线如何生成工具调用原子。
+3. 如何添加你自己的工具。
+
+## 工具在哪里声明
+
+分为两层。
+
+**目录**——一组 OpenAI 风格函数模式组成的列表——位于
+每个 dataset 的 `meta/info.json["tools"]`。示例：
+
+```json
+{
+  "features": { "...": "..." },
+  "tools": [
+    {
+      "type": "function",
+      "function": {
+        "name": "say",
+        "description": "Speak a short utterance to the user via the TTS executor.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "text": {
+              "type": "string",
+              "description": "The verbatim text to speak."
+            }
+          },
+          "required": ["text"]
+        }
+      }
+    }
+  ]
+}
+```
+
+通过 dataset 元数据访问器读取：
+
+```python
+from lerobot.datasets.dataset_metadata import LeRobotDatasetMetadata
+
+meta = LeRobotDatasetMetadata(repo_id="pepijn/super_poulain_final_annotations")
+tools = meta.tools     # list[dict] — OpenAI tool schemas
+```
+
+如果 dataset 的 `info.json` 没有声明任何工具，`meta.tools`
+会从 `lerobot.datasets.language` 返回 `DEFAULT_TOOLS`——目前是一个
+包含规范 `say` 模式的单条目列表。因此，未标注的
+dataset 和聊天模板消费者无需任何
+配置即可继续工作：
+
+```python
+prompt_str = tokenizer.apply_chat_template(
+    sample["messages"],
+    tools=meta.tools,                 # works either way
+    add_generation_prompt=False,
+    tokenize=False,
+)
+```
+
+**实现**——可运行的 Python——将位于
+`src/lerobot/tools/` 之下，每个工具一个文件。运行时调度器和
+规范 `say` 实现（封装了 Kyutai 的 pocket-tts）不属于
+本文描述的目录层；目前这一层只提供
+模式存储和 `DEFAULT_TOOLS` 回退常量。
+
+## 按行工具_调用_
+
+上面的目录描述了_可以调用什么_。实际的_调用_——
+函数名加上参数值——按行存储在
+`language_events` 中的助手原子（assistant atoms）上：
+
+```python
+{
+  "role": "assistant",
+  "content": null,
+  "style": null,
+  "timestamp": 12.4,
+  "camera": null,
+  "tool_calls": [
+    { "type": "function",
+      "function": { "name": "say", "arguments": { "text": "On it." } } }
+  ]
+}
+```
+
+配方（Recipes）通过 `tool_calls_from` 将这些拼接进渲染后的消息中：
+
+```yaml
+user_interjection_response:
+  bindings:
+    speech: "emitted_at(t, role=assistant, tool_name=say)"
+  messages:
+    - { role: user, content: "${task}", stream: high_level }
+    - {
+        role: assistant,
+        content: "${current_plan}",
+        stream: high_level,
+        target: true,
+        tool_calls_from: speech,
+      }
+```
+
+模型的训练目标是一个助手 episode，它同时携带
+计划文本_和_`say` 工具调用。inference 时，运行时会将
+生成文本解析回结构化的 `tool_calls`，并分派给
+匹配的实现。
+
+## 如何添加你自己的工具
+
+> **注意：** 下面的步骤 2 和 3 描述的是运行时层
+>（`src/lerobot/tools/`、`Tool` 协议、`TOOL_REGISTRY`、
+> `get_tools(meta)`），它不属于当前已交付的目录层——
+> 这些模块在代码树中尚不存在。仅步骤 1 就足以
+> 通过 `meta.tools` 让工具对聊天模板可见，
+> 从而使模型学会_生成_该调用；
+> 在 inference 时执行该调用需要运行时层。
+
+分为三个步骤。具体示例：一个 policy 可以调用的 `record_observation` 工具，
+用于在常规控制循环之外捕获额外的 observation。
+
+### 步骤 1——声明模式
+
+在 `meta/info.json["tools"]` 下添加一个条目。既可以_在_
+运行标注流水线_之前_直接编辑磁盘上的文件（它会被
+保留），也可以通过配置标志将其交给 `lerobot-annotate`。
+
+```json
+{
+  "tools": [
+    { "type": "function", "function": { "name": "say", "...": "..." } },
+    {
+      "type": "function",
+      "function": {
+        "name": "record_observation",
+        "description": "Capture a high-resolution still image for the user.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "label": {
+              "type": "string",
+              "description": "Short label for the saved image."
+            }
+          },
+          "required": ["label"]
+        }
+      }
+    }
+  ]
+}
+```
+
+该模式完全遵循 OpenAI 的函数调用约定，因此
+聊天模板可以原生渲染它。
+
+### 步骤 2——实现调用
+
+创建 `src/lerobot/tools/record_observation.py`：
+
+```python
+from .base import Tool
+from typing import Any
+
+RECORD_OBSERVATION_SCHEMA: dict[str, Any] = { "...": "..." }   # mirrors the JSON above
+
+
+class RecordObservationTool:
+    name = "record_observation"
+    schema = RECORD_OBSERVATION_SCHEMA
+
+    def __init__(self, schema: dict | None = None, output_dir: str = "."):
+        self.output_dir = output_dir
+
+    def call(self, arguments: dict) -> str:
+        label = arguments["label"]
+        # ... save the latest camera frame to <output_dir>/<label>.png ...
+        return f"saved {label}.png"
+```
+
+每个工具一个文件可保持依赖隔离——`record_observation`
+可能会引入 `pillow`，而 `say` 会引入 `pocket-tts`。只安装
+所需工具的用户可以避免沉重的传递依赖。
+
+### 步骤 3——注册它
+
+添加到 `src/lerobot/tools/registry.py`：
+
+```python
+from .record_observation import RecordObservationTool
+
+TOOL_REGISTRY["record_observation"] = RecordObservationTool
+```
+
+就是这样。运行时 `get_tools(meta)` 会在
+`meta.tools` 中查找每个模式，实例化匹配的已注册类，并返回
+一个名称 → 实例字典，供调度器路由使用。
+
+如果你想_在不_编写实现的情况下使用某个工具（例如仅用于
+训练时的聊天模板格式化），仅步骤 1 就够了——
+模型仍会学会_生成_该调用。步骤 2 和 3 仅用于
+在 inference 时真正_执行_它。
+
+
+
+<EditOnGithub source="https://github.com/huggingface/lerobot/blob/main/docs/source/tools.mdx" />
+
+<!--HF DOCBUILD BODY END-->
+
+HF_DOC_BODY_END
+

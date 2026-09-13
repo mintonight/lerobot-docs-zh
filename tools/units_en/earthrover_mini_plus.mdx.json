@@ -1,0 +1,735 @@
+{
+ "file": "earthrover_mini_plus.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1946,
+   "text": "# EarthRover Mini Plus",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 2159,
+   "end": 2352,
+   "text": "The EarthRover Mini Plus is a fully open source mobile robot that connects through the cloud using the Frodobots SDK. This lets you control the robot and record datasets for training AI models.",
+   "tokens": []
+  },
+  {
+   "id": 2,
+   "kind": "heading",
+   "start": 2354,
+   "end": 2370,
+   "text": "## What You Need",
+   "tokens": []
+  },
+  {
+   "id": 3,
+   "kind": "heading",
+   "start": 2372,
+   "end": 2384,
+   "text": "### Hardware",
+   "tokens": []
+  },
+  {
+   "id": 4,
+   "kind": "list",
+   "start": 2386,
+   "end": 2409,
+   "text": "- EarthRover Mini robot",
+   "tokens": []
+  },
+  {
+   "id": 5,
+   "kind": "list",
+   "start": 2410,
+   "end": 2446,
+   "text": "- Computer with Python 3.12 or newer",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "list",
+   "start": 2447,
+   "end": 2468,
+   "text": "- Internet connection",
+   "tokens": []
+  },
+  {
+   "id": 7,
+   "kind": "heading",
+   "start": 2470,
+   "end": 2502,
+   "text": "### Setting Up the Frodobots SDK",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "para",
+   "start": 2504,
+   "end": 2628,
+   "text": "The robot needs the [Frodobots SDK](⟦0⟧) running on your computer. Here's how:",
+   "tokens": [
+    "https://github.com/frodobots-org/earth-rovers-sdk"
+   ]
+  },
+  {
+   "id": 9,
+   "kind": "list",
+   "start": 2630,
+   "end": 2662,
+   "text": "1. Download and install the SDK:",
+   "tokens": []
+  },
+  {
+   "id": 10,
+   "kind": "list",
+   "start": 2793,
+   "end": 2813,
+   "text": "2. Save Credentials:",
+   "tokens": []
+  },
+  {
+   "id": 11,
+   "kind": "para",
+   "start": 2815,
+   "end": 2906,
+   "text": "Write your .env variables with the SDK API key and bot name provided by the Frodobots team.",
+   "tokens": []
+  },
+  {
+   "id": 12,
+   "kind": "list",
+   "start": 3424,
+   "end": 3441,
+   "text": "3. Start the SDK:",
+   "tokens": []
+  },
+  {
+   "id": 13,
+   "kind": "list",
+   "start": 3484,
+   "end": 3561,
+   "text": "4. Open your web browser and go to ⟦0⟧, then click \"Join\"",
+   "tokens": [
+    "`http://localhost:8000`"
+   ]
+  },
+  {
+   "id": 14,
+   "kind": "para",
+   "start": 3563,
+   "end": 3581,
+   "text": "The SDK gives you:",
+   "tokens": []
+  },
+  {
+   "id": 15,
+   "kind": "list",
+   "start": 3583,
+   "end": 3623,
+   "text": "- Live video from front and rear cameras",
+   "tokens": []
+  },
+  {
+   "id": 16,
+   "kind": "quote",
+   "start": 3625,
+   "end": 3695,
+   "text": "> [!IMPORTANT]\n> The SDK must be running before you can use the robot.",
+   "tokens": []
+  },
+  {
+   "id": 17,
+   "kind": "heading",
+   "start": 3697,
+   "end": 3715,
+   "text": "## Install LeRobot",
+   "tokens": []
+  },
+  {
+   "id": 18,
+   "kind": "para",
+   "start": 3717,
+   "end": 3784,
+   "text": "Follow our [Installation Guide](⟦0⟧) to install LeRobot.",
+   "tokens": [
+    "./installation"
+   ]
+  },
+  {
+   "id": 19,
+   "kind": "para",
+   "start": 3786,
+   "end": 3879,
+   "text": "In addition to the base installation, install the EarthRover Mini with hardware dependencies:",
+   "tokens": []
+  },
+  {
+   "id": 20,
+   "kind": "heading",
+   "start": 3923,
+   "end": 3938,
+   "text": "## How It Works",
+   "tokens": []
+  },
+  {
+   "id": 21,
+   "kind": "para",
+   "start": 3940,
+   "end": 3983,
+   "text": "The robot uses the internet to communicate:",
+   "tokens": []
+  },
+  {
+   "id": 22,
+   "kind": "list",
+   "start": 3985,
+   "end": 4030,
+   "text": "- **Movement commands**: Sent through the SDK",
+   "tokens": []
+  },
+  {
+   "id": 23,
+   "kind": "list",
+   "start": 4031,
+   "end": 4072,
+   "text": "- **Camera video**: Received from the SDK",
+   "tokens": []
+  },
+  {
+   "id": 24,
+   "kind": "list",
+   "start": 4073,
+   "end": 4128,
+   "text": "- **Robot info**: Battery, location, speed from the SDK",
+   "tokens": []
+  },
+  {
+   "id": 25,
+   "kind": "para",
+   "start": 4130,
+   "end": 4196,
+   "text": "You don't need to plug anything in - it all works through the SDK.",
+   "tokens": []
+  },
+  {
+   "id": 26,
+   "kind": "heading",
+   "start": 4198,
+   "end": 4212,
+   "text": "## Calibration",
+   "tokens": []
+  },
+  {
+   "id": 27,
+   "kind": "para",
+   "start": 4214,
+   "end": 4293,
+   "text": "No calibration needed! The robot is ready to use as soon as the SDK is running.",
+   "tokens": []
+  },
+  {
+   "id": 28,
+   "kind": "heading",
+   "start": 4295,
+   "end": 4319,
+   "text": "## Controlling the Robot",
+   "tokens": []
+  },
+  {
+   "id": 29,
+   "kind": "para",
+   "start": 4321,
+   "end": 4411,
+   "text": "You control the robot using your keyboard - just like playing a video game with WASD keys.",
+   "tokens": []
+  },
+  {
+   "id": 30,
+   "kind": "heading",
+   "start": 4413,
+   "end": 4434,
+   "text": "### Keyboard Controls",
+   "tokens": []
+  },
+  {
+   "id": 31,
+   "kind": "table",
+   "start": 4436,
+   "end": 4478,
+   "text": "| Key | Action                           |",
+   "tokens": []
+  },
+  {
+   "id": 32,
+   "kind": "table",
+   "start": 4522,
+   "end": 4564,
+   "text": "| W   | Move forward                     |",
+   "tokens": []
+  },
+  {
+   "id": 33,
+   "kind": "table",
+   "start": 4565,
+   "end": 4607,
+   "text": "| S   | Move backward                    |",
+   "tokens": []
+  },
+  {
+   "id": 34,
+   "kind": "table",
+   "start": 4608,
+   "end": 4650,
+   "text": "| A   | Turn left (with forward motion)  |",
+   "tokens": []
+  },
+  {
+   "id": 35,
+   "kind": "table",
+   "start": 4651,
+   "end": 4693,
+   "text": "| D   | Turn right (with forward motion) |",
+   "tokens": []
+  },
+  {
+   "id": 36,
+   "kind": "table",
+   "start": 4694,
+   "end": 4736,
+   "text": "| Q   | Rotate left in place             |",
+   "tokens": []
+  },
+  {
+   "id": 37,
+   "kind": "table",
+   "start": 4737,
+   "end": 4779,
+   "text": "| E   | Rotate right in place            |",
+   "tokens": []
+  },
+  {
+   "id": 38,
+   "kind": "table",
+   "start": 4780,
+   "end": 4822,
+   "text": "| X   | Stop all movement                |",
+   "tokens": []
+  },
+  {
+   "id": 39,
+   "kind": "table",
+   "start": 4823,
+   "end": 4865,
+   "text": "| +/= | Increase speed                   |",
+   "tokens": []
+  },
+  {
+   "id": 40,
+   "kind": "table",
+   "start": 4866,
+   "end": 4908,
+   "text": "| -   | Decrease speed                   |",
+   "tokens": []
+  },
+  {
+   "id": 41,
+   "kind": "table",
+   "start": 4909,
+   "end": 4951,
+   "text": "| ESC | Disconnect                       |",
+   "tokens": []
+  },
+  {
+   "id": 42,
+   "kind": "heading",
+   "start": 4953,
+   "end": 4971,
+   "text": "### Speed Settings",
+   "tokens": []
+  },
+  {
+   "id": 43,
+   "kind": "para",
+   "start": 4973,
+   "end": 5013,
+   "text": "You can adjust how fast the robot moves:",
+   "tokens": []
+  },
+  {
+   "id": 44,
+   "kind": "list",
+   "start": 5015,
+   "end": 5072,
+   "text": "- **Forward/backward speed**: Default is full speed (1.0)",
+   "tokens": []
+  },
+  {
+   "id": 45,
+   "kind": "list",
+   "start": 5073,
+   "end": 5121,
+   "text": "- **Turning speed**: Default is full speed (1.0)",
+   "tokens": []
+  },
+  {
+   "id": 46,
+   "kind": "list",
+   "start": 5122,
+   "end": 5182,
+   "text": "- **Speed changes**: Use +/- keys to adjust by 0.1 each time",
+   "tokens": []
+  },
+  {
+   "id": 47,
+   "kind": "heading",
+   "start": 5184,
+   "end": 5198,
+   "text": "### Try It Out",
+   "tokens": []
+  },
+  {
+   "id": 48,
+   "kind": "para",
+   "start": 5200,
+   "end": 5245,
+   "text": "Test driving the robot before recording data:",
+   "tokens": []
+  },
+  {
+   "id": 49,
+   "kind": "quote",
+   "start": 5999,
+   "end": 6215,
+   "text": "> [!TIP]\n> If you're using a Mac, you might need to give Terminal permission to access your keyboard for teleoperation. Go to System Preferences > Security & Privacy > Input Monitoring and check the box for Terminal.",
+   "tokens": []
+  },
+  {
+   "id": 50,
+   "kind": "heading",
+   "start": 6217,
+   "end": 6234,
+   "text": "## Recording Data",
+   "tokens": []
+  },
+  {
+   "id": 51,
+   "kind": "para",
+   "start": 6236,
+   "end": 6339,
+   "text": "Once you can drive the robot well, you can start recording data to train AI models. The system records:",
+   "tokens": []
+  },
+  {
+   "id": 52,
+   "kind": "list",
+   "start": 6341,
+   "end": 6411,
+   "text": "- **What you do**: How you move the robot (forward, backward, turning)",
+   "tokens": []
+  },
+  {
+   "id": 53,
+   "kind": "list",
+   "start": 6412,
+   "end": 6438,
+   "text": "- **What the robot sees**:",
+   "tokens": []
+  },
+  {
+   "id": 54,
+   "kind": "list",
+   "start": 6439,
+   "end": 6467,
+   "text": "  - Videos from both cameras",
+   "tokens": []
+  },
+  {
+   "id": 55,
+   "kind": "list",
+   "start": 6468,
+   "end": 6497,
+   "text": "  - Robot speed and direction",
+   "tokens": []
+  },
+  {
+   "id": 56,
+   "kind": "list",
+   "start": 6498,
+   "end": 6528,
+   "text": "  - Battery level and location",
+   "tokens": []
+  },
+  {
+   "id": 57,
+   "kind": "list",
+   "start": 6529,
+   "end": 6556,
+   "text": "  - GPS position and signal",
+   "tokens": []
+  },
+  {
+   "id": 58,
+   "kind": "list",
+   "start": 6557,
+   "end": 6578,
+   "text": "  - Other sensor data",
+   "tokens": []
+  },
+  {
+   "id": 59,
+   "kind": "list",
+   "start": 6579,
+   "end": 6628,
+   "text": "- **When it happened**: Timestamps for everything",
+   "tokens": []
+  },
+  {
+   "id": 60,
+   "kind": "heading",
+   "start": 6630,
+   "end": 6657,
+   "text": "### Setting Up Hugging Face",
+   "tokens": []
+  },
+  {
+   "id": 61,
+   "kind": "para",
+   "start": 6659,
+   "end": 6805,
+   "text": "We use Hugging Face to store your data online. First, log in with your token from [Hugging Face settings](⟦0⟧):",
+   "tokens": [
+    "https://huggingface.co/settings/tokens"
+   ]
+  },
+  {
+   "id": 62,
+   "kind": "para",
+   "start": 6887,
+   "end": 6920,
+   "text": "Store your Hugging Face username:",
+   "tokens": []
+  },
+  {
+   "id": 63,
+   "kind": "heading",
+   "start": 7008,
+   "end": 7027,
+   "text": "### Start Recording",
+   "tokens": []
+  },
+  {
+   "id": 64,
+   "kind": "para",
+   "start": 7029,
+   "end": 7064,
+   "text": "Use the standard recording command:",
+   "tokens": []
+  },
+  {
+   "id": 65,
+   "kind": "para",
+   "start": 7476,
+   "end": 7573,
+   "text": "Replace ⟦0⟧ with your Hugging Face username and a name for your dataset.",
+   "tokens": [
+    "`your_username/dataset_name`"
+   ]
+  },
+  {
+   "id": 66,
+   "kind": "heading",
+   "start": 7575,
+   "end": 7594,
+   "text": "### What Gets Saved",
+   "tokens": []
+  },
+  {
+   "id": 67,
+   "kind": "para",
+   "start": 7596,
+   "end": 7618,
+   "text": "Your dataset includes:",
+   "tokens": []
+  },
+  {
+   "id": 68,
+   "kind": "para",
+   "start": 7620,
+   "end": 7650,
+   "text": "**Your Actions (2 features)**:",
+   "tokens": []
+  },
+  {
+   "id": 69,
+   "kind": "list",
+   "start": 7652,
+   "end": 7708,
+   "text": "- ⟦0⟧: How much you moved forward/backward",
+   "tokens": [
+    "`linear_velocity`"
+   ]
+  },
+  {
+   "id": 70,
+   "kind": "list",
+   "start": 7709,
+   "end": 7761,
+   "text": "- ⟦0⟧: How much you turned left/right",
+   "tokens": [
+    "`angular_velocity`"
+   ]
+  },
+  {
+   "id": 71,
+   "kind": "para",
+   "start": 7763,
+   "end": 7800,
+   "text": "**Robot Observations (24 features)**:",
+   "tokens": []
+  },
+  {
+   "id": 72,
+   "kind": "list",
+   "start": 7802,
+   "end": 7822,
+   "text": "- Front camera video",
+   "tokens": []
+  },
+  {
+   "id": 73,
+   "kind": "list",
+   "start": 7823,
+   "end": 7842,
+   "text": "- Rear camera video",
+   "tokens": []
+  },
+  {
+   "id": 74,
+   "kind": "list",
+   "start": 7843,
+   "end": 7858,
+   "text": "- Current speed",
+   "tokens": []
+  },
+  {
+   "id": 75,
+   "kind": "list",
+   "start": 7859,
+   "end": 7874,
+   "text": "- Battery level",
+   "tokens": []
+  },
+  {
+   "id": 76,
+   "kind": "list",
+   "start": 7875,
+   "end": 7888,
+   "text": "- Orientation",
+   "tokens": []
+  },
+  {
+   "id": 77,
+   "kind": "list",
+   "start": 7889,
+   "end": 7933,
+   "text": "- GPS (latitude, longitude, signal strength)",
+   "tokens": []
+  },
+  {
+   "id": 78,
+   "kind": "list",
+   "start": 7934,
+   "end": 7959,
+   "text": "- Network signal strength",
+   "tokens": []
+  },
+  {
+   "id": 79,
+   "kind": "list",
+   "start": 7960,
+   "end": 7977,
+   "text": "- Vibration level",
+   "tokens": []
+  },
+  {
+   "id": 80,
+   "kind": "list",
+   "start": 7978,
+   "end": 7999,
+   "text": "- Lamp state (on/off)",
+   "tokens": []
+  },
+  {
+   "id": 81,
+   "kind": "list",
+   "start": 8000,
+   "end": 8025,
+   "text": "- Accelerometer (x, y, z)",
+   "tokens": []
+  },
+  {
+   "id": 82,
+   "kind": "list",
+   "start": 8026,
+   "end": 8047,
+   "text": "- Gyroscope (x, y, z)",
+   "tokens": []
+  },
+  {
+   "id": 83,
+   "kind": "list",
+   "start": 8048,
+   "end": 8072,
+   "text": "- Magnetometer (x, y, z)",
+   "tokens": []
+  },
+  {
+   "id": 84,
+   "kind": "list",
+   "start": 8073,
+   "end": 8096,
+   "text": "- Wheel RPMs (4 wheels)",
+   "tokens": []
+  },
+  {
+   "id": 85,
+   "kind": "heading",
+   "start": 8098,
+   "end": 8122,
+   "text": "### Where Your Data Goes",
+   "tokens": []
+  },
+  {
+   "id": 86,
+   "kind": "para",
+   "start": 8124,
+   "end": 8182,
+   "text": "On your computer: ⟦0⟧",
+   "tokens": [
+    "`~/.cache/huggingface/lerobot/{repo-id}`"
+   ]
+  },
+  {
+   "id": 87,
+   "kind": "para",
+   "start": 8184,
+   "end": 8259,
+   "text": "After recording, your data automatically uploads to your Hugging Face page:",
+   "tokens": []
+  },
+  {
+   "id": 88,
+   "kind": "para",
+   "start": 8344,
+   "end": 8411,
+   "text": "Your dataset will be tagged with ⟦0⟧ for community discovery.",
+   "tokens": [
+    "`LeRobot`"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,1142 @@
+{
+ "file": "molmoact2.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1942,
+   "text": "# MolmoAct2 Policy",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1944,
+   "end": 2164,
+   "text": "MolmoAct2 is the LeRobot policy implementation of\n[MolmoAct2](⟦0⟧), ported into the LeRobot\ntraining, evaluation, checkpointing, and dataset interfaces for easier use with\nLeRobot datasets.",
+   "tokens": [
+    "https://allenai.org/blog/molmoact2"
+   ]
+  },
+  {
+   "id": 2,
+   "kind": "para",
+   "start": 2166,
+   "end": 2363,
+   "text": "This implementation currently supports training and evaluation for the regular\nMolmoAct2 model. MolmoAct2-Think, which supports adaptive depth reasoning, is\nnot included in this LeRobot policy yet.",
+   "tokens": []
+  },
+  {
+   "id": 3,
+   "kind": "para",
+   "start": 2365,
+   "end": 2516,
+   "text": "For the original MolmoAct2 training code used for the experiments reported in\nthe paper, see [allenai/molmoact2](⟦0⟧).",
+   "tokens": [
+    "https://github.com/allenai/molmoact2"
+   ]
+  },
+  {
+   "id": 4,
+   "kind": "heading",
+   "start": 2518,
+   "end": 2546,
+   "text": "## Installation Requirements",
+   "tokens": []
+  },
+  {
+   "id": 5,
+   "kind": "para",
+   "start": 2548,
+   "end": 2605,
+   "text": "Install LeRobot with the MolmoAct2 optional dependencies:",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "para",
+   "start": 2655,
+   "end": 3097,
+   "text": "To run the models in this repository, you need an NVIDIA GPU. The current\nmixed-precision path stores the complete action expert in fp32 and the large VLM\nmatrices in bf16. ⟦0⟧ optionally compiles the action\nexpert blocks while leaving the VLM, vision tower, connector, and policy wrapper\neager. This boundary passed same-start output, gradient, and optimizer-update\nparity checks; compiling the bf16 VLM path did not.",
+   "tokens": [
+    "`policy.compile_model=true`"
+   ]
+  },
+  {
+   "id": 7,
+   "kind": "para",
+   "start": 3099,
+   "end": 3630,
+   "text": "Multi-GPU training through ⟦0⟧ increases throughput and global batch\nsize. This path has been exercised on two-node, eight-GPU GB200 runs, but this\nLeRobot port does not expose the original MolmoAct2 ⟦1⟧\nmodel-parallel training path. A one-GPU GB200 replay with two real prompt widths\nproduced one compiled action graph with no graph breaks, the same 55.15 GiB peak\nmemory as eager execution, and a modest steady-state speedup. Treat these as\nimplementation checks rather than portable throughput or ETA claims.",
+   "tokens": [
+    "`accelerate`",
+    "`fsdp_devices`"
+   ]
+  },
+  {
+   "id": 8,
+   "kind": "para",
+   "start": 3632,
+   "end": 3675,
+   "text": "The repo has been tested with Ubuntu 22.04.",
+   "tokens": []
+  },
+  {
+   "id": 9,
+   "kind": "heading",
+   "start": 3677,
+   "end": 3685,
+   "text": "## Usage",
+   "tokens": []
+  },
+  {
+   "id": 10,
+   "kind": "para",
+   "start": 3687,
+   "end": 3738,
+   "text": "To use MolmoAct2 in a LeRobot training config, set:",
+   "tokens": []
+  },
+  {
+   "id": 11,
+   "kind": "heading",
+   "start": 3777,
+   "end": 3788,
+   "text": "## Training",
+   "tokens": []
+  },
+  {
+   "id": 12,
+   "kind": "para",
+   "start": 3790,
+   "end": 4116,
+   "text": "MolmoAct2 can be fine-tuned from either the released MolmoAct2 Hugging Face\ncheckpoint format or from a checkpoint already saved by LeRobot. Both routes use\nthe same LeRobot training loop, dataset transforms, checkpoint saving, and\nlogging. The difference is only how the initial policy weights and processor\nstate are loaded.",
+   "tokens": []
+  },
+  {
+   "id": 13,
+   "kind": "para",
+   "start": 4118,
+   "end": 4670,
+   "text": "LeRobot disables dataset image augmentation by default. Keep\n⟦0⟧ in MolmoAct2 training commands. The\noriginal MolmoAct2 transform recipe is not LeRobot's generic transform default,\nso the first command also pins its 95% crop, 5-degree rotation, and color\njitter explicitly. The original recipe additionally applies a Gaussian blur\nwith probability 0.2; LeRobot's generic ⟦1⟧ configuration cannot\nexpress that optional fourth transform without sometimes dropping one of the\nthree required transforms.",
+   "tokens": [
+    "`--dataset.image_transforms.enable=true`",
+    "`RandomSubsetApply`"
+   ]
+  },
+  {
+   "id": 14,
+   "kind": "heading",
+   "start": 4672,
+   "end": 4715,
+   "text": "### Training With Original MolmoAct2 Weight",
+   "tokens": []
+  },
+  {
+   "id": 15,
+   "kind": "para",
+   "start": 4717,
+   "end": 4999,
+   "text": "Use ⟦0⟧ when starting from a released MolmoAct2 checkpoint,\nfor example ⟦1⟧ or ⟦2⟧. LeRobot will load\nthe original HF model files, then build its own policy processor from the\ndataset metadata and the policy options below.",
+   "tokens": [
+    "`policy.checkpoint_path`",
+    "`allenai/MolmoAct2`",
+    "`allenai/MolmoAct2-LIBERO`"
+   ]
+  },
+  {
+   "id": 16,
+   "kind": "para",
+   "start": 5001,
+   "end": 5398,
+   "text": "The command below shows full fine-tuning on the merged LIBERO dataset from the\nreleased base checkpoint. It uses bf16 model loading, 8 flow timesteps, the\nofficial LIBERO quantile statistics, image augmentation, and LeRobot's\ncheckpointing/logging path. Do not substitute ⟦0⟧'s approximate\nmetadata quantiles for the released ⟦1⟧; their q01/q99 values are\nnot identical.",
+   "tokens": [
+    "`lerobot/libero`",
+    "`norm_stats.json`"
+   ]
+  },
+  {
+   "id": 17,
+   "kind": "heading",
+   "start": 7271,
+   "end": 7313,
+   "text": "### Training With LeRobot MolmoAct2 Weight",
+   "tokens": []
+  },
+  {
+   "id": 18,
+   "kind": "para",
+   "start": 7315,
+   "end": 8032,
+   "text": "Use ⟦0⟧ when starting from a MolmoAct2 checkpoint that was saved by\nLeRobot, either from a local ⟦1⟧ directory or from the Hub. This\nrestores the saved LeRobot policy config, model weights, processor, and\nnormalization statistics. You can still override training-time options such as\n⟦2⟧, ⟦3⟧, or ⟦4⟧. Checkpoint loading is strict and\npreserves the saved FFT or LoRA topology, so do not override\n⟦5⟧ when using ⟦6⟧. To start a new LoRA run,\ninitialize from HF weights with ⟦7⟧ instead, for example\nwith ⟦8⟧,\n⟦9⟧, and\n⟦10⟧.",
+   "tokens": [
+    "`policy.path`",
+    "`pretrained_model`",
+    "`batch_size`",
+    "`steps`",
+    "`policy.action_mode`",
+    "`policy.train_mode_vlm`",
+    "`policy.path`",
+    "`policy.checkpoint_path`",
+    "`--policy.type=molmoact2`",
+    "`--policy.checkpoint_path=allenai/MolmoAct2`",
+    "`--policy.train_mode_vlm=lora`"
+   ]
+  },
+  {
+   "id": 19,
+   "kind": "heading",
+   "start": 8957,
+   "end": 8977,
+   "text": "### Common Practices",
+   "tokens": []
+  },
+  {
+   "id": 20,
+   "kind": "para",
+   "start": 8979,
+   "end": 9657,
+   "text": "For fine-tuning on a comparatively small dataset, such as a single LIBERO suite\nor a real-world dataset with less than 200 demonstrations, a global batch size of\n16 to 32 is a good starting point. In these settings, we recommend using\n⟦0⟧ (the default), which usually gives similar or even\nbetter performance than ⟦1⟧. Additionally, ⟦2⟧ is\nalso a practical choice. In all modes, we intentionally keep the action expert\nfully trainable, which we found to be crucial for model performance. For larger\nfine-tuning datasets, larger global batch sizes and full VLM fine-tuning\n(⟦3⟧) are usually preferred.",
+   "tokens": [
+    "`policy.train_mode_vlm=lora`",
+    "`fft`",
+    "`policy.train_mode_vlm=freeze`",
+    "`policy.train_mode_vlm=fft`"
+   ]
+  },
+  {
+   "id": 21,
+   "kind": "heading",
+   "start": 9659,
+   "end": 9684,
+   "text": "### Common Policy Options",
+   "tokens": []
+  },
+  {
+   "id": 22,
+   "kind": "list",
+   "start": 9686,
+   "end": 9809,
+   "text": "- ⟦0⟧: original MolmoAct2 HF checkpoint to initialize from.\n  Use this for released MolmoAct2 weights.",
+   "tokens": [
+    "`policy.checkpoint_path`"
+   ]
+  },
+  {
+   "id": 23,
+   "kind": "list",
+   "start": 9810,
+   "end": 9921,
+   "text": "- ⟦0⟧: LeRobot checkpoint to initialize from. Use this for checkpoints\n  created by LeRobot training.",
+   "tokens": [
+    "`policy.path`"
+   ]
+  },
+  {
+   "id": 24,
+   "kind": "list",
+   "start": 9922,
+   "end": 10204,
+   "text": "- ⟦0⟧: training target, one of ⟦1⟧, ⟦2⟧, or\n  ⟦3⟧. Official MolmoAct2 robot fine-tuning uses ⟦4⟧. Released\n  checkpoints retain discrete-action weights; ⟦5⟧ is available as an\n  explicit joint flow-matching plus action-token ablation.",
+   "tokens": [
+    "`policy.action_mode`",
+    "`continuous`",
+    "`discrete`",
+    "`both`",
+    "`continuous`",
+    "`both`"
+   ]
+  },
+  {
+   "id": 25,
+   "kind": "list",
+   "start": 10205,
+   "end": 10553,
+   "text": "- ⟦0⟧: controls the VLM fine-tuning mode, one of ⟦1⟧,\n  ⟦2⟧, or ⟦3⟧. ⟦4⟧ fully fine-tunes the VLM, ⟦5⟧ trains LoRA\n  adapters on VLM linear layers, and ⟦6⟧ freezes the VLM. The action expert\n  is fully fine-tuned in all three modes. The default is ⟦7⟧. ⟦8⟧\n  requires ⟦9⟧.",
+   "tokens": [
+    "`policy.train_mode_vlm`",
+    "`fft`",
+    "`lora`",
+    "`freeze`",
+    "`fft`",
+    "`lora`",
+    "`freeze`",
+    "`lora`",
+    "`freeze`",
+    "`policy.action_mode=continuous`"
+   ]
+  },
+  {
+   "id": 26,
+   "kind": "list",
+   "start": 10554,
+   "end": 10698,
+   "text": "- ⟦0⟧: when ⟦1⟧, detaches action-expert\n  context K/V states before the action loss. The default is ⟦2⟧.",
+   "tokens": [
+    "`policy.enable_knowledge_insulation`",
+    "`true`",
+    "`false`"
+   ]
+  },
+  {
+   "id": 27,
+   "kind": "list",
+   "start": 10699,
+   "end": 10874,
+   "text": "- ⟦0⟧: action horizon used by the policy. For LIBERO we use\n  ⟦1⟧. This LeRobot port overrides the loaded checkpoint's\n  ⟦2⟧ with this value.",
+   "tokens": [
+    "`policy.chunk_size`",
+    "`10`",
+    "`max_action_horizon`"
+   ]
+  },
+  {
+   "id": 28,
+   "kind": "list",
+   "start": 10875,
+   "end": 11026,
+   "text": "- ⟦0⟧: number of actions consumed from each predicted\n  chunk before querying the policy again. For LIBERO, set it to ⟦1⟧.",
+   "tokens": [
+    "`policy.n_action_steps`",
+    "`chunk_size`"
+   ]
+  },
+  {
+   "id": 29,
+   "kind": "list",
+   "start": 11027,
+   "end": 11312,
+   "text": "- ⟦0⟧: text inserted into the prompt to describe the robot and\n  scene, e.g. ⟦1⟧. More examples are listed\n  in the ⟦2⟧ entries of\n  [⟦3⟧](⟦4⟧).",
+   "tokens": [
+    "`policy.setup_type`",
+    "`single franka robotic arm in libero`",
+    "`metadata_by_tag`",
+    "`norm_stats.json`",
+    "https://huggingface.co/allenai/MolmoAct2/blob/main/norm_stats.json"
+   ]
+  },
+  {
+   "id": 30,
+   "kind": "list",
+   "start": 11313,
+   "end": 11456,
+   "text": "- ⟦0⟧: text inserted into the prompt to describe the action\n  space, e.g. ⟦1⟧ or ⟦2⟧.",
+   "tokens": [
+    "`policy.control_mode`",
+    "`delta end-effector pose`",
+    "`absolute joint pose`"
+   ]
+  },
+  {
+   "id": 31,
+   "kind": "list",
+   "start": 11457,
+   "end": 11545,
+   "text": "- ⟦0⟧: ordered LeRobot image observation keys passed to the\n  processor.",
+   "tokens": [
+    "`policy.image_keys`"
+   ]
+  },
+  {
+   "id": 32,
+   "kind": "list",
+   "start": 11546,
+   "end": 12427,
+   "text": "- ⟦0⟧: Pi0.5-style precision switch. ⟦1⟧ uses bf16\n  autocast/storage for large VLM matrices while retaining the complete action\n  expert and numerically sensitive modules in fp32. ⟦2⟧ disables\n  autocast and keeps the full model in fp32. The low-memory ⟦3⟧ profile\n  intentionally differs from the original MolmoAct2 FP32-master AMP run:\n  AdamW moments follow each parameter's storage dtype, so the large bf16 VLM\n  parameters also have bf16 moments. Full fine-tuning lazily allocates one bf16\n  compensation tensor for each gradient-bearing bf16 parameter so updates\n  smaller than one parameter ULP are carried into later steps. This is not an\n  fp32 master copy. LoRA adapters, the action expert, and explicitly sensitive\n  modules retain fp32 parameters and optimizer state; frozen VLM parameters in\n  LoRA mode allocate no compensation tensor.",
+   "tokens": [
+    "`policy.dtype`",
+    "`bfloat16`",
+    "`float32`",
+    "`bfloat16`"
+   ]
+  },
+  {
+   "id": 33,
+   "kind": "list",
+   "start": 12428,
+   "end": 13662,
+   "text": "- ⟦0⟧: enables MolmoAct2's block-wise ⟦1⟧ path.\n  Full fine-tuning and LoRA both compile only the action-expert transformer\n  blocks. Eager VLM/ViT/connector execution avoids compiler-induced BF16\n  activation and gradient drift while retaining acceleration for the action\n  path evaluated at every flow timestep. Inductor is also instructed to\n  preserve eager BF16 downcast/upcast boundaries across fused operations. This\n  is one fixed precision-safe boundary and does not add another compile option.\n  Compilation is disabled by default; enable it for long GPU training runs.\n  The action blocks use PyTorch's automatic shape strategy. With gradient\n  checkpointing, only the variable encoder-context sequence dimension is marked\n  dynamic; batch size, action horizon, and flow-timestep count remain static.\n  Dynamo graph-cache reordering and its extra DDP graph splitter are disabled in\n  that mode so backward recomputation selects the same block graph as forward.\n  Batch-local text/action sequences are left-padded to an internal multiple of\n  8 before BOS insertion. This adds at most seven masked tokens while sharply\n  reducing shape-specific compile warm-up; it is not a user-facing option.",
+   "tokens": [
+    "`policy.compile_model`",
+    "`torch.compile`"
+   ]
+  },
+  {
+   "id": 34,
+   "kind": "list",
+   "start": 13663,
+   "end": 13794,
+   "text": "- ⟦0⟧: number of flow-matching timesteps sampled per\n  example during training. We use ⟦1⟧ for fine-tuning.",
+   "tokens": [
+    "`policy.num_flow_timesteps`",
+    "`8`"
+   ]
+  },
+  {
+   "id": 35,
+   "kind": "list",
+   "start": 13795,
+   "end": 13904,
+   "text": "- ⟦0⟧: optional override for continuous action\n  generation steps at inference time.",
+   "tokens": [
+    "`policy.num_inference_steps`"
+   ]
+  },
+  {
+   "id": 36,
+   "kind": "list",
+   "start": 13905,
+   "end": 14015,
+   "text": "- ⟦0⟧: enables checkpointing in the VLM/action path\n  to reduce activation memory.",
+   "tokens": [
+    "`policy.gradient_checkpointing`"
+   ]
+  },
+  {
+   "id": 37,
+   "kind": "list",
+   "start": 14016,
+   "end": 14093,
+   "text": "- ⟦0⟧: freezes input embeddings. The default is ⟦1⟧.",
+   "tokens": [
+    "`policy.freeze_embedding`",
+    "`true`"
+   ]
+  },
+  {
+   "id": 38,
+   "kind": "list",
+   "start": 14094,
+   "end": 14238,
+   "text": "- ⟦0⟧: controls whether gripper dimensions are included\n  in state/action quantile normalization. The default is ⟦1⟧.",
+   "tokens": [
+    "`policy.normalize_gripper`",
+    "`false`"
+   ]
+  },
+  {
+   "id": 39,
+   "kind": "list",
+   "start": 14239,
+   "end": 14346,
+   "text": "- ⟦0⟧: normalizes task strings before prompt\n  construction. The default is ⟦1⟧.",
+   "tokens": [
+    "`policy.normalize_language`",
+    "`true`"
+   ]
+  },
+  {
+   "id": 40,
+   "kind": "list",
+   "start": 14347,
+   "end": 14488,
+   "text": "- ⟦0⟧: masks padded dimensions in the flow loss.\n  Released checkpoints use ⟦1⟧.",
+   "tokens": [
+    "`policy.mask_action_dim_padding`",
+    "`policy.expected_max_action_dim=32`"
+   ]
+  },
+  {
+   "id": 41,
+   "kind": "list",
+   "start": 14489,
+   "end": 14668,
+   "text": "- ⟦0⟧: optional manual sequence cap. Leave unset to\n  infer it from images, state dimension, action dimension, action horizon, and\n  discrete-action mode.",
+   "tokens": [
+    "`policy.max_sequence_length`"
+   ]
+  },
+  {
+   "id": 42,
+   "kind": "heading",
+   "start": 14670,
+   "end": 14688,
+   "text": "### Learning Rates",
+   "tokens": []
+  },
+  {
+   "id": 43,
+   "kind": "para",
+   "start": 14690,
+   "end": 14792,
+   "text": "MolmoAct2 uses parameter-group learning rates to match the original MolmoAct2\nfine-tuning experiments.",
+   "tokens": []
+  },
+  {
+   "id": 44,
+   "kind": "list",
+   "start": 14794,
+   "end": 15049,
+   "text": "- Full fine-tuning uses ⟦0⟧ for the VLM,\n  ⟦1⟧ for the vision tower,\n  ⟦2⟧ for image connector layers, and\n  ⟦3⟧ for the action expert.",
+   "tokens": [
+    "`policy.optimizer_lr=1e-5`",
+    "`policy.optimizer_vit_lr=5e-6`",
+    "`policy.optimizer_connector_lr=5e-6`",
+    "`policy.optimizer_action_expert_lr=5e-5`"
+   ]
+  },
+  {
+   "id": 45,
+   "kind": "list",
+   "start": 15050,
+   "end": 15265,
+   "text": "- LoRA VLM fine-tuning sets the VLM, vision, and connector LoRA parameter\n  groups to ⟦0⟧ when ⟦1⟧; the action expert is still\n  fully fine-tuned with ⟦2⟧.",
+   "tokens": [
+    "`5e-5`",
+    "`policy.train_mode_vlm=lora`",
+    "`policy.optimizer_action_expert_lr`"
+   ]
+  },
+  {
+   "id": 46,
+   "kind": "list",
+   "start": 15266,
+   "end": 15411,
+   "text": "- Frozen-VLM fine-tuning uses ⟦0⟧, trains only the\n  action expert, and uses ⟦1⟧.",
+   "tokens": [
+    "`policy.train_mode_vlm=freeze`",
+    "`policy.optimizer_action_expert_lr=5e-5`"
+   ]
+  },
+  {
+   "id": 47,
+   "kind": "list",
+   "start": 15412,
+   "end": 15645,
+   "text": "- ⟦0⟧ is applied independently to the LLM, vision\n  tower, image connector, and action-expert parameter groups, matching the\n  original MolmoAct2 optimizer. It is not a single global-model gradient norm.",
+   "tokens": [
+    "`policy.optimizer_grad_clip_norm`"
+   ]
+  },
+  {
+   "id": 48,
+   "kind": "para",
+   "start": 15647,
+   "end": 16209,
+   "text": "You can override the full fine-tuning and action-expert learning rates with\n⟦0⟧, ⟦1⟧,\n⟦2⟧, and ⟦3⟧.\nScheduler settings can be changed with ⟦4⟧,\n⟦5⟧, and ⟦6⟧. The default\n24,000-step decay horizon matches the official\n[⟦7⟧](⟦8⟧)\nrecipe.",
+   "tokens": [
+    "`policy.optimizer_lr`",
+    "`policy.optimizer_vit_lr`",
+    "`policy.optimizer_connector_lr`",
+    "`policy.optimizer_action_expert_lr`",
+    "`policy.scheduler_warmup_steps`",
+    "`policy.scheduler_decay_steps`",
+    "`policy.scheduler_decay_lr`",
+    "`train_lerobot.py`",
+    "https://github.com/allenai/molmoact2/blob/5aac8f8a1180d79757ce500f819a02217079811c/experiments/launch_scripts/train_lerobot.py#L867-L868"
+   ]
+  },
+  {
+   "id": 49,
+   "kind": "heading",
+   "start": 16211,
+   "end": 16242,
+   "text": "### Dataset Quantile Statistics",
+   "tokens": []
+  },
+  {
+   "id": 50,
+   "kind": "para",
+   "start": 16244,
+   "end": 16407,
+   "text": "MolmoAct2 defaults to quantile normalization for state and action features. If\nyour dataset has not been converted with quantile statistics, you can add them\nwith:",
+   "tokens": []
+  },
+  {
+   "id": 51,
+   "kind": "para",
+   "start": 16510,
+   "end": 16799,
+   "text": "Recording, resuming, and merging aggregate quantiles from per-episode summaries, so ⟦0⟧ ends up holding a conservative envelope (⟦1⟧ for ⟦2⟧, ⟦3⟧ for ⟦4⟧) rather than whole-dataset quantiles. To estimate the latter, scan every episode with a running histogram:",
+   "tokens": [
+    "`meta/stats.json`",
+    "`min`",
+    "`q <= 50`",
+    "`max`",
+    "`q > 50`"
+   ]
+  },
+  {
+   "id": 52,
+   "kind": "para",
+   "start": 16936,
+   "end": 17414,
+   "text": "⟦0⟧ keeps the existing image statistics and avoids downloading or decoding video data when only ⟦1⟧/⟦2⟧ need recomputing, and ⟦3⟧ reads a local dataset instead of the Hub. These values are histogram estimates, subject to discretization and rebinning error, so they can differ from the conservative ones — which changes MolmoAct2's normalized targets and therefore its loss scale. Statistics already saved inside an existing checkpoint are not affected.",
+   "tokens": [
+    "`--skip-images`",
+    "`STATE`",
+    "`ACTION`",
+    "`--root`"
+   ]
+  },
+  {
+   "id": 53,
+   "kind": "para",
+   "start": 17416,
+   "end": 17475,
+   "text": "Alternatively, train MolmoAct2 with mean/std normalization:",
+   "tokens": []
+  },
+  {
+   "id": 54,
+   "kind": "heading",
+   "start": 17589,
+   "end": 17602,
+   "text": "## Evaluation",
+   "tokens": []
+  },
+  {
+   "id": 55,
+   "kind": "para",
+   "start": 17604,
+   "end": 17803,
+   "text": "Evaluation also supports both LeRobot-saved checkpoints and original MolmoAct2\nHF checkpoints. For LIBERO replication, keep the EGL rendering environment\nfixed and use ⟦0⟧.",
+   "tokens": [
+    "`policy.per_episode_seed=true`"
+   ]
+  },
+  {
+   "id": 56,
+   "kind": "para",
+   "start": 17805,
+   "end": 18005,
+   "text": "**Important:** We found that ⟦0⟧ does not reliably let the\nLIBERO scene stabilize and can degrade measured success. All LIBERO evaluation\nresults reported here use ⟦1⟧.",
+   "tokens": [
+    "`num_steps_wait=10`",
+    "`num_steps_wait=50`"
+   ]
+  },
+  {
+   "id": 57,
+   "kind": "heading",
+   "start": 18007,
+   "end": 18051,
+   "text": "### Evaluation With LeRobot MolmoAct2 Weight",
+   "tokens": []
+  },
+  {
+   "id": 58,
+   "kind": "para",
+   "start": 18053,
+   "end": 18192,
+   "text": "Use ⟦0⟧ for a checkpoint saved by LeRobot. The saved processor and\nnormalization statistics are restored together with the model.",
+   "tokens": [
+    "`policy.path`"
+   ]
+  },
+  {
+   "id": 59,
+   "kind": "heading",
+   "start": 18834,
+   "end": 18879,
+   "text": "### Evaluation With Original MolmoAct2 Weight",
+   "tokens": []
+  },
+  {
+   "id": 60,
+   "kind": "para",
+   "start": 18881,
+   "end": 19276,
+   "text": "You can evaluate a released Hugging Face checkpoint directly without first\nconverting it to a LeRobot checkpoint. In this case, set\n⟦0⟧ to the HF model repo and provide ⟦1⟧.\nFor LIBERO, ⟦2⟧ loads the LIBERO action/state\nnormalization statistics, action horizon, prompt metadata, and image-key order\nfrom the checkpoint's ⟦3⟧.",
+   "tokens": [
+    "`policy.checkpoint_path`",
+    "`policy.norm_tag`",
+    "`policy.norm_tag=libero`",
+    "`norm_stats.json`"
+   ]
+  },
+  {
+   "id": 61,
+   "kind": "para",
+   "start": 19278,
+   "end": 19602,
+   "text": "To fully replicate the MolmoAct2 paper results with released Hugging Face\ncheckpoints, we recommend using the v0.5.1-pinned\n[⟦0⟧ ⟦1⟧](⟦2⟧)\nbranch. That branch matches the original evaluation settings used for the\nreported numbers.",
+   "tokens": [
+    "`allenai/lerobot`",
+    "`molmoact2-hf-inference`",
+    "https://github.com/allenai/lerobot/tree/molmoact2-hf-inference"
+   ]
+  },
+  {
+   "id": 62,
+   "kind": "para",
+   "start": 20264,
+   "end": 20515,
+   "text": "Use ⟦0⟧ to run the\nfull LIBERO suite. The same command works for other released MolmoAct2\ncheckpoints as long as the requested ⟦1⟧ exists in that\ncheckpoint's ⟦2⟧.",
+   "tokens": [
+    "`--env.task=libero_10,libero_goal,libero_object,libero_spatial`",
+    "`policy.norm_tag`",
+    "`norm_stats.json`"
+   ]
+  },
+  {
+   "id": 63,
+   "kind": "heading",
+   "start": 20517,
+   "end": 20546,
+   "text": "### Common Evaluation Options",
+   "tokens": []
+  },
+  {
+   "id": 64,
+   "kind": "list",
+   "start": 20548,
+   "end": 20787,
+   "text": "- ⟦0⟧: required for rollout. Use ⟦1⟧ for\n  flow-matching inference or ⟦2⟧ for action-token inference. It must be\n  compatible with the training-time ⟦3⟧ saved in the\n  checkpoint.",
+   "tokens": [
+    "`policy.inference_action_mode`",
+    "`continuous`",
+    "`discrete`",
+    "`policy.action_mode`"
+   ]
+  },
+  {
+   "id": 65,
+   "kind": "list",
+   "start": 20788,
+   "end": 20886,
+   "text": "- ⟦0⟧: LeRobot checkpoint path or Hub repo. Use this for checkpoints\n  saved by LeRobot.",
+   "tokens": [
+    "`policy.path`"
+   ]
+  },
+  {
+   "id": 66,
+   "kind": "list",
+   "start": 20887,
+   "end": 21028,
+   "text": "- ⟦0⟧: original MolmoAct2 HF checkpoint path or Hub repo.\n  Use this with ⟦1⟧ and ⟦2⟧.",
+   "tokens": [
+    "`policy.checkpoint_path`",
+    "`policy.type=molmoact2`",
+    "`policy.norm_tag`"
+   ]
+  },
+  {
+   "id": 67,
+   "kind": "list",
+   "start": 21029,
+   "end": 21253,
+   "text": "- ⟦0⟧: selects normalization statistics, prompt metadata,\n  image-key order, and action horizon from the original checkpoint's\n  ⟦1⟧. It is required for direct original-HF checkpoint\n  evaluation.",
+   "tokens": [
+    "`policy.norm_tag`",
+    "`norm_stats.json`"
+   ]
+  },
+  {
+   "id": 68,
+   "kind": "list",
+   "start": 21254,
+   "end": 21412,
+   "text": "- ⟦0⟧: model storage/autocast profile. Use ⟦1⟧ for normal GPU\n  evaluation. Use ⟦2⟧ only when you explicitly want full-fp32 inference.",
+   "tokens": [
+    "`policy.dtype`",
+    "`bfloat16`",
+    "`float32`"
+   ]
+  },
+  {
+   "id": 69,
+   "kind": "list",
+   "start": 21413,
+   "end": 21549,
+   "text": "- ⟦0⟧: enables the MolmoAct2 inference CUDA\n  graph path for faster repeated continuous-action rollout.",
+   "tokens": [
+    "`policy.enable_inference_cuda_graph`"
+   ]
+  },
+  {
+   "id": 70,
+   "kind": "list",
+   "start": 21550,
+   "end": 21691,
+   "text": "- ⟦0⟧ and ⟦1⟧: make stochastic continuous\n  action generation deterministic per episode for replication.",
+   "tokens": [
+    "`policy.per_episode_seed`",
+    "`policy.eval_seed`"
+   ]
+  },
+  {
+   "id": 71,
+   "kind": "list",
+   "start": 21692,
+   "end": 21837,
+   "text": "- ⟦0⟧: comma-separated LIBERO suites or a single suite. Use\n  ⟦1⟧ for the full benchmark.",
+   "tokens": [
+    "`env.task`",
+    "`libero_10,libero_goal,libero_object,libero_spatial`"
+   ]
+  },
+  {
+   "id": 72,
+   "kind": "list",
+   "start": 21838,
+   "end": 21945,
+   "text": "- ⟦0⟧: maps LIBERO camera names to the image keys expected\n  by the policy processor.",
+   "tokens": [
+    "`env.camera_name_mapping`"
+   ]
+  },
+  {
+   "id": 73,
+   "kind": "heading",
+   "start": 21947,
+   "end": 21969,
+   "text": "## Performance Results",
+   "tokens": []
+  },
+  {
+   "id": 74,
+   "kind": "heading",
+   "start": 21971,
+   "end": 21999,
+   "text": "### LIBERO Benchmark Results",
+   "tokens": []
+  },
+  {
+   "id": 75,
+   "kind": "para",
+   "start": 22001,
+   "end": 22381,
+   "text": "MolmoAct2 has demonstrated strong performance on the LIBERO benchmark suite. To\ncompare and test its LeRobot implementation, we fine-tuned\n[⟦0⟧](⟦1⟧)\nfor an additional 10k steps on the LIBERO dataset with per-GPU batch size 32 on\n8 H100 GPUs, then compared the results to the original MolmoAct2 reference\nresults.",
+   "tokens": [
+    "`allenai/MolmoAct2-LIBERO`",
+    "https://huggingface.co/allenai/MolmoAct2-LIBERO"
+   ]
+  },
+  {
+   "id": 76,
+   "kind": "para",
+   "start": 22383,
+   "end": 22663,
+   "text": "The LeRobot fine-tuned checkpoint reported here is available at\n[⟦0⟧](⟦1⟧)\nand was trained on\n[⟦2⟧](⟦3⟧).",
+   "tokens": [
+    "`allenai/MolmoAct2-LIBERO-LeRobot`",
+    "https://huggingface.co/allenai/MolmoAct2-LIBERO-LeRobot",
+    "`allenai/MolmoAct2-LIBERO-Dataset`",
+    "https://huggingface.co/datasets/allenai/MolmoAct2-LIBERO-Dataset"
+   ]
+  },
+  {
+   "id": 77,
+   "kind": "table",
+   "start": 22665,
+   "end": 22729,
+   "text": "| Benchmark      | LeRobot Implementation | MolmoAct2 Original |",
+   "tokens": []
+  },
+  {
+   "id": 78,
+   "kind": "table",
+   "start": 22795,
+   "end": 22859,
+   "text": "| LIBERO Spatial |                  98.4% |              97.8% |",
+   "tokens": []
+  },
+  {
+   "id": 79,
+   "kind": "table",
+   "start": 22860,
+   "end": 22924,
+   "text": "| LIBERO Object  |                 100.0% |             100.0% |",
+   "tokens": []
+  },
+  {
+   "id": 80,
+   "kind": "table",
+   "start": 22925,
+   "end": 22989,
+   "text": "| LIBERO Goal    |                  98.0% |              97.8% |",
+   "tokens": []
+  },
+  {
+   "id": 81,
+   "kind": "table",
+   "start": 22990,
+   "end": 23054,
+   "text": "| LIBERO 10      |                  96.6% |              93.2% |",
+   "tokens": []
+  },
+  {
+   "id": 82,
+   "kind": "table",
+   "start": 23055,
+   "end": 23119,
+   "text": "| Average        |                 98.25% |             97.20% |",
+   "tokens": []
+  },
+  {
+   "id": 83,
+   "kind": "para",
+   "start": 23121,
+   "end": 23297,
+   "text": "These results demonstrate MolmoAct2's strong performance across diverse robotic\nmanipulation tasks. To reproduce them, follow the instructions in the LIBERO\nevaluation section.",
+   "tokens": []
+  },
+  {
+   "id": 84,
+   "kind": "heading",
+   "start": 23299,
+   "end": 23339,
+   "text": "## Hardware Deployment (lerobot-rollout)",
+   "tokens": []
+  },
+  {
+   "id": 85,
+   "kind": "para",
+   "start": 23341,
+   "end": 23525,
+   "text": "LeRobot-format checkpoints are available on the Hub for direct use with\n⟦0⟧. Each checkpoint uses specific camera names that must\nmatch your robot's camera configuration.",
+   "tokens": [
+    "`lerobot-rollout`"
+   ]
+  },
+  {
+   "id": 86,
+   "kind": "heading",
+   "start": 23527,
+   "end": 23555,
+   "text": "### Camera naming convention",
+   "tokens": []
+  },
+  {
+   "id": 87,
+   "kind": "para",
+   "start": 23557,
+   "end": 23694,
+   "text": "Each checkpoint expects specific ⟦0⟧ keys.\nIf your robot cameras have different names, use ⟦1⟧ to map them:",
+   "tokens": [
+    "`observation.images.*`",
+    "`--rename_map`"
+   ]
+  },
+  {
+   "id": 88,
+   "kind": "table",
+   "start": 23696,
+   "end": 23781,
+   "text": "| Checkpoint                    | Camera keys            | Description              |",
+   "tokens": []
+  },
+  {
+   "id": 89,
+   "kind": "table",
+   "start": 23868,
+   "end": 23953,
+   "text": "| MolmoAct2-LIBERO-LeRobot      | ⟦0⟧, ⟦1⟧ | LIBERO sim cameras       |",
+   "tokens": [
+    "`image`",
+    "`wrist_image`"
+   ]
+  },
+  {
+   "id": 90,
+   "kind": "table",
+   "start": 23954,
+   "end": 24039,
+   "text": "| MolmoAct2-BimanualYAM-LeRobot | ⟦0⟧, ⟦1⟧, ⟦2⟧ | YAM 3-camera setup       |",
+   "tokens": [
+    "`top`",
+    "`left`",
+    "`right`"
+   ]
+  },
+  {
+   "id": 91,
+   "kind": "table",
+   "start": 24040,
+   "end": 24125,
+   "text": "| MolmoAct2-DROID-LeRobot       | ⟦0⟧, ⟦1⟧         | External + wrist         |",
+   "tokens": [
+    "`cam0`",
+    "`cam1`"
+   ]
+  },
+  {
+   "id": 92,
+   "kind": "table",
+   "start": 24126,
+   "end": 24211,
+   "text": "| MolmoAct2-SO100_101-LeRobot   | ⟦0⟧, ⟦1⟧         | Primary + secondary view |",
+   "tokens": [
+    "`cam0`",
+    "`cam1`"
+   ]
+  },
+  {
+   "id": 93,
+   "kind": "para",
+   "start": 24213,
+   "end": 24269,
+   "text": "Example with an SO-100 robot using top and side cameras:",
+   "tokens": []
+  },
+  {
+   "id": 94,
+   "kind": "para",
+   "start": 24777,
+   "end": 24839,
+   "text": "To use a wrist camera instead, just change the rename mapping:",
+   "tokens": []
+  },
+  {
+   "id": 95,
+   "kind": "heading",
+   "start": 24978,
+   "end": 25026,
+   "text": "### Joint frame transform (SO-100/101 zero-shot)",
+   "tokens": []
+  },
+  {
+   "id": 96,
+   "kind": "para",
+   "start": 25028,
+   "end": 25246,
+   "text": "⟦0⟧\nThe MolmoAct2-SO100_101 checkpoint was trained on data that uses a different\njoint calibration convention than LeRobot >= 0.5.0. Without a frame\ncorrection, the arm may move in the wrong direction.",
+   "tokens": [
+    "<Tip warning={true}>"
+   ]
+  },
+  {
+   "id": 97,
+   "kind": "para",
+   "start": 25248,
+   "end": 25465,
+   "text": "This affects both **zero-shot deployment** and **fine-tuning** from the\noriginal checkpoint. The pretrained weights expect the old convention, so\nall joint data (observations and actions) must be transformed to match.",
+   "tokens": []
+  },
+  {
+   "id": 98,
+   "kind": "para",
+   "start": 25467,
+   "end": 25723,
+   "text": "The converted LeRobot checkpoint (⟦0⟧)\nalready includes this correction in its processor pipeline. If you convert\nor fine-tune the checkpoint yourself, set the following in the policy config (⟦1⟧):",
+   "tokens": [
+    "`lerobot/MolmoAct2-SO100_101-LeRobot`",
+    "`configuration_molmoact2.py`"
+   ]
+  },
+  {
+   "id": 99,
+   "kind": "list",
+   "start": 25725,
+   "end": 25795,
+   "text": "- ⟦0⟧: ⟦1⟧ (flips shoulder_lift direction)",
+   "tokens": [
+    "`joint_signs`",
+    "`[1, -1, 1, 1, 1, 1]`"
+   ]
+  },
+  {
+   "id": 100,
+   "kind": "list",
+   "start": 25796,
+   "end": 25882,
+   "text": "- ⟦0⟧: ⟦1⟧ (shifts shoulder_lift and elbow_flex by 90°)",
+   "tokens": [
+    "`joint_offsets`",
+    "`[0, 90, 90, 0, 0, 0]`"
+   ]
+  },
+  {
+   "id": 101,
+   "kind": "para",
+   "start": 25884,
+   "end": 25977,
+   "text": "See the [backward compatibility guide](⟦0⟧) for details on the\ncalibration change.",
+   "tokens": [
+    "./backwardcomp"
+   ]
+  },
+  {
+   "id": 102,
+   "kind": "heading",
+   "start": 25987,
+   "end": 26034,
+   "text": "## Differences From the Original Implementation",
+   "tokens": []
+  },
+  {
+   "id": 103,
+   "kind": "para",
+   "start": 26036,
+   "end": 26250,
+   "text": "This LeRobot port is intended to match MolmoAct2 behavior while using LeRobot's\ndataset, training, evaluation, checkpoint, and logging infrastructure. The main\ndifferences from the original training repository are:",
+   "tokens": []
+  },
+  {
+   "id": 104,
+   "kind": "list",
+   "start": 26252,
+   "end": 26762,
+   "text": "- The original paper training stack keeps fp32 master parameters and trains\n  under bf16 AMP. This LeRobot port uses ⟦0⟧ to lower\n  memory: large VLM matrices are stored in bf16, while the action expert and\n  numerically sensitive modules remain in fp32 and eligible operators run\n  under bf16 autocast. A bf16 update-compensation tensor reduces parameter\n  rounding loss during full fine-tuning, but its bf16 Adam moments still do not\n  exactly reproduce the original fp32 optimizer state.",
+   "tokens": [
+    "`policy.dtype=bfloat16`"
+   ]
+  },
+  {
+   "id": 105,
+   "kind": "list",
+   "start": 26763,
+   "end": 26957,
+   "text": "- The original repository uses its own FSDP/model-parallel training path. The\n  LeRobot port uses the standard LeRobot/Accelerate training path and has not\n  been tested for multi-node training.",
+   "tokens": []
+  },
+  {
+   "id": 106,
+   "kind": "list",
+   "start": 26958,
+   "end": 27146,
+   "text": "- The original repository supports sequence packing. The LeRobot port trains on\n  one LeRobot sample per item and uses batch-local padding with an inferred\n  maximum sequence-length guard.",
+   "tokens": []
+  },
+  {
+   "id": 107,
+   "kind": "list",
+   "start": 27147,
+   "end": 27310,
+   "text": "- The LeRobot port follows LeRobot's optimizer, scheduler, checkpoint saving,\n  dataset transforms, image augmentation, and Weights & Biases logging\n  conventions.",
+   "tokens": []
+  },
+  {
+   "id": 108,
+   "kind": "list",
+   "start": 27311,
+   "end": 27792,
+   "text": "- The original training path supports mixed action horizons by padding to\n  ⟦0⟧ and masking padded horizon slots in the action expert\n  self-attention. This is useful when training across datasets with different\n  control frequencies. The LeRobot port currently targets single-dataset\n  fine-tuning, so ⟦1⟧ overrides the checkpoint\n  ⟦2⟧ and horizon masking is not implemented yet. Support for\n  this mixed-horizon path is planned.",
+   "tokens": [
+    "`max_action_horizon`",
+    "`policy.chunk_size`",
+    "`max_action_horizon`"
+   ]
+  },
+  {
+   "id": 109,
+   "kind": "heading",
+   "start": 27794,
+   "end": 27805,
+   "text": "## Citation",
+   "tokens": []
+  },
+  {
+   "id": 110,
+   "kind": "heading",
+   "start": 28589,
+   "end": 28599,
+   "text": "## License",
+   "tokens": []
+  },
+  {
+   "id": 111,
+   "kind": "para",
+   "start": 28601,
+   "end": 28856,
+   "text": "This model is licensed under Apache 2.0. It is intended for research and\neducational use in accordance with\n[Ai2's Responsible Use Guidelines](⟦0⟧),\nconsistent with [allenai/molmoact2](⟦1⟧).",
+   "tokens": [
+    "https://allenai.org/responsible-use",
+    "https://github.com/allenai/molmoact2"
+   ]
+  }
+ ]
+}

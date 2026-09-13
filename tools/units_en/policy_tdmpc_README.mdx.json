@@ -1,0 +1,21 @@
+{
+ "file": "policy_tdmpc_README.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1784,
+   "end": 1792,
+   "text": "## Paper",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "heading",
+   "start": 1833,
+   "end": 1844,
+   "text": "## Citation",
+   "tokens": []
+  }
+ ]
+}

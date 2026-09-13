@@ -1,0 +1,283 @@
+{
+ "file": "act.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1965,
+   "text": "# ACT (Action Chunking with Transformers)",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1967,
+   "end": 2259,
+   "text": "ACT is a **lightweight and efficient policy for imitation learning**, especially well-suited for fine-grained manipulation tasks. It's the **first model we recommend when you're starting out** with LeRobot due to its fast training time, low computational requirements, and strong performance.",
+   "tokens": []
+  },
+  {
+   "id": 2,
+   "kind": "para",
+   "start": 2582,
+   "end": 2717,
+   "text": "_Watch this tutorial from the LeRobot team to learn how ACT works: [LeRobot ACT Tutorial](⟦0⟧)_",
+   "tokens": [
+    "https://www.youtube.com/watch?v=ft73x0LfGpM"
+   ]
+  },
+  {
+   "id": 3,
+   "kind": "heading",
+   "start": 2719,
+   "end": 2736,
+   "text": "## Model Overview",
+   "tokens": []
+  },
+  {
+   "id": 4,
+   "kind": "para",
+   "start": 2738,
+   "end": 3056,
+   "text": "Action Chunking with Transformers (ACT) was introduced in the paper [Learning Fine-Grained Bimanual Manipulation with Low-Cost Hardware](⟦0⟧) by Zhao et al. The policy was designed to enable precise, contact-rich manipulation tasks using affordable hardware and minimal demonstration data.",
+   "tokens": [
+    "https://arxiv.org/abs/2304.13705"
+   ]
+  },
+  {
+   "id": 5,
+   "kind": "heading",
+   "start": 3058,
+   "end": 3092,
+   "text": "### Why ACT is Great for Beginners",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "para",
+   "start": 3094,
+   "end": 3160,
+   "text": "ACT stands out as an excellent starting point for several reasons:",
+   "tokens": []
+  },
+  {
+   "id": 7,
+   "kind": "list",
+   "start": 3162,
+   "end": 3220,
+   "text": "- **Fast Training**: Trains in a few hours on a single GPU",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "list",
+   "start": 3221,
+   "end": 3303,
+   "text": "- **Lightweight**: Only ~80M parameters, making it efficient and easy to work with",
+   "tokens": []
+  },
+  {
+   "id": 9,
+   "kind": "list",
+   "start": 3304,
+   "end": 3387,
+   "text": "- **Data Efficient**: Often achieves high success rates with just 50 demonstrations",
+   "tokens": []
+  },
+  {
+   "id": 10,
+   "kind": "heading",
+   "start": 3389,
+   "end": 3405,
+   "text": "### Architecture",
+   "tokens": []
+  },
+  {
+   "id": 11,
+   "kind": "para",
+   "start": 3407,
+   "end": 3476,
+   "text": "ACT uses a transformer-based architecture with three main components:",
+   "tokens": []
+  },
+  {
+   "id": 12,
+   "kind": "list",
+   "start": 3478,
+   "end": 3560,
+   "text": "1. **Vision Backbone**: ResNet-18 processes images from multiple camera viewpoints",
+   "tokens": []
+  },
+  {
+   "id": 13,
+   "kind": "list",
+   "start": 3561,
+   "end": 3681,
+   "text": "2. **Transformer Encoder**: Synthesizes information from camera features, joint positions, and a learned latent variable",
+   "tokens": []
+  },
+  {
+   "id": 14,
+   "kind": "list",
+   "start": 3682,
+   "end": 3767,
+   "text": "3. **Transformer Decoder**: Generates coherent action sequences using cross-attention",
+   "tokens": []
+  },
+  {
+   "id": 15,
+   "kind": "para",
+   "start": 3769,
+   "end": 3795,
+   "text": "The policy takes as input:",
+   "tokens": []
+  },
+  {
+   "id": 16,
+   "kind": "list",
+   "start": 3797,
+   "end": 3864,
+   "text": "- Multiple RGB images (e.g., from wrist cameras, front/top cameras)",
+   "tokens": []
+  },
+  {
+   "id": 17,
+   "kind": "list",
+   "start": 3865,
+   "end": 3896,
+   "text": "- Current robot joint positions",
+   "tokens": []
+  },
+  {
+   "id": 18,
+   "kind": "list",
+   "start": 3897,
+   "end": 3982,
+   "text": "- A latent style variable ⟦0⟧ (learned during training, set to zero during inference)",
+   "tokens": [
+    "`z`"
+   ]
+  },
+  {
+   "id": 19,
+   "kind": "para",
+   "start": 3984,
+   "end": 4035,
+   "text": "And outputs a chunk of ⟦0⟧ future action sequences.",
+   "tokens": [
+    "`k`"
+   ]
+  },
+  {
+   "id": 20,
+   "kind": "heading",
+   "start": 4037,
+   "end": 4065,
+   "text": "## Installation Requirements",
+   "tokens": []
+  },
+  {
+   "id": 21,
+   "kind": "list",
+   "start": 4067,
+   "end": 4140,
+   "text": "1. Install LeRobot by following our [Installation Guide](⟦0⟧).",
+   "tokens": [
+    "./installation"
+   ]
+  },
+  {
+   "id": 22,
+   "kind": "list",
+   "start": 4141,
+   "end": 4235,
+   "text": "2. ACT is included in the base LeRobot installation, so no additional dependencies are needed!",
+   "tokens": []
+  },
+  {
+   "id": 23,
+   "kind": "heading",
+   "start": 4237,
+   "end": 4252,
+   "text": "## Training ACT",
+   "tokens": []
+  },
+  {
+   "id": 24,
+   "kind": "para",
+   "start": 4254,
+   "end": 4379,
+   "text": "ACT works seamlessly with the standard LeRobot training pipeline. Here's a complete example for training ACT on your dataset:",
+   "tokens": []
+  },
+  {
+   "id": 25,
+   "kind": "heading",
+   "start": 4648,
+   "end": 4665,
+   "text": "### Training Tips",
+   "tokens": []
+  },
+  {
+   "id": 26,
+   "kind": "list",
+   "start": 4667,
+   "end": 4749,
+   "text": "1. **Start with defaults**: ACT's default hyperparameters work well for most tasks",
+   "tokens": []
+  },
+  {
+   "id": 27,
+   "kind": "list",
+   "start": 4750,
+   "end": 4834,
+   "text": "2. **Training duration**: Expect a few hours for 100k training steps on a single GPU",
+   "tokens": []
+  },
+  {
+   "id": 28,
+   "kind": "list",
+   "start": 4835,
+   "end": 4913,
+   "text": "3. **Batch size**: Start with batch size 8 and adjust based on your GPU memory",
+   "tokens": []
+  },
+  {
+   "id": 29,
+   "kind": "heading",
+   "start": 4915,
+   "end": 4943,
+   "text": "### Train using Google Colab",
+   "tokens": []
+  },
+  {
+   "id": 30,
+   "kind": "para",
+   "start": 4945,
+   "end": 5113,
+   "text": "If your local computer doesn't have a powerful GPU, you can utilize Google Colab to train your model by following the [ACT training notebook](⟦0⟧).",
+   "tokens": [
+    "./notebooks#training-act"
+   ]
+  },
+  {
+   "id": 31,
+   "kind": "heading",
+   "start": 5115,
+   "end": 5132,
+   "text": "## Evaluating ACT",
+   "tokens": []
+  },
+  {
+   "id": 32,
+   "kind": "para",
+   "start": 5134,
+   "end": 5310,
+   "text": "Once training is complete, you can evaluate your ACT policy using the ⟦0⟧ command with your trained policy. This will run inference and record evaluation episodes:",
+   "tokens": [
+    "`lerobot-record`"
+   ]
+  }
+ ]
+}

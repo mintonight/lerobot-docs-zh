@@ -1,0 +1,544 @@
+{
+ "file": "fastwam.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1933,
+   "text": "# FastWAM",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1935,
+   "end": 2206,
+   "text": "FastWAM is a World Action Model policy for robot control. The LeRobot integration exposes FastWAM through the standard policy API so it can be configured with ⟦0⟧, trained with ⟦1⟧, and loaded through the LeRobot pretrained policy interface.",
+   "tokens": [
+    "`policy.type=fastwam`",
+    "`lerobot-train`"
+   ]
+  },
+  {
+   "id": 2,
+   "kind": "heading",
+   "start": 2208,
+   "end": 2225,
+   "text": "## Model Overview",
+   "tokens": []
+  },
+  {
+   "id": 3,
+   "kind": "para",
+   "start": 2227,
+   "end": 2573,
+   "text": "FastWAM keeps video modeling during training, but uses direct action prediction at inference time instead of iteratively generating future observations. This LeRobot policy wraps the FastWAM action model, adapts LeRobot batches to FastWAM training samples, and provides the standard processor pipeline for normalization and action postprocessing.",
+   "tokens": []
+  },
+  {
+   "id": 4,
+   "kind": "para",
+   "start": 2575,
+   "end": 2756,
+   "text": "The implementation initializes the visual world-model components from ⟦0⟧ by default and predicts action chunks with shape ⟦1⟧.",
+   "tokens": [
+    "`Wan-AI/Wan2.2-TI2V-5B`",
+    "`[batch, action_horizon, action_dim]`"
+   ]
+  },
+  {
+   "id": 5,
+   "kind": "heading",
+   "start": 2758,
+   "end": 2797,
+   "text": "### What the LeRobot Integration Covers",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "list",
+   "start": 2799,
+   "end": 2861,
+   "text": "- Standard ⟦0⟧ configuration through LeRobot",
+   "tokens": [
+    "`policy.type=fastwam`"
+   ]
+  },
+  {
+   "id": 7,
+   "kind": "list",
+   "start": 2862,
+   "end": 2920,
+   "text": "- Image, state, action, and language-task batch adaptation",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "list",
+   "start": 2921,
+   "end": 2996,
+   "text": "- Action chunk inference through ⟦0⟧ and ⟦1⟧",
+   "tokens": [
+    "`select_action`",
+    "`predict_action_chunk`"
+   ]
+  },
+  {
+   "id": 9,
+   "kind": "list",
+   "start": 2997,
+   "end": 3051,
+   "text": "- Checkpoint save/load through the LeRobot policy APIs",
+   "tokens": []
+  },
+  {
+   "id": 10,
+   "kind": "list",
+   "start": 3052,
+   "end": 3103,
+   "text": "- Configurable LIBERO gripper action postprocessing",
+   "tokens": []
+  },
+  {
+   "id": 11,
+   "kind": "heading",
+   "start": 3105,
+   "end": 3133,
+   "text": "## Installation Requirements",
+   "tokens": []
+  },
+  {
+   "id": 12,
+   "kind": "para",
+   "start": 3135,
+   "end": 3198,
+   "text": "Install LeRobot from source, then install FastWAM dependencies:",
+   "tokens": []
+  },
+  {
+   "id": 13,
+   "kind": "para",
+   "start": 3241,
+   "end": 3386,
+   "text": "This installs the FastWAM policy extra from ⟦0⟧: ⟦1⟧,\n⟦2⟧, ⟦3⟧, and ⟦4⟧, plus LeRobot's base dependencies.",
+   "tokens": [
+    "`pyproject.toml`",
+    "`transformers`",
+    "`diffusers`",
+    "`ftfy`",
+    "`regex`"
+   ]
+  },
+  {
+   "id": 14,
+   "kind": "para",
+   "start": 3388,
+   "end": 3450,
+   "text": "For LIBERO evaluation, install the benchmark dependencies too:",
+   "tokens": []
+  },
+  {
+   "id": 15,
+   "kind": "para",
+   "start": 3500,
+   "end": 3666,
+   "text": "This installs both extras. In addition to the FastWAM dependencies above, the\n⟦0⟧ extra installs LeRobot dataset dependencies, ⟦1⟧ on Linux, and\n⟦2⟧.",
+   "tokens": [
+    "`libero`",
+    "`hf-libero`",
+    "`scipy`"
+   ]
+  },
+  {
+   "id": 16,
+   "kind": "para",
+   "start": 3668,
+   "end": 3731,
+   "text": "FastWAM uses the Wan2.2 TI2V backbone. The default model id is:",
+   "tokens": []
+  },
+  {
+   "id": 17,
+   "kind": "heading",
+   "start": 3786,
+   "end": 3806,
+   "text": "## Data Requirements",
+   "tokens": []
+  },
+  {
+   "id": 18,
+   "kind": "para",
+   "start": 3808,
+   "end": 3847,
+   "text": "FastWAM expects a LeRobot dataset with:",
+   "tokens": []
+  },
+  {
+   "id": 19,
+   "kind": "list",
+   "start": 3849,
+   "end": 3933,
+   "text": "- one or more visual observations whose widths concatenate to ⟦0⟧",
+   "tokens": [
+    "`policy.image_size[1]`"
+   ]
+  },
+  {
+   "id": 20,
+   "kind": "list",
+   "start": 3934,
+   "end": 3995,
+   "text": "- ⟦0⟧ when ⟦1⟧ is not ⟦2⟧",
+   "tokens": [
+    "`observation.state`",
+    "`policy.proprio_dim`",
+    "`None`"
+   ]
+  },
+  {
+   "id": 21,
+   "kind": "list",
+   "start": 4007,
+   "end": 4120,
+   "text": "- a language task instruction through the dataset task field, or precomputed ⟦0⟧ and ⟦1⟧ tensors",
+   "tokens": [
+    "`context`",
+    "`context_mask`"
+   ]
+  },
+  {
+   "id": 22,
+   "kind": "para",
+   "start": 4122,
+   "end": 4355,
+   "text": "The default visual setup is one image feature named ⟦0⟧ with shape ⟦1⟧. If the dataset uses two cameras, configure ⟦2⟧ so their heights match ⟦3⟧ and their widths sum to ⟦4⟧.",
+   "tokens": [
+    "`observation.images.image`",
+    "`(3, 224, 448)`",
+    "`policy.input_features`",
+    "`224`",
+    "`448`"
+   ]
+  },
+  {
+   "id": 23,
+   "kind": "heading",
+   "start": 4357,
+   "end": 4365,
+   "text": "## Usage",
+   "tokens": []
+  },
+  {
+   "id": 24,
+   "kind": "para",
+   "start": 4367,
+   "end": 4400,
+   "text": "Create a new FastWAM policy with:",
+   "tokens": []
+  },
+  {
+   "id": 25,
+   "kind": "para",
+   "start": 4789,
+   "end": 4854,
+   "text": "Evaluate an existing LeRobot-format checkpoint on LIBERO-10 with:",
+   "tokens": []
+  },
+  {
+   "id": 26,
+   "kind": "para",
+   "start": 5232,
+   "end": 5321,
+   "text": "For ⟦0⟧, ⟦1⟧, and ⟦2⟧, use\n⟦3⟧.",
+   "tokens": [
+    "`libero_goal`",
+    "`libero_spatial`",
+    "`libero_object`",
+    "`--env.episode_length=300`"
+   ]
+  },
+  {
+   "id": 27,
+   "kind": "para",
+   "start": 5323,
+   "end": 5376,
+   "text": "For real-robot rollout, use the same checkpoint path:",
+   "tokens": []
+  },
+  {
+   "id": 28,
+   "kind": "heading",
+   "start": 5515,
+   "end": 5537,
+   "text": "## Configuration Notes",
+   "tokens": []
+  },
+  {
+   "id": 29,
+   "kind": "heading",
+   "start": 5539,
+   "end": 5557,
+   "text": "### Image Features",
+   "tokens": []
+  },
+  {
+   "id": 30,
+   "kind": "para",
+   "start": 5559,
+   "end": 5784,
+   "text": "⟦0⟧ is the size of the concatenated FastWAM image tensor as ⟦1⟧. Each configured image feature must have shape ⟦2⟧, and all camera widths must sum to the configured width.",
+   "tokens": [
+    "`policy.image_size`",
+    "`(height, width)`",
+    "`(3, height, camera_width)`"
+   ]
+  },
+  {
+   "id": 31,
+   "kind": "heading",
+   "start": 5786,
+   "end": 5805,
+   "text": "### Action Chunking",
+   "tokens": []
+  },
+  {
+   "id": 32,
+   "kind": "para",
+   "start": 5807,
+   "end": 6111,
+   "text": "⟦0⟧ controls the number of future actions supervised during training and predicted during inference. ⟦1⟧ controls how many actions are consumed before the policy predicts a fresh chunk. ⟦2⟧ must be less than or equal to ⟦3⟧.",
+   "tokens": [
+    "`policy.action_horizon`",
+    "`policy.n_action_steps`",
+    "`policy.n_action_steps`",
+    "`policy.action_horizon`"
+   ]
+  },
+  {
+   "id": 33,
+   "kind": "heading",
+   "start": 6113,
+   "end": 6131,
+   "text": "### Wan Components",
+   "tokens": []
+  },
+  {
+   "id": 34,
+   "kind": "para",
+   "start": 6133,
+   "end": 6399,
+   "text": "FastWAM loads the Wan VAE, video DiT, text encoder, and tokenizer from the configured Wan model directory or Hugging Face Hub model id. LeRobot-format FastWAM checkpoints saved by ⟦0⟧ also copy the local Wan component files needed by ⟦1⟧.",
+   "tokens": [
+    "`save_pretrained`",
+    "`from_pretrained`"
+   ]
+  },
+  {
+   "id": 35,
+   "kind": "heading",
+   "start": 6401,
+   "end": 6422,
+   "text": "### Attention Backend",
+   "tokens": []
+  },
+  {
+   "id": 36,
+   "kind": "para",
+   "start": 6424,
+   "end": 6930,
+   "text": "FastWAM's DiT uses PyTorch's ⟦0⟧ (SDPA) for all attention. It does **not** use FlashAttention: its Mixture-of-Transformers (MoT) routing needs arbitrary boolean ⟦1⟧ attention masks, which the FlashAttention varlen API cannot express. Installing the ⟦2⟧ package therefore has no effect on the FastWAM path. (Note that SDPA itself may still select PyTorch's own flash / memory-efficient / math kernel internally — this is unrelated to the ⟦3⟧ package.)",
+   "tokens": [
+    "`scaled_dot_product_attention`",
+    "`[query, key]`",
+    "`flash-attn`",
+    "`flash-attn`"
+   ]
+  },
+  {
+   "id": 37,
+   "kind": "heading",
+   "start": 6932,
+   "end": 6961,
+   "text": "### Compiled Action Inference",
+   "tokens": []
+  },
+  {
+   "id": 38,
+   "kind": "para",
+   "start": 6963,
+   "end": 7121,
+   "text": "FastWAM can compile its video-prefill and cached action-denoising graphs to reduce\nPython and CUDA kernel-launch overhead across the repeated inference steps:",
+   "tokens": []
+  },
+  {
+   "id": 39,
+   "kind": "para",
+   "start": 7171,
+   "end": 7481,
+   "text": "The option is disabled by default. The first action prediction compiles a graph\nfor the current input shapes and is therefore slower; later predictions with the\nsame shapes reuse it. Shape changes may trigger recompilation. The eager path\nremains available on unsupported PyTorch or accelerator configurations.",
+   "tokens": []
+  },
+  {
+   "id": 40,
+   "kind": "heading",
+   "start": 7483,
+   "end": 7507,
+   "text": "### LIBERO Action Toggle",
+   "tokens": []
+  },
+  {
+   "id": 41,
+   "kind": "para",
+   "start": 7509,
+   "end": 7678,
+   "text": "FastWAM LIBERO checkpoints use ⟦0⟧ by\ndefault to match the gripper action convention used by the original FastWAM\nevaluation pipeline:",
+   "tokens": [
+    "`policy.toggle_action_dimensions=[-1]`"
+   ]
+  },
+  {
+   "id": 42,
+   "kind": "heading",
+   "start": 7734,
+   "end": 7744,
+   "text": "## Results",
+   "tokens": []
+  },
+  {
+   "id": 43,
+   "kind": "para",
+   "start": 7746,
+   "end": 7879,
+   "text": "Evaluated on LIBERO with [⟦0⟧](⟦1⟧):",
+   "tokens": [
+    "`ZibinDong/fastwam_libero_uncond_2cam224`",
+    "https://huggingface.co/ZibinDong/fastwam_libero_uncond_2cam224"
+   ]
+  },
+  {
+   "id": 44,
+   "kind": "table",
+   "start": 7881,
+   "end": 7927,
+   "text": "| Suite          | Success rate | n_episodes |",
+   "tokens": []
+  },
+  {
+   "id": 45,
+   "kind": "table",
+   "start": 7975,
+   "end": 8021,
+   "text": "| libero_spatial |        97.6% |        500 |",
+   "tokens": []
+  },
+  {
+   "id": 46,
+   "kind": "table",
+   "start": 8022,
+   "end": 8068,
+   "text": "| libero_object  |        99.0% |        500 |",
+   "tokens": []
+  },
+  {
+   "id": 47,
+   "kind": "table",
+   "start": 8069,
+   "end": 8115,
+   "text": "| libero_goal    |        95.0% |        500 |",
+   "tokens": []
+  },
+  {
+   "id": 48,
+   "kind": "table",
+   "start": 8116,
+   "end": 8162,
+   "text": "| libero_10      |        94.0% |        500 |",
+   "tokens": []
+  },
+  {
+   "id": 49,
+   "kind": "table",
+   "start": 8163,
+   "end": 8209,
+   "text": "| **average**    |    **96.4%** |       2000 |",
+   "tokens": []
+  },
+  {
+   "id": 50,
+   "kind": "para",
+   "start": 8211,
+   "end": 8560,
+   "text": "Reproduce: ⟦0⟧ (1x H20 140 GB).",
+   "tokens": [
+    "`lerobot-eval --policy.path=ZibinDong/fastwam_libero_uncond_2cam224 --policy.device=cuda --policy.torch_dtype=float32 --policy.n_action_steps=10 --env.type=libero --env.task=libero_spatial --env.observation_height=256 --env.observation_width=256 --eval.batch_size=1 --eval.n_episodes=50 --seed=0 --env.episode_length=300`"
+   ]
+  },
+  {
+   "id": 51,
+   "kind": "heading",
+   "start": 8562,
+   "end": 8575,
+   "text": "## References",
+   "tokens": []
+  },
+  {
+   "id": 52,
+   "kind": "list",
+   "start": 8577,
+   "end": 8629,
+   "text": "- [Fast-WAM paper](⟦0⟧)",
+   "tokens": [
+    "https://arxiv.org/abs/2603.16666"
+   ]
+  },
+  {
+   "id": 53,
+   "kind": "list",
+   "start": 8630,
+   "end": 8698,
+   "text": "- [Fast-WAM project page](⟦0⟧)",
+   "tokens": [
+    "https://yuantianyuan01.github.io/FastWAM/"
+   ]
+  },
+  {
+   "id": 54,
+   "kind": "list",
+   "start": 8699,
+   "end": 8759,
+   "text": "- [Fast-WAM code](⟦0⟧)",
+   "tokens": [
+    "https://github.com/yuantianyuan01/FastWAM"
+   ]
+  },
+  {
+   "id": 55,
+   "kind": "list",
+   "start": 8760,
+   "end": 8832,
+   "text": "- [Released upstream checkpoints](⟦0⟧)",
+   "tokens": [
+    "https://huggingface.co/yuanty/fastwam"
+   ]
+  },
+  {
+   "id": 56,
+   "kind": "list",
+   "start": 8833,
+   "end": 8897,
+   "text": "- [Wan2.2 TI2V 5B](⟦0⟧)",
+   "tokens": [
+    "https://huggingface.co/Wan-AI/Wan2.2-TI2V-5B"
+   ]
+  },
+  {
+   "id": 57,
+   "kind": "heading",
+   "start": 8899,
+   "end": 8910,
+   "text": "## Citation",
+   "tokens": []
+  }
+ ]
+}

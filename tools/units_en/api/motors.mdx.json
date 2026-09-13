@@ -1,0 +1,714 @@
+{
+ "file": "api/motors.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1932,
+   "text": "# Motors",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1934,
+   "end": 2129,
+   "text": "⟦0⟧ is the low-level interface to a chain of servos on a serial bus. Robots use it to read positions\nand write goal positions; you rarely touch it directly unless you are adding hardware.",
+   "tokens": [
+    "`MotorsBus`"
+   ]
+  },
+  {
+   "id": 2,
+   "kind": "para",
+   "start": 2131,
+   "end": 2319,
+   "text": "See [Bring Your Own Hardware](⟦0⟧) for adding a new bus, and\n[Updating Feetech Firmware](⟦1⟧) and [Damiao Motors and CAN Bus](⟦2⟧) for device-specific notes.",
+   "tokens": [
+    "../integrate_hardware",
+    "../feetech",
+    "../damiao"
+   ]
+  },
+  {
+   "id": 3,
+   "kind": "heading",
+   "start": 2321,
+   "end": 2378,
+   "text": "## MotorsBus⟦0⟧",
+   "tokens": [
+    "[[lerobot.motors.motors_bus.SerialMotorsBus]]"
+   ]
+  },
+  {
+   "id": 4,
+   "kind": "para",
+   "start": 2890,
+   "end": 3134,
+   "text": "A SerialMotorsBus allows to efficiently read and write to motors connected via serial communication.\nIt represents several motors daisy-chained together and connected through a serial port.\nThere are currently two implementations of this class:",
+   "tokens": []
+  },
+  {
+   "id": 5,
+   "kind": "list",
+   "start": 3135,
+   "end": 3155,
+   "text": "- DynamixelMotorsBus",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "list",
+   "start": 3156,
+   "end": 3174,
+   "text": "- FeetechMotorsBus",
+   "tokens": []
+  },
+  {
+   "id": 7,
+   "kind": "para",
+   "start": 3176,
+   "end": 3263,
+   "text": "This class is specifically for serial-based motor protocols (Dynamixel, Feetech, etc.).",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "para",
+   "start": 3265,
+   "end": 3374,
+   "text": "A MotorsBus subclass instance requires a port (e.g. ⟦0⟧)).",
+   "tokens": [
+    "`FeetechMotorsBus(port=\"/dev/tty.usbmodem575E0031751\"`"
+   ]
+  },
+  {
+   "id": 9,
+   "kind": "para",
+   "start": 3454,
+   "end": 3503,
+   "text": "To find the port, you can run our utility script:",
+   "tokens": []
+  },
+  {
+   "id": 10,
+   "kind": "para",
+   "start": 3925,
+   "end": 3991,
+   "text": "Example of usage for 1 Feetech sts3215 motor connected to the bus:",
+   "tokens": []
+  },
+  {
+   "id": 11,
+   "kind": "docfield",
+   "start": 4838,
+   "end": 5192,
+   "text": "⟦0⟧- **num_retry** (int, optional) -- Retry attempts.  Defaults to ⟦1⟧.\n- **raise_on_error** (bool, optional) -- When ⟦2⟧ failures raise an exception instead of returning\n  ⟦3⟧. Defaults to ⟦4⟧.⟦5⟧⟦6⟧⟦7⟧Mapping *id → model number* or ⟦8⟧ if the call failed.⟦9⟧⟦10⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "`0`",
+    "`True`",
+    "`None`",
+    "`False`",
+    "</paramsdesc>",
+    "<rettype>dict[int, int] | None</rettype>",
+    "<retdesc>",
+    "`None`",
+    "</retdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 12,
+   "kind": "para",
+   "start": 5193,
+   "end": 5246,
+   "text": "Ping every ID on the bus using the broadcast address.",
+   "tokens": []
+  },
+  {
+   "id": 13,
+   "kind": "para",
+   "start": 5584,
+   "end": 5663,
+   "text": "⟦0⟧\nWrite implementation-specific recommended settings to every motor.",
+   "tokens": [
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 14,
+   "kind": "para",
+   "start": 5665,
+   "end": 5775,
+   "text": "Typical changes include shortening the return delay, increasing\nacceleration limits or disabling safety locks.",
+   "tokens": []
+  },
+  {
+   "id": 15,
+   "kind": "docfield",
+   "start": 6134,
+   "end": 6386,
+   "text": "⟦0⟧- **handshake** (bool, optional) -- Pings every expected motor and performs additional\n  integrity checks specific to the implementation. Defaults to ⟦1⟧.⟦2⟧⟦3⟧- ⟦4⟧ -- The port is already open.",
+   "tokens": [
+    "<paramsdesc>",
+    "`True`",
+    "</paramsdesc>",
+    "<raises>",
+    "``DeviceAlreadyConnectedError``"
+   ]
+  },
+  {
+   "id": 16,
+   "kind": "list",
+   "start": 6387,
+   "end": 6643,
+   "text": "- ⟦0⟧ -- The underlying SDK failed to open the port or the handshake did not succeed.⟦1⟧⟦2⟧⟦3⟧\nOpen the serial port and initialise communication.",
+   "tokens": [
+    "``ConnectionError``",
+    "</raises>",
+    "<raisederrors>``DeviceAlreadyConnectedError`` or ``ConnectionError``</raisederrors>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 17,
+   "kind": "docfield",
+   "start": 7080,
+   "end": 7410,
+   "text": "⟦0⟧- **motors** ( str | list[str] | None, optional) -- Target motors.  Accepts a motor name, an ID, a\n  list of names or ⟦1⟧ to affect every registered motor.  Defaults to ⟦2⟧.\n- **num_retry** (int, optional) -- Number of additional retry attempts on communication failure.\n  Defaults to 0.⟦3⟧⟦4⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "`None`",
+    "`None`",
+    "</paramsdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 18,
+   "kind": "para",
+   "start": 7411,
+   "end": 7445,
+   "text": "Disable torque on selected motors.",
+   "tokens": []
+  },
+  {
+   "id": 19,
+   "kind": "para",
+   "start": 7447,
+   "end": 7532,
+   "text": "Disabling Torque allows to write to the motors' permanent memory area (EPROM/EEPROM).",
+   "tokens": []
+  },
+  {
+   "id": 20,
+   "kind": "docfield",
+   "start": 7904,
+   "end": 8158,
+   "text": "⟦0⟧- **disable_torque** (bool, optional) -- If ⟦1⟧ (default) torque is disabled on every motor before\n  closing the port. This can prevent damaging motors if they are left applying resisting torque\n  after disconnect.⟦2⟧⟦3⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "`True`",
+    "</paramsdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 21,
+   "kind": "para",
+   "start": 8159,
+   "end": 8217,
+   "text": "Close the serial port (optionally disabling torque first).",
+   "tokens": []
+  },
+  {
+   "id": 22,
+   "kind": "docfield",
+   "start": 8654,
+   "end": 8927,
+   "text": "⟦0⟧- **motors** (int | str | list[str] | None, optional) -- Same semantics as :pymeth:⟦1⟧.\n  Defaults to ⟦2⟧.\n- **num_retry** (int, optional) -- Number of additional retry attempts on communication failure.\n  Defaults to 0.⟦3⟧⟦4⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "`disable_torque`",
+    "`None`",
+    "</paramsdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 23,
+   "kind": "para",
+   "start": 8928,
+   "end": 8961,
+   "text": "Enable torque on selected motors.",
+   "tokens": []
+  },
+  {
+   "id": 24,
+   "kind": "para",
+   "start": 9287,
+   "end": 9420,
+   "text": "⟦0⟧⟦1⟧Baud-rate in bits / second.⟦2⟧⟦3⟧\nReturn the current baud-rate configured on the port.",
+   "tokens": [
+    "<rettype>int</rettype>",
+    "<retdesc>",
+    "</retdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 25,
+   "kind": "docfield",
+   "start": 9866,
+   "end": 10269,
+   "text": "⟦0⟧- **motor** (NameOrID) -- Target motor (name or ID).\n- **num_retry** (int, optional) -- Extra attempts before giving up. Defaults to ⟦1⟧.\n- **raise_on_error** (bool, optional) -- If ⟦2⟧ communication errors raise exceptions instead of\n  returning ⟦3⟧. Defaults to ⟦4⟧.⟦5⟧⟦6⟧⟦7⟧Motor model number or ⟦8⟧ on failure.⟦9⟧⟦10⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "`0`",
+    "`True`",
+    "`None`",
+    "`False`",
+    "</paramsdesc>",
+    "<rettype>int | None</rettype>",
+    "<retdesc>",
+    "`None`",
+    "</retdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 26,
+   "kind": "para",
+   "start": 10270,
+   "end": 10318,
+   "text": "Ping a single motor and return its model number.",
+   "tokens": []
+  },
+  {
+   "id": 27,
+   "kind": "docfield",
+   "start": 10794,
+   "end": 11228,
+   "text": "⟦0⟧- **data_name** (str) -- Control-table key (e.g. ⟦1⟧).\n- **motor** (str) -- Motor name.\n- **normalize** (bool, optional) -- When ⟦2⟧ (default) scale the value to a user-friendly range as\n  defined by the calibration.\n- **num_retry** (int, optional) -- Retry attempts.  Defaults to ⟦3⟧.⟦4⟧⟦5⟧⟦6⟧Raw or normalised value depending on *normalize*.⟦7⟧⟦8⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "`\"Present_Position\"`",
+    "`True`",
+    "`0`",
+    "</paramsdesc>",
+    "<rettype>Value</rettype>",
+    "<retdesc>",
+    "</retdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 28,
+   "kind": "para",
+   "start": 11229,
+   "end": 11258,
+   "text": "Read a register from a motor.",
+   "tokens": []
+  },
+  {
+   "id": 29,
+   "kind": "para",
+   "start": 11596,
+   "end": 11753,
+   "text": "⟦0⟧⟦1⟧Mapping *motor name → calibration*.⟦2⟧⟦3⟧\nRead calibration parameters from the motors.",
+   "tokens": [
+    "<rettype>dict[str, MotorCalibration]</rettype>",
+    "<retdesc>",
+    "</retdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 30,
+   "kind": "docfield",
+   "start": 12229,
+   "end": 12584,
+   "text": "⟦0⟧- **motors** (NameOrID | list[NameOrID] | None, optional) -- Motors to record.\n  Defaults to every motor (⟦1⟧).\n- **display_values** (bool, optional) -- When ⟦2⟧ (default) a live table is printed to the console.⟦3⟧⟦4⟧⟦5⟧Two dictionaries *mins* and *maxes* with the",
+   "tokens": [
+    "<paramsdesc>",
+    "`None`",
+    "`True`",
+    "</paramsdesc>",
+    "<rettype>tuple[dict[str, Value], dict[str, Value]]</rettype>",
+    "<retdesc>"
+   ]
+  },
+  {
+   "id": 31,
+   "kind": "para",
+   "start": 12585,
+   "end": 12709,
+   "text": "extreme values observed for each motor.⟦0⟧⟦1⟧\nInteractively record the min/max encoder values of each motor.",
+   "tokens": [
+    "</retdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 32,
+   "kind": "para",
+   "start": 12711,
+   "end": 12828,
+   "text": "Move the joints by hand (with torque disabled) while the method streams live positions. Press\n:kbd:⟦0⟧ to finish.",
+   "tokens": [
+    "`Enter`"
+   ]
+  },
+  {
+   "id": 33,
+   "kind": "docfield",
+   "start": 13242,
+   "end": 13403,
+   "text": "⟦0⟧- **motors** (NameOrID | Sequence[NameOrID] | None, optional) -- Selection of motors. *None* (default)\n  resets every motor.⟦1⟧⟦2⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "</paramsdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 34,
+   "kind": "para",
+   "start": 13404,
+   "end": 13456,
+   "text": "Restore factory calibration for the selected motors.",
+   "tokens": []
+  },
+  {
+   "id": 35,
+   "kind": "para",
+   "start": 13458,
+   "end": 13595,
+   "text": "Homing offset is set to ⟦0⟧ and min/max position limits are set to the full usable range.\nThe in-memory :pyattr:*calibration* is cleared.",
+   "tokens": [
+    "`0`"
+   ]
+  },
+  {
+   "id": 36,
+   "kind": "docfield",
+   "start": 14010,
+   "end": 14254,
+   "text": "⟦0⟧- **port** (str) -- Serial/USB port to scan (e.g. ⟦1⟧).\n- ***args,** **kwargs -- Forwarded to the subclass constructor.⟦2⟧⟦3⟧⟦4⟧Mapping *baud-rate → list of motor IDs*",
+   "tokens": [
+    "<paramsdesc>",
+    "`\"/dev/ttyUSB0\"`",
+    "</paramsdesc>",
+    "<rettype>dict[int, list[int]]</rettype>",
+    "<retdesc>"
+   ]
+  },
+  {
+   "id": 37,
+   "kind": "para",
+   "start": 14255,
+   "end": 14400,
+   "text": "for every baud-rate that produced at least one response.⟦0⟧⟦1⟧\nProbe *port* at every supported baud-rate and list responding IDs.",
+   "tokens": [
+    "</retdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 38,
+   "kind": "docfield",
+   "start": 14766,
+   "end": 14981,
+   "text": "⟦0⟧- **baudrate** (int) -- Desired baud-rate in bits / second.⟦1⟧⟦2⟧- ⟦3⟧ -- The SDK failed to apply the change.⟦4⟧⟦5⟧⟦6⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "</paramsdesc>",
+    "<raises>",
+    "``RuntimeError``",
+    "</raises>",
+    "<raisederrors>``RuntimeError``</raisederrors>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 39,
+   "kind": "para",
+   "start": 14982,
+   "end": 15019,
+   "text": "Set a new UART baud-rate on the port.",
+   "tokens": []
+  },
+  {
+   "id": 40,
+   "kind": "docfield",
+   "start": 15441,
+   "end": 15688,
+   "text": "⟦0⟧- **motors** (NameOrID | list[NameOrID] | None, optional) -- Motors to adjust. Defaults to all motors (⟦1⟧).⟦2⟧⟦3⟧⟦4⟧Mapping *motor name → written homing offset*.⟦5⟧⟦6⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "`None`",
+    "</paramsdesc>",
+    "<rettype>dict[str, Value]</rettype>",
+    "<retdesc>",
+    "</retdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 41,
+   "kind": "para",
+   "start": 15689,
+   "end": 15741,
+   "text": "Centre each motor range around its current position.",
+   "tokens": []
+  },
+  {
+   "id": 42,
+   "kind": "para",
+   "start": 15743,
+   "end": 15887,
+   "text": "The function computes and writes a homing offset such that the present position becomes exactly one\nhalf-turn (e.g. ⟦0⟧ on a 12-bit encoder).",
+   "tokens": [
+    "`2047`"
+   ]
+  },
+  {
+   "id": 43,
+   "kind": "docfield",
+   "start": 16267,
+   "end": 16447,
+   "text": "⟦0⟧- **timeout_ms** (int | None, optional) -- Timeout in *milliseconds*. If ⟦1⟧ (default) the method falls\n  back to :pyattr:⟦2⟧.⟦3⟧⟦4⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "`None`",
+    "`default_timeout`",
+    "</paramsdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 44,
+   "kind": "para",
+   "start": 16448,
+   "end": 16490,
+   "text": "Change the packet timeout used by the SDK.",
+   "tokens": []
+  },
+  {
+   "id": 45,
+   "kind": "docfield",
+   "start": 16961,
+   "end": 17345,
+   "text": "⟦0⟧- **motor** (str) -- Key of the motor in :pyattr:⟦1⟧.\n- **initial_baudrate** (int | None, optional) -- Current baud-rate (skips scanning when provided).\n  Defaults to None.\n- **initial_id** (int | None, optional) -- Current ID (skips scanning when provided). Defaults to None.⟦2⟧⟦3⟧- ⟦4⟧ -- The motor could not be found or its model number",
+   "tokens": [
+    "<paramsdesc>",
+    "`motors`",
+    "</paramsdesc>",
+    "<raises>",
+    "``RuntimeError``"
+   ]
+  },
+  {
+   "id": 46,
+   "kind": "para",
+   "start": 17346,
+   "end": 17380,
+   "text": "  does not match the expected one.",
+   "tokens": []
+  },
+  {
+   "id": 47,
+   "kind": "list",
+   "start": 17381,
+   "end": 17586,
+   "text": "- ⟦0⟧ -- Communication with the motor failed.⟦1⟧⟦2⟧⟦3⟧\nAssign the correct ID and baud-rate to a single motor.",
+   "tokens": [
+    "``ConnectionError``",
+    "</raises>",
+    "<raisederrors>``RuntimeError`` or ``ConnectionError``</raisederrors>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 48,
+   "kind": "para",
+   "start": 17588,
+   "end": 17740,
+   "text": "This helper temporarily switches to the motor's current settings, disables torque, sets the desired\nID, and finally programs the bus' default baud-rate.",
+   "tokens": []
+  },
+  {
+   "id": 49,
+   "kind": "docfield",
+   "start": 18268,
+   "end": 18691,
+   "text": "⟦0⟧- **data_name** (str) -- Register name.\n- **motors** (NameOrID | Sequence[NameOrID] | None, optional) -- Motors to query. ⟦1⟧ (default) reads every motor.\n- **normalize** (bool, optional) -- Normalisation flag.  Defaults to ⟦2⟧.\n- **num_retry** (int, optional) -- Retry attempts.  Defaults to ⟦3⟧.⟦4⟧⟦5⟧⟦6⟧Mapping *motor name → value*.⟦7⟧⟦8⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "`None`",
+    "`True`",
+    "`0`",
+    "</paramsdesc>",
+    "<rettype>dict[str, Value]</rettype>",
+    "<retdesc>",
+    "</retdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 50,
+   "kind": "para",
+   "start": 18692,
+   "end": 18743,
+   "text": "Read the same register from several motors at once.",
+   "tokens": []
+  },
+  {
+   "id": 51,
+   "kind": "docfield",
+   "start": 19254,
+   "end": 19631,
+   "text": "⟦0⟧- **data_name** (str) -- Register name.\n- **values** (Value | dict[str, Value]) -- Either a single value (applied to every motor) or a mapping\n  *motor name → value*.\n- **normalize** (bool, optional) -- If ⟦1⟧ (default) convert values from the user range to raw units.\n- **num_retry** (int, optional) -- Retry attempts.  Defaults to ⟦2⟧.⟦3⟧⟦4⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "`True`",
+    "`0`",
+    "</paramsdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 52,
+   "kind": "para",
+   "start": 19632,
+   "end": 19675,
+   "text": "Write the same register on multiple motors.",
+   "tokens": []
+  },
+  {
+   "id": 53,
+   "kind": "para",
+   "start": 19677,
+   "end": 19962,
+   "text": "Contrary to :pymeth:⟦0⟧, this *does not* expects a response status packet emitted by the motor, which\ncan allow for lost packets. It is faster than :pymeth:⟦1⟧ and should typically be used when\nfrequency matters and losing some packets is acceptable (e.g. teleoperation loops).",
+   "tokens": [
+    "`write`",
+    "`write`"
+   ]
+  },
+  {
+   "id": 54,
+   "kind": "para",
+   "start": 20354,
+   "end": 20420,
+   "text": "⟦0⟧\nContext-manager that guarantees torque is re-enabled.",
+   "tokens": [
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 55,
+   "kind": "para",
+   "start": 20422,
+   "end": 20498,
+   "text": "This helper is useful to temporarily disable torque when configuring motors.",
+   "tokens": []
+  },
+  {
+   "id": 56,
+   "kind": "para",
+   "start": 20500,
+   "end": 20585,
+   "text": "Examples:\n>>> with bus.torque_disabled():\n...     # Safe operations here\n...     pass",
+   "tokens": []
+  },
+  {
+   "id": 57,
+   "kind": "docfield",
+   "start": 21095,
+   "end": 21472,
+   "text": "⟦0⟧- **data_name** (str) -- Register name.\n- **motor** (str) -- Motor name.\n- **value** (Value) -- Value to write.  If *normalize* is ⟦1⟧ the value is first converted to raw\n  units.\n- **normalize** (bool, optional) -- Enable or disable normalisation. Defaults to ⟦2⟧.\n- **num_retry** (int, optional) -- Retry attempts.  Defaults to ⟦3⟧.⟦4⟧⟦5⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "`True`",
+    "`True`",
+    "`0`",
+    "</paramsdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 58,
+   "kind": "para",
+   "start": 21473,
+   "end": 21516,
+   "text": "Write a value to a single motor's register.",
+   "tokens": []
+  },
+  {
+   "id": 59,
+   "kind": "para",
+   "start": 21518,
+   "end": 21828,
+   "text": "Contrary to :pymeth:⟦0⟧, this expects a response status packet emitted by the motor, which\nprovides a guarantee that the value was written to the register successfully. In consequence, it is\nslower than :pymeth:⟦1⟧ but it is more reliable. It should typically be used when configuring\nmotors.",
+   "tokens": [
+    "`sync_write`",
+    "`sync_write`"
+   ]
+  },
+  {
+   "id": 60,
+   "kind": "docfield",
+   "start": 22275,
+   "end": 22543,
+   "text": "⟦0⟧- **calibration_dict** (dict[str, MotorCalibration]) -- Calibration obtained from\n  :pymeth:⟦1⟧ or crafted by the user.\n- **cache** (bool, optional) -- Save the calibration to :pyattr:⟦2⟧. Defaults to True.⟦3⟧⟦4⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "`read_calibration`",
+    "`calibration`",
+    "</paramsdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 61,
+   "kind": "para",
+   "start": 22544,
+   "end": 22613,
+   "text": "Write calibration parameters to the motors and optionally cache them.",
+   "tokens": []
+  },
+  {
+   "id": 62,
+   "kind": "heading",
+   "start": 22632,
+   "end": 22664,
+   "text": "## Motor⟦0⟧",
+   "tokens": [
+    "[[lerobot.motors.Motor]]"
+   ]
+  },
+  {
+   "id": 63,
+   "kind": "heading",
+   "start": 23206,
+   "end": 23260,
+   "text": "## MotorCalibration⟦0⟧",
+   "tokens": [
+    "[[lerobot.motors.MotorCalibration]]"
+   ]
+  },
+  {
+   "id": 64,
+   "kind": "heading",
+   "start": 23792,
+   "end": 23840,
+   "text": "## MotorNormMode⟦0⟧",
+   "tokens": [
+    "[[lerobot.motors.MotorNormMode]]"
+   ]
+  }
+ ]
+}

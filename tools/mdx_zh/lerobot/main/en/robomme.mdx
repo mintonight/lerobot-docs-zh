@@ -1,0 +1,187 @@
+<script lang="ts">
+import {onMount} from "svelte";
+import Tip from "$lib/Tip.svelte";
+import CopyLLMTxtMenu from "$lib/CopyLLMTxtMenu.svelte";
+import Youtube from "$lib/Youtube.svelte";
+import Docstring from "$lib/Docstring.svelte";
+import CodeBlock from "$lib/CodeBlock.svelte";
+import CodeBlockFw from "$lib/CodeBlockFw.svelte";
+import DocNotebookDropdown from "$lib/DocNotebookDropdown.svelte";
+import CourseFloatingBanner from "$lib/CourseFloatingBanner.svelte";
+import IconCopyLink from "$lib/IconCopyLink.svelte";
+import FrameworkContent from "$lib/FrameworkContent.svelte";
+import Markdown from "$lib/Markdown.svelte";
+import Question from "$lib/Question.svelte";
+import FrameworkSwitchCourse from "$lib/FrameworkSwitchCourse.svelte";
+import InferenceApi from "$lib/InferenceApi.svelte";
+import TokenizersLanguageContent from "$lib/TokenizersLanguageContent.svelte";
+import ExampleCodeBlock from "$lib/ExampleCodeBlock.svelte";
+import Added from "$lib/Added.svelte";
+import Changed from "$lib/Changed.svelte";
+import Deprecated from "$lib/Deprecated.svelte";
+import PipelineIcon from "$lib/PipelineIcon.svelte";
+import PipelineTag from "$lib/PipelineTag.svelte";
+import Heading from "$lib/Heading.svelte";
+import HfOptions from "$lib/HfOptions.svelte";
+import HfOption from "$lib/HfOption.svelte";
+import EditOnGithub from "$lib/EditOnGithub.svelte";
+import InferenceSnippet from "$lib/InferenceSnippet/InferenceSnippet.svelte";
+import MermaidChart from "$lib/MermaidChart.svelte";
+let fw: "pt" | "tf" = "pt";
+onMount(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    fw = urlParams.get("fw") || "pt";
+});
+</script>
+<svelte:head>
+  <meta name="hf:doc:metadata" content={metadata} >
+</svelte:head>
+
+<!--HF DOCBUILD BODY START-->
+
+HF_DOC_BODY_START
+
+<CopyLLMTxtMenu containerStyle="float: right; margin-left: 10px; display: inline-flex; position: relative; z-index: 10;"></CopyLLMTxtMenu>
+
+# RoboMME
+
+[RoboMME](https://robomme.github.io) 是基于 ManiSkill（SAPIEN）构建的、增强记忆的操作 benchmark。它评估机器人在整个 episode 中保留和使用信息的能力——计数、物体恒存、参照和模仿。
+
+- **16 个任务**，分布在 4 个记忆技能套件中
+- **1,600 个训练 demonstration**（每个任务 100 个，50 个验证、50 个测试）
+- **dataset**：[`lerobot/robomme`](https://huggingface.co/datasets/lerobot/robomme) — LeRobot v3.0，10 fps 下 76.8 万帧
+- **simulation 器**：ManiSkill / SAPIEN，Panda 机械臂，仅支持 Linux
+
+![RoboMME benchmark tasks overview](https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2603.04639/gradient.png)
+
+## 任务
+
+| 套件                             | 任务                                                         |
+| --------------------------------- | ------------------------------------------------------------- |
+| **计数**（时间记忆）    | BinFill, PickXtimes, SwingXtimes, StopCube                    |
+| **恒存**（空间记忆）   | VideoUnmask, VideoUnmaskSwap, ButtonUnmask, ButtonUnmaskSwap  |
+| **参照**（物体记忆）     | PickHighlight, VideoRepick, VideoPlaceButton, VideoPlaceOrder |
+| **模仿**（程序性记忆） | MoveCube, InsertPeg, PatternLock, RouteStick                  |
+
+## 安装
+
+> RoboMME 需要 **Linux**（ManiSkill/SAPIEN 使用 Vulkan 渲染）。建议使用 Docker 来隔离依赖冲突。
+
+### 原生安装（Linux）
+
+```bash
+pip install --override <(printf 'gymnasium==0.29.1\nnumpy==1.26.4\n') \
+  -e '.[smolvla,av-dep]' \
+  'robomme @ git+https://github.com/RoboMME/robomme_benchmark.git@main'
+```
+
+> **依赖说明**：`mani-skill`（由 `robomme` 引入）固化了 `gymnasium==0.29.1` 和 `numpy<2.0.0`，这会与 lerobot 的基础 `numpy>=2.0.0` 冲突。这就是为什么 `robomme` 不是 pyproject 的额外依赖——请使用上面的覆盖安装方式，或使用下面的 Docker 方案来完全避免冲突。
+
+### Docker（推荐）
+
+```bash
+# Build the RoboMME evaluation image from the repo root
+docker build -f docker/Dockerfile.benchmark.robomme -t lerobot-benchmark-robomme .
+```
+
+该 benchmark 的 Dockerfile 基于已发布的 `huggingface/lerobot-gpu:latest` 镜像扩展，然后覆盖 `gymnasium==0.29.1` 和 `numpy==1.26.4`。就 lerobot 实际的 API 使用而言，这两个版本在运行时都是安全的。
+
+## 运行评估
+
+### 默认（单任务、单 episode）
+
+```bash
+lerobot-eval \
+    --policy.path=<your_policy_repo> \
+    --env.type=robomme \
+    --env.task=PickXtimes \
+    --env.dataset_split=test \
+    --env.task_ids=[0] \
+    --eval.batch_size=1 \
+    --eval.n_episodes=1
+```
+
+### 多任务评估
+
+通过用逗号分隔任务名称，可在一次运行中评估多个任务。使用 `task_ids` 控制每个任务要评估哪些 episode。建议：测试划分中每个任务评估 50 个 episode。
+
+```bash
+lerobot-eval \
+    --policy.path=<your_policy_repo> \
+    --env.type=robomme \
+    --env.task=PickXtimes,BinFill,StopCube,MoveCube,InsertPeg \
+    --env.dataset_split=test \
+    --env.task_ids=[0,1,2,3,4,5,6,7,8,9] \
+    --eval.batch_size=1 \
+    --eval.n_episodes=50
+```
+
+### `env.type=robomme` 的关键 CLI 选项
+
+| 选项               | 默认值       | 描述                                        |
+| -------------------- | ------------- | -------------------------------------------------- |
+| `env.task`           | `PickXtimes`  | 上面 16 个任务名称中的任意一个（逗号分隔）   |
+| `env.dataset_split`  | `test`        | `train`、`val` 或 `test`                          |
+| `env.action_space`   | `joint_angle` | `joint_angle`（8 维）或 `ee_pose`（7 维）             |
+| `env.episode_length` | `300`         | 每个 episode 的最大步数                              |
+| `env.task_ids`       | `null`        | 要评估的 episode index 列表（null = `[0]`） |
+
+## dataset
+
+dataset [`lerobot/robomme`](https://huggingface.co/datasets/lerobot/robomme) 采用 **LeRobot v3.0 格式**，可以直接加载：
+
+```python
+from lerobot.datasets.lerobot_dataset import LeRobotDataset
+
+dataset = LeRobotDataset("lerobot/robomme")
+```
+
+### dataset 特征
+
+| 特征            | 形状         | 描述                     |
+| ------------------ | ------------- | ------------------------------- |
+| `image`            | (256, 256, 3) | 前置相机 RGB                |
+| `wrist_image`      | (256, 256, 3) | 腕部相机 RGB                |
+| `actions`          | (8,)          | 关节角度 + gripper          |
+| `state`            | (8,)          | 关节位置 + gripper state |
+| `simple_subgoal`   | str           | 高层级语言标注  |
+| `grounded_subgoal` | str           | 与场景关联的语言标注    |
+| `episode_index`    | int           | episode ID                      |
+| `frame_index`      | int           | episode 内的帧            |
+
+### 特征键对齐（训练）
+
+环境包装器将其相机暴露在 `pixels/<camera_name>` 下，分别由 `RoboMMEEnv.front_camera_name` 和 `RoboMMEEnv.wrist_camera_name` 命名（默认分别为 `camera1` 和 `camera2`）。`RoboMMEEnv` 中的 `features_map` 将这两者映射到 policy 的 `observation.images.camera1` 和 `observation.images.camera2`。state 以 `agent_pos` 形式暴露，并映射到 `observation.state`。
+
+dataset 的原始列与这些 policy 键不匹配，因此在 fine-tune 时需要传入 `--rename_map`：
+
+```bash
+--rename_map='{"image": "observation.images.camera1", "wrist_image": "observation.images.camera2", "state": "observation.state", "actions": "action"}'
+```
+
+如果你使用不同的键名训练，请覆盖 `--env.front_camera_name` / `--env.wrist_camera_name`，以便评估 observation 与 policy 训练时所用的键一致。
+
+## action space
+
+| 类型          | 维度 | 描述                                               |
+| ------------- | --- | --------------------------------------------------------- |
+| `joint_angle` | 8   | 7 个关节角度 + 1 个 gripper（−1 闭合，+1 张开，绝对量） |
+| `ee_pose`     | 7   | xyz + roll/pitch/yaw + gripper                            |
+
+通过 `--env.action_space=joint_angle`（默认）或 `--env.action_space=ee_pose` 设置。
+
+## 平台说明
+
+- **仅支持 Linux**：ManiSkill 需要 SAPIEN/Vulkan。不支持 macOS 和 Windows。
+- **建议使用 GPU**：渲染可以在 CPU 上运行但速度较慢；CUDA + Vulkan 可提供全速。
+- **gymnasium / numpy 冲突**：参见上面的安装说明。Docker 镜像会自动处理此问题。
+- **ManiSkill 分支**：`robomme` 依赖特定的 ManiSkill 分支（`YinpeiDai/ManiSkill`），通过 `robomme` 包自动引入。
+
+
+
+<EditOnGithub source="https://github.com/huggingface/lerobot/blob/main/docs/source/robomme.mdx" />
+
+<!--HF DOCBUILD BODY END-->
+
+HF_DOC_BODY_END
+

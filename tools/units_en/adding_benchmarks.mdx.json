@@ -1,0 +1,1089 @@
+{
+ "file": "adding_benchmarks.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1948,
+   "text": "# Adding a New Benchmark",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1950,
+   "end": 2096,
+   "text": "This guide walks you through adding a new simulation benchmark to LeRobot. Follow the steps in order and use the existing benchmarks as templates.",
+   "tokens": []
+  },
+  {
+   "id": 2,
+   "kind": "para",
+   "start": 2098,
+   "end": 2366,
+   "text": "A benchmark in LeRobot is a set of [Gymnasium](⟦0⟧) environments that wrap a third-party simulator (like LIBERO or Meta-World) behind a standard ⟦1⟧ interface. The ⟦2⟧ CLI then runs evaluation uniformly across all benchmarks.",
+   "tokens": [
+    "https://gymnasium.farama.org/",
+    "`gym.Env`",
+    "`lerobot-eval`"
+   ]
+  },
+  {
+   "id": 3,
+   "kind": "heading",
+   "start": 2368,
+   "end": 2402,
+   "text": "## Existing benchmarks at a glance",
+   "tokens": []
+  },
+  {
+   "id": 4,
+   "kind": "para",
+   "start": 2404,
+   "end": 2457,
+   "text": "Before diving in, here is what is already integrated:",
+   "tokens": []
+  },
+  {
+   "id": 5,
+   "kind": "table",
+   "start": 2459,
+   "end": 2588,
+   "text": "| Benchmark      | Env file            | Config class       | Tasks               | Action dim   | Processor                    |",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "table",
+   "start": 2719,
+   "end": 2848,
+   "text": "| LIBERO         | ⟦0⟧    | ⟦1⟧        | 130 across 5 suites | 7            | ⟦2⟧        |",
+   "tokens": [
+    "`envs/libero.py`",
+    "`LiberoEnv`",
+    "`LiberoProcessorStep`"
+   ]
+  },
+  {
+   "id": 7,
+   "kind": "table",
+   "start": 2849,
+   "end": 2978,
+   "text": "| Meta-World     | ⟦0⟧ | ⟦1⟧     | 50 (MT50)           | 4            | None                         |",
+   "tokens": [
+    "`envs/metaworld.py`",
+    "`MetaworldEnv`"
+   ]
+  },
+  {
+   "id": 8,
+   "kind": "table",
+   "start": 2979,
+   "end": 3108,
+   "text": "| IsaacLab Arena | Hub-hosted          | ⟦0⟧ | Configurable        | Configurable | ⟦1⟧ |",
+   "tokens": [
+    "`IsaaclabArenaEnv`",
+    "`IsaaclabArenaProcessorStep`"
+   ]
+  },
+  {
+   "id": 9,
+   "kind": "para",
+   "start": 3110,
+   "end": 3208,
+   "text": "Use ⟦0⟧ and ⟦1⟧ as reference implementations.",
+   "tokens": [
+    "`src/lerobot/envs/libero.py`",
+    "`src/lerobot/envs/metaworld.py`"
+   ]
+  },
+  {
+   "id": 10,
+   "kind": "heading",
+   "start": 3210,
+   "end": 3237,
+   "text": "## How it all fits together",
+   "tokens": []
+  },
+  {
+   "id": 11,
+   "kind": "heading",
+   "start": 3239,
+   "end": 3252,
+   "text": "### Data flow",
+   "tokens": []
+  },
+  {
+   "id": 12,
+   "kind": "para",
+   "start": 3254,
+   "end": 3304,
+   "text": "During evaluation, data moves through four stages:",
+   "tokens": []
+  },
+  {
+   "id": 13,
+   "kind": "para",
+   "start": 3751,
+   "end": 3907,
+   "text": "Most benchmarks only need to care about stage 1 (producing observations in the right format) and optionally stage 3 (if env-specific transforms are needed).",
+   "tokens": []
+  },
+  {
+   "id": 14,
+   "kind": "heading",
+   "start": 3909,
+   "end": 3934,
+   "text": "### Environment structure",
+   "tokens": []
+  },
+  {
+   "id": 15,
+   "kind": "para",
+   "start": 3936,
+   "end": 3998,
+   "text": "⟦0⟧ returns a nested dict of vectorized environments:",
+   "tokens": [
+    "`make_env()`"
+   ]
+  },
+  {
+   "id": 16,
+   "kind": "para",
+   "start": 4085,
+   "end": 4253,
+   "text": "A single-task env (e.g. PushT) looks like ⟦0⟧.\nA multi-task benchmark (e.g. LIBERO) looks like ⟦1⟧.",
+   "tokens": [
+    "`{\"pusht\": {0: vec_env}}`",
+    "`{\"libero_spatial\": {0: vec0, 1: vec1, ...}, ...}`"
+   ]
+  },
+  {
+   "id": 17,
+   "kind": "heading",
+   "start": 4255,
+   "end": 4278,
+   "text": "### How evaluation runs",
+   "tokens": []
+  },
+  {
+   "id": 18,
+   "kind": "para",
+   "start": 4280,
+   "end": 4340,
+   "text": "All benchmarks are evaluated the same way by ⟦0⟧:",
+   "tokens": [
+    "`lerobot-eval`"
+   ]
+  },
+  {
+   "id": 19,
+   "kind": "list",
+   "start": 4342,
+   "end": 4413,
+   "text": "1. ⟦0⟧ builds the nested ⟦1⟧ dict.",
+   "tokens": [
+    "`make_env()`",
+    "`{suite: {task_id: VectorEnv}}`"
+   ]
+  },
+  {
+   "id": 20,
+   "kind": "list",
+   "start": 4414,
+   "end": 4472,
+   "text": "2. ⟦0⟧ iterates over every suite and task.",
+   "tokens": [
+    "`eval_policy_all()`"
+   ]
+  },
+  {
+   "id": 21,
+   "kind": "list",
+   "start": 4473,
+   "end": 4537,
+   "text": "3. For each task, it runs ⟦0⟧ rollouts via ⟦1⟧.",
+   "tokens": [
+    "`n_episodes`",
+    "`rollout()`"
+   ]
+  },
+  {
+   "id": 22,
+   "kind": "list",
+   "start": 4538,
+   "end": 4610,
+   "text": "4. Results are aggregated hierarchically: episode, task, suite, overall.",
+   "tokens": []
+  },
+  {
+   "id": 23,
+   "kind": "list",
+   "start": 4611,
+   "end": 4698,
+   "text": "5. Metrics include ⟦0⟧ (success rate), ⟦1⟧, and ⟦2⟧.",
+   "tokens": [
+    "`pc_success`",
+    "`avg_sum_reward`",
+    "`avg_max_reward`"
+   ]
+  },
+  {
+   "id": 24,
+   "kind": "para",
+   "start": 4700,
+   "end": 4847,
+   "text": "The critical piece: your env must return ⟦0⟧ on every ⟦1⟧ call. This is how the eval loop knows whether a task was completed.",
+   "tokens": [
+    "`info[\"is_success\"]`",
+    "`step()`"
+   ]
+  },
+  {
+   "id": 25,
+   "kind": "heading",
+   "start": 4849,
+   "end": 4886,
+   "text": "## What your environment must provide",
+   "tokens": []
+  },
+  {
+   "id": 26,
+   "kind": "para",
+   "start": 4888,
+   "end": 5011,
+   "text": "LeRobot does not enforce a strict observation schema. Instead it relies on a set of conventions that all benchmarks follow.",
+   "tokens": []
+  },
+  {
+   "id": 27,
+   "kind": "heading",
+   "start": 5013,
+   "end": 5031,
+   "text": "### Env attributes",
+   "tokens": []
+  },
+  {
+   "id": 28,
+   "kind": "para",
+   "start": 5033,
+   "end": 5074,
+   "text": "Your ⟦0⟧ must set these attributes:",
+   "tokens": [
+    "`gym.Env`"
+   ]
+  },
+  {
+   "id": 29,
+   "kind": "table",
+   "start": 5076,
+   "end": 5163,
+   "text": "| Attribute            | Type  | Why                                                  |",
+   "tokens": []
+  },
+  {
+   "id": 30,
+   "kind": "table",
+   "start": 5252,
+   "end": 5339,
+   "text": "| ⟦0⟧ | ⟦1⟧ | ⟦2⟧ uses this to cap episode length          |",
+   "tokens": [
+    "`_max_episode_steps`",
+    "`int`",
+    "`rollout()`"
+   ]
+  },
+  {
+   "id": 31,
+   "kind": "table",
+   "start": 5340,
+   "end": 5427,
+   "text": "| ⟦0⟧   | ⟦1⟧ | Passed to VLA policies as a language instruction     |",
+   "tokens": [
+    "`task_description`",
+    "`str`"
+   ]
+  },
+  {
+   "id": 32,
+   "kind": "table",
+   "start": 5428,
+   "end": 5515,
+   "text": "| ⟦0⟧               | ⟦1⟧ | Fallback identifier if ⟦2⟧ is not set |",
+   "tokens": [
+    "`task`",
+    "`str`",
+    "`task_description`"
+   ]
+  },
+  {
+   "id": 33,
+   "kind": "heading",
+   "start": 5517,
+   "end": 5538,
+   "text": "### Success reporting",
+   "tokens": []
+  },
+  {
+   "id": 34,
+   "kind": "para",
+   "start": 5540,
+   "end": 5615,
+   "text": "Your ⟦0⟧ and ⟦1⟧ must include ⟦2⟧ in the ⟦3⟧ dict:",
+   "tokens": [
+    "`step()`",
+    "`reset()`",
+    "`\"is_success\"`",
+    "`info`"
+   ]
+  },
+  {
+   "id": 35,
+   "kind": "heading",
+   "start": 5729,
+   "end": 5745,
+   "text": "### Observations",
+   "tokens": []
+  },
+  {
+   "id": 36,
+   "kind": "para",
+   "start": 5747,
+   "end": 5947,
+   "text": "The simplest approach is to map your simulator's outputs to the standard keys that ⟦0⟧ already understands. Do this inside your ⟦1⟧ (e.g. in a ⟦2⟧ helper):",
+   "tokens": [
+    "`preprocess_observation()`",
+    "`gym.Env`",
+    "`_format_raw_obs()`"
+   ]
+  },
+  {
+   "id": 37,
+   "kind": "table",
+   "start": 5949,
+   "end": 6047,
+   "text": "| Your env should output    | LeRobot maps it to         | What it is                            |",
+   "tokens": []
+  },
+  {
+   "id": 38,
+   "kind": "table",
+   "start": 6147,
+   "end": 6245,
+   "text": "| ⟦0⟧ (single array) | ⟦1⟧        | Single camera image, HWC uint8        |",
+   "tokens": [
+    "`\"pixels\"`",
+    "`observation.image`"
+   ]
+  },
+  {
+   "id": 39,
+   "kind": "table",
+   "start": 6246,
+   "end": 6344,
+   "text": "| ⟦0⟧ (dict)         | ⟦1⟧ | Multiple cameras, each HWC uint8      |",
+   "tokens": [
+    "`\"pixels\"`",
+    "`observation.images.<cam>`"
+   ]
+  },
+  {
+   "id": 40,
+   "kind": "table",
+   "start": 6345,
+   "end": 6443,
+   "text": "| ⟦0⟧             | ⟦1⟧        | Proprioceptive state vector           |",
+   "tokens": [
+    "`\"agent_pos\"`",
+    "`observation.state`"
+   ]
+  },
+  {
+   "id": 41,
+   "kind": "table",
+   "start": 6444,
+   "end": 6542,
+   "text": "| ⟦0⟧     | ⟦1⟧    | Full environment state (e.g. PushT)   |",
+   "tokens": [
+    "`\"environment_state\"`",
+    "`observation.env_state`"
+   ]
+  },
+  {
+   "id": 42,
+   "kind": "table",
+   "start": 6543,
+   "end": 6641,
+   "text": "| ⟦0⟧           | ⟦1⟧  | Nested robot state dict (e.g. LIBERO) |",
+   "tokens": [
+    "`\"robot_state\"`",
+    "`observation.robot_state`"
+   ]
+  },
+  {
+   "id": 43,
+   "kind": "para",
+   "start": 6643,
+   "end": 6708,
+   "text": "If your simulator uses different key names, you have two options:",
+   "tokens": []
+  },
+  {
+   "id": 44,
+   "kind": "list",
+   "start": 6710,
+   "end": 6793,
+   "text": "1. **Recommended:** Rename them to the standard keys inside your ⟦0⟧ wrapper.",
+   "tokens": [
+    "`gym.Env`"
+   ]
+  },
+  {
+   "id": 45,
+   "kind": "list",
+   "start": 6794,
+   "end": 6920,
+   "text": "2. **Alternative:** Write an env processor to transform observations after ⟦0⟧ runs (see step 4 below).",
+   "tokens": [
+    "`preprocess_observation()`"
+   ]
+  },
+  {
+   "id": 46,
+   "kind": "heading",
+   "start": 6922,
+   "end": 6933,
+   "text": "### Actions",
+   "tokens": []
+  },
+  {
+   "id": 47,
+   "kind": "para",
+   "start": 6935,
+   "end": 7183,
+   "text": "Actions are continuous numpy arrays in a ⟦0⟧. The dimensionality depends on your benchmark (7 for LIBERO, 4 for Meta-World, etc.). Policies adapt to different action dimensions through their ⟦1⟧ / ⟦2⟧ config.",
+   "tokens": [
+    "`gym.spaces.Box`",
+    "`input_features`",
+    "`output_features`"
+   ]
+  },
+  {
+   "id": 48,
+   "kind": "heading",
+   "start": 7185,
+   "end": 7208,
+   "text": "### Feature declaration",
+   "tokens": []
+  },
+  {
+   "id": 49,
+   "kind": "para",
+   "start": 7210,
+   "end": 7291,
+   "text": "Each ⟦0⟧ subclass declares two dicts that tell the policy what to expect:",
+   "tokens": [
+    "`EnvConfig`"
+   ]
+  },
+  {
+   "id": 50,
+   "kind": "list",
+   "start": 7293,
+   "end": 7390,
+   "text": "- ⟦0⟧ — maps feature names to ⟦1⟧ (e.g. action dim, image shape).",
+   "tokens": [
+    "`features`",
+    "`PolicyFeature(type, shape)`"
+   ]
+  },
+  {
+   "id": 51,
+   "kind": "list",
+   "start": 7391,
+   "end": 7509,
+   "text": "- ⟦0⟧ — maps raw observation keys to LeRobot convention keys (e.g. ⟦1⟧ to ⟦2⟧).",
+   "tokens": [
+    "`features_map`",
+    "`\"agent_pos\"`",
+    "`\"observation.state\"`"
+   ]
+  },
+  {
+   "id": 52,
+   "kind": "heading",
+   "start": 7511,
+   "end": 7526,
+   "text": "## Step by step",
+   "tokens": []
+  },
+  {
+   "id": 53,
+   "kind": "para",
+   "start": 7528,
+   "end": 7741,
+   "text": "⟦0⟧\n  At minimum, you need two files: a **gym.Env wrapper** and an **EnvConfig\n  subclass** with a ⟦1⟧ override. Everything else is optional or\n  documentation. No changes to ⟦2⟧ are needed.",
+   "tokens": [
+    "<Tip>",
+    "`create_envs()`",
+    "`factory.py`"
+   ]
+  },
+  {
+   "id": 54,
+   "kind": "heading",
+   "start": 7750,
+   "end": 7763,
+   "text": "### Checklist",
+   "tokens": []
+  },
+  {
+   "id": 55,
+   "kind": "table",
+   "start": 7765,
+   "end": 7883,
+   "text": "| File                                     | Required | Why                                                          |",
+   "tokens": []
+  },
+  {
+   "id": 56,
+   "kind": "table",
+   "start": 8003,
+   "end": 8121,
+   "text": "| ⟦0⟧        | Yes      | Wraps the simulator as a standard gym.Env                    |",
+   "tokens": [
+    "`src/lerobot/envs/<benchmark>.py`"
+   ]
+  },
+  {
+   "id": 57,
+   "kind": "table",
+   "start": 8122,
+   "end": 8240,
+   "text": "| ⟦0⟧            | Yes      | Registers your benchmark and its ⟦1⟧ for the CLI |",
+   "tokens": [
+    "`src/lerobot/envs/configs.py`",
+    "`create_envs()`"
+   ]
+  },
+  {
+   "id": 58,
+   "kind": "table",
+   "start": 8241,
+   "end": 8359,
+   "text": "| ⟦0⟧ | Optional | Custom observation/action transforms                         |",
+   "tokens": [
+    "`src/lerobot/processor/env_processor.py`"
+   ]
+  },
+  {
+   "id": 59,
+   "kind": "table",
+   "start": 8360,
+   "end": 8478,
+   "text": "| ⟦0⟧              | Optional | Only if you need new raw observation keys                    |",
+   "tokens": [
+    "`src/lerobot/envs/utils.py`"
+   ]
+  },
+  {
+   "id": 60,
+   "kind": "table",
+   "start": 8479,
+   "end": 8597,
+   "text": "| ⟦0⟧                         | Yes      | Declares benchmark-specific dependencies                     |",
+   "tokens": [
+    "`pyproject.toml`"
+   ]
+  },
+  {
+   "id": 61,
+   "kind": "table",
+   "start": 8598,
+   "end": 8716,
+   "text": "| ⟦0⟧            | Yes      | User-facing documentation page                               |",
+   "tokens": [
+    "`docs/source/<benchmark>.mdx`"
+   ]
+  },
+  {
+   "id": 62,
+   "kind": "table",
+   "start": 8717,
+   "end": 8835,
+   "text": "| ⟦0⟧               | Yes      | Adds your page to the docs sidebar                           |",
+   "tokens": [
+    "`docs/source/_toctree.yml`"
+   ]
+  },
+  {
+   "id": 63,
+   "kind": "heading",
+   "start": 8837,
+   "end": 8899,
+   "text": "### 1. The gym.Env wrapper (⟦0⟧)",
+   "tokens": [
+    "`src/lerobot/envs/<benchmark>.py`"
+   ]
+  },
+  {
+   "id": 64,
+   "kind": "para",
+   "start": 8901,
+   "end": 8966,
+   "text": "Create a ⟦0⟧ subclass that wraps the third-party simulator:",
+   "tokens": [
+    "`gym.Env`"
+   ]
+  },
+  {
+   "id": 65,
+   "kind": "para",
+   "start": 9830,
+   "end": 10173,
+   "text": "**GPU-based simulators (e.g. MuJoCo with EGL rendering):** If your simulator allocates GPU/EGL contexts during ⟦0⟧, defer that allocation to a ⟦1⟧ helper called on first ⟦2⟧/⟦3⟧. This avoids inheriting stale GPU handles when ⟦4⟧ spawns worker processes. See ⟦5⟧ for the pattern.",
+   "tokens": [
+    "`__init__`",
+    "`_ensure_env()`",
+    "`reset()`",
+    "`step()`",
+    "`AsyncVectorEnv`",
+    "`LiberoEnv._ensure_env()`"
+   ]
+  },
+  {
+   "id": 66,
+   "kind": "para",
+   "start": 10175,
+   "end": 10246,
+   "text": "Also provide a factory function that returns the nested dict structure:",
+   "tokens": []
+  },
+  {
+   "id": 67,
+   "kind": "para",
+   "start": 10502,
+   "end": 10626,
+   "text": "See ⟦0⟧ (multi-suite, multi-task) and ⟦1⟧ (difficulty-grouped tasks) for reference.",
+   "tokens": [
+    "`create_libero_envs()`",
+    "`create_metaworld_envs()`"
+   ]
+  },
+  {
+   "id": 68,
+   "kind": "heading",
+   "start": 10628,
+   "end": 10677,
+   "text": "### 2. The config (⟦0⟧)",
+   "tokens": [
+    "`src/lerobot/envs/configs.py`"
+   ]
+  },
+  {
+   "id": 69,
+   "kind": "para",
+   "start": 10679,
+   "end": 10846,
+   "text": "Register a config dataclass so users can select your benchmark with ⟦0⟧. Each config owns its environment creation and processor logic via two methods:",
+   "tokens": [
+    "`--env.type=<name>`"
+   ]
+  },
+  {
+   "id": 70,
+   "kind": "list",
+   "start": 10848,
+   "end": 11034,
+   "text": "- **⟦0⟧** — Returns ⟦1⟧. The base class default uses ⟦2⟧ for single-task envs. Multi-task benchmarks override this.",
+   "tokens": [
+    "`create_envs(n_envs, use_async_envs)`",
+    "`{suite: {task_id: VectorEnv}}`",
+    "`gym.make()`"
+   ]
+  },
+  {
+   "id": 71,
+   "kind": "list",
+   "start": 11035,
+   "end": 11229,
+   "text": "- **⟦0⟧** — Returns ⟦1⟧. The base class default returns identity (no-op) pipelines. Override if your benchmark needs observation/action transforms.",
+   "tokens": [
+    "`get_env_processors()`",
+    "`(preprocessor, postprocessor)`"
+   ]
+  },
+  {
+   "id": 72,
+   "kind": "para",
+   "start": 12649,
+   "end": 12660,
+   "text": "Key points:",
+   "tokens": []
+  },
+  {
+   "id": 73,
+   "kind": "list",
+   "start": 12662,
+   "end": 12745,
+   "text": "- The ⟦0⟧ name is what users pass on the CLI (⟦1⟧).",
+   "tokens": [
+    "`register_subclass`",
+    "`--env.type=<name>`"
+   ]
+  },
+  {
+   "id": 74,
+   "kind": "list",
+   "start": 12746,
+   "end": 12806,
+   "text": "- ⟦0⟧ tells the policy what the environment produces.",
+   "tokens": [
+    "`features`"
+   ]
+  },
+  {
+   "id": 75,
+   "kind": "list",
+   "start": 12807,
+   "end": 12877,
+   "text": "- ⟦0⟧ maps raw observation keys to LeRobot convention keys.",
+   "tokens": [
+    "`features_map`"
+   ]
+  },
+  {
+   "id": 76,
+   "kind": "list",
+   "start": 12878,
+   "end": 13010,
+   "text": "- **No changes to ⟦0⟧ needed** — the factory delegates to ⟦1⟧ and ⟦2⟧ automatically.",
+   "tokens": [
+    "`factory.py`",
+    "`cfg.create_envs()`",
+    "`cfg.get_env_processors()`"
+   ]
+  },
+  {
+   "id": 77,
+   "kind": "heading",
+   "start": 13012,
+   "end": 13086,
+   "text": "### 3. Env processor (optional — ⟦0⟧)",
+   "tokens": [
+    "`src/lerobot/processor/env_processor.py`"
+   ]
+  },
+  {
+   "id": 78,
+   "kind": "para",
+   "start": 13088,
+   "end": 13344,
+   "text": "Only needed if your benchmark requires observation transforms beyond what ⟦0⟧ handles (e.g. image flipping, coordinate conversion). Define the processor step here and return it from ⟦1⟧ in your config (see step 2):",
+   "tokens": [
+    "`preprocess_observation()`",
+    "`get_env_processors()`"
+   ]
+  },
+  {
+   "id": 79,
+   "kind": "para",
+   "start": 13827,
+   "end": 13926,
+   "text": "See ⟦0⟧ for a full example (image rotation, quaternion-to-axis-angle conversion).",
+   "tokens": [
+    "`LiberoProcessorStep`"
+   ]
+  },
+  {
+   "id": 80,
+   "kind": "heading",
+   "start": 13928,
+   "end": 13966,
+   "text": "### 4. Dependencies (⟦0⟧)",
+   "tokens": [
+    "`pyproject.toml`"
+   ]
+  },
+  {
+   "id": 81,
+   "kind": "para",
+   "start": 13968,
+   "end": 14004,
+   "text": "Add a new optional-dependency group:",
+   "tokens": []
+  },
+  {
+   "id": 82,
+   "kind": "para",
+   "start": 14083,
+   "end": 14097,
+   "text": "Pinning rules:",
+   "tokens": []
+  },
+  {
+   "id": 83,
+   "kind": "list",
+   "start": 14099,
+   "end": 14199,
+   "text": "- **Always pin** benchmark packages to exact versions for reproducibility (e.g. ⟦0⟧).",
+   "tokens": [
+    "`metaworld==3.0.0`"
+   ]
+  },
+  {
+   "id": 84,
+   "kind": "list",
+   "start": 14200,
+   "end": 14274,
+   "text": "- **Add platform markers** when needed (e.g. ⟦0⟧).",
+   "tokens": [
+    "`; sys_platform == 'linux'`"
+   ]
+  },
+  {
+   "id": 85,
+   "kind": "list",
+   "start": 14275,
+   "end": 14359,
+   "text": "- **Pin fragile transitive deps** if known (e.g. ⟦0⟧ for Meta-World).",
+   "tokens": [
+    "`gymnasium==1.1.0`"
+   ]
+  },
+  {
+   "id": 86,
+   "kind": "list",
+   "start": 14360,
+   "end": 14414,
+   "text": "- **Document constraints** in your benchmark doc page.",
+   "tokens": []
+  },
+  {
+   "id": 87,
+   "kind": "para",
+   "start": 14416,
+   "end": 14435,
+   "text": "Users install with:",
+   "tokens": []
+  },
+  {
+   "id": 88,
+   "kind": "heading",
+   "start": 14482,
+   "end": 14534,
+   "text": "### 5. Documentation (⟦0⟧)",
+   "tokens": [
+    "`docs/source/<benchmark>.mdx`"
+   ]
+  },
+  {
+   "id": 89,
+   "kind": "para",
+   "start": 14536,
+   "end": 14684,
+   "text": "Write a user-facing page following the template in the next section. See ⟦0⟧ and ⟦1⟧ for full examples.",
+   "tokens": [
+    "`docs/source/libero.mdx`",
+    "`docs/source/metaworld.mdx`"
+   ]
+  },
+  {
+   "id": 90,
+   "kind": "heading",
+   "start": 14686,
+   "end": 14739,
+   "text": "### 6. Table of contents (⟦0⟧)",
+   "tokens": [
+    "`docs/source/_toctree.yml`"
+   ]
+  },
+  {
+   "id": 91,
+   "kind": "para",
+   "start": 14741,
+   "end": 14788,
+   "text": "Add your benchmark to the \"Benchmarks\" section:",
+   "tokens": []
+  },
+  {
+   "id": 92,
+   "kind": "heading",
+   "start": 15072,
+   "end": 15101,
+   "text": "## Verifying your integration",
+   "tokens": []
+  },
+  {
+   "id": 93,
+   "kind": "para",
+   "start": 15103,
+   "end": 15167,
+   "text": "After completing the steps above, confirm that everything works:",
+   "tokens": []
+  },
+  {
+   "id": 94,
+   "kind": "list",
+   "start": 15169,
+   "end": 15269,
+   "text": "1. **Install** — ⟦0⟧ and verify the dependency group installs cleanly.",
+   "tokens": [
+    "`pip install -e \".[mybenchmark]\"`"
+   ]
+  },
+  {
+   "id": 95,
+   "kind": "list",
+   "start": 15270,
+   "end": 15494,
+   "text": "2. **Smoke test env creation** — call ⟦0⟧ with your config in Python, check that the returned dict has the expected ⟦1⟧ shape, and that ⟦2⟧ returns observations with the right keys.",
+   "tokens": [
+    "`make_env()`",
+    "`{suite: {task_id: VectorEnv}}`",
+    "`reset()`"
+   ]
+  },
+  {
+   "id": 96,
+   "kind": "list",
+   "start": 15495,
+   "end": 15787,
+   "text": "3. **Run a full eval** — ⟦0⟧ to exercise the full pipeline end-to-end. (⟦1⟧ defaults to auto-tuning based on CPU cores; pass ⟦2⟧ to force a single environment.)",
+   "tokens": [
+    "`lerobot-eval --env.type=<name> --env.task=<task> --eval.n_episodes=1 --policy.path=<any_compatible_policy>`",
+    "`batch_size`",
+    "`--eval.batch_size=1`"
+   ]
+  },
+  {
+   "id": 97,
+   "kind": "list",
+   "start": 15788,
+   "end": 15964,
+   "text": "4. **Check success detection** — verify that ⟦0⟧ flips to ⟦1⟧ when the task is actually completed. This is what the eval loop uses to compute success rates.",
+   "tokens": [
+    "`info[\"is_success\"]`",
+    "`True`"
+   ]
+  },
+  {
+   "id": 98,
+   "kind": "heading",
+   "start": 15966,
+   "end": 15997,
+   "text": "## Writing a benchmark doc page",
+   "tokens": []
+  },
+  {
+   "id": 99,
+   "kind": "para",
+   "start": 15999,
+   "end": 16041,
+   "text": "Each benchmark ⟦0⟧ page should include:",
+   "tokens": [
+    "`.mdx`"
+   ]
+  },
+  {
+   "id": 100,
+   "kind": "list",
+   "start": 16043,
+   "end": 16135,
+   "text": "- **Title and description** — 1-2 paragraphs on what the benchmark tests and why it matters.",
+   "tokens": []
+  },
+  {
+   "id": 101,
+   "kind": "list",
+   "start": 16136,
+   "end": 16201,
+   "text": "- **Links** — paper, GitHub repo, project website (if available).",
+   "tokens": []
+  },
+  {
+   "id": 102,
+   "kind": "list",
+   "start": 16202,
+   "end": 16230,
+   "text": "- **Overview image or GIF.**",
+   "tokens": []
+  },
+  {
+   "id": 103,
+   "kind": "list",
+   "start": 16231,
+   "end": 16311,
+   "text": "- **Available tasks** — table of task suites with counts and brief descriptions.",
+   "tokens": []
+  },
+  {
+   "id": 104,
+   "kind": "list",
+   "start": 16312,
+   "end": 16416,
+   "text": "- **Installation** — ⟦0⟧ plus any extra steps (env vars, system packages).",
+   "tokens": [
+    "`pip install -e \".[<benchmark>]\"`"
+   ]
+  },
+  {
+   "id": 105,
+   "kind": "list",
+   "start": 16417,
+   "end": 16631,
+   "text": "- **Evaluation** — recommended ⟦0⟧ command with ⟦1⟧ for reproducible results. ⟦2⟧ defaults to auto; only specify it if needed. Include single-task and multi-task examples if applicable.",
+   "tokens": [
+    "`lerobot-eval`",
+    "`n_episodes`",
+    "`batch_size`"
+   ]
+  },
+  {
+   "id": 106,
+   "kind": "list",
+   "start": 16632,
+   "end": 16721,
+   "text": "- **Policy inputs and outputs** — observation keys with shapes, action space description.",
+   "tokens": []
+  },
+  {
+   "id": 107,
+   "kind": "list",
+   "start": 16722,
+   "end": 16801,
+   "text": "- **Recommended evaluation episodes** — how many episodes per task is standard.",
+   "tokens": []
+  },
+  {
+   "id": 108,
+   "kind": "list",
+   "start": 16802,
+   "end": 16851,
+   "text": "- **Training** — example ⟦0⟧ command.",
+   "tokens": [
+    "`lerobot-train`"
+   ]
+  },
+  {
+   "id": 109,
+   "kind": "list",
+   "start": 16852,
+   "end": 16959,
+   "text": "- **Reproducing published results** — link to pretrained model, eval command, results table (if available).",
+   "tokens": []
+  },
+  {
+   "id": 110,
+   "kind": "para",
+   "start": 16961,
+   "end": 17044,
+   "text": "See ⟦0⟧ and ⟦1⟧ for complete examples.",
+   "tokens": [
+    "`docs/source/libero.mdx`",
+    "`docs/source/metaworld.mdx`"
+   ]
+  }
+ ]
+}

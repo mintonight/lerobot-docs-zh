@@ -1,0 +1,250 @@
+<script lang="ts">
+import {onMount} from "svelte";
+import Tip from "$lib/Tip.svelte";
+import CopyLLMTxtMenu from "$lib/CopyLLMTxtMenu.svelte";
+import Youtube from "$lib/Youtube.svelte";
+import Docstring from "$lib/Docstring.svelte";
+import CodeBlock from "$lib/CodeBlock.svelte";
+import CodeBlockFw from "$lib/CodeBlockFw.svelte";
+import DocNotebookDropdown from "$lib/DocNotebookDropdown.svelte";
+import CourseFloatingBanner from "$lib/CourseFloatingBanner.svelte";
+import IconCopyLink from "$lib/IconCopyLink.svelte";
+import FrameworkContent from "$lib/FrameworkContent.svelte";
+import Markdown from "$lib/Markdown.svelte";
+import Question from "$lib/Question.svelte";
+import FrameworkSwitchCourse from "$lib/FrameworkSwitchCourse.svelte";
+import InferenceApi from "$lib/InferenceApi.svelte";
+import TokenizersLanguageContent from "$lib/TokenizersLanguageContent.svelte";
+import ExampleCodeBlock from "$lib/ExampleCodeBlock.svelte";
+import Added from "$lib/Added.svelte";
+import Changed from "$lib/Changed.svelte";
+import Deprecated from "$lib/Deprecated.svelte";
+import PipelineIcon from "$lib/PipelineIcon.svelte";
+import PipelineTag from "$lib/PipelineTag.svelte";
+import Heading from "$lib/Heading.svelte";
+import HfOptions from "$lib/HfOptions.svelte";
+import HfOption from "$lib/HfOption.svelte";
+import EditOnGithub from "$lib/EditOnGithub.svelte";
+import InferenceSnippet from "$lib/InferenceSnippet/InferenceSnippet.svelte";
+import MermaidChart from "$lib/MermaidChart.svelte";
+let fw: "pt" | "tf" = "pt";
+onMount(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    fw = urlParams.get("fw") || "pt";
+});
+</script>
+<svelte:head>
+  <meta name="hf:doc:metadata" content={metadata} >
+</svelte:head>
+
+<!--HF DOCBUILD BODY START-->
+
+HF_DOC_BODY_START
+
+<CopyLLMTxtMenu containerStyle="float: right; margin-left: 10px; display: inline-flex; position: relative; z-index: 10;"></CopyLLMTxtMenu>
+
+# 手机
+
+使用你的手机（iOS 或 Android）控制机器人。
+
+**本指南将介绍：**
+
+- 如何连接 iOS/Android 手机
+- 手机位姿如何映射到机器人 end-effector（EE）目标
+- 如何调整安全限制、gripper 控制和 IK 设置
+
+要使用手机控制机器人，请使用以下命令安装相关依赖：
+
+```bash
+pip install lerobot[phone]
+```
+
+## 开始使用
+
+### 支持的平台
+
+- iOS：使用 HEBI Mobile I/O 应用（ARKit 位姿 + 按钮）。先下载该应用并打开，示例会在你的网络上发现它，并流式传输手机位姿和输入。
+- Android：使用 `teleop` 包（WebXR）。当你启动 Python 进程时，它会打印一个本地 URL。在手机上打开该链接，点击 Start，然后使用 Move 流式传输位姿。
+
+链接：
+
+- Android WebXR 库：[PyPI 上的 `teleop`](https://pypi.org/project/teleop/)
+- iOS 应用：[HEBI Mobile I/O](https://docs.hebi.us/tools.html#mobile-io)
+
+### 手机方向与控制
+
+- 方向：握住手机，使屏幕朝上，且顶部边缘指向与机器人 gripper 相同的方向。这可确保 calibration 将手机的坐标系与机器人坐标系对齐，使运动感觉自然，参考下图。
+- 启用/禁用：
+  - iOS：按住 `B1` 启用 teleoperation，松开停止。第一次按下会捕获一个参考位姿。
+  - Android：按住 `Move` 按钮，松开停止。第一次按下会捕获一个参考位姿。
+- gripper 控制：
+  - iOS：模拟输入 `A3` 作为速度输入控制 gripper。
+  - Android：按钮 `A` 和 `B` 的作用类似于递增/递减（A 打开，B 关闭）。你可以在 `GripperVelocityToJoint` 步骤中调整速度。
+
+<img src="https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/lerobot/phone_teleop.webp" alt="Phone teleop orientation" title="Phone teleop orientation" width="40%">
+
+### 步骤 1：选择平台
+
+修改示例，在 `PhoneConfig` 中使用 `PhoneOS.IOS` 或 `PhoneOS.ANDROID`。各平台的 API 完全相同，只是输入源不同。所有示例都在 `examples/` 下，并具有 `phone_so100_*.py` 变体。
+
+teleoperation 示例：
+
+```python
+from lerobot.teleoperators.phone import Phone, PhoneConfig
+from lerobot.teleoperators.phone.config_phone import PhoneOS
+
+teleop_config = PhoneConfig(phone_os=PhoneOS.IOS)  # or PhoneOS.ANDROID
+teleop_device = Phone(teleop_config)
+```
+
+### 步骤 2：连接与 calibration
+
+创建 `Phone(teleop_config)` 并调用 `connect()` 时，会自动提示 calibration。以上述方向握住手机，然后：
+
+- iOS：按住 `B1` 以捕获参考位姿。
+- Android：在 WebXR 页面上按下 `Move` 按钮以捕获参考位姿。
+
+为什么要 calibration？我们捕获当前位姿，以便后续位姿在机器人对齐的坐标系中表示。当你再次按下按钮启用控制时，会重新捕获位置，以避免手机在禁用期间被移动时产生漂移。
+
+### 步骤 3：运行示例
+
+运行其中一个示例脚本以进行 teleoperation、录制 dataset、回放 dataset 或评估 policy。
+
+所有脚本都假定你已配置好机器人（例如 SO-100 follower arm）并设置了正确的串口。
+
+此外，你需要**将机器人的 URDF 复制到示例文件夹中**。对于本教程中的示例（使用 SO100/SO101），将 [SO-ARM100 仓库](https://github.com/TheRobotStudio/SO-ARM100/blob/main/Simulation/SO101)中的 `SO101` 文件夹复制到 `examples/phone_to_so100/` 目录中，使 URDF 文件路径变为 `examples/phone_to_so100/SO101/so101_new_calib.urdf`。
+
+- 运行此示例进行 teleoperation：
+
+  ```bash
+  cd examples/phone_to_so100
+  python teleoperate.py
+  ```
+
+运行示例后：
+
+- Android：启动脚本后，在手机上打开打印的本地 URL，点击 Start，然后按住 Move。
+- iOS：先打开 HEBI Mobile I/O；B1 启用运动。A3 控制 gripper。
+
+此外，你可以通过编辑示例中展示的处理器步骤来自定义映射或安全限制。你还可以通过修改输入和运动学步骤来重新映射输入（例如使用不同的模拟输入）或将流水线适配到其他机器人（例如 LeKiwi）。更多内容请参阅[机器人与 teleoperator 的处理器](./processors_robots_teleop)指南。
+
+- 运行此示例以录制 dataset，它会保存绝对的 end-effector observation 和 action：
+
+  ```bash
+  cd examples/phone_to_so100
+  python record.py
+  ```
+
+- 运行此示例回放录制的 episode：
+
+  ```bash
+  cd examples/phone_to_so100
+  python replay.py
+  ```
+
+- 运行此示例评估预训练 policy：
+
+  ```bash
+  cd examples/phone_to_so100
+  python evaluate.py
+  ```
+
+### 重要的流水线步骤与选项
+
+- 运动学用于多个步骤。我们使用 [Placo](https://github.com/Rhoban/placo)，它是 Pinocchio 的封装，用于处理我们的运动学。我们通过传入机器人的 URDF 和目标坐标系来构造运动学对象。我们将 `target_frame_name` 设置为 gripper 坐标系。
+
+  ```python
+  kinematics_solver = RobotKinematics(
+    urdf_path="./SO101/so101_new_calib.urdf",
+    target_frame_name="gripper_frame_link",
+    joint_names=list(robot.bus.motors.keys()),
+  )
+
+  ```
+
+- `MapPhoneActionToRobotAction` 步骤将 calibration 后的手机位姿和输入转换为目标增量和 gripper 命令，下面展示了该步骤的输出。
+
+  ```python
+  action["enabled"] = enabled
+        action["target_x"] = -pos[1] if enabled else 0.0
+        action["target_y"] = pos[0] if enabled else 0.0
+        action["target_z"] = pos[2] if enabled else 0.0
+        action["target_wx"] = rotvec[1] if enabled else 0.0
+        action["target_wy"] = rotvec[0] if enabled else 0.0
+        action["target_wz"] = -rotvec[2] if enabled else 0.0
+        action["gripper_vel"] = gripper_vel  # Still send gripper action when disabled
+  ```
+
+- `EEReferenceAndDelta` 步骤将目标增量转换为绝对期望 EE 位姿，并在启用时存储一个参考值，`end_effector_step_sizes` 是 EE 位姿的步长，可以修改以改变运动速度。
+
+  ```python
+  EEReferenceAndDelta(
+      kinematics=kinematics_solver,
+      end_effector_step_sizes={"x": 0.5, "y": 0.5, "z": 0.5},
+      motor_names=list(robot.bus.motors.keys()),
+      use_latched_reference=True,
+  ),
+  ```
+
+- `EEBoundsAndSafety` 步骤将 EE 运动限制在工作空间内，并检查大的 EE 步进跳跃以确保安全。`end_effector_bounds` 是 EE 位姿的边界，可以修改以改变工作空间。`max_ee_step_m` 是 EE 位姿的步进限制，可以修改以改变安全限制。
+
+  ```python
+  EEBoundsAndSafety(
+      end_effector_bounds={"min": [-1.0, -1.0, -1.0], "max": [1.0, 1.0, 1.0]},
+      max_ee_step_m=0.10,
+  )
+  ```
+
+- `GripperVelocityToJoint` 步骤使用当前测量 state 将类似速度的 gripper 输入转换为绝对 gripper 位置。`speed_factor` 是速度乘数因子。
+
+  ```python
+  GripperVelocityToJoint(speed_factor=20.0)
+  ```
+
+#### 不同的 IK 初始猜测
+
+我们在运动学步骤中使用不同的 IK 初始猜测。初始猜测使用当前测量的关节或先前的 IK 解。
+
+- 闭环（用于录制/评估）：设置 `initial_guess_current_joints=True`，使 IK 每帧从测量的关节开始。
+
+  ```python
+  InverseKinematicsEEToJoints(
+      kinematics=kinematics_solver,
+      motor_names=list(robot.bus.motors.keys()),
+      initial_guess_current_joints=True,  # closed loop
+  )
+  ```
+
+- 开环（用于回放）：设置 `initial_guess_current_joints=False`，使 IK 从先前的 IK 解而非测量 state 继续。这在我们无反馈回放时保持 action 稳定性。
+
+  ```python
+  InverseKinematicsEEToJoints(
+      kinematics=kinematics_solver,
+      motor_names=list(robot.bus.motors.keys()),
+      initial_guess_current_joints=False,  # open loop
+  )
+  ```
+
+### 流水线步骤详解
+
+- MapPhoneActionToRobotAction：将 calibration 后的手机位姿和输入转换为目标增量和 gripper 命令。运动由启用信号控制（iOS 上为 B1，Android 上为 Move）。
+- EEReferenceAndDelta：在启用时锁存一个参考 EE 位姿，并将其与目标增量组合，每帧生成绝对期望 EE 位姿。禁用时，它继续发送最后命令的位姿。
+- EEBoundsAndSafety：将 EE 位姿限制在工作空间内，并为了安全对跳跃进行速率限制。还声明 `action.ee.*` 特征。
+- InverseKinematicsEEToJoints：使用 IK 将 EE 位姿转换为关节位置。推荐在闭环控制中使用 `initial_guess_current_joints=True`；为稳定性在开环回放中设置 `False`。
+- GripperVelocityToJoint：使用当前测量 state 将类似速度的 gripper 输入积分为绝对 gripper 位置。
+- ForwardKinematicsJointsToEE：从观测到的关节计算 `observation.state.ee.*`，用于记录和基于 EE state 进行训练。
+
+### 故障排查
+
+- 未发现 iOS：确保 HEBI Mobile I/O 已打开，且你的笔记本电脑/手机在同一网络上。
+- Android URL 无法访问：检查你使用的是 `https` 而不是 `http`，使用脚本打印的精确 IP，并允许浏览器进入并忽略证书问题。
+- 运动感觉反向：调整 `MapPhoneActionToRobotAction` 中的符号翻转或交换轴以匹配你的设置。
+
+
+
+<EditOnGithub source="https://github.com/huggingface/lerobot/blob/main/docs/source/phone_teleop.mdx" />
+
+<!--HF DOCBUILD BODY END-->
+
+HF_DOC_BODY_END
+

@@ -1,0 +1,187 @@
+<script lang="ts">
+import {onMount} from "svelte";
+import Tip from "$lib/Tip.svelte";
+import CopyLLMTxtMenu from "$lib/CopyLLMTxtMenu.svelte";
+import Youtube from "$lib/Youtube.svelte";
+import Docstring from "$lib/Docstring.svelte";
+import CodeBlock from "$lib/CodeBlock.svelte";
+import CodeBlockFw from "$lib/CodeBlockFw.svelte";
+import DocNotebookDropdown from "$lib/DocNotebookDropdown.svelte";
+import CourseFloatingBanner from "$lib/CourseFloatingBanner.svelte";
+import IconCopyLink from "$lib/IconCopyLink.svelte";
+import FrameworkContent from "$lib/FrameworkContent.svelte";
+import Markdown from "$lib/Markdown.svelte";
+import Question from "$lib/Question.svelte";
+import FrameworkSwitchCourse from "$lib/FrameworkSwitchCourse.svelte";
+import InferenceApi from "$lib/InferenceApi.svelte";
+import TokenizersLanguageContent from "$lib/TokenizersLanguageContent.svelte";
+import ExampleCodeBlock from "$lib/ExampleCodeBlock.svelte";
+import Added from "$lib/Added.svelte";
+import Changed from "$lib/Changed.svelte";
+import Deprecated from "$lib/Deprecated.svelte";
+import PipelineIcon from "$lib/PipelineIcon.svelte";
+import PipelineTag from "$lib/PipelineTag.svelte";
+import Heading from "$lib/Heading.svelte";
+import HfOptions from "$lib/HfOptions.svelte";
+import HfOption from "$lib/HfOption.svelte";
+import EditOnGithub from "$lib/EditOnGithub.svelte";
+import InferenceSnippet from "$lib/InferenceSnippet/InferenceSnippet.svelte";
+import MermaidChart from "$lib/MermaidChart.svelte";
+let fw: "pt" | "tf" = "pt";
+onMount(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    fw = urlParams.get("fw") || "pt";
+});
+</script>
+<svelte:head>
+  <meta name="hf:doc:metadata" content={metadata} >
+</svelte:head>
+
+<!--HF DOCBUILD BODY START-->
+
+HF_DOC_BODY_START
+
+<CopyLLMTxtMenu containerStyle="float: right; margin-left: 10px; display: inline-flex; position: relative; z-index: 10;"></CopyLLMTxtMenu>
+
+# Cameras
+
+Cameras supply the image observations a policy sees. Every backend — OpenCV, Intel RealSense, Reachy 2 —
+implements the `Camera` interface, so swapping hardware does not change the code that reads frames.
+
+See the [Cameras guide](../cameras) for choosing and configuring a camera, and
+[Third-Party Cameras & Sensors](../third_party_sensors) for devices outside the core set.
+
+## Camera[[lerobot.cameras.Camera]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.cameras.Camera"} anchor={"lerobot.cameras.Camera"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/cameras/camera.py#L26"} parameters={[{"name": "config", "val": ": CameraConfig"}]}>
+<paramsdesc>- **fps** (int | None) -- Configured frames per second
+- **width** (int | None) -- Frame width in pixels
+- **height** (int | None) -- Frame height in pixels</paramsdesc></Docstring>
+Base class for camera implementations.
+
+Defines a standard interface for camera operations across different backends.
+Subclasses must implement all abstract methods.
+
+Manages basic camera properties (FPS, resolution) and core operations:
+- Connection/disconnection
+- Frame capture (sync/async/latest)
+
+
+
+
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"connect"} anchor={"lerobot.cameras.Camera.connect"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/cameras/camera.py#L99"} parameters={[{"name": "warmup", "val": ": bool = True"}]}>
+<paramsdesc>- **warmup** -- If True (default), captures a warmup frame before returning. Useful
+  for cameras that require time to adjust capture settings.
+  If False, skips the warmup frame.</paramsdesc></Docstring>
+Establish connection to the camera.
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"disconnect"} anchor={"lerobot.cameras.Camera.disconnect"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/cameras/camera.py#L181"} parameters={[]}>
+</Docstring>
+Disconnect from the camera and release resources.
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"read"} anchor={"lerobot.cameras.Camera.read"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/cameras/camera.py#L110"} parameters={[]}>
+<rettype>np.ndarray</rettype><retdesc>Captured frame as a numpy array.</retdesc></Docstring>
+Capture and return a single frame from the camera synchronously.
+
+This is a blocking call that will wait for the hardware and its SDK.
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"async_read"} anchor={"lerobot.cameras.Camera.async_read"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/cameras/camera.py#L121"} parameters={[{"name": "timeout_ms", "val": ": float = Ellipsis"}]}>
+<paramsdesc>- **timeout_ms** -- Maximum time to wait for a new frame in milliseconds.
+  Defaults to 200ms (0.2s).</paramsdesc><rettype>np.ndarray</rettype><retdesc>Captured frame as a numpy array.</retdesc><raises>- ``TimeoutError`` -- If no new frame arrives within `timeout_ms`.</raises><raisederrors>``TimeoutError``</raisederrors></Docstring>
+Return the most recent new frame.
+
+This method retrieves the latest frame captured by the background thread.
+If a new frame is already available in the buffer (captured since the last call),
+it returns it immediately.
+
+It blocks up to `timeout_ms` only if the buffer is empty or if the latest frame
+was already consumed by a previous `async_read` call.
+
+Essentially, this method return the latest unconsumed frame, waiting if necessary
+for a new one to arrive within the specified timeout.
+
+Usage:
+- Ideal for control loops where you want to ensure every processed frame
+is fresh, effectively synchronizing your loop to the camera's FPS.
+- Causes of a timeout usually include: very low camera FPS, heavy processing load,
+or if the camera is disconnected.
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"find_cameras"} anchor={"lerobot.cameras.Camera.find_cameras"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/cameras/camera.py#L89"} parameters={[]}>
+<rettype>List[Dict[str, Any]]</rettype><retdesc>A list of dictionaries,
+where each dictionary contains information about a detected camera.</retdesc></Docstring>
+Detects available cameras connected to the system.
+
+
+
+
+
+</div></div>
+
+## CameraConfig[[lerobot.cameras.CameraConfig]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.cameras.CameraConfig"} anchor={"lerobot.cameras.CameraConfig"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/cameras/configs.py#L60"} parameters={[{"name": "fps", "val": ": int | None = None"}, {"name": "width", "val": ": int | None = None"}, {"name": "height", "val": ": int | None = None"}]}>
+</Docstring>
+
+
+</div>
+
+## make_cameras_from_configs[[lerobot.cameras.make_cameras_from_configs]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"lerobot.cameras.make_cameras_from_configs"} anchor={"lerobot.cameras.make_cameras_from_configs"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/cameras/utils.py#L25"} parameters={[{"name": "camera_configs", "val": ": dict"}]}>
+</Docstring>
+
+
+</div>
+
+<!--HF DOCBUILD BODY END-->
+
+HF_DOC_BODY_END
+

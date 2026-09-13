@@ -1,0 +1,526 @@
+{
+ "file": "multi_gpu_training.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1944,
+   "text": "# Multi-GPU Training",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1946,
+   "end": 2095,
+   "text": "LeRobot trains on multiple GPUs through [Hugging Face Accelerate](⟦0⟧). Three data-parallel layouts are supported:",
+   "tokens": [
+    "https://huggingface.co/docs/accelerate"
+   ]
+  },
+  {
+   "id": 2,
+   "kind": "table",
+   "start": 2097,
+   "end": 2231,
+   "text": "| Layout   | What it does                                                  | Config                                                  |",
+   "tokens": []
+  },
+  {
+   "id": 3,
+   "kind": "table",
+   "start": 2367,
+   "end": 2501,
+   "text": "| **DDP**  | Replicates the full model on every GPU                        | default on any multi-GPU launch                         |",
+   "tokens": []
+  },
+  {
+   "id": 4,
+   "kind": "table",
+   "start": 2502,
+   "end": 2636,
+   "text": "| **FSDP** | Shards parameters, gradients, and optimizer state across GPUs | ⟦0⟧                              |",
+   "tokens": [
+    "`--parallelism.dp_shard=N`"
+   ]
+  },
+  {
+   "id": 5,
+   "kind": "table",
+   "start": 2637,
+   "end": 2771,
+   "text": "| **HSDP** | Shards within groups of GPUs, replicates across groups        | ⟦0⟧ |",
+   "tokens": [
+    "`--parallelism.dp_replicate=R --parallelism.dp_shard=S`"
+   ]
+  },
+  {
+   "id": 6,
+   "kind": "heading",
+   "start": 2773,
+   "end": 2788,
+   "text": "## Installation",
+   "tokens": []
+  },
+  {
+   "id": 7,
+   "kind": "para",
+   "start": 2790,
+   "end": 2839,
+   "text": "⟦0⟧ is included in the ⟦1⟧ extra:",
+   "tokens": [
+    "`accelerate`",
+    "`training`"
+   ]
+  },
+  {
+   "id": 8,
+   "kind": "heading",
+   "start": 2886,
+   "end": 2898,
+   "text": "## Launching",
+   "tokens": []
+  },
+  {
+   "id": 9,
+   "kind": "para",
+   "start": 2900,
+   "end": 3149,
+   "text": "Distributed training can be launched through both ⟦0⟧ and ⟦1⟧. Accelerate is used as a plain launcher: it does not manage the training configuration, and every distributed training setting lives in LeRobot's own config system.",
+   "tokens": [
+    "`torchrun`",
+    "`accelerate launch`"
+   ]
+  },
+  {
+   "id": 10,
+   "kind": "para",
+   "start": 3151,
+   "end": 3167,
+   "text": "With ⟦0⟧:",
+   "tokens": [
+    "`torchrun`"
+   ]
+  },
+  {
+   "id": 11,
+   "kind": "para",
+   "start": 3447,
+   "end": 3494,
+   "text": "With ⟦0⟧ (as a plain launcher):",
+   "tokens": [
+    "`accelerate launch`"
+   ]
+  },
+  {
+   "id": 12,
+   "kind": "para",
+   "start": 3782,
+   "end": 4014,
+   "text": "With no ⟦0⟧ flags, a multi-process launch runs plain DDP. Multi-node runs use the standard ⟦1⟧ flags (or ⟦2⟧).",
+   "tokens": [
+    "`--parallelism.*`",
+    "`torchrun --nnodes/--node-rank/--rdzv-endpoint`",
+    "`accelerate launch --num_machines/--machine_rank/--main_process_ip`"
+   ]
+  },
+  {
+   "id": 13,
+   "kind": "quote",
+   "start": 4016,
+   "end": 4639,
+   "text": "> [!WARNING]\n> Accelerate's YAML config files (⟦0⟧, ⟦1⟧) are not supported. They configure the engine through environment variables, bypassing LeRobot's configuration system, so ⟦2⟧ would no longer describe the settings a run actually used. ⟦3⟧ therefore refuses to start when [accelerate environment variables](⟦4⟧) are set. Put the settings in ⟦5⟧ / ⟦6⟧ flags instead, or set ⟦7⟧ to acknowledge the override and proceed anyway.",
+   "tokens": [
+    "`accelerate launch --config_file some.yaml`",
+    "`accelerate config`",
+    "`train_config.json`",
+    "`lerobot-train`",
+    "https://huggingface.co/docs/accelerate/usage_guides/fsdp",
+    "`--parallelism.*`",
+    "`--accelerator.*`",
+    "`LEROBOT_ALLOW_ACCELERATE_ENV=1`"
+   ]
+  },
+  {
+   "id": 14,
+   "kind": "heading",
+   "start": 4641,
+   "end": 4685,
+   "text": "## Batch semantics, learning rate, and steps",
+   "tokens": []
+  },
+  {
+   "id": 15,
+   "kind": "para",
+   "start": 4687,
+   "end": 4943,
+   "text": "Each of the ⟦0⟧ data-parallel workers loads its own ⟦1⟧ micro-batch every step, so one training step consumes ⟦2⟧ samples, and ⟦3⟧ of those go into each optimizer update:",
+   "tokens": [
+    "`dp_replicate × dp_shard`",
+    "`--batch_size`",
+    "`batch_size × dp_world_size`",
+    "`× gradient_accumulation_steps`"
+   ]
+  },
+  {
+   "id": 16,
+   "kind": "para",
+   "start": 5034,
+   "end": 5170,
+   "text": "The training banner prints this factorization at startup. ⟦0⟧ counts loop steps (micro-batches per worker), not optimizer updates.",
+   "tokens": [
+    "`--steps`"
+   ]
+  },
+  {
+   "id": 17,
+   "kind": "para",
+   "start": 5172,
+   "end": 5216,
+   "text": "Gradient accumulation is a first-class flag:",
+   "tokens": []
+  },
+  {
+   "id": 18,
+   "kind": "para",
+   "start": 5349,
+   "end": 5609,
+   "text": "**LeRobot does not auto-scale the learning rate or the number of steps** when the effective batch size grows. If you scale out and want equivalent training, please adjust manually, e.g. with 2 GPUs: double ⟦0⟧ (linear scaling), or halve ⟦1⟧.",
+   "tokens": [
+    "`--optimizer.lr`",
+    "`--steps`"
+   ]
+  },
+  {
+   "id": 19,
+   "kind": "heading",
+   "start": 5611,
+   "end": 5637,
+   "text": "## Sharded training (FSDP)",
+   "tokens": []
+  },
+  {
+   "id": 20,
+   "kind": "para",
+   "start": 5639,
+   "end": 5702,
+   "text": "If a model is too large to train with DDP, shard it with FSDP2:",
+   "tokens": []
+  },
+  {
+   "id": 21,
+   "kind": "para",
+   "start": 5958,
+   "end": 6042,
+   "text": "⟦0⟧ shards over however many processes the launcher started.",
+   "tokens": [
+    "`--parallelism.dp_shard=-1`"
+   ]
+  },
+  {
+   "id": 22,
+   "kind": "heading",
+   "start": 6044,
+   "end": 6058,
+   "text": "### Wrap units",
+   "tokens": []
+  },
+  {
+   "id": 23,
+   "kind": "para",
+   "start": 6060,
+   "end": 6545,
+   "text": "FSDP shards the model in units (typically the repeated transformer block) and gathers one unit at a time during forward/backward. Policies declare their wrap units via ⟦0⟧ on the policy class. For example, ACT declares ⟦1⟧ and FastWAM declares ⟦2⟧. For a policy without a ⟦3⟧ declaration, pass one of the flags below. You can specify the module class name explicitly, or use a size-based policy instead:",
+   "tokens": [
+    "`_fsdp_wrap_modules`",
+    "`[\"ACTEncoderLayer\", \"ACTDecoderLayer\"]`",
+    "`[\"MoTLayer\"]`",
+    "`_fsdp_wrap_modules`"
+   ]
+  },
+  {
+   "id": 24,
+   "kind": "para",
+   "start": 6744,
+   "end": 7010,
+   "text": "If a policy doesn't declare ⟦0⟧ and no ⟦1⟧ or ⟦2⟧ is passed, the run fails at startup rather than silently wrapping only the root module (which would forfeit all sharding memory savings).",
+   "tokens": [
+    "`_fsdp_wrap_modules`",
+    "`--accelerator.fsdp.wrap_modules`",
+    "`--accelerator.fsdp.min_num_params`"
+   ]
+  },
+  {
+   "id": 25,
+   "kind": "para",
+   "start": 7012,
+   "end": 7036,
+   "text": "Other sharding settings:",
+   "tokens": []
+  },
+  {
+   "id": 26,
+   "kind": "list",
+   "start": 7038,
+   "end": 7146,
+   "text": "- ⟦0⟧: whether to keep each unit's parameters resident after forward.",
+   "tokens": [
+    "`--accelerator.fsdp.reshard_after_forward`"
+   ]
+  },
+  {
+   "id": 27,
+   "kind": "list",
+   "start": 7147,
+   "end": 7239,
+   "text": "- ⟦0⟧: keeps parameters, gradients and optimizer states on CPU.",
+   "tokens": [
+    "`--accelerator.fsdp.cpu_offload`"
+   ]
+  },
+  {
+   "id": 28,
+   "kind": "list",
+   "start": 7240,
+   "end": 7322,
+   "text": "- ⟦0⟧: a regex of module paths to keep unsharded.",
+   "tokens": [
+    "`--accelerator.fsdp.ignored_modules`"
+   ]
+  },
+  {
+   "id": 29,
+   "kind": "heading",
+   "start": 7324,
+   "end": 7332,
+   "text": "### HSDP",
+   "tokens": []
+  },
+  {
+   "id": 30,
+   "kind": "para",
+   "start": 7334,
+   "end": 7699,
+   "text": "Hybrid Sharded Data Parallel: parameters, gradients and optimizer states are sharded across ⟦0⟧ ranks, and that sharding is replicated ⟦1⟧ times. Parameter all-gathers and gradient reduce-scatters stay inside a shard group; only the all-reduce that synchronizes the replicas crosses between groups. The two degrees must multiply to the world size:",
+   "tokens": [
+    "`dp_shard`",
+    "`dp_replicate`"
+   ]
+  },
+  {
+   "id": 31,
+   "kind": "heading",
+   "start": 7914,
+   "end": 7928,
+   "text": "## Checkpoints",
+   "tokens": []
+  },
+  {
+   "id": 32,
+   "kind": "para",
+   "start": 7930,
+   "end": 8022,
+   "text": "Every checkpoint contains a ⟦0⟧ directory and a ⟦1⟧ directory:",
+   "tokens": [
+    "`pretrained_model/`",
+    "`training_state/`"
+   ]
+  },
+  {
+   "id": 33,
+   "kind": "para",
+   "start": 9217,
+   "end": 9398,
+   "text": "During single-GPU or DDP training, the pipeline serializes each state dict into a single file: ⟦0⟧ for the model and ⟦1⟧ for the optimizer.",
+   "tokens": [
+    "`model.safetensors`",
+    "`optimizer_state.safetensors`"
+   ]
+  },
+  {
+   "id": 34,
+   "kind": "para",
+   "start": 9400,
+   "end": 9607,
+   "text": "During sharded training, the optimizer state is saved as DCP shards under ⟦0⟧, and the layout of the model under ⟦1⟧ can be configured through ⟦2⟧:",
+   "tokens": [
+    "`training_state/optimizer_0/`",
+    "`pretrained_model/`",
+    "`--checkpoint_format`"
+   ]
+  },
+  {
+   "id": 35,
+   "kind": "table",
+   "start": 9609,
+   "end": 9757,
+   "text": "| ⟦0⟧     | Weights artifact                             | Use when                                                              |",
+   "tokens": [
+    "`--checkpoint_format`"
+   ]
+  },
+  {
+   "id": 36,
+   "kind": "table",
+   "start": 9907,
+   "end": 10055,
+   "text": "| ⟦0⟧ _(default)_ | single ⟦1⟧ only              | you want every checkpoint immediately loadable with ⟦2⟧ |",
+   "tokens": [
+    "`safetensors`",
+    "`model.safetensors`",
+    "`from_pretrained`"
+   ]
+  },
+  {
+   "id": 37,
+   "kind": "table",
+   "start": 10056,
+   "end": 10204,
+   "text": "| ⟦0⟧                     | ⟦1⟧ shard directory only | gathering the full weights makes saves and resumes too slow           |",
+   "tokens": [
+    "`dcp`",
+    "`pytorch_model_fsdp_0/`"
+   ]
+  },
+  {
+   "id": 38,
+   "kind": "table",
+   "start": 10205,
+   "end": 10353,
+   "text": "| ⟦0⟧         | both                                         | you want fast resume _and_ immediately loadable checkpoints           |",
+   "tokens": [
+    "`safetensors_dcp`"
+   ]
+  },
+  {
+   "id": 39,
+   "kind": "para",
+   "start": 10355,
+   "end": 10435,
+   "text": "Two things to know about gathered (⟦0⟧) checkpoints from sharded runs:",
+   "tokens": [
+    "`safetensors`"
+   ]
+  },
+  {
+   "id": 40,
+   "kind": "list",
+   "start": 10437,
+   "end": 10616,
+   "text": "- **They store fp32 weights.** Under mixed precision training, FSDP keeps an fp32 master copy, and the checkpoint saves the master copy to make sure training resumes consistently.",
+   "tokens": []
+  },
+  {
+   "id": 41,
+   "kind": "list",
+   "start": 10617,
+   "end": 10701,
+   "text": "- The gather is collective (all ranks participate) but only the main process writes.",
+   "tokens": []
+  },
+  {
+   "id": 42,
+   "kind": "heading",
+   "start": 10703,
+   "end": 10733,
+   "text": "### Converting DCP checkpoints",
+   "tokens": []
+  },
+  {
+   "id": 43,
+   "kind": "para",
+   "start": 10735,
+   "end": 10847,
+   "text": "⟦0⟧ merges a DCP shard directory into a regular ⟦1⟧, offline and without GPUs:",
+   "tokens": [
+    "`lerobot-convert-dcp`",
+    "`model.safetensors`"
+   ]
+  },
+  {
+   "id": 44,
+   "kind": "para",
+   "start": 11030,
+   "end": 11096,
+   "text": "⟦0⟧ publishes the converted directory as a model repo.",
+   "tokens": [
+    "`--push_to_hub`"
+   ]
+  },
+  {
+   "id": 45,
+   "kind": "heading",
+   "start": 11098,
+   "end": 11110,
+   "text": "### Resuming",
+   "tokens": []
+  },
+  {
+   "id": 46,
+   "kind": "para",
+   "start": 11112,
+   "end": 11577,
+   "text": "Resume with ⟦0⟧. Resuming from a DCP checkpoint supports resharding the model and optimizer state to the _current_ topology, which means you can resume with a different ⟦1⟧ split. The data sampler can always resume at the right epoch and offset, but is only _sample-exact_ when the world size and batch size match the original run (a warning is logged otherwise).",
+   "tokens": [
+    "`--resume=true --config_path=.../checkpoints/last/pretrained_model/train_config.json`",
+    "`dp_replicate/dp_shard`"
+   ]
+  },
+  {
+   "id": 47,
+   "kind": "quote",
+   "start": 11579,
+   "end": 11737,
+   "text": "> [!NOTE]\n> FSDP checkpoints written by LeRobot 0.6.x and earlier used a different on-disk layout (a gathered full optimizer state) and **cannot be resumed**.",
+   "tokens": []
+  },
+  {
+   "id": 48,
+   "kind": "heading",
+   "start": 11739,
+   "end": 11747,
+   "text": "## Notes",
+   "tokens": []
+  },
+  {
+   "id": 49,
+   "kind": "list",
+   "start": 11749,
+   "end": 11925,
+   "text": "- Checkpoint saves and end-of-training publishes are collective (every rank enters them). Gathered weights, sidecar files and Hub uploads are written by the main process alone.",
+   "tokens": []
+  },
+  {
+   "id": 50,
+   "kind": "list",
+   "start": 11926,
+   "end": 12046,
+   "text": "- Metrics are reduced across ranks before logging: losses are averaged, and ⟦0⟧ reports cluster-wide throughput.",
+   "tokens": [
+    "`samples/s`"
+   ]
+  },
+  {
+   "id": 51,
+   "kind": "list",
+   "start": 12047,
+   "end": 12198,
+   "text": "- Learning-rate scheduling is stepped once per training step regardless of the number of processes (⟦0⟧ is baked in).",
+   "tokens": [
+    "`step_scheduler_with_optimizer=False`"
+   ]
+  },
+  {
+   "id": 52,
+   "kind": "para",
+   "start": 12200,
+   "end": 12469,
+   "text": "For background on the underlying machinery, see the [Accelerate FSDP guide](⟦0⟧). To go deeper on large-scale training, check out the [Ultrascale Playbook](⟦1⟧).",
+   "tokens": [
+    "https://huggingface.co/docs/accelerate/usage_guides/fsdp",
+    "https://huggingface.co/spaces/nanotron/ultrascale-playbook"
+   ]
+  }
+ ]
+}

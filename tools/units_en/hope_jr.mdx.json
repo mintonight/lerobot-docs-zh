@@ -1,0 +1,414 @@
+{
+ "file": "hope_jr.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1932,
+   "text": "# HopeJR",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "heading",
+   "start": 1934,
+   "end": 1950,
+   "text": "## Prerequisites",
+   "tokens": []
+  },
+  {
+   "id": 2,
+   "kind": "list",
+   "start": 1952,
+   "end": 2012,
+   "text": "- [Hardware Setup](⟦0⟧)",
+   "tokens": [
+    "https://github.com/TheRobotStudio/HOPEJr"
+   ]
+  },
+  {
+   "id": 3,
+   "kind": "heading",
+   "start": 2014,
+   "end": 2032,
+   "text": "## Install LeRobot",
+   "tokens": []
+  },
+  {
+   "id": 4,
+   "kind": "para",
+   "start": 2034,
+   "end": 2145,
+   "text": "Follow the [installation instructions](⟦0⟧) to install LeRobot.",
+   "tokens": [
+    "https://github.com/huggingface/lerobot#installation"
+   ]
+  },
+  {
+   "id": 5,
+   "kind": "para",
+   "start": 2147,
+   "end": 2188,
+   "text": "Install LeRobot with HopeJR dependencies:",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "heading",
+   "start": 2230,
+   "end": 2253,
+   "text": "## Device Configuration",
+   "tokens": []
+  },
+  {
+   "id": 7,
+   "kind": "para",
+   "start": 2255,
+   "end": 2440,
+   "text": "Before starting calibration and operation, you need to identify the USB ports for each HopeJR component. Run this script to find the USB ports for the arm, hand, glove, and exoskeleton:",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "para",
+   "start": 2473,
+   "end": 2796,
+   "text": "This will display the available USB ports and their associated devices. Make note of the port paths (e.g., ⟦0⟧, ⟦1⟧) as you'll need to specify them in the ⟦2⟧ and ⟦3⟧ parameters when recording data, replaying episodes, or running teleoperation scripts.",
+   "tokens": [
+    "`/dev/tty.usbmodem58760433331`",
+    "`/dev/tty.usbmodem11301`",
+    "`--robot.port`",
+    "`--teleop.port`"
+   ]
+  },
+  {
+   "id": 9,
+   "kind": "heading",
+   "start": 2798,
+   "end": 2820,
+   "text": "## Step 1: Calibration",
+   "tokens": []
+  },
+  {
+   "id": 10,
+   "kind": "para",
+   "start": 2822,
+   "end": 2970,
+   "text": "Before performing teleoperation, HopeJR's limbs need to be calibrated. Calibration files will be saved in ⟦0⟧",
+   "tokens": [
+    "`~/.cache/huggingface/lerobot/calibration`"
+   ]
+  },
+  {
+   "id": 11,
+   "kind": "heading",
+   "start": 2972,
+   "end": 3000,
+   "text": "### 1.1 Calibrate Robot Hand",
+   "tokens": []
+  },
+  {
+   "id": 12,
+   "kind": "para",
+   "start": 3160,
+   "end": 3263,
+   "text": "When running the calibration script, a calibration GUI will pop up. Finger joints are named as follows:",
+   "tokens": []
+  },
+  {
+   "id": 13,
+   "kind": "para",
+   "start": 3265,
+   "end": 3275,
+   "text": "**Thumb**:",
+   "tokens": []
+  },
+  {
+   "id": 14,
+   "kind": "list",
+   "start": 3277,
+   "end": 3323,
+   "text": "- **CMC**: base joint connecting thumb to hand",
+   "tokens": []
+  },
+  {
+   "id": 15,
+   "kind": "list",
+   "start": 3324,
+   "end": 3348,
+   "text": "- **MCP**: knuckle joint",
+   "tokens": []
+  },
+  {
+   "id": 16,
+   "kind": "list",
+   "start": 3349,
+   "end": 3378,
+   "text": "- **PIP**: first finger joint",
+   "tokens": []
+  },
+  {
+   "id": 17,
+   "kind": "list",
+   "start": 3379,
+   "end": 3406,
+   "text": "- **DIP** : fingertip joint",
+   "tokens": []
+  },
+  {
+   "id": 18,
+   "kind": "para",
+   "start": 3408,
+   "end": 3451,
+   "text": "**Index, Middle, Ring, and Pinky fingers**:",
+   "tokens": []
+  },
+  {
+   "id": 19,
+   "kind": "list",
+   "start": 3453,
+   "end": 3512,
+   "text": "- **Radial flexor**: Moves base of finger towards the thumb",
+   "tokens": []
+  },
+  {
+   "id": 20,
+   "kind": "list",
+   "start": 3513,
+   "end": 3571,
+   "text": "- **Ulnar flexor**: Moves base of finger towards the pinky",
+   "tokens": []
+  },
+  {
+   "id": 21,
+   "kind": "list",
+   "start": 3572,
+   "end": 3639,
+   "text": "- **PIP/DIP**: Flexes the distal and proximal phalanx of the finger",
+   "tokens": []
+  },
+  {
+   "id": 22,
+   "kind": "para",
+   "start": 3641,
+   "end": 3847,
+   "text": "Each one of these will need to be calibrated individually via the GUI.\nNote that ulnar and radial flexors should have ranges of the same size (but with different offsets) in order to get symmetric movement.",
+   "tokens": []
+  },
+  {
+   "id": 23,
+   "kind": "para",
+   "start": 4142,
+   "end": 4230,
+   "text": "Use the calibration interface to set the range boundaries for each joint as shown above.",
+   "tokens": []
+  },
+  {
+   "id": 24,
+   "kind": "para",
+   "start": 4483,
+   "end": 4602,
+   "text": "Once you have set the appropriate boundaries for all joints, click \"Save\" to save the calibration values to the motors.",
+   "tokens": []
+  },
+  {
+   "id": 25,
+   "kind": "heading",
+   "start": 4604,
+   "end": 4640,
+   "text": "### 1.2 Calibrate Teleoperator Glove",
+   "tokens": []
+  },
+  {
+   "id": 26,
+   "kind": "para",
+   "start": 4801,
+   "end": 4876,
+   "text": "Move each finger through its full range of motion, starting from the thumb.",
+   "tokens": []
+  },
+  {
+   "id": 27,
+   "kind": "para",
+   "start": 5208,
+   "end": 5234,
+   "text": "Continue with each finger:",
+   "tokens": []
+  },
+  {
+   "id": 28,
+   "kind": "para",
+   "start": 5574,
+   "end": 5745,
+   "text": "Once calibration is complete, the system will save the calibration to ⟦0⟧",
+   "tokens": [
+    "`/Users/your_username/.cache/huggingface/lerobot/calibration/teleoperators/homunculus_glove/red.json`"
+   ]
+  },
+  {
+   "id": 29,
+   "kind": "heading",
+   "start": 5747,
+   "end": 5774,
+   "text": "### 1.3 Calibrate Robot Arm",
+   "tokens": []
+  },
+  {
+   "id": 30,
+   "kind": "para",
+   "start": 5904,
+   "end": 6029,
+   "text": "This will open a calibration GUI where you can set the range limits for each motor. The arm motions are organized as follows:",
+   "tokens": []
+  },
+  {
+   "id": 31,
+   "kind": "list",
+   "start": 6031,
+   "end": 6067,
+   "text": "- **Shoulder**: pitch, yaw, and roll",
+   "tokens": []
+  },
+  {
+   "id": 32,
+   "kind": "list",
+   "start": 6068,
+   "end": 6085,
+   "text": "- **Elbow**: flex",
+   "tokens": []
+  },
+  {
+   "id": 33,
+   "kind": "list",
+   "start": 6086,
+   "end": 6119,
+   "text": "- **Wrist**: pitch, yaw, and roll",
+   "tokens": []
+  },
+  {
+   "id": 34,
+   "kind": "para",
+   "start": 6412,
+   "end": 6672,
+   "text": "Use the calibration interface to set the range boundaries for each joint. Move each joint through its full range of motion and adjust the minimum and maximum values accordingly. Once you have set the appropriate boundaries for all joints, save the calibration.",
+   "tokens": []
+  },
+  {
+   "id": 35,
+   "kind": "heading",
+   "start": 6674,
+   "end": 6716,
+   "text": "### 1.4 Calibrate Teleoperator Exoskeleton",
+   "tokens": []
+  },
+  {
+   "id": 36,
+   "kind": "para",
+   "start": 6851,
+   "end": 6997,
+   "text": "The exoskeleton allows one to control the robot arm. During calibration, you'll be prompted to move all joints through their full range of motion:",
+   "tokens": []
+  },
+  {
+   "id": 37,
+   "kind": "heading",
+   "start": 7660,
+   "end": 7684,
+   "text": "## Step 2: Teleoperation",
+   "tokens": []
+  },
+  {
+   "id": 38,
+   "kind": "para",
+   "start": 7686,
+   "end": 7813,
+   "text": "Due to global variable conflicts in the Feetech middleware, teleoperation for arm and hand must run in separate shell sessions:",
+   "tokens": []
+  },
+  {
+   "id": 39,
+   "kind": "heading",
+   "start": 7815,
+   "end": 7823,
+   "text": "### Hand",
+   "tokens": []
+  },
+  {
+   "id": 40,
+   "kind": "heading",
+   "start": 8154,
+   "end": 8161,
+   "text": "### Arm",
+   "tokens": []
+  },
+  {
+   "id": 41,
+   "kind": "heading",
+   "start": 8436,
+   "end": 8468,
+   "text": "## Step 3: Record, Replay, Train",
+   "tokens": []
+  },
+  {
+   "id": 42,
+   "kind": "para",
+   "start": 8470,
+   "end": 8530,
+   "text": "Record, Replay and Train with Hope-JR is still experimental.",
+   "tokens": []
+  },
+  {
+   "id": 43,
+   "kind": "heading",
+   "start": 8532,
+   "end": 8542,
+   "text": "### Record",
+   "tokens": []
+  },
+  {
+   "id": 44,
+   "kind": "para",
+   "start": 8544,
+   "end": 8688,
+   "text": "This step records the dataset, which can be seen as an example [here](⟦0⟧).",
+   "tokens": [
+    "https://huggingface.co/datasets/nepyope/hand_record_test_with_video_data"
+   ]
+  },
+  {
+   "id": 45,
+   "kind": "heading",
+   "start": 9490,
+   "end": 9500,
+   "text": "### Replay",
+   "tokens": []
+  },
+  {
+   "id": 46,
+   "kind": "heading",
+   "start": 9744,
+   "end": 9753,
+   "text": "### Train",
+   "tokens": []
+  },
+  {
+   "id": 47,
+   "kind": "heading",
+   "start": 10024,
+   "end": 10036,
+   "text": "### Evaluate",
+   "tokens": []
+  },
+  {
+   "id": 48,
+   "kind": "para",
+   "start": 10038,
+   "end": 10150,
+   "text": "This training run can be viewed as an example [here](⟦0⟧).",
+   "tokens": [
+    "https://wandb.ai/tino/lerobot/runs/rp0k8zvw?nw=nwusertino"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,209 @@
+{
+ "file": "rtc.mdx",
+ "units": [
+  {
+   "id": 0,
+   "zh": "# 实时分块（RTC）"
+  },
+  {
+   "id": 1,
+   "zh": "实时分块（RTC）让 [Pi0](⟦0⟧)、[Pi0.5](⟦1⟧) 和 [SmolVLA](⟦2⟧) 等基于流匹配的大型机器人 policy，即使 inference latency 很高，也能产生平滑、连续且反应灵敏的运动。LeRobot 提供了原始的 inference 时引导模式，并针对兼容的 Pi05 checkpoint，提供训练时 action 条件化与廉价的硬前缀（hard-prefix）inference。"
+  },
+  {
+   "id": 2,
+   "zh": "这类 policy 生成的是未来 action chunk（例如每次 50 步），而不是单个 action。\n由于模型很大，生成每个 action chunk 所需的时间比机器人执行它所需的时间更长。\n简单地逐个执行 action chunk 会导致问题，例如停顿、过渡卡顿，或当下一个 action chunk 到达过晚或与先前执行的 action 不一致时 policy 突然改变。"
+  },
+  {
+   "id": 3,
+   "zh": "RTC 通过异步生成下一个 action chunk（同时机器人继续执行当前 action chunk），并引导新 action chunk 使其与上一个 action chunk 中已经执行的部分平滑衔接，来解决这一问题。"
+  },
+  {
+   "id": 4,
+   "zh": "## RTC 的工作原理（简化版）"
+  },
+  {
+   "id": 5,
+   "zh": "RTC 让机器人在移动的同时提前思考。当机器人正在执行一个 action chunk 时，RTC 会提前开始生成下一个 action chunk。\n但由于新 action chunk 就绪时机器人已经移动了一段距离，RTC 必须确保新 action chunk 与机器人当前的 action 仍然平滑衔接。"
+  },
+  {
+   "id": 6,
+   "zh": "为此，RTC 将新 action chunk 的开头视为一个图像修复（inpainting）或“填补空缺”问题：\n它会温和地调整新 action chunk 的开头部分，使其与机器人正在进行的运动自然融合。结果是既没有停顿，也没有突然跳跃。"
+  },
+  {
+   "id": 7,
+   "zh": "用技术术语来说，RTC 在流匹配去噪过程中加入了一个引导项，迫使新 action chunk 中重叠的时间步与上一个 action chunk 已执行的部分保持接近，通常使用一个软过渡掩码。"
+  },
+  {
+   "id": 8,
+   "zh": "## 快速开始"
+  },
+  {
+   "id": 9,
+   "zh": "### 安装"
+  },
+  {
+   "id": 10,
+   "zh": "RTC 内置在 LeRobot 中。只需安装你需要的 policy 依赖："
+  },
+  {
+   "id": 11,
+   "zh": "### 将 RTC 与 Pi0 一起使用"
+  },
+  {
+   "id": 12,
+   "zh": "你可以使用 ⟦0⟧ 在真实机器人上进行 RTC 部署。\n下面的代码片段提供了一个简化的伪示例，说明 RTC 如何与 Pi0 在你的流水线中运作："
+  },
+  {
+   "id": 13,
+   "zh": "## 关键参数"
+  },
+  {
+   "id": 14,
+   "zh": "⟦0⟧ 有以下可供调优的参数："
+  },
+  {
+   "id": 15,
+   "zh": "**⟦0⟧** 选择 action 前缀条件化方法："
+  },
+  {
+   "id": 16,
+   "zh": "- ⟦0⟧（默认）在去噪过程中应用原始的雅可比（Jacobian）引导，适用于普通的流匹配 checkpoint。"
+  },
+  {
+   "id": 17,
+   "zh": "- ⟦0⟧ 使用逐 action 的流时间步对上一个 action chunk 的前缀进行硬图像修复。它目前需要一个使用 ⟦1⟧ 训练的 Pi05 checkpoint，并避免了引导的反向传播。"
+  },
+  {
+   "id": 18,
+   "zh": "对于 trained 模式，⟦0⟧ 与 rollout 后端的\n⟦1⟧ 都必须至少等于 checkpoint 的\n⟦2⟧，且 ⟦3⟧ 不得超过\n⟦4⟧（即 RTC\n论文中的 ⟦5⟧ 界限）；rollout 会在连接机器人之前验证这一点。"
+  },
+  {
+   "id": 19,
+   "zh": "**⟦0⟧**：需要与上一个 action chunk 保持一致的步数。值越大，过渡越平滑，但反应性可能越低。"
+  },
+  {
+   "id": 20,
+   "zh": "典型值：8-12 步"
+  },
+  {
+   "id": 21,
+   "zh": "**⟦0⟧**：对与上一个 action chunk 保持一致的约束强度。这是一个可通过调优来平衡过渡平滑性与 policy 反应性的超参数。对于 10 步流匹配（SmolVLA、Pi0、Pi0.5），10.0 是一个最佳值。"
+  },
+  {
+   "id": 22,
+   "zh": "**⟦0⟧**：如何在重叠区域内对一致性进行加权。"
+  },
+  {
+   "id": 23,
+   "zh": "- ⟦0⟧：从 inference_delay 到 execution_horizon 的线性衰减"
+  },
+  {
+   "id": 24,
+   "zh": "- ⟦0⟧：指数衰减（推荐入门使用）"
+  },
+  {
+   "id": 25,
+   "zh": "- ⟦0⟧：在整个 execution_horizon 上施加完整权重"
+  },
+  {
+   "id": 26,
+   "zh": "- ⟦0⟧：二值（在 inference_delay 之前为完整权重，之后为零）"
+  },
+  {
+   "id": 27,
+   "zh": "**⟦0⟧**：你的系统的 inference latency 步数。该值会传给 ⟦1⟧ 而不是配置，因为它可能在运行时变化。"
+  },
+  {
+   "id": 28,
+   "zh": "## 离线测试 RTC"
+  },
+  {
+   "id": 29,
+   "zh": "在真实机器人上运行之前，先用 dataset 样本测试 RTC，以可视化它的工作方式："
+  },
+  {
+   "id": 30,
+   "zh": "在评估兼容的训练时 RTC Pi05\ncheckpoint 时，请添加 ⟦0⟧。不支持的 policy 会拒绝 trained 模式，而不是回退到\nguided RTC。"
+  },
+  {
+   "id": 31,
+   "zh": "该脚本会生成去噪过程的可视化结果，将标准生成（左）与 RTC（右）进行对比。在 RTC 图中，你可以看到开头几步（蓝色/紫色线条）是如何被引导以匹配红色真值轨迹（上一个 action chunk 的尾部）的，从而确保 action chunk 之间的平滑过渡。"
+  },
+  {
+   "id": 32,
+   "zh": "## 在真实机器人上测试 RTC"
+  },
+  {
+   "id": 33,
+   "zh": "对于训练时 RTC Pi05 checkpoint，请将模式改为 ⟦0⟧。该\ncheckpoint 记录了它支持的最大延迟，rollout 会将测量到的\n延迟与之对比验证："
+  },
+  {
+   "id": 34,
+   "zh": "## 与 LeRobot 中 async inference 的区别"
+  },
+  {
+   "id": 35,
+   "zh": "RTC 和[async inference](⟦0⟧)都能改善实时机器人控制，但它们解决的是不同的问题。"
+  },
+  {
+   "id": 36,
+   "zh": "| 方面 | async inference | RTC |"
+  },
+  {
+   "id": 37,
+   "zh": "| **问题** | 等待 inference 时出现空闲帧 | action chunk 之间的不连续性 |"
+  },
+  {
+   "id": 38,
+   "zh": "| **解决方案** | 将预测与执行解耦 | 引导新 action chunk 平滑延续自上一个 action chunk |"
+  },
+  {
+   "id": 39,
+   "zh": "| **优势** | 无需等待，action 连续 | 平滑过渡，action 自然 |"
+  },
+  {
+   "id": 40,
+   "zh": "| **适用场景** | async inference 最适合高 inference latency 的大型模型 | 基于流匹配的 policy |"
+  },
+  {
+   "id": 41,
+   "zh": "**将两者结合使用**可获得最佳的平滑性和反应性！"
+  },
+  {
+   "id": 42,
+   "zh": "## 进阶：调试跟踪"
+  },
+  {
+   "id": 43,
+   "zh": "RTC 内置了调试跟踪功能，帮助你了解 inference 期间发生的情况："
+  },
+  {
+   "id": 44,
+   "zh": "参见 ⟦0⟧ 查看离线 RTC 可视化的完整示例。"
+  },
+  {
+   "id": 45,
+   "zh": "## 参考资料"
+  },
+  {
+   "id": 46,
+   "zh": "- [Smooth-As-Butter Robot Policies](⟦0⟧)——关于真实机器人结果的出色技术讲解"
+  },
+  {
+   "id": 47,
+   "zh": "- [Physical Intelligence - Real-Time Chunking](⟦0⟧)——原始论文与研究"
+  },
+  {
+   "id": 48,
+   "zh": "- [Kinetix RTC Implementation](⟦0⟧)——来自 Physical Intelligence 的参考实现"
+  },
+  {
+   "id": 49,
+   "zh": "- [Training-Time Action Conditioning](⟦0⟧)——在训练期间使用干净前缀条件化的高效 RTC"
+  },
+  {
+   "id": 50,
+   "zh": "- [RLDX-1](⟦0⟧)——用于训练时 RTC 集成的 PyTorch 参考实现"
+  }
+ ]
+}

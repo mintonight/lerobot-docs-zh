@@ -1,0 +1,559 @@
+<script lang="ts">
+import {onMount} from "svelte";
+import Tip from "$lib/Tip.svelte";
+import CopyLLMTxtMenu from "$lib/CopyLLMTxtMenu.svelte";
+import Youtube from "$lib/Youtube.svelte";
+import Docstring from "$lib/Docstring.svelte";
+import CodeBlock from "$lib/CodeBlock.svelte";
+import CodeBlockFw from "$lib/CodeBlockFw.svelte";
+import DocNotebookDropdown from "$lib/DocNotebookDropdown.svelte";
+import CourseFloatingBanner from "$lib/CourseFloatingBanner.svelte";
+import IconCopyLink from "$lib/IconCopyLink.svelte";
+import FrameworkContent from "$lib/FrameworkContent.svelte";
+import Markdown from "$lib/Markdown.svelte";
+import Question from "$lib/Question.svelte";
+import FrameworkSwitchCourse from "$lib/FrameworkSwitchCourse.svelte";
+import InferenceApi from "$lib/InferenceApi.svelte";
+import TokenizersLanguageContent from "$lib/TokenizersLanguageContent.svelte";
+import ExampleCodeBlock from "$lib/ExampleCodeBlock.svelte";
+import Added from "$lib/Added.svelte";
+import Changed from "$lib/Changed.svelte";
+import Deprecated from "$lib/Deprecated.svelte";
+import PipelineIcon from "$lib/PipelineIcon.svelte";
+import PipelineTag from "$lib/PipelineTag.svelte";
+import Heading from "$lib/Heading.svelte";
+import HfOptions from "$lib/HfOptions.svelte";
+import HfOption from "$lib/HfOption.svelte";
+import EditOnGithub from "$lib/EditOnGithub.svelte";
+import InferenceSnippet from "$lib/InferenceSnippet/InferenceSnippet.svelte";
+import MermaidChart from "$lib/MermaidChart.svelte";
+let fw: "pt" | "tf" = "pt";
+onMount(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    fw = urlParams.get("fw") || "pt";
+});
+</script>
+<svelte:head>
+  <meta name="hf:doc:metadata" content={metadata} >
+</svelte:head>
+
+<!--HF DOCBUILD BODY START-->
+
+HF_DOC_BODY_START
+
+<CopyLLMTxtMenu containerStyle="float: right; margin-left: 10px; display: inline-flex; position: relative; z-index: 10;"></CopyLLMTxtMenu>
+
+# dataset
+
+`LeRobotDataset` 是每个 LeRobot 脚本读写所用的格式。它感知 episode，能够即时解码视频 observation，并可与 Hugging Face Hub 往返同步。
+
+关于该格式及常用操作，请参阅 [使用 LeRobotDataset](../lerobot-dataset-v3)，迁移请参阅 [移植大型 dataset](../porting_datasets_v3)，CLI 请参阅 [工具](../tools)。
+
+## LeRobotDataset [[lerobot.datasets.LeRobotDataset]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.datasets.LeRobotDataset"} anchor={"lerobot.datasets.LeRobotDataset"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/lerobot_dataset.py#L52"} parameters={[{"name": "repo_id", "val": ": str"}, {"name": "root", "val": ": str | pathlib.Path | None = None"}, {"name": "episodes", "val": ": list[int] | None = None"}, {"name": "episode_filter", "val": ": collections.abc.Callable[[dict], bool] | None = None"}, {"name": "image_transforms", "val": ": collections.abc.Callable | None = None"}, {"name": "delta_timestamps", "val": ": dict[str, list[float]] | None = None"}, {"name": "tolerance_s", "val": ": float = 0.0001"}, {"name": "revision", "val": ": str | None = None"}, {"name": "force_cache_sync", "val": ": bool = False"}, {"name": "download_videos", "val": ": bool = True"}, {"name": "video_backend", "val": ": str | None = None"}, {"name": "return_uint8", "val": ": bool = False"}, {"name": "depth_output_unit", "val": ": str = 'mm'"}, {"name": "batch_encoding_size", "val": ": int = 1"}, {"name": "rgb_encoder", "val": ": lerobot.configs.video.RGBEncoderConfig | None = None"}, {"name": "depth_encoder", "val": ": lerobot.configs.video.DepthEncoderConfig | None = None"}, {"name": "encoder_threads", "val": ": int | None = None"}, {"name": "streaming_encoding", "val": ": bool = False"}, {"name": "encoder_queue_maxsize", "val": ": int = 30"}, {"name": "repo_type", "val": ": str = 'dataset'"}, {"name": "token", "val": ": str | bool | None = None"}]}>
+</Docstring>
+
+
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"add_frame"} anchor={"lerobot.datasets.LeRobotDataset.add_frame"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/lerobot_dataset.py#L475"} parameters={[{"name": "frame", "val": ": dict"}]}>
+<paramsdesc>- **frame** -- 将该帧的特征名称映射到其值的字典。
+  必须包含 `'task'` 键。Torch 张量会转换为 numpy。</paramsdesc><raises>- `RuntimeError` -- 如果 dataset 为只读（无写入器）。</raises><raisederrors>`RuntimeError`</raisederrors></Docstring>
+向当前 episode 缓冲区添加单个帧。
+
+委托给 `DatasetWriter.add_frame`。dataset 必须处于写入模式（通过 `create` 或 `resume` 创建）。
+
+
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"clear_episode_buffer"} anchor={"lerobot.datasets.LeRobotDataset.clear_episode_buffer"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/lerobot_dataset.py#L509"} parameters={[{"name": "delete_images", "val": ": bool = True"}]}>
+<paramsdesc>- **delete_images** -- 若为 `True`，同时删除为当前 episode 写入磁盘的临时图像文件。</paramsdesc><raises>- `RuntimeError` -- 如果 dataset 为只读（无写入器）。</raises><raisederrors>`RuntimeError`</raisederrors></Docstring>
+丢弃当前 episode 缓冲区而不保存。
+
+委托给 `DatasetWriter.clear_episode_buffer`。用于丢弃失败或中断的采集 episode。
+
+
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"clear_image_transforms"} anchor={"lerobot.datasets.LeRobotDataset.clear_image_transforms"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/lerobot_dataset.py#L611"} parameters={[]}>
+</Docstring>
+移除应用于视觉 observation 的变换。
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"create"} anchor={"lerobot.datasets.LeRobotDataset.create"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/lerobot_dataset.py#L741"} parameters={[{"name": "repo_id", "val": ": str"}, {"name": "fps", "val": ": int"}, {"name": "features", "val": ": dict"}, {"name": "root", "val": ": str | pathlib.Path | None = None"}, {"name": "robot_type", "val": ": str | None = None"}, {"name": "use_videos", "val": ": bool = True"}, {"name": "tolerance_s", "val": ": float = 0.0001"}, {"name": "image_writer_processes", "val": ": int = 0"}, {"name": "image_writer_threads", "val": ": int = 0"}, {"name": "video_backend", "val": ": str | None = None"}, {"name": "batch_encoding_size", "val": ": int = 1"}, {"name": "rgb_encoder", "val": ": lerobot.configs.video.RGBEncoderConfig | None = None"}, {"name": "depth_encoder", "val": ": lerobot.configs.video.DepthEncoderConfig | None = None"}, {"name": "metadata_buffer_size", "val": ": int = 10"}, {"name": "streaming_encoding", "val": ": bool = False"}, {"name": "encoder_queue_maxsize", "val": ": int = 30"}, {"name": "encoder_threads", "val": ": int | None = None"}, {"name": "video_files_size_in_mb", "val": ": int | None = None"}, {"name": "data_files_size_in_mb", "val": ": int | None = None"}]}>
+<paramsdesc>- **repo_id** -- 仓库标识符，通常为 `'&amp;lcub;hf_user}/&amp;lcub;dataset_name}'`。
+- **fps** -- 数据采集时使用的每秒帧数。
+- **features** -- 将特征名称映射到其类型/形状元数据的特征规格字典。
+- **root** -- dataset 存储的本地目录。默认为
+  `$HF_LEROBOT_HOME/&amp;lcub;repo_id}`。
+- **robot_type** -- 存储在元数据中的可选机器人类型字符串。
+- **use_videos** -- 若为 `True`，视觉模态存储为 MP4 视频。
+  若为 `False`，则存储为图像。
+- **tolerance_s** -- 时间戳同步容差，单位为秒。
+- **image_writer_processes** -- 异步图像写入的子进程数。`0` 表示仅使用线程。
+- **image_writer_threads** -- 异步图像写入的线程数。
+- **video_backend** -- 视频解码后端（在回读时使用）。
+- **batch_encoding_size** -- 在批量编码视频之前累积的 episode 数。`1` 表示立即编码。
+- **rgb_encoder** -- 相机的视频编码器设置（编解码器、质量等）。
+  当为 `None` 时，使用 `rgb_encoder_defaults()`。
+- **depth_encoder** -- 深度相机的视频编码器设置（编解码器、质量等）。
+  当为 `None` 时，使用 `depth_encoder_defaults()`。
+- **encoder_threads** -- 编码器线程数（全局）。`None`
+  让编解码器自行决定。
+- **metadata_buffer_size** -- 在刷新到 parquet 之前缓冲的 episode 元数据记录数。
+- **streaming_encoding** -- 若为 `True`，在采集期间实时编码视频帧，而不是先写入图像。
+- **encoder_queue_maxsize** -- 使用流式编码时每台相机的最大缓冲帧数。</paramsdesc><retdesc> 一个处于写入模式的新 `LeRobotDataset`。</retdesc></Docstring>
+从头创建一个新的 LeRobotDataset 以采集数据。
+
+返回一个带有活动 `DatasetWriter` 的写入模式 dataset。使用 `add_frame` / `save_episode` 填充它，完成后调用 `finalize`。
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"finalize"} anchor={"lerobot.datasets.LeRobotDataset.finalize"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/lerobot_dataset.py#L532"} parameters={[]}>
+</Docstring>
+刷新所有待处理工作并关闭写入器。
+
+必须在数据采集/转换之后调用，否则页脚元数据不会被写入 parquet 文件，dataset 将无效。
+
+幂等——可安全多次调用。如果从未显式调用，DatasetWriter.__del__ 将作为安全网。
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"get_raw_item"} anchor={"lerobot.datasets.LeRobotDataset.get_raw_item"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/lerobot_dataset.py#L587"} parameters={[{"name": "idx", "val": ""}]}>
+</Docstring>
+获取未经图像变换的原始帧。
+
+与 `__getitem__` 不同，此方法返回给定索引处的原始 HF dataset 行，不进行增量时间戳扩展、视频解码或图像变换。
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"has_pending_frames"} anchor={"lerobot.datasets.LeRobotDataset.has_pending_frames"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/lerobot_dataset.py#L525"} parameters={[]}>
+</Docstring>
+检查 episode 缓冲区中是否有未保存的帧。
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"push_to_hub"} anchor={"lerobot.datasets.LeRobotDataset.push_to_hub"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/lerobot_dataset.py#L619"} parameters={[{"name": "branch", "val": ": str | None = None"}, {"name": "tags", "val": ": list | None = None"}, {"name": "license", "val": ": str | None = 'apache-2.0'"}, {"name": "tag_version", "val": ": bool = True"}, {"name": "push_videos", "val": ": bool = True"}, {"name": "private", "val": ": bool | None = None"}, {"name": "allow_patterns", "val": ": list[str] | str | None = None"}, {"name": "upload_large_folder", "val": ": bool = False"}, {"name": "**card_kwargs", "val": ""}]}>
+<paramsdesc>- **branch** -- 可选的推送目标分支。若不存在，则从当前修订创建。
+- **tags** -- dataset 卡片使用的可选标签列表。
+- **license** -- dataset 卡片的许可证标识符。
+- **tag_version** -- 若为 `True`，为当前代码库版本创建 Git 标签。
+- **push_videos** -- 若为 `False`，跳过上传 `videos/` 目录。
+- **private** -- 若为 `True`，创建私有仓库。若为 `None`（默认），则遵循 Hub 上的组织默认设置（仅影响组织）。
+- **allow_patterns** -- 限制上传哪些文件的 glob 模式。
+- **upload_large_folder** -- 若为 `True`，对非常大的 dataset 使用 `upload_large_folder` 而非 `upload_folder`。
+- ****card_kwargs** -- 转发给 dataset 卡片创建的额外关键字参数。</paramsdesc></Docstring>
+将 dataset 上传到 Hugging Face Hub。
+
+若仓库不存在则创建，上传所有 dataset 文件（可选排除视频），生成 dataset 卡片，并用当前代码库版本为修订打标签。
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"resume"} anchor={"lerobot.datasets.LeRobotDataset.resume"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/lerobot_dataset.py#L855"} parameters={[{"name": "repo_id", "val": ": str"}, {"name": "root", "val": ": str | pathlib.Path | None = None"}, {"name": "tolerance_s", "val": ": float = 0.0001"}, {"name": "revision", "val": ": str | None = None"}, {"name": "force_cache_sync", "val": ": bool = False"}, {"name": "video_backend", "val": ": str | None = None"}, {"name": "batch_encoding_size", "val": ": int = 1"}, {"name": "rgb_encoder", "val": ": lerobot.configs.video.RGBEncoderConfig | None = None"}, {"name": "depth_encoder", "val": ": lerobot.configs.video.DepthEncoderConfig | None = None"}, {"name": "encoder_threads", "val": ": int | None = None"}, {"name": "image_writer_processes", "val": ": int = 0"}, {"name": "image_writer_threads", "val": ": int = 0"}, {"name": "streaming_encoding", "val": ": bool = False"}, {"name": "encoder_queue_maxsize", "val": ": int = 30"}, {"name": "token", "val": ": str | bool | None = None"}]}>
+<paramsdesc>- **repo_id** -- 现有 dataset 的仓库标识符。
+- **root** -- dataset 的本地目录。提供时，Hub 下载会直接落到该目录。省略时，Hub 下载使用 `$HF_LEROBOT_HOME/hub` 下的修订安全快照缓存。
+- **tolerance_s** -- 时间戳同步容差，单位为秒。
+- **revision** -- Git 修订（分支、标签或提交哈希）。默认为当前代码库版本标签。
+- **force_cache_sync** -- 若为 `True`，即使存在本地缓存，也重新从 Hub 下载元数据。
+- **video_backend** -- 用于回读数据的视频解码后端。
+- **batch_encoding_size** -- 在批量编码视频之前累积的 episode 数。
+- **rgb_encoder** -- 相机的视频编码器设置（编解码器、质量等）。当为 `None` 时，使用 `rgb_encoder_defaults()`。
+- **depth_encoder** -- 深度相机的视频编码器设置（编解码器、质量等）。当为 `None` 时，使用 `depth_encoder_defaults()`。
+- **encoder_threads** -- 编码器线程数（全局）。`None` 让编解码器自行决定。
+- **image_writer_processes** -- 异步图像写入的子进程。
+- **image_writer_threads** -- 异步图像写入的线程。
+- **streaming_encoding** -- 若为 `True`，在采集期间实时编码视频。
+- **encoder_queue_maxsize** -- 流式处理时每台相机的最大缓冲帧数。
+- **token** -- 当必须从 Hub 下载元数据时使用的认证令牌。令牌不会保留在 dataset 实例上。</paramsdesc><retdesc> 一个处于写入模式、可追加新 episode 的 `LeRobotDataset`。</retdesc></Docstring>
+在现有 dataset 上继续采集。
+
+从现有 dataset（本地或 Hub）加载元数据，并创建一个 `DatasetWriter` 用于追加新 episode。底层 HF dataset 在调用 `finalize` 并随后读取数据之前不会被加载。
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"save_episode"} anchor={"lerobot.datasets.LeRobotDataset.save_episode"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/lerobot_dataset.py#L491"} parameters={[{"name": "episode_data", "val": ": dict | None = None"}, {"name": "parallel_encoding", "val": ": bool = True"}]}>
+<paramsdesc>- **episode_data** -- 可选的预构建 episode 字典。若为 `None`，则使用由 `add_frame` 填充的内部 episode 缓冲区。
+- **parallel_encoding** -- 若为 `True` 且存在多个相机，则使用进程池并行编码视频。</paramsdesc><raises>- `RuntimeError` -- 如果 dataset 为只读（无写入器）。</raises><raisederrors>`RuntimeError`</raisederrors></Docstring>
+将当前 episode 缓冲区保存到磁盘。
+
+委托给 `DatasetWriter.save_episode`。编码视频、写入 parquet 数据并更新元数据。之后 episode 缓冲区会被重置。
+
+
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"select_columns"} anchor={"lerobot.datasets.LeRobotDataset.select_columns"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/lerobot_dataset.py#L579"} parameters={[{"name": "column_names", "val": ": str | list[str]"}]}>
+</Docstring>
+从底层 dataset 选择特定列。
+
+用于在重放期间提取 action sequence 而无需加载所有特征。返回仅包含所请求列的 `datasets.Dataset`。
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"set_image_transforms"} anchor={"lerobot.datasets.LeRobotDataset.set_image_transforms"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/lerobot_dataset.py#L606"} parameters={[{"name": "image_transforms", "val": ": collections.abc.Callable | None"}]}>
+</Docstring>
+替换应用于视觉 observation 的变换。
+
+</div></div>
+
+## LeRobotDatasetMetadata [[lerobot.datasets.LeRobotDatasetMetadata]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.datasets.LeRobotDatasetMetadata"} anchor={"lerobot.datasets.LeRobotDatasetMetadata"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/dataset_metadata.py#L64"} parameters={[{"name": "repo_id", "val": ": str"}, {"name": "root", "val": ": str | pathlib.Path | None = None"}, {"name": "revision", "val": ": str | None = None"}, {"name": "force_cache_sync", "val": ": bool = False"}, {"name": "metadata_buffer_size", "val": ": int = 10"}, {"name": "repo_type", "val": ": typing.Literal['dataset', 'bucket'] = 'dataset'"}, {"name": "token", "val": ": str | bool | None = None"}]}>
+</Docstring>
+LeRobot dataset 的元数据容器。
+
+管理描述 dataset 结构、内容和统计信息的 `info.json`、`stats.json`、`tasks.parquet` 和 `episodes/` parquet 文件。
+
+
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"create"} anchor={"lerobot.datasets.LeRobotDatasetMetadata.create"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/dataset_metadata.py#L787"} parameters={[{"name": "repo_id", "val": ": str"}, {"name": "fps", "val": ": int"}, {"name": "features", "val": ": dict"}, {"name": "robot_type", "val": ": str | None = None"}, {"name": "root", "val": ": str | pathlib.Path | None = None"}, {"name": "use_videos", "val": ": bool = True"}, {"name": "metadata_buffer_size", "val": ": int = 10"}, {"name": "chunks_size", "val": ": int | None = None"}, {"name": "data_files_size_in_mb", "val": ": int | None = None"}, {"name": "video_files_size_in_mb", "val": ": int | None = None"}]}>
+<paramsdesc>- **repo_id** -- 仓库标识符（例如 `'user/my_dataset'`）。
+- **fps** -- 数据采集时使用的每秒帧数。
+- **features** -- 将特征名称映射到其类型/形状元数据的特征规格字典。
+- **robot_type** -- 存储在元数据中的可选机器人类型字符串。
+- **root** -- dataset 的本地目录。默认为
+  `$HF_LEROBOT_HOME/&amp;lcub;repo_id}`。必须尚不存在。
+- **use_videos** -- 若为 `True`，视觉模态编码为 MP4 视频。
+- **metadata_buffer_size** -- 在刷新到 parquet 之前缓冲的 episode 元数据记录数。
+- **chunks_size** -- 每个块目录的最大文件数。`None` 使用默认值。
+- **data_files_size_in_mb** -- parquet 文件最大大小，单位为 MB。`None` 使用默认值。
+- **video_files_size_in_mb** -- 视频文件最大大小，单位为 MB。`None` 使用默认值。</paramsdesc><retdesc> 一个新的 `LeRobotDatasetMetadata` 实例。</retdesc></Docstring>
+从头创建一个新的 LeRobot dataset 的元数据。
+
+使用提供的特征模式和 dataset 设置在磁盘上初始化 `info.json` 文件。此时不写入任何 episode 数据。
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"ensure_readable"} anchor={"lerobot.datasets.LeRobotDatasetMetadata.ensure_readable"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/dataset_metadata.py#L222"} parameters={[]}>
+</Docstring>
+确保为读取操作完全加载元数据。
+
+幂等——当元数据已在内存中时，这只是一次 `is None` 检查。在同一实例上从写入模式切换到读取模式之前调用此方法。
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"filter_episodes"} anchor={"lerobot.datasets.LeRobotDatasetMetadata.filter_episodes"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/dataset_metadata.py#L232"} parameters={[{"name": "predicate", "val": ": Callable"}, {"name": "candidates", "val": ": list[int] | None = None"}]}>
+<paramsdesc>- **predicate** -- 用于选择 episode 的每 episode 元数据行谓词。
+- **candidates** -- 可选的 episode index 列表，用于限制评估范围。</paramsdesc><retdesc> 满足谓词的已排序 episode index 列表。</retdesc></Docstring>
+筛选元数据满足给定谓词的 episode。
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"finalize"} anchor={"lerobot.datasets.LeRobotDatasetMetadata.finalize"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/dataset_metadata.py#L199"} parameters={[]}>
+</Docstring>
+刷新元数据缓冲区并关闭 parquet 写入器。
+
+幂等——可安全多次调用。
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"get_chunk_settings"} anchor={"lerobot.datasets.LeRobotDatasetMetadata.get_chunk_settings"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/dataset_metadata.py#L764"} parameters={[]}>
+<retdesc> 包含 chunks_size、data_files_size_in_mb 和 video_files_size_in_mb 的字典。</retdesc></Docstring>
+获取当前的块和文件大小设置。
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"get_data_file_path"} anchor={"lerobot.datasets.LeRobotDatasetMetadata.get_data_file_path"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/dataset_metadata.py#L311"} parameters={[{"name": "ep_index", "val": ": int"}]}>
+<paramsdesc>- **ep_index** -- 从零开始的 episode index。</paramsdesc><retdesc> 包含此 episode 数据的 parquet 文件路径。</retdesc><raises>- `IndexError` -- 如果 `ep_index` 超出范围。</raises><raisederrors>`IndexError`</raisederrors></Docstring>
+返回给定 episode index 的相对 parquet 文件路径。
+
+
+
+
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"get_task_index"} anchor={"lerobot.datasets.LeRobotDatasetMetadata.get_task_index"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/dataset_metadata.py#L528"} parameters={[{"name": "task", "val": ": str"}]}>
+</Docstring>
+
+给定自然语言任务，如果该任务已存在于 dataset 中，则返回其 task_index，否则返回 None。
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"get_video_file_path"} anchor={"lerobot.datasets.LeRobotDatasetMetadata.get_video_file_path"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/dataset_metadata.py#L335"} parameters={[{"name": "ep_index", "val": ": int"}, {"name": "vid_key", "val": ": str"}]}>
+<paramsdesc>- **ep_index** -- 从零开始的 episode index。
+- **vid_key** -- 标识视频流的特征键（例如 `'observation.images.laptop'`）。</paramsdesc><retdesc> 包含此 episode 帧的视频文件路径。</retdesc><raises>- `IndexError` -- 如果 `ep_index` 超出范围。</raises><raisederrors>`IndexError`</raisederrors></Docstring>
+返回给定 episode 和视频键的相对视频文件路径。
+
+
+
+
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"rescale_depth_stats"} anchor={"lerobot.datasets.LeRobotDatasetMetadata.rescale_depth_stats"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/dataset_metadata.py#L411"} parameters={[{"name": "output_unit", "val": ": str"}]}>
+</Docstring>
+将深度特征统计从记录时的单位原地重缩放为 `output_unit`。
+
+深度统计以帧记录时的单位（`features[key]["info"]["depth_unit"]`）存储，而读取时帧以 `output_unit` 返回。此操作转换带单位的统计条目，使统计信息与消费者看到的帧一致。
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"save_episode"} anchor={"lerobot.datasets.LeRobotDatasetMetadata.save_episode"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/dataset_metadata.py#L638"} parameters={[{"name": "episode_index", "val": ": int"}, {"name": "episode_length", "val": ": int"}, {"name": "episode_tasks", "val": ": list"}, {"name": "episode_stats", "val": ": dict"}, {"name": "episode_metadata", "val": ": dict"}]}>
+<paramsdesc>- **episode_index** -- 正在保存的 episode 的从零开始索引。
+- **episode_length** -- 此 episode 中的帧数。
+- **episode_tasks** -- 此 episode 的任务描述列表。
+- **episode_stats** -- 此 episode 的每特征统计信息。
+- **episode_metadata** -- 额外元数据（块/文件索引、帧范围、视频时间戳等）。</paramsdesc></Docstring>
+持久化 episode 元数据，更新 dataset 信息并聚合统计信息。
+
+将 episode 的元数据写入缓冲的 parquet 写入器，递增 `info.json` 中的总 episode/帧计数器，并将 episode 的统计信息合并到运行中的 dataset 统计信息中。
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"save_episode_tasks"} anchor={"lerobot.datasets.LeRobotDatasetMetadata.save_episode_tasks"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/dataset_metadata.py#L538"} parameters={[{"name": "tasks", "val": ": list"}]}>
+<paramsdesc>- **tasks** -- 自然语言的唯一任务描述列表。</paramsdesc><raises>- `ValueError` -- 如果 `tasks` 包含重复项。</raises><raisederrors>`ValueError`</raisederrors></Docstring>
+为当前 episode 注册任务并持久化到磁盘。
+
+dataset 中尚不存在的新任务会被分配连续的任务索引，并追加到 tasks parquet 文件。
+
+
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"update_chunk_settings"} anchor={"lerobot.datasets.LeRobotDatasetMetadata.update_chunk_settings"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/dataset_metadata.py#L729"} parameters={[{"name": "chunks_size", "val": ": int | None = None"}, {"name": "data_files_size_in_mb", "val": ": int | None = None"}, {"name": "video_files_size_in_mb", "val": ": int | None = None"}]}>
+<paramsdesc>- **chunks_size** -- 每个块目录的最大文件数。若为 None，则保留当前值。
+- **data_files_size_in_mb** -- 数据 parquet 文件的最大大小，单位为 MB。若为 None，则保留当前值。
+- **video_files_size_in_mb** -- 视频文件的最大大小，单位为 MB。若为 None，则保留当前值。</paramsdesc></Docstring>
+在 dataset 创建后更新块和文件大小设置。
+
+这允许用户自定义存储组织方式而无需修改构造函数。这些设置控制 episode 如何分块以及文件在创建新文件前可增长到多大。
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"update_video_info"} anchor={"lerobot.datasets.LeRobotDatasetMetadata.update_video_info"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/dataset_metadata.py#L680"} parameters={[{"name": "video_key", "val": ": str | None = None"}, {"name": "video_encoder", "val": ": lerobot.configs.video.VideoEncoderConfig | None = None"}, {"name": "preserve_keys", "val": ": collections.abc.Iterable[str] | None = None"}]}>
+<paramsdesc>- **video_key** -- 若提供，则仅更新此视频键。否则更新 dataset 中的所有视频键。
+- **video_encoder** -- 用于生成视频的编码器配置。提供时，其字段会与从流派生的 `video.*` 条目一起记录为 `video.&amp;lt;field>` 条目（参见 `get_video_info`）。
+- **preserve_keys** -- 保留其现有值而非重新计算的键。`None`（默认）重新计算每个键。</paramsdesc></Docstring>
+在 `info.json` 中填充或刷新每特征的视频信息。
+
+警告：此函数从第一个 episode 的视频写入信息，隐含假设所有视频都以相同方式编码。此外，这意味着它假设第一个 episode 存在。
+
+始终重新探测视频并覆盖每个重新计算的键的现有信息。`preserve_keys` 列出必须保留其现有值的键（例如 `is_depth_map` 和深度量化参数等数据固有条目），而不是重新计算。
+
+
+
+
+</div></div>
+
+## MultiLeRobotDataset [[lerobot.datasets.MultiLeRobotDataset]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.datasets.MultiLeRobotDataset"} anchor={"lerobot.datasets.MultiLeRobotDataset"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/multi_dataset.py#L34"} parameters={[{"name": "repo_ids", "val": ": list"}, {"name": "root", "val": ": str | pathlib.Path | None = None"}, {"name": "episodes", "val": ": dict | None = None"}, {"name": "image_transforms", "val": ": collections.abc.Callable | None = None"}, {"name": "delta_timestamps", "val": ": dict[str, list[float]] | None = None"}, {"name": "tolerances_s", "val": ": dict | None = None"}, {"name": "download_videos", "val": ": bool = True"}, {"name": "video_backend", "val": ": str | None = None"}, {"name": "token", "val": ": str | bool | None = None"}]}>
+</Docstring>
+由多个底层 `LeRobotDataset` 组成的 dataset。
+
+底层 `LeRobotDataset` 被有效地拼接在一起，此类采用了 `LeRobotDataset` 的大部分 API 结构。
+
+
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"clear_image_transforms"} anchor={"lerobot.datasets.MultiLeRobotDataset.clear_image_transforms"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/multi_dataset.py#L111"} parameters={[]}>
+</Docstring>
+移除此 dataset 及其子 dataset 的变换。
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"set_image_transforms"} anchor={"lerobot.datasets.MultiLeRobotDataset.set_image_transforms"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/multi_dataset.py#L103"} parameters={[{"name": "image_transforms", "val": ": collections.abc.Callable | None"}]}>
+</Docstring>
+替换此 dataset 及其子 dataset 的变换。
+
+</div></div>
+
+## StreamingLeRobotDataset [[lerobot.datasets.StreamingLeRobotDataset]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.datasets.StreamingLeRobotDataset"} anchor={"lerobot.datasets.StreamingLeRobotDataset"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/streaming_dataset.py#L208"} parameters={[{"name": "repo_id", "val": ": str"}, {"name": "root", "val": ": str | pathlib.Path | None = None"}, {"name": "episodes", "val": ": list[int] | None = None"}, {"name": "image_transforms", "val": ": collections.abc.Callable | None = None"}, {"name": "delta_timestamps", "val": ": dict[list[float]] | None = None"}, {"name": "tolerance_s", "val": ": float = 0.0001"}, {"name": "revision", "val": ": str | None = None"}, {"name": "force_cache_sync", "val": ": bool = False"}, {"name": "streaming", "val": ": bool = True"}, {"name": "buffer_size", "val": ": int = 1000"}, {"name": "max_num_shards", "val": ": int = 16"}, {"name": "seed", "val": ": int = 42"}, {"name": "rng", "val": ": numpy.random._generator.Generator | None = None"}, {"name": "shuffle", "val": ": bool = True"}, {"name": "return_uint8", "val": ": bool = False"}, {"name": "depth_output_unit", "val": ": str = 'mm'"}, {"name": "repo_type", "val": ": typing.Literal['dataset', 'bucket'] = 'dataset'"}, {"name": "token", "val": ": str | bool | None = None"}]}>
+</Docstring>
+具有流式传输能力的 LeRobotDataset。
+
+此类扩展了 LeRobotDataset 以添加流式传输功能，允许数据以流式方式处理，而非全部加载到内存中。这对于可能无法装入内存的大型 dataset，或希望在不完全下载的情况下快速浏览 dataset 时特别有用。
+
+关键创新在于使用了可回溯迭代器（Backtrackable iterator），它维护一个有界的近期项缓冲区，使我们能够访问先前的帧以处理增量时间戳，而无需将整个 dataset 加载到内存中。
+
+示例：
+<ExampleCodeBlock anchor="lerobot.datasets.StreamingLeRobotDataset.example">
+
+基本用法：
+```python
+from lerobot.common.datasets.streaming_dataset import StreamingLeRobotDataset
+
+# Create a streaming dataset with delta timestamps
+delta_timestamps = {
+    "observation.image": [-1.0, -0.5, 0.0],  # 1 sec ago, 0.5 sec ago, current
+    "action": [0.0, 0.1, 0.2],  # current, 0.1 sec future, 0.2 sec future
+}
+
+dataset = StreamingLeRobotDataset(
+    repo_id="your-dataset-repo-id",
+    delta_timestamps=delta_timestamps,
+    streaming=True,
+    buffer_size=1000,
+)
+
+# Iterate over the dataset
+for i, item in enumerate(dataset):
+    print(f"Sample {i}: Episode {item['episode_index']} Frame {item['frame_index']}")
+    # item will contain stacked frames according to delta_timestamps
+    if i >= 10:
+        break
+```
+
+</ExampleCodeBlock>
+
+
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"make_frame"} anchor={"lerobot.datasets.StreamingLeRobotDataset.make_frame"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/datasets/streaming_dataset.py#L525"} parameters={[{"name": "dataset_iterator", "val": ": Backtrackable"}]}>
+</Docstring>
+从 dataset 迭代器创建帧
+
+</div></div>
+
+
+<EditOnGithub source="https://github.com/huggingface/lerobot/blob/main/docs/source/api/datasets.mdx" />
+
+<!--HF DOCBUILD BODY END-->
+
+HF_DOC_BODY_END
+
