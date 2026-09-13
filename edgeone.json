@@ -1,0 +1,6 @@
+{
+  "outputDirectory": "./site",
+  "redirects": [
+    { "source": "/", "destination": "/docs/lerobot/main/en/", "statusCode": 302 }
+  ]
+}

@@ -21,17 +21,22 @@ python tools/serve_site.py
 > 站点资源路径以 `/docs/lerobot/main/en/` 为根（与官网一致），所以需要用上面的小服务器预览，
 > 直接双击 HTML 文件会缺少样式。
 
-## 部署到 Vercel
+## 部署到 Vercel / EdgeOne Makers
 
 纯静态，无需构建，两种方式任选：
 
 - **CLI（最快）**：在项目根目录执行 `npx vercel --prod`（首次会要求登录）
-- **Git 导入**：把本仓库推到 GitHub，在 Vercel 导入并直接 Deploy（`vercel.json` 已配置输出目录 `site/`）
+- **Git 导入**：把本仓库推到 GitHub，在平台导入并直接 Deploy
 
-部署后访问 `https://<项目名>.vercel.app/docs/lerobot/main/en/`；访问根路径 `/` 会自动跳转到该首页。
+平台配置文件均已提供：
+
+- `vercel.json`：`outputDirectory: site`、`cleanUrls`、根路径跳转
+- `edgeone.json`（EdgeOne Makers）：`outputDirectory: ./site`、根路径 302 跳转
+- `site/index.html`：根路径兜底跳转页（即使平台不读取上述配置，访问 `/` 也会自动跳转）
+
+部署后访问 `https://<域名>/docs/lerobot/main/en/`；访问根路径 `/` 会自动跳转到该首页。
 站点文件按官网 URL 结构放在 `site/docs/lerobot/main/en/` 下，站内绝对链接（`/docs/lerobot/main/en/...`）
-可直接命中；根路径重定向与无扩展名链接（`/installation` → `installation.html`）由 `vercel.json` 中的
-`redirects` 和 `cleanUrls` 处理。
+可直接命中。
 
 ## 目录结构
 
