@@ -44,27 +44,33 @@ def main() -> None:
             if self.path == "/favicon.ico" and (root / "favicon.png").is_file():
                 self.path = "/favicon.png"
                 return super().do_GET()
-            if self.path.startswith(prefix + "/") or self.path == prefix:
-                rest = self.path[len(prefix):].lstrip("/")
-            else:
-                # allow direct access to anything in the root (e.g. /_app/...)
-                rest = self.path.lstrip("/")
-            rest, _, query = rest.partition("?")
-            rest = posixpath.normpath(rest) if rest else ""
-            if rest == ".":
-                rest = ""
-            target = root / rest
-            if target.is_dir():
-                target = target / "index.html"
-            if not target.is_file() and not rest.endswith(".html"):
-                candidate = root / (rest + ".html")
-                if candidate.is_file():
-                    target = candidate
-            if target.is_file() and target.resolve().is_relative_to(root):
-                self.path = "/" + str(target.relative_to(root)).replace("\\", "/")
-                if query:
-                    self.path += "?" + query
-                return super().do_GET()
+            # resolve against both layouts: files nested under the prefix (deploy layout)
+            # and files at the site root with the prefix mapped onto it (raw build layout)
+            path_only, _, query = self.path.partition("?")
+            rests = []
+            if path_only.startswith(prefix + "/") or path_only == prefix:
+                rests.append(path_only[len(prefix):].lstrip("/"))
+            rests.append(path_only.lstrip("/"))
+            seen: set[str] = set()
+            for rest in rests:
+                rest = posixpath.normpath(rest) if rest else ""
+                if rest == ".":
+                    rest = ""
+                if rest in seen:
+                    continue
+                seen.add(rest)
+                target = root / rest
+                if target.is_dir():
+                    target = target / "index.html"
+                if not target.is_file() and not rest.endswith(".html"):
+                    candidate = root / (rest + ".html")
+                    if candidate.is_file():
+                        target = candidate
+                if target.is_file() and target.resolve().is_relative_to(root):
+                    self.path = "/" + str(target.relative_to(root)).replace("\\", "/")
+                    if query:
+                        self.path += "?" + query
+                    return super().do_GET()
             self.send_error(404, "Not found")
 
     server = ThreadingHTTPServer(("127.0.0.1", args.port), Handler)
