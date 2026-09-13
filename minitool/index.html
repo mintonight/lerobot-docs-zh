@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>LeRobot 速查手册</title>
+  <link rel="stylesheet" href="./assets/style.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="app-header">
+      <h1 class="app-title">LeRobot 速查手册</h1>
+      <p class="app-sub">离线小工具 · 内容来自 LeRobot 官方速查表（中文）</p>
+      <div class="search-wrap">
+        <input id="search" class="search" type="search" placeholder="搜索命令、参数或功能…"
+               autocomplete="off" autocapitalize="off" spellcheck="false" />
+        <button id="clearBtn" class="clear-btn" type="button" aria-label="清空搜索" hidden>×</button>
+      </div>
+    </header>
+
+    <nav id="chips" class="chips" aria-label="分类筛选"></nav>
+
+    <main id="list" class="list" aria-live="polite"></main>
+
+    <footer class="app-footer">
+      <p>提示：点击命令框会自动选中命令，长按选中文本即可复制（容器内不支持一键复制）。</p>
+      <p>请把下列命令中的端口 / 名称 / ID 换成你自己的值。</p>
+    </footer>
+  </div>
+
+  <div id="toast" class="toast" hidden></div>
+
+  <script src="./assets/data.js"></script>
+  <script src="./assets/app.js"></script>
+</body>
+</html>
