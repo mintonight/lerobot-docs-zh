@@ -1,0 +1,1 @@
+import"./DsnmJJEf.js";import{g as s,a as p,d as i,c as n,h as c,r as l}from"./B9a_YfHB.js";import{a as m,b as f,c as d}from"./CrPi-TAD.js";import{p as b}from"./D-NYYvTJ.js";var g=i("<blockquote><!></blockquote>");function v(r,o){let t=b(o,"warning",3,!1);var a=g(),e=n(a);m(e,()=>o.children??c),l(a),s(()=>f(a,1,d(t()?"warning":"tip"))),p(r,a)}export{v as T};
