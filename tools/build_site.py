@@ -77,6 +77,25 @@ def main():
                 continue
             shutil.move(str(item), str(prefix_dir / item.name))
 
+        # root fallback: redirect the domain root to the docs homepage (works even on hosts
+        # that ignore edgeone.json / vercel.json redirect rules)
+        prefix = f"/docs/{args.library}/{args.version}/{args.language}"
+        redirect_page = f"""<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <title>LeRobot 文档中文站</title>
+  <meta http-equiv="refresh" content="0; url={prefix}/" />
+  <link rel="canonical" href="{prefix}/" />
+  <script>location.replace("{prefix}/");</script>
+</head>
+<body>
+  正在跳转到 <a href="{prefix}/">LeRobot 中文文档</a>…
+</body>
+</html>
+"""
+        (out_dir / "index.html").write_text(redirect_page, encoding="utf-8", newline="\n")
+
     n_pages = len(list(out_dir.rglob("*.html")))
     print(f"Done. {n_pages} html pages written to {out_dir}")
 
