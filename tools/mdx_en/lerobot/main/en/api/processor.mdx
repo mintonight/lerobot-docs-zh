@@ -1,0 +1,532 @@
+<script lang="ts">
+import {onMount} from "svelte";
+import Tip from "$lib/Tip.svelte";
+import CopyLLMTxtMenu from "$lib/CopyLLMTxtMenu.svelte";
+import Youtube from "$lib/Youtube.svelte";
+import Docstring from "$lib/Docstring.svelte";
+import CodeBlock from "$lib/CodeBlock.svelte";
+import CodeBlockFw from "$lib/CodeBlockFw.svelte";
+import DocNotebookDropdown from "$lib/DocNotebookDropdown.svelte";
+import CourseFloatingBanner from "$lib/CourseFloatingBanner.svelte";
+import IconCopyLink from "$lib/IconCopyLink.svelte";
+import FrameworkContent from "$lib/FrameworkContent.svelte";
+import Markdown from "$lib/Markdown.svelte";
+import Question from "$lib/Question.svelte";
+import FrameworkSwitchCourse from "$lib/FrameworkSwitchCourse.svelte";
+import InferenceApi from "$lib/InferenceApi.svelte";
+import TokenizersLanguageContent from "$lib/TokenizersLanguageContent.svelte";
+import ExampleCodeBlock from "$lib/ExampleCodeBlock.svelte";
+import Added from "$lib/Added.svelte";
+import Changed from "$lib/Changed.svelte";
+import Deprecated from "$lib/Deprecated.svelte";
+import PipelineIcon from "$lib/PipelineIcon.svelte";
+import PipelineTag from "$lib/PipelineTag.svelte";
+import Heading from "$lib/Heading.svelte";
+import HfOptions from "$lib/HfOptions.svelte";
+import HfOption from "$lib/HfOption.svelte";
+import EditOnGithub from "$lib/EditOnGithub.svelte";
+import InferenceSnippet from "$lib/InferenceSnippet/InferenceSnippet.svelte";
+import MermaidChart from "$lib/MermaidChart.svelte";
+let fw: "pt" | "tf" = "pt";
+onMount(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    fw = urlParams.get("fw") || "pt";
+});
+</script>
+<svelte:head>
+  <meta name="hf:doc:metadata" content={metadata} >
+</svelte:head>
+
+<!--HF DOCBUILD BODY START-->
+
+HF_DOC_BODY_START
+
+<CopyLLMTxtMenu containerStyle="float: right; margin-left: 10px; display: inline-flex; position: relative; z-index: 10;"></CopyLLMTxtMenu>
+
+# Processors
+
+Processors are the data transformation layer between a robot, a dataset and a policy. A pipeline is a chain
+of `ProcessorStep`s; each step declares how it transforms both the data and the feature contract.
+
+See [Introduction to Robot Processors](../introduction_processors) for the concepts,
+[Implement your own processor](../implement_your_own_processor) to write a step, and
+[Debug your processor pipeline](../debug_processor_pipeline) when a pipeline misbehaves.
+
+## ProcessorStep[[lerobot.processor.ProcessorStep]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.processor.ProcessorStep"} anchor={"lerobot.processor.ProcessorStep"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/processor/pipeline.py#L150"} parameters={[]}>
+</Docstring>
+Abstract base class for a single step in a data processing pipeline.
+
+Each step must implement the `__call__` method to perform its transformation
+on a data transition and the `transform_features` method to describe how it
+alters the shape or type of data features.
+
+Subclasses can optionally be stateful by implementing `state_dict` and `load_state_dict`.
+
+
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"get_config"} anchor={"lerobot.processor.ProcessorStep.get_config"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/processor/pipeline.py#L191"} parameters={[]}>
+<retdesc>A JSON-serializable dictionary of configuration parameters.</retdesc></Docstring>
+Returns the configuration of the step for serialization.
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"load_state_dict"} anchor={"lerobot.processor.ProcessorStep.load_state_dict"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/processor/pipeline.py#L207"} parameters={[{"name": "state", "val": ": dict[str, torch.Tensor]"}]}>
+<paramsdesc>- **state** -- A dictionary of state tensors.</paramsdesc></Docstring>
+Loads the step's state from a state dictionary.
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"reset"} anchor={"lerobot.processor.ProcessorStep.reset"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/processor/pipeline.py#L219"} parameters={[]}>
+</Docstring>
+Resets the internal state of the processor step, if any.
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"save_artifacts"} anchor={"lerobot.processor.ProcessorStep.save_artifacts"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/processor/pipeline.py#L215"} parameters={[{"name": "save_directory", "val": ": Path"}]}>
+</Docstring>
+Save non-tensor assets and map constructor arguments to relative paths.
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"state_dict"} anchor={"lerobot.processor.ProcessorStep.state_dict"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/processor/pipeline.py#L199"} parameters={[]}>
+<retdesc>A dictionary mapping state names to tensors.</retdesc></Docstring>
+Returns the state of the step (e.g., learned parameters, running means).
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"transform_features"} anchor={"lerobot.processor.ProcessorStep.transform_features"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/processor/pipeline.py#L223"} parameters={[{"name": "features", "val": ": dict[PipelineFeatureType, dict[str, PolicyFeature]]"}]}>
+<paramsdesc>- **features** -- A dictionary describing the input features for observations, actions, etc.</paramsdesc><retdesc>A dictionary describing the output features after this step's transformation.</retdesc></Docstring>
+Defines how this step modifies the description of pipeline features.
+
+This method is used to track changes in data shapes, dtypes, or modalities
+as data flows through the pipeline, without needing to process actual data.
+
+
+
+
+
+
+</div></div>
+
+## DataProcessorPipeline[[lerobot.processor.DataProcessorPipeline]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.processor.DataProcessorPipeline"} anchor={"lerobot.processor.DataProcessorPipeline"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/processor/pipeline.py#L264"} parameters={[{"name": "steps", "val": ": Sequence[ProcessorStep] = <factory>"}, {"name": "name", "val": ": str = 'DataProcessorPipeline'"}, {"name": "to_transition", "val": ": Callable[[TInput], EnvTransition] = <factory>"}, {"name": "to_output", "val": ": Callable[[EnvTransition], TOutput] = <factory>"}, {"name": "before_step_hooks", "val": ": list[Callable[[int, EnvTransition], None]] = <factory>"}, {"name": "after_step_hooks", "val": ": list[Callable[[int, EnvTransition], None]] = <factory>"}]}>
+<paramsdesc>- **steps** -- A sequence of `ProcessorStep` objects that make up the pipeline.
+- **name** -- A descriptive name for the pipeline.
+- **to_transition** -- A function to convert raw input data into the standardized `EnvTransition` format.
+- **to_output** -- A function to convert the final `EnvTransition` into the desired output format.
+- **before_step_hooks** -- A list of functions to be called before each step is executed.
+- **after_step_hooks** -- A list of functions to be called after each step is executed.</paramsdesc></Docstring>
+A sequential pipeline for processing data, integrated with the Hugging Face Hub.
+
+This class chains together multiple `ProcessorStep` instances to form a complete
+data processing workflow. It's generic, allowing for custom input and output types,
+which are handled by the `to_transition` and `to_output` converters.
+
+
+
+
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"from_config"} anchor={"lerobot.processor.DataProcessorPipeline.from_config"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/processor/pipeline.py#L785"} parameters={[{"name": "config", "val": ": dict[str, Any]"}, {"name": "state_dict", "val": ": dict[str, dict[str, torch.Tensor]] | None = None"}, {"name": "overrides", "val": ": dict[str, Any] | None = None"}, {"name": "to_transition", "val": ": Callable[[TInput], EnvTransition] | None = None"}, {"name": "to_output", "val": ": Callable[[EnvTransition], TOutput] | None = None"}]}>
+<paramsdesc>- **config** -- A config dictionary with the same structure as the saved processor JSON.
+- **state_dict** -- Optional in-memory pipeline state grouped by suffixless state key.
+- **overrides** -- Optional constructor overrides keyed by registry name or class name.
+- **to_transition** -- Optional converter from input data to `EnvTransition`.
+- **to_output** -- Optional converter from `EnvTransition` to output data.</paramsdesc><retdesc>A processor pipeline built from the config and optional state.</retdesc></Docstring>
+Build a pipeline from an in-memory config and optional state tensors.
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"from_pretrained"} anchor={"lerobot.processor.DataProcessorPipeline.from_pretrained"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/processor/pipeline.py#L638"} parameters={[{"name": "pretrained_model_name_or_path", "val": ": str | Path"}, {"name": "config_filename", "val": ": str"}, {"name": "force_download", "val": ": bool = False"}, {"name": "resume_download", "val": ": bool | None = None"}, {"name": "proxies", "val": ": dict[str, str] | None = None"}, {"name": "token", "val": ": str | bool | None = None"}, {"name": "cache_dir", "val": ": str | Path | None = None"}, {"name": "local_files_only", "val": ": bool = False"}, {"name": "revision", "val": ": str | None = None"}, {"name": "overrides", "val": ": dict[str, Any] | None = None"}, {"name": "to_transition", "val": ": Callable[[TInput], EnvTransition] | None = None"}, {"name": "to_output", "val": ": Callable[[EnvTransition], TOutput] | None = None"}, {"name": "**kwargs", "val": ""}]}>
+<paramsdesc>- **pretrained_model_name_or_path** -- The identifier of the repository on the Hugging Face Hub,
+  a path to a local directory, or a path to a single config file.
+- **config_filename** -- The name of the pipeline's JSON configuration file. Always required
+  to prevent ambiguity when multiple configs exist (e.g., preprocessor vs postprocessor).
+- **force_download** -- Whether to force (re)downloading the files.
+- **resume_download** -- Whether to resume a previously interrupted download.
+- **proxies** -- A dictionary of proxy servers to use.
+- **token** -- The token to use as HTTP bearer authorization for private Hub repositories.
+- **cache_dir** -- The path to a specific cache folder to store downloaded files.
+- **local_files_only** -- If True, avoid downloading files from the Hub.
+- **revision** -- The specific model version to use (e.g., a branch name, tag name, or commit id).
+- **overrides** -- A dictionary to override the configuration of specific steps. Keys should
+  match the step's class name or registry name.
+- **to_transition** -- A custom function to convert input data to `EnvTransition`.
+- **to_output** -- A custom function to convert the final `EnvTransition` to the output format.
+- ****kwargs** -- Additional arguments (not used).</paramsdesc><retdesc>An instance of `DataProcessorPipeline` loaded with the specified configuration and state.</retdesc><raises>- ``FileNotFoundError`` -- If the config file cannot be found.
+- ``ValueError`` -- If configuration is ambiguous or instantiation fails.
+- ``ImportError`` -- If a step's class cannot be imported.
+- ``KeyError`` -- If an override key doesn't match any step in the pipeline.
+- ``ProcessorMigrationError`` -- If the model requires migration to processor format.</raises><raisederrors>``FileNotFoundError`` or ``ValueError`` or ``ImportError`` or ``KeyError`` or ``ProcessorMigrationError``</raisederrors></Docstring>
+Loads a pipeline from a local directory, single file, or Hugging Face Hub repository.
+
+This method implements a simplified loading pipeline with intelligent migration detection:
+
+**Simplified Loading Strategy**:
+1. **Config Loading** (_load_config):
+   - **Directory**: Load specified config_filename from directory
+   - **Single file**: Load file directly (config_filename ignored)
+   - **Hub repository**: Download specified config_filename from Hub
+
+2. **Config Validation** (_validate_loaded_config):
+   - Format validation: Ensure config is valid processor format
+   - Migration detection: Guide users to migrate old LeRobot models
+   - Clear errors: Provide actionable error messages
+
+3. **Step Construction** (_build_steps_with_overrides):
+   - Class resolution: Registry lookup or dynamic imports
+   - Override merging: User parameters override saved config
+   - State loading: Load .safetensors files for stateful steps
+
+4. **Override Validation** (_validate_overrides_used):
+   - Ensure all user overrides were applied (catch typos)
+   - Provide helpful error messages with available keys
+
+**Migration Detection**:
+- **Smart detection**: Analyzes JSON files to detect old LeRobot models
+- **Precise targeting**: Avoids false positives on other HuggingFace models
+- **Clear guidance**: Provides exact migration command to run
+- **Error mode**: Always raises ProcessorMigrationError for clear user action
+
+<ExampleCodeBlock anchor="lerobot.processor.DataProcessorPipeline.from_pretrained.example">
+
+**Loading Examples**:
+```python
+# Directory loading
+pipeline = DataProcessorPipeline.from_pretrained("/models/my_model", config_filename="processor.json")
+
+# Single file loading
+pipeline = DataProcessorPipeline.from_pretrained(
+    "/models/my_model/processor.json", config_filename="processor.json"
+)
+
+# Hub loading
+pipeline = DataProcessorPipeline.from_pretrained("user/repo", config_filename="processor.json")
+
+# Multiple configs (preprocessor/postprocessor)
+preprocessor = DataProcessorPipeline.from_pretrained(
+    "model", config_filename="policy_preprocessor.json"
+)
+postprocessor = DataProcessorPipeline.from_pretrained(
+    "model", config_filename="policy_postprocessor.json"
+)
+```
+
+</ExampleCodeBlock>
+
+**Override System**:
+- **Key matching**: Use registry names or class names as override keys
+- **Config merging**: User overrides take precedence over saved config
+- **Validation**: Ensure all override keys match actual steps (catch typos)
+- **Example**: overrides={"NormalizeStep": {"device": "cuda"}}
+
+
+
+
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"get_config"} anchor={"lerobot.processor.DataProcessorPipeline.get_config"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/processor/pipeline.py#L442"} parameters={[]}>
+<retdesc>A dictionary with the same content that `save_pretrained()` writes as JSON.</retdesc></Docstring>
+Return the JSON-serializable pipeline configuration.
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"load_state_dict"} anchor={"lerobot.processor.DataProcessorPipeline.load_state_dict"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/processor/pipeline.py#L506"} parameters={[{"name": "state_dict", "val": ": dict[str, dict[str, torch.Tensor]]"}]}>
+<paramsdesc>- **state_dict** -- A dictionary mapping suffixless state keys to step state dictionaries.</paramsdesc><raises>- ``KeyError`` -- If loading finds missing expected state or unexpected extra state.</raises><raisederrors>``KeyError``</raisederrors></Docstring>
+Load pipeline state tensors into the existing steps.
+
+
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"process_action"} anchor={"lerobot.processor.DataProcessorPipeline.process_action"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/processor/pipeline.py#L1771"} parameters={[{"name": "action", "val": ": PolicyAction | RobotAction | EnvAction"}]}>
+<paramsdesc>- **action** -- The action data.</paramsdesc><retdesc>The processed action.</retdesc></Docstring>
+Processes only the action part of a transition through the pipeline.
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"process_complementary_data"} anchor={"lerobot.processor.DataProcessorPipeline.process_complementary_data"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/processor/pipeline.py#L1838"} parameters={[{"name": "complementary_data", "val": ": dict[str, Any]"}]}>
+<paramsdesc>- **complementary_data** -- The complementary data dictionary.</paramsdesc><retdesc>The processed complementary data dictionary.</retdesc></Docstring>
+Processes only the complementary data part of a transition through the pipeline.
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"process_done"} anchor={"lerobot.processor.DataProcessorPipeline.process_done"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/processor/pipeline.py#L1799"} parameters={[{"name": "done", "val": ": bool | torch.Tensor"}]}>
+<paramsdesc>- **done** -- The done flag.</paramsdesc><retdesc>The processed done flag.</retdesc></Docstring>
+Processes only the done flag of a transition through the pipeline.
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"process_info"} anchor={"lerobot.processor.DataProcessorPipeline.process_info"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/processor/pipeline.py#L1825"} parameters={[{"name": "info", "val": ": dict[str, Any]"}]}>
+<paramsdesc>- **info** -- The info dictionary.</paramsdesc><retdesc>The processed info dictionary.</retdesc></Docstring>
+Processes only the info dictionary of a transition through the pipeline.
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"process_observation"} anchor={"lerobot.processor.DataProcessorPipeline.process_observation"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/processor/pipeline.py#L1758"} parameters={[{"name": "observation", "val": ": RobotObservation"}]}>
+<paramsdesc>- **observation** -- The observation dictionary.</paramsdesc><retdesc>The processed observation dictionary.</retdesc></Docstring>
+Processes only the observation part of a transition through the pipeline.
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"process_reward"} anchor={"lerobot.processor.DataProcessorPipeline.process_reward"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/processor/pipeline.py#L1786"} parameters={[{"name": "reward", "val": ": float | torch.Tensor"}]}>
+<paramsdesc>- **reward** -- The reward value.</paramsdesc><retdesc>The processed reward.</retdesc></Docstring>
+Processes only the reward part of a transition through the pipeline.
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"process_truncated"} anchor={"lerobot.processor.DataProcessorPipeline.process_truncated"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/processor/pipeline.py#L1812"} parameters={[{"name": "truncated", "val": ": bool | torch.Tensor"}]}>
+<paramsdesc>- **truncated** -- The truncated flag.</paramsdesc><retdesc>The processed truncated flag.</retdesc></Docstring>
+Processes only the truncated flag of a transition through the pipeline.
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"register_after_step_hook"} anchor={"lerobot.processor.DataProcessorPipeline.register_after_step_hook"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/processor/pipeline.py#L1682"} parameters={[{"name": "fn", "val": ": Callable[[int, EnvTransition], None]"}]}>
+<paramsdesc>- **fn** -- A callable that accepts the step index and the current transition.</paramsdesc></Docstring>
+Registers a function to be called after each step.
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"register_before_step_hook"} anchor={"lerobot.processor.DataProcessorPipeline.register_before_step_hook"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/processor/pipeline.py#L1658"} parameters={[{"name": "fn", "val": ": Callable[[int, EnvTransition], None]"}]}>
+<paramsdesc>- **fn** -- A callable that accepts the step index and the current transition.</paramsdesc></Docstring>
+Registers a function to be called before each step.
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"reset"} anchor={"lerobot.processor.DataProcessorPipeline.reset"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/processor/pipeline.py#L1706"} parameters={[]}>
+</Docstring>
+Resets the state of all stateful steps in the pipeline.
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"save_pretrained"} anchor={"lerobot.processor.DataProcessorPipeline.save_pretrained"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/processor/pipeline.py#L586"} parameters={[{"name": "save_directory", "val": ": str | Path | None = None"}, {"name": "repo_id", "val": ": str | None = None"}, {"name": "push_to_hub", "val": ": bool = False"}, {"name": "card_kwargs", "val": ": dict[str, Any] | None = None"}, {"name": "config_filename", "val": ": str | None = None"}, {"name": "**push_to_hub_kwargs", "val": ""}]}>
+<paramsdesc>- **save_directory** -- The directory where the pipeline will be saved. If None, saves to
+  HF_LEROBOT_HOME/processors/{sanitized_pipeline_name}.
+- **repo_id** -- ID of your repository on the Hub. Used only if `push_to_hub=true`.
+- **push_to_hub** -- Whether or not to push your object to the Hugging Face Hub after saving it.
+- **card_kwargs** -- Additional arguments passed to the card template to customize the card.
+- **config_filename** -- The name of the JSON configuration file. If None, a name is
+  generated from the pipeline's `name` attribute.
+- ****push_to_hub_kwargs** -- Additional key word arguments passed along to the push_to_hub method.</paramsdesc></Docstring>
+Saves the pipeline's configuration and state to a directory.
+
+This method creates a JSON configuration file that defines the pipeline's structure
+(name and steps). For each stateful step, it also saves a `.safetensors` file
+containing its state dictionary.
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"state_dict"} anchor={"lerobot.processor.DataProcessorPipeline.state_dict"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/processor/pipeline.py#L479"} parameters={[]}>
+<retdesc>A dictionary mapping suffixless state keys to cloned step state dictionaries.</retdesc></Docstring>
+Return pipeline state tensors grouped by state key.
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"step_through"} anchor={"lerobot.processor.DataProcessorPipeline.step_through"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/processor/pipeline.py#L334"} parameters={[{"name": "data", "val": ": TInput"}]}>
+<paramsdesc>- **data** -- The input data.</paramsdesc><yielddesc>The `EnvTransition` object, starting with the initial state and then after
+each processing step.</yielddesc></Docstring>
+Processes data step-by-step, yielding the transition at each stage.
+
+This is a generator method useful for debugging and inspecting the intermediate
+state of the data as it passes through the pipeline.
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"transform_features"} anchor={"lerobot.processor.DataProcessorPipeline.transform_features"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/processor/pipeline.py#L1735"} parameters={[{"name": "initial_features", "val": ": dict[PipelineFeatureType, dict[str, PolicyFeature]]"}]}>
+<paramsdesc>- **initial_features** -- A dictionary describing the initial features.</paramsdesc><retdesc>The final feature description after all transformations.</retdesc></Docstring>
+Applies feature transformations from all steps sequentially.
+
+This method propagates a feature description dictionary through each step's
+`transform_features` method, allowing the pipeline to statically determine
+the output feature specification without processing any real data.
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"unregister_after_step_hook"} anchor={"lerobot.processor.DataProcessorPipeline.unregister_after_step_hook"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/processor/pipeline.py#L1690"} parameters={[{"name": "fn", "val": ": Callable[[int, EnvTransition], None]"}]}>
+<paramsdesc>- **fn** -- The exact function object that was previously registered.</paramsdesc><raises>- ``ValueError`` -- If the hook is not found in the list.</raises><raisederrors>``ValueError``</raisederrors></Docstring>
+Unregisters an 'after_step' hook.
+
+
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"unregister_before_step_hook"} anchor={"lerobot.processor.DataProcessorPipeline.unregister_before_step_hook"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/processor/pipeline.py#L1666"} parameters={[{"name": "fn", "val": ": Callable[[int, EnvTransition], None]"}]}>
+<paramsdesc>- **fn** -- The exact function object that was previously registered.</paramsdesc><raises>- ``ValueError`` -- If the hook is not found in the list.</raises><raisederrors>``ValueError``</raisederrors></Docstring>
+Unregisters a 'before_step' hook.
+
+
+
+
+
+
+
+
+</div></div>
+
+## PolicyProcessorPipeline[[lerobot.processor.DataProcessorPipeline]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"lerobot.processor.DataProcessorPipeline"} anchor={"lerobot.processor.DataProcessorPipeline"} parameters={[{"name": "*args", "val": ""}, {"name": "**kwargs", "val": ""}]}>
+</Docstring>
+
+
+</div>
+
+<!--HF DOCBUILD BODY END-->
+
+HF_DOC_BODY_END
+

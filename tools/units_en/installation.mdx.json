@@ -1,0 +1,638 @@
+{
+ "file": "installation.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1938,
+   "text": "# Installation",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1940,
+   "end": 2206,
+   "text": "This guide uses ⟦0⟧ (via miniforge) to manage environments (recommended). If you prefer another environment manager (e.g. ⟦1⟧, ⟦2⟧), ensure you have Python >=3.12 and support PyTorch >= 2.10, then skip ahead to [Environment Setup](⟦3⟧).",
+   "tokens": [
+    "`conda`",
+    "`uv`",
+    "`venv`",
+    "#step-2-environment-setup"
+   ]
+  },
+  {
+   "id": 2,
+   "kind": "heading",
+   "start": 2208,
+   "end": 2290,
+   "text": "## Step 1 (⟦0⟧ only): Install [⟦1⟧](⟦2⟧)",
+   "tokens": [
+    "`conda`",
+    "`miniforge`",
+    "https://conda-forge.org/download/"
+   ]
+  },
+  {
+   "id": 3,
+   "kind": "heading",
+   "start": 2453,
+   "end": 2481,
+   "text": "## Step 2: Environment Setup",
+   "tokens": []
+  },
+  {
+   "id": 4,
+   "kind": "para",
+   "start": 2483,
+   "end": 2529,
+   "text": "Create a virtual environment with Python 3.12:",
+   "tokens": []
+  },
+  {
+   "id": 5,
+   "kind": "para",
+   "start": 2664,
+   "end": 2717,
+   "text": "⟦0⟧\n⟦1⟧= 2.10 only)\">",
+   "tokens": [
+    "</hfoption>",
+    "<hfoption id=\"uv (PyTorch >"
+   ]
+  },
+  {
+   "id": 6,
+   "kind": "para",
+   "start": 2830,
+   "end": 2932,
+   "text": "Then activate your virtual environment, you have to do this each time you open a shell to use lerobot:",
+   "tokens": []
+  },
+  {
+   "id": 7,
+   "kind": "quote",
+   "start": 3055,
+   "end": 3167,
+   "text": "> [!NOTE]\n> When installing LeRobot inside WSL (Windows Subsystem for Linux), make sure to also install ⟦0⟧:",
+   "tokens": [
+    "`evdev`"
+   ]
+  },
+  {
+   "id": 8,
+   "kind": "para",
+   "start": 3224,
+   "end": 3277,
+   "text": "⟦0⟧\n⟦1⟧= 2.10 only)\">",
+   "tokens": [
+    "</hfoption>",
+    "<hfoption id=\"uv (PyTorch >"
+   ]
+  },
+  {
+   "id": 9,
+   "kind": "quote",
+   "start": 3375,
+   "end": 3487,
+   "text": "> [!NOTE]\n> When installing LeRobot inside WSL (Windows Subsystem for Linux), make sure to also install ⟦0⟧:",
+   "tokens": [
+    "`evdev`"
+   ]
+  },
+  {
+   "id": 10,
+   "kind": "heading",
+   "start": 3617,
+   "end": 3658,
+   "text": "### Install ⟦0⟧ (for video decoding)",
+   "tokens": [
+    "`ffmpeg`"
+   ]
+  },
+  {
+   "id": 11,
+   "kind": "para",
+   "start": 3660,
+   "end": 3785,
+   "text": "LeRobot uses [TorchCodec](⟦0⟧) for video decoding by default, which requires ⟦1⟧.",
+   "tokens": [
+    "https://github.com/meta-pytorch/torchcodec",
+    "`ffmpeg`"
+   ]
+  },
+  {
+   "id": 12,
+   "kind": "quote",
+   "start": 3787,
+   "end": 4072,
+   "text": "> [!NOTE]\n> **Platform support:** TorchCodec is **not available** on macOS Intel (x86_64), Linux ARM (aarch64, arm64, armv7l), or Windows with PyTorch < 2.8. On these platforms, LeRobot automatically falls back to ⟦0⟧ — so you do not need to install ⟦1⟧ and can skip to Step 3.",
+   "tokens": [
+    "`pyav`",
+    "`ffmpeg`"
+   ]
+  },
+  {
+   "id": 13,
+   "kind": "quote",
+   "start": 4075,
+   "end": 4572,
+   "text": "> **Jetson (aarch64 + CUDA):** the ⟦0⟧ fallback above means no GPU-accelerated video decode by default. [⟦1⟧](⟦2⟧) builds ⟦3⟧/⟦4⟧ from source with CUDA support for JetPack 6.2 — community-maintained, see [⟦5⟧](⟦6⟧) for the prebuilt image and issue [#819](⟦7⟧) for background.",
+   "tokens": [
+    "`pyav`",
+    "`docker/Dockerfile.jetson`",
+    "https://github.com/huggingface/lerobot/blob/main/docker/Dockerfile.jetson",
+    "`torch`",
+    "`torchcodec`",
+    "`ravediamond/lerobot-jetson`",
+    "https://github.com/ravediamond/lerobot-jetson",
+    "https://github.com/huggingface/lerobot/issues/819"
+   ]
+  },
+  {
+   "id": 14,
+   "kind": "para",
+   "start": 4574,
+   "end": 4660,
+   "text": "If your platform supports TorchCodec, install ⟦0⟧ using one of the methods below:",
+   "tokens": [
+    "`ffmpeg`"
+   ]
+  },
+  {
+   "id": 15,
+   "kind": "para",
+   "start": 4771,
+   "end": 4895,
+   "text": "Install ⟦0⟧ in your conda environment. This works with **all PyTorch versions** and is **required for PyTorch < 2.10**:",
+   "tokens": [
+    "`ffmpeg`"
+   ]
+  },
+  {
+   "id": 16,
+   "kind": "quote",
+   "start": 4946,
+   "end": 5195,
+   "text": "> [!TIP]\n> This usually installs ⟦0⟧ with the ⟦1⟧ encoder. If you run into issues (e.g. ⟦2⟧ missing — check with ⟦3⟧ — or a version mismatch with ⟦4⟧), you can explicitly install ⟦5⟧ using:",
+   "tokens": [
+    "`ffmpeg 8.X`",
+    "`libsvtav1`",
+    "`libsvtav1`",
+    "`ffmpeg -encoders`",
+    "`torchcodec`",
+    "`ffmpeg 7.1.1`"
+   ]
+  },
+  {
+   "id": 17,
+   "kind": "para",
+   "start": 5259,
+   "end": 5312,
+   "text": "⟦0⟧\n⟦1⟧= 2.10 only)\">",
+   "tokens": [
+    "</hfoption>",
+    "<hfoption id=\"uv (PyTorch >"
+   ]
+  },
+  {
+   "id": 18,
+   "kind": "para",
+   "start": 5314,
+   "end": 5514,
+   "text": "Starting with **PyTorch >= 2.10** (TorchCodec ≥ 0.10), TorchCodec can dynamically link to a system-wide ⟦0⟧ installation. This is useful when using ⟦1⟧ or other non-⟦2⟧ environment managers:",
+   "tokens": [
+    "`ffmpeg`",
+    "`uv`",
+    "`conda`"
+   ]
+  },
+  {
+   "id": 19,
+   "kind": "quote",
+   "start": 5614,
+   "end": 5807,
+   "text": "> [!IMPORTANT]\n> System-wide ⟦0⟧ is **only supported with PyTorch >= 2.10** (TorchCodec ≥ 0.10). For older PyTorch versions, you **must** use ⟦1⟧ instead.",
+   "tokens": [
+    "`ffmpeg`",
+    "`conda install ffmpeg -c conda-forge`"
+   ]
+  },
+  {
+   "id": 20,
+   "kind": "heading",
+   "start": 5864,
+   "end": 5892,
+   "text": "## Step 3: Install LeRobot 🤗",
+   "tokens": []
+  },
+  {
+   "id": 21,
+   "kind": "para",
+   "start": 5894,
+   "end": 6179,
+   "text": "The base ⟦0⟧ install is intentionally **lightweight** — it includes only core ML dependencies (PyTorch, torchvision, numpy, opencv, einops, draccus, huggingface-hub, gymnasium, safetensors). Heavier dependencies are gated behind optional extras so you only install what you need.",
+   "tokens": [
+    "`lerobot`"
+   ]
+  },
+  {
+   "id": 22,
+   "kind": "heading",
+   "start": 6181,
+   "end": 6196,
+   "text": "### From Source",
+   "tokens": []
+  },
+  {
+   "id": 23,
+   "kind": "para",
+   "start": 6198,
+   "end": 6258,
+   "text": "First, clone the repository and navigate into the directory:",
+   "tokens": []
+  },
+  {
+   "id": 24,
+   "kind": "para",
+   "start": 6337,
+   "end": 6434,
+   "text": "Then, install the library in editable mode. This is useful if you plan to contribute to the code.",
+   "tokens": []
+  },
+  {
+   "id": 25,
+   "kind": "heading",
+   "start": 7119,
+   "end": 7145,
+   "text": "### Installation from PyPI",
+   "tokens": []
+  },
+  {
+   "id": 26,
+   "kind": "para",
+   "start": 7147,
+   "end": 7195,
+   "text": "**Core Library:**\nInstall the base package with:",
+   "tokens": []
+  },
+  {
+   "id": 27,
+   "kind": "para",
+   "start": 7441,
+   "end": 7535,
+   "text": "_This installs only the core ML dependencies. You will need to add extras for most workflows._",
+   "tokens": []
+  },
+  {
+   "id": 28,
+   "kind": "para",
+   "start": 7537,
+   "end": 7719,
+   "text": "**Feature Extras:**\nLeRobot provides **feature-scoped extras** that map to common workflows. If you are using ⟦0⟧, replace ⟦1⟧ with ⟦2⟧ in the commands below.",
+   "tokens": [
+    "`uv`",
+    "`pip install`",
+    "`uv pip install`"
+   ]
+  },
+  {
+   "id": 29,
+   "kind": "table",
+   "start": 7721,
+   "end": 7819,
+   "text": "| Extra      | What it adds                                | Typical use case                    |",
+   "tokens": []
+  },
+  {
+   "id": 30,
+   "kind": "table",
+   "start": 7919,
+   "end": 8017,
+   "text": "| ⟦0⟧  | ⟦1⟧, ⟦2⟧, ⟦3⟧, ⟦4⟧ | Loading & creating datasets         |",
+   "tokens": [
+    "`dataset`",
+    "`datasets`",
+    "`av`",
+    "`torchcodec`",
+    "`jsonlines`"
+   ]
+  },
+  {
+   "id": 31,
+   "kind": "table",
+   "start": 8018,
+   "end": 8116,
+   "text": "| ⟦0⟧ | ⟦1⟧ + ⟦2⟧, ⟦3⟧           | Training policies                   |",
+   "tokens": [
+    "`training`",
+    "`dataset`",
+    "`accelerate`",
+    "`wandb`"
+   ]
+  },
+  {
+   "id": 32,
+   "kind": "table",
+   "start": 8117,
+   "end": 8215,
+   "text": "| ⟦0⟧ | ⟦1⟧, ⟦2⟧, ⟦3⟧            | Connecting to real robots           |",
+   "tokens": [
+    "`hardware`",
+    "`pynput`",
+    "`pyserial`",
+    "`deepdiff`"
+   ]
+  },
+  {
+   "id": 33,
+   "kind": "table",
+   "start": 8216,
+   "end": 8314,
+   "text": "| ⟦0⟧      | ⟦1⟧                                 | Visualization during recording/eval |",
+   "tokens": [
+    "`viz`",
+    "`rerun-sdk`"
+   ]
+  },
+  {
+   "id": 34,
+   "kind": "para",
+   "start": 8316,
+   "end": 8383,
+   "text": "**Composite Extras** combine feature extras for common CLI scripts:",
+   "tokens": []
+  },
+  {
+   "id": 35,
+   "kind": "table",
+   "start": 8385,
+   "end": 8494,
+   "text": "| Extra          | Includes                       | Typical use case                                        |",
+   "tokens": []
+  },
+  {
+   "id": 36,
+   "kind": "table",
+   "start": 8715,
+   "end": 8824,
+   "text": "| ⟦0⟧   | ⟦1⟧                           | ⟦2⟧ (add policy + env extras as needed)      |",
+   "tokens": [
+    "`evaluation`",
+    "`av`",
+    "`lerobot-eval`"
+   ]
+  },
+  {
+   "id": 37,
+   "kind": "para",
+   "start": 9204,
+   "end": 9295,
+   "text": "**Policy, environment, and hardware extras** are still available for specific dependencies:",
+   "tokens": []
+  },
+  {
+   "id": 38,
+   "kind": "para",
+   "start": 9641,
+   "end": 9774,
+   "text": "_Multiple extras can be combined (e.g., ⟦0⟧). For a full list of available extras, refer to ⟦1⟧._",
+   "tokens": [
+    "`.[core_scripts,pi,pusht]`",
+    "`pyproject.toml`"
+   ]
+  },
+  {
+   "id": 39,
+   "kind": "heading",
+   "start": 9776,
+   "end": 9813,
+   "text": "### PyTorch CUDA variant (Linux only)",
+   "tokens": []
+  },
+  {
+   "id": 40,
+   "kind": "para",
+   "start": 9815,
+   "end": 9999,
+   "text": "On Linux, the install path determines which CUDA wheel you get. macOS and Windows installs use the PyPI default (MPS / CPU / CUDA-Windows wheel respectively) and can skip this section.",
+   "tokens": []
+  },
+  {
+   "id": 41,
+   "kind": "para",
+   "start": 10090,
+   "end": 10154,
+   "text": "**Source install via ⟦0⟧ (⟦1⟧ or ⟦2⟧)**",
+   "tokens": [
+    "`uv`",
+    "`uv sync`",
+    "`uv pip install -e .`"
+   ]
+  },
+  {
+   "id": 42,
+   "kind": "para",
+   "start": 10156,
+   "end": 10397,
+   "text": "⟦0⟧ and ⟦1⟧ are pinned by the project to the **CUDA 12.8** PyTorch index (⟦2⟧, driver floor **570.86**) — covers Ampere/Ada/Hopper/Blackwell GPUs. No action needed for typical NVIDIA setups.",
+   "tokens": [
+    "`torch`",
+    "`torchvision`",
+    "`https://download.pytorch.org/whl/cu128`"
+   ]
+  },
+  {
+   "id": 43,
+   "kind": "para",
+   "start": 10399,
+   "end": 10440,
+   "text": "To override for a different CUDA variant:",
+   "tokens": []
+  },
+  {
+   "id": 44,
+   "kind": "para",
+   "start": 10660,
+   "end": 10732,
+   "text": "**Source install via ⟦0⟧/⟦1⟧, or ⟦2⟧ from PyPI**",
+   "tokens": [
+    "`pip`",
+    "`conda`",
+    "`pip install lerobot`"
+   ]
+  },
+  {
+   "id": 45,
+   "kind": "para",
+   "start": 10734,
+   "end": 10825,
+   "text": "PyPI default torch wheel is currently a cu130-bundled Linux wheel, driver floor **580.65**.",
+   "tokens": []
+  },
+  {
+   "id": 46,
+   "kind": "para",
+   "start": 10827,
+   "end": 10859,
+   "text": "To pick a specific CUDA variant:",
+   "tokens": []
+  },
+  {
+   "id": 47,
+   "kind": "para",
+   "start": 10861,
+   "end": 10947,
+   "text": "**Using ⟦0⟧ or ⟦1⟧** — install torch first with an explicit index, then lerobot:",
+   "tokens": [
+    "`pip`",
+    "`conda`"
+   ]
+  },
+  {
+   "id": 48,
+   "kind": "para",
+   "start": 11139,
+   "end": 11220,
+   "text": "**Using ⟦0⟧ to install from PyPI** — one-liner via ⟦1⟧ (uv ≥ 0.6):",
+   "tokens": [
+    "`uv`",
+    "`--torch-backend`"
+   ]
+  },
+  {
+   "id": 49,
+   "kind": "para",
+   "start": 11280,
+   "end": 11419,
+   "text": "Supported values include ⟦0⟧, ⟦1⟧, ⟦2⟧, ⟦3⟧, ⟦4⟧, ⟦5⟧, plus various ⟦6⟧ and ⟦7⟧. Swap as needed for your driver.",
+   "tokens": [
+    "`auto`",
+    "`cpu`",
+    "`cu126`",
+    "`cu128`",
+    "`cu129`",
+    "`cu130`",
+    "`rocm*`",
+    "`xpu`"
+   ]
+  },
+  {
+   "id": 50,
+   "kind": "heading",
+   "start": 11476,
+   "end": 11495,
+   "text": "### Troubleshooting",
+   "tokens": []
+  },
+  {
+   "id": 51,
+   "kind": "para",
+   "start": 11497,
+   "end": 11662,
+   "text": "If you encounter build errors, you may need to install additional system dependencies: ⟦0⟧, ⟦1⟧, and ⟦2⟧.\nTo install these for Linux run:",
+   "tokens": [
+    "`cmake`",
+    "`build-essential`",
+    "`ffmpeg libs`"
+   ]
+  },
+  {
+   "id": 52,
+   "kind": "para",
+   "start": 11853,
+   "end": 11973,
+   "text": "For other systems, see: [Compiling PyAV](⟦0⟧)",
+   "tokens": [
+    "https://pyav.org/docs/develop/overview/installation.html#bring-your-own-ffmpeg"
+   ]
+  },
+  {
+   "id": 53,
+   "kind": "heading",
+   "start": 11975,
+   "end": 11999,
+   "text": "## Optional dependencies",
+   "tokens": []
+  },
+  {
+   "id": 54,
+   "kind": "para",
+   "start": 12001,
+   "end": 12266,
+   "text": "LeRobot provides optional extras for specific functionalities. Multiple extras can be combined (e.g., ⟦0⟧). For all available extras, refer to ⟦1⟧. If you are using ⟦2⟧, replace ⟦3⟧ with ⟦4⟧ in the commands below.",
+   "tokens": [
+    "`.[aloha,feetech]`",
+    "`pyproject.toml`",
+    "`uv`",
+    "`pip install`",
+    "`uv pip install`"
+   ]
+  },
+  {
+   "id": 55,
+   "kind": "heading",
+   "start": 12268,
+   "end": 12283,
+   "text": "### Simulations",
+   "tokens": []
+  },
+  {
+   "id": 56,
+   "kind": "para",
+   "start": 12285,
+   "end": 12496,
+   "text": "Install environment packages: ⟦0⟧ ([gym-aloha](⟦1⟧)), or ⟦2⟧ ([gym-pusht](⟦3⟧)).\nThese automatically include the ⟦4⟧ extra.",
+   "tokens": [
+    "`aloha`",
+    "https://github.com/huggingface/gym-aloha",
+    "`pusht`",
+    "https://github.com/huggingface/gym-pusht",
+    "`dataset`"
+   ]
+  },
+  {
+   "id": 57,
+   "kind": "heading",
+   "start": 12564,
+   "end": 12581,
+   "text": "### Motor Control",
+   "tokens": []
+  },
+  {
+   "id": 58,
+   "kind": "para",
+   "start": 12583,
+   "end": 12669,
+   "text": "For Koch v1.1 install the Dynamixel SDK, for SO100/SO101/Moss install the Feetech SDK.",
+   "tokens": []
+  },
+  {
+   "id": 59,
+   "kind": "heading",
+   "start": 12743,
+   "end": 12766,
+   "text": "### Experiment Tracking",
+   "tokens": []
+  },
+  {
+   "id": 60,
+   "kind": "para",
+   "start": 12768,
+   "end": 12923,
+   "text": "Weights and Biases is included in the ⟦0⟧ extra. To use [Weights and Biases](⟦1⟧) for experiment tracking, log in with:",
+   "tokens": [
+    "`training`",
+    "https://docs.wandb.ai/quickstart"
+   ]
+  },
+  {
+   "id": 61,
+   "kind": "para",
+   "start": 12950,
+   "end": 13101,
+   "text": "You can now assemble your robot if it's not ready yet, look for your robot type on the left. Then follow the link below to use Lerobot with your robot.",
+   "tokens": []
+  }
+ ]
+}

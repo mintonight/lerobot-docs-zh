@@ -1,0 +1,157 @@
+<script lang="ts">
+import {onMount} from "svelte";
+import Tip from "$lib/Tip.svelte";
+import CopyLLMTxtMenu from "$lib/CopyLLMTxtMenu.svelte";
+import Youtube from "$lib/Youtube.svelte";
+import Docstring from "$lib/Docstring.svelte";
+import CodeBlock from "$lib/CodeBlock.svelte";
+import CodeBlockFw from "$lib/CodeBlockFw.svelte";
+import DocNotebookDropdown from "$lib/DocNotebookDropdown.svelte";
+import CourseFloatingBanner from "$lib/CourseFloatingBanner.svelte";
+import IconCopyLink from "$lib/IconCopyLink.svelte";
+import FrameworkContent from "$lib/FrameworkContent.svelte";
+import Markdown from "$lib/Markdown.svelte";
+import Question from "$lib/Question.svelte";
+import FrameworkSwitchCourse from "$lib/FrameworkSwitchCourse.svelte";
+import InferenceApi from "$lib/InferenceApi.svelte";
+import TokenizersLanguageContent from "$lib/TokenizersLanguageContent.svelte";
+import ExampleCodeBlock from "$lib/ExampleCodeBlock.svelte";
+import Added from "$lib/Added.svelte";
+import Changed from "$lib/Changed.svelte";
+import Deprecated from "$lib/Deprecated.svelte";
+import PipelineIcon from "$lib/PipelineIcon.svelte";
+import PipelineTag from "$lib/PipelineTag.svelte";
+import Heading from "$lib/Heading.svelte";
+import HfOptions from "$lib/HfOptions.svelte";
+import HfOption from "$lib/HfOption.svelte";
+import EditOnGithub from "$lib/EditOnGithub.svelte";
+import InferenceSnippet from "$lib/InferenceSnippet/InferenceSnippet.svelte";
+import MermaidChart from "$lib/MermaidChart.svelte";
+let fw: "pt" | "tf" = "pt";
+onMount(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    fw = urlParams.get("fw") || "pt";
+});
+</script>
+<svelte:head>
+  <meta name="hf:doc:metadata" content={metadata} >
+</svelte:head>
+
+<!--HF DOCBUILD BODY START-->
+
+HF_DOC_BODY_START
+
+<CopyLLMTxtMenu containerStyle="float: right; margin-left: 10px; display: inline-flex; position: relative; z-index: 10;"></CopyLLMTxtMenu>
+
+# 重命名映射与空相机
+
+当你使用机器人 policy 进行训练、评估或录制时，你的**dataset**或**环境**会以一组键（例如 `observation.images.front`、`observation.images.eagle`）提供 observation，而你的**policy**期望另一组键（例如 `observation.images.image`、`observation.images.image2`）。**重命名映射**可以在不修改 policy 或数据源的情况下弥合这一差异。
+
+> **范围：** 重命名映射只重命名**observation**键（图像和 state）。action 键不受影响。
+
+## 为什么 observation 键并不总是匹配
+
+policy 在其预训练配置中固定了一组**输入特征名**。例如：
+
+- [pi0fast-libero](https://huggingface.co/lerobot/pi0fast-libero) 期望 `observation.images.base_0_rgb` 和 `observation.images.left_wrist_0_rgb`。
+- [xvla-base](https://huggingface.co/lerobot/xvla-base) 期望 `observation.images.image`、`observation.images.image2` 和 `observation.images.image3`。
+
+你的 dataset 可能使用完全不同的名称（例如 `observation.images.front`、`observation.images.eagle`、`observation.images.glove`），而你的评估环境可能使用另一组。与其编辑 policy 配置或重命名 dataset 中的列，你可以传入一个**重命名映射**：一个将源键映射到 policy 期望键的 JSON 字典。重命名发生在预处理器流水线内部，因此 policy 始终能看到它期望的键。
+
+## 使用重命名映射
+
+在命令行上将映射作为 JSON 字符串传入。约定始终为：
+
+```
+--rename_map='{"source_key": "policy_key", ...}'
+```
+
+其中 **source_key** 是 dataset 或环境提供的键，**policy_key** 是 policy 期望的键。
+
+只有列出的键会被重命名；其他所有内容都原样通过。条目顺序无关紧要。
+
+支持的 policy：**PI0**、**PI05**、**PI0Fast**、**SmolVLA** 和 **XVLA**。
+
+### 训练
+
+假设你在图像键为 `observation.images.front`、`observation.images.eagle` 和 `observation.images.glove` 的 dataset 上 fine-tune [lerobot/xvla-base](https://huggingface.co/lerobot/xvla-base)。XVLA 期望 `observation.images.image`、`observation.images.image2` 和 `observation.images.image3`：
+
+```bash
+lerobot-train \
+  --dataset.repo_id=YOUR_DATASET \
+  --output_dir=./outputs/xvla_training \
+  --job_name=xvla_training \
+  --policy.path="lerobot/xvla-base" \
+  --policy.repo_id="HF_USER/xvla-your-robot" \
+  --policy.dtype=bfloat16 \
+  --policy.action_mode=auto \
+  --steps=20000 \
+  --policy.device=cuda \
+  --policy.freeze_vision_encoder=false \
+  --policy.freeze_language_encoder=false \
+  --policy.train_policy_transformer=true \
+  --policy.train_soft_prompts=true \
+  --rename_map='{"observation.images.front": "observation.images.image", "observation.images.eagle": "observation.images.image2", "observation.images.glove": "observation.images.image3"}'
+```
+
+### 评估
+
+一个期望 `observation.images.base_0_rgb` 和 `observation.images.left_wrist_0_rgb` 的 policy（例如 [pi0fast-libero](https://huggingface.co/lerobot/pi0fast-libero)），但 LIBERO 环境返回 `observation.images.image` 和 `observation.images.image2`：
+
+```bash
+lerobot-eval \
+  --policy.path=lerobot/pi0fast-libero \
+  --env.type=libero \
+  ... \
+  --rename_map='{"observation.images.image": "observation.images.base_0_rgb", "observation.images.image2": "observation.images.left_wrist_0_rgb"}'
+```
+
+## 替代方案：直接编辑 policy 配置
+
+如果你始终使用相同的 dataset 或环境，可以**编辑 policy 的 `config.json`**，使其 observation 键与你的数据源匹配。这样就不需要重命名映射。
+
+权衡之处：修改 policy 配置会将其绑定到单一数据源。而重命名映射可让同一个 policy 在多个 dataset 和环境中使用。
+
+## 空相机：视图少于 policy 期望
+
+有些 policy 是为固定数量的图像输入构建的。如果你的 dataset 相机更少，可以在 policy 配置中设置 **`empty_cameras`**，而不必修改模型架构。
+
+### 工作原理
+
+设置 `empty_cameras=N` 会向 policy 配置添加 N 个占位图像特征，命名如下：
+
+```
+observation.images.empty_camera_0
+observation.images.empty_camera_1
+...
+```
+
+在运行时，这些键在批次中没有对应数据。policy 会用带掩码的虚拟张量填充它们（对于基于 SigLIP 的视觉编码器用 `-1` 填充，并使用零注意力掩码），因此在训练和 inference 期间额外的图像槽实际上被忽略。
+
+### 示例
+
+XVLA-base 默认有三个视觉输入和 `empty_cameras=0`。你的 dataset 只有两个相机：
+
+1. 设置 `--policy.empty_cameras=1`。
+2. 配置会添加第三个键：`observation.images.empty_camera_0`。
+3. 像往常一样为你的两个真实相机使用重命名映射。
+4. 第三个槽被掩码掉——dataset 中无需伪造图像。
+
+## 快速参考
+
+| 目标                                    | 做法                                                                       |
+| --------------------------------------- | --------------------------------------------------------------------------- |
+| dataset 键 ≠ policy 键                        | `--rename_map='{"dataset_key": "policy_key", ...}'`                         |
+| 环境键 ≠ policy 键（评估）                  | `--rename_map='{"env_key": "policy_key", ...}'`                             |
+| 使用不同键进行 rollout（inference）           | `--rename_map='{"source_key": "policy_key", ...}'`。                         |
+| 相机少于 policy 期望                         | `--policy.empty_cameras=N`（由 PI0、PI05、PI0Fast、SmolVLA、XVLA 支持） |
+| 避免传入重命名映射                       | 编辑 policy 的 `config.json`，使其键与你的数据源匹配                     |
+
+
+
+<EditOnGithub source="https://github.com/huggingface/lerobot/blob/main/docs/source/rename_map.mdx" />
+
+<!--HF DOCBUILD BODY END-->
+
+HF_DOC_BODY_END
+

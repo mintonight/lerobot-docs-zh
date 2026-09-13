@@ -1,0 +1,506 @@
+<script lang="ts">
+import {onMount} from "svelte";
+import Tip from "$lib/Tip.svelte";
+import CopyLLMTxtMenu from "$lib/CopyLLMTxtMenu.svelte";
+import Youtube from "$lib/Youtube.svelte";
+import Docstring from "$lib/Docstring.svelte";
+import CodeBlock from "$lib/CodeBlock.svelte";
+import CodeBlockFw from "$lib/CodeBlockFw.svelte";
+import DocNotebookDropdown from "$lib/DocNotebookDropdown.svelte";
+import CourseFloatingBanner from "$lib/CourseFloatingBanner.svelte";
+import IconCopyLink from "$lib/IconCopyLink.svelte";
+import FrameworkContent from "$lib/FrameworkContent.svelte";
+import Markdown from "$lib/Markdown.svelte";
+import Question from "$lib/Question.svelte";
+import FrameworkSwitchCourse from "$lib/FrameworkSwitchCourse.svelte";
+import InferenceApi from "$lib/InferenceApi.svelte";
+import TokenizersLanguageContent from "$lib/TokenizersLanguageContent.svelte";
+import ExampleCodeBlock from "$lib/ExampleCodeBlock.svelte";
+import Added from "$lib/Added.svelte";
+import Changed from "$lib/Changed.svelte";
+import Deprecated from "$lib/Deprecated.svelte";
+import PipelineIcon from "$lib/PipelineIcon.svelte";
+import PipelineTag from "$lib/PipelineTag.svelte";
+import Heading from "$lib/Heading.svelte";
+import HfOptions from "$lib/HfOptions.svelte";
+import HfOption from "$lib/HfOption.svelte";
+import EditOnGithub from "$lib/EditOnGithub.svelte";
+import InferenceSnippet from "$lib/InferenceSnippet/InferenceSnippet.svelte";
+import MermaidChart from "$lib/MermaidChart.svelte";
+let fw: "pt" | "tf" = "pt";
+onMount(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    fw = urlParams.get("fw") || "pt";
+});
+</script>
+<svelte:head>
+  <meta name="hf:doc:metadata" content={metadata} >
+</svelte:head>
+
+<!--HF DOCBUILD BODY START-->
+
+HF_DOC_BODY_START
+
+<CopyLLMTxtMenu containerStyle="float: right; margin-left: 10px; display: inline-flex; position: relative; z-index: 10;"></CopyLLMTxtMenu>
+
+# Motors
+
+`MotorsBus` is the low-level interface to a chain of servos on a serial bus. Robots use it to read positions
+and write goal positions; you rarely touch it directly unless you are adding hardware.
+
+See [Bring Your Own Hardware](../integrate_hardware) for adding a new bus, and
+[Updating Feetech Firmware](../feetech) and [Damiao Motors and CAN Bus](../damiao) for device-specific notes.
+
+## MotorsBus[[lerobot.motors.motors_bus.SerialMotorsBus]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.motors.motors_bus.SerialMotorsBus"} anchor={"lerobot.motors.motors_bus.SerialMotorsBus"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/motors/motors_bus.py#L303"} parameters={[{"name": "port", "val": ": str"}, {"name": "motors", "val": ": dict[str, Motor]"}, {"name": "calibration", "val": ": dict[str, MotorCalibration] | None = None"}]}>
+</Docstring>
+
+A SerialMotorsBus allows to efficiently read and write to motors connected via serial communication.
+It represents several motors daisy-chained together and connected through a serial port.
+There are currently two implementations of this class:
+- DynamixelMotorsBus
+- FeetechMotorsBus
+
+This class is specifically for serial-based motor protocols (Dynamixel, Feetech, etc.).
+
+A MotorsBus subclass instance requires a port (e.g. `FeetechMotorsBus(port="/dev/tty.usbmodem575E0031751"`)).
+<ExampleCodeBlock anchor="lerobot.motors.motors_bus.SerialMotorsBus.example">
+
+To find the port, you can run our utility script:
+```bash
+lerobot-find-port.py
+>>> Finding all available ports for the MotorsBus.
+>>> ["/dev/tty.usbmodem575E0032081", "/dev/tty.usbmodem575E0031751"]
+>>> Remove the usb cable from your MotorsBus and press Enter when done.
+>>> The port of this MotorsBus is /dev/tty.usbmodem575E0031751.
+>>> Reconnect the usb cable.
+```
+
+</ExampleCodeBlock>
+
+<ExampleCodeBlock anchor="lerobot.motors.motors_bus.SerialMotorsBus.example-2">
+
+Example of usage for 1 Feetech sts3215 motor connected to the bus:
+```python
+bus = FeetechMotorsBus(
+    port="/dev/tty.usbmodem575E0031751",
+    motors={"my_motor": (1, "sts3215")},
+)
+bus.connect()
+
+position = bus.read("Present_Position", "my_motor", normalize=False)
+
+# Move from a few motor steps as an example
+few_steps = 30
+bus.write("Goal_Position", "my_motor", position + few_steps, normalize=False)
+
+# When done, properly disconnect the port using
+bus.disconnect()
+```
+
+</ExampleCodeBlock>
+
+
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"broadcast_ping"} anchor={"lerobot.motors.motors_bus.SerialMotorsBus.broadcast_ping"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/motors/motors_bus.py#L980"} parameters={[{"name": "num_retry", "val": ": int = 0"}, {"name": "raise_on_error", "val": ": bool = False"}]}>
+<paramsdesc>- **num_retry** (int, optional) -- Retry attempts.  Defaults to `0`.
+- **raise_on_error** (bool, optional) -- When `True` failures raise an exception instead of returning
+  `None`. Defaults to `False`.</paramsdesc><rettype>dict[int, int] | None</rettype><retdesc>Mapping *id → model number* or `None` if the call failed.</retdesc></Docstring>
+Ping every ID on the bus using the broadcast address.
+
+
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"configure_motors"} anchor={"lerobot.motors.motors_bus.SerialMotorsBus.configure_motors"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/motors/motors_bus.py#L637"} parameters={[]}>
+</Docstring>
+Write implementation-specific recommended settings to every motor.
+
+Typical changes include shortening the return delay, increasing
+acceleration limits or disabling safety locks.
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"connect"} anchor={"lerobot.motors.motors_bus.SerialMotorsBus.connect"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/motors/motors_bus.py#L513"} parameters={[{"name": "handshake", "val": ": bool = True"}]}>
+<paramsdesc>- **handshake** (bool, optional) -- Pings every expected motor and performs additional
+  integrity checks specific to the implementation. Defaults to `True`.</paramsdesc><raises>- ``DeviceAlreadyConnectedError`` -- The port is already open.
+- ``ConnectionError`` -- The underlying SDK failed to open the port or the handshake did not succeed.</raises><raisederrors>``DeviceAlreadyConnectedError`` or ``ConnectionError``</raisederrors></Docstring>
+Open the serial port and initialise communication.
+
+
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"disable_torque"} anchor={"lerobot.motors.motors_bus.SerialMotorsBus.disable_torque"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/motors/motors_bus.py#L646"} parameters={[{"name": "motors", "val": ": str | list[str] | None = None"}, {"name": "num_retry", "val": ": int = 0"}]}>
+<paramsdesc>- **motors** ( str | list[str] | None, optional) -- Target motors.  Accepts a motor name, an ID, a
+  list of names or `None` to affect every registered motor.  Defaults to `None`.
+- **num_retry** (int, optional) -- Number of additional retry attempts on communication failure.
+  Defaults to 0.</paramsdesc></Docstring>
+Disable torque on selected motors.
+
+Disabling Torque allows to write to the motors' permanent memory area (EPROM/EEPROM).
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"disconnect"} anchor={"lerobot.motors.motors_bus.SerialMotorsBus.disconnect"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/motors/motors_bus.py#L546"} parameters={[{"name": "disable_torque", "val": ": bool = True"}]}>
+<paramsdesc>- **disable_torque** (bool, optional) -- If `True` (default) torque is disabled on every motor before
+  closing the port. This can prevent damaging motors if they are left applying resisting torque
+  after disconnect.</paramsdesc></Docstring>
+Close the serial port (optionally disabling torque first).
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"enable_torque"} anchor={"lerobot.motors.motors_bus.SerialMotorsBus.enable_torque"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/motors/motors_bus.py#L664"} parameters={[{"name": "motors", "val": ": int | str | list[str] | None = None"}, {"name": "num_retry", "val": ": int = 0"}]}>
+<paramsdesc>- **motors** (int | str | list[str] | None, optional) -- Same semantics as :pymeth:`disable_torque`.
+  Defaults to `None`.
+- **num_retry** (int, optional) -- Number of additional retry attempts on communication failure.
+  Defaults to 0.</paramsdesc></Docstring>
+Enable torque on selected motors.
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"get_baudrate"} anchor={"lerobot.motors.motors_bus.SerialMotorsBus.get_baudrate"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/motors/motors_bus.py#L703"} parameters={[]}>
+<rettype>int</rettype><retdesc>Baud-rate in bits / second.</retdesc></Docstring>
+Return the current baud-rate configured on the port.
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"ping"} anchor={"lerobot.motors.motors_bus.SerialMotorsBus.ping"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/motors/motors_bus.py#L948"} parameters={[{"name": "motor", "val": ": NameOrID"}, {"name": "num_retry", "val": ": int = 0"}, {"name": "raise_on_error", "val": ": bool = False"}]}>
+<paramsdesc>- **motor** (NameOrID) -- Target motor (name or ID).
+- **num_retry** (int, optional) -- Extra attempts before giving up. Defaults to `0`.
+- **raise_on_error** (bool, optional) -- If `True` communication errors raise exceptions instead of
+  returning `None`. Defaults to `False`.</paramsdesc><rettype>int | None</rettype><retdesc>Motor model number or `None` on failure.</retdesc></Docstring>
+Ping a single motor and return its model number.
+
+
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"read"} anchor={"lerobot.motors.motors_bus.SerialMotorsBus.read"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/motors/motors_bus.py#L994"} parameters={[{"name": "data_name", "val": ": str"}, {"name": "motor", "val": ": str"}, {"name": "normalize", "val": ": bool = True"}, {"name": "num_retry", "val": ": int = 0"}]}>
+<paramsdesc>- **data_name** (str) -- Control-table key (e.g. `"Present_Position"`).
+- **motor** (str) -- Motor name.
+- **normalize** (bool, optional) -- When `True` (default) scale the value to a user-friendly range as
+  defined by the calibration.
+- **num_retry** (int, optional) -- Retry attempts.  Defaults to `0`.</paramsdesc><rettype>Value</rettype><retdesc>Raw or normalised value depending on *normalize*.</retdesc></Docstring>
+Read a register from a motor.
+
+
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"read_calibration"} anchor={"lerobot.motors.motors_bus.SerialMotorsBus.read_calibration"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/motors/motors_bus.py#L734"} parameters={[]}>
+<rettype>dict[str, MotorCalibration]</rettype><retdesc>Mapping *motor name → calibration*.</retdesc></Docstring>
+Read calibration parameters from the motors.
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"record_ranges_of_motion"} anchor={"lerobot.motors.motors_bus.SerialMotorsBus.record_ranges_of_motion"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/motors/motors_bus.py#L803"} parameters={[{"name": "motors", "val": ": NameOrID | Sequence[NameOrID] | None = None"}, {"name": "display_values", "val": ": bool = True"}]}>
+<paramsdesc>- **motors** (NameOrID | list[NameOrID] | None, optional) -- Motors to record.
+  Defaults to every motor (`None`).
+- **display_values** (bool, optional) -- When `True` (default) a live table is printed to the console.</paramsdesc><rettype>tuple[dict[str, Value], dict[str, Value]]</rettype><retdesc>Two dictionaries *mins* and *maxes* with the
+extreme values observed for each motor.</retdesc></Docstring>
+Interactively record the min/max encoder values of each motor.
+
+Move the joints by hand (with torque disabled) while the method streams live positions. Press
+:kbd:`Enter` to finish.
+
+
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"reset_calibration"} anchor={"lerobot.motors.motors_bus.SerialMotorsBus.reset_calibration"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/motors/motors_bus.py#L754"} parameters={[{"name": "motors", "val": ": NameOrID | Sequence[NameOrID] | None = None"}]}>
+<paramsdesc>- **motors** (NameOrID | Sequence[NameOrID] | None, optional) -- Selection of motors. *None* (default)
+  resets every motor.</paramsdesc></Docstring>
+Restore factory calibration for the selected motors.
+
+Homing offset is set to `0` and min/max position limits are set to the full usable range.
+The in-memory :pyattr:*calibration* is cleared.
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"scan_port"} anchor={"lerobot.motors.motors_bus.SerialMotorsBus.scan_port"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/motors/motors_bus.py#L564"} parameters={[{"name": "port", "val": ": str"}, {"name": "*args", "val": ""}, {"name": "**kwargs", "val": ""}]}>
+<paramsdesc>- **port** (str) -- Serial/USB port to scan (e.g. `"/dev/ttyUSB0"`).
+- ***args,** **kwargs -- Forwarded to the subclass constructor.</paramsdesc><rettype>dict[int, list[int]]</rettype><retdesc>Mapping *baud-rate → list of motor IDs*
+for every baud-rate that produced at least one response.</retdesc></Docstring>
+Probe *port* at every supported baud-rate and list responding IDs.
+
+
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"set_baudrate"} anchor={"lerobot.motors.motors_bus.SerialMotorsBus.set_baudrate"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/motors/motors_bus.py#L711"} parameters={[{"name": "baudrate", "val": ": int"}]}>
+<paramsdesc>- **baudrate** (int) -- Desired baud-rate in bits / second.</paramsdesc><raises>- ``RuntimeError`` -- The SDK failed to apply the change.</raises><raisederrors>``RuntimeError``</raisederrors></Docstring>
+Set a new UART baud-rate on the port.
+
+
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"set_half_turn_homings"} anchor={"lerobot.motors.motors_bus.SerialMotorsBus.set_half_turn_homings"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/motors/motors_bus.py#L775"} parameters={[{"name": "motors", "val": ": NameOrID | Sequence[NameOrID] | None = None"}]}>
+<paramsdesc>- **motors** (NameOrID | list[NameOrID] | None, optional) -- Motors to adjust. Defaults to all motors (`None`).</paramsdesc><rettype>dict[str, Value]</rettype><retdesc>Mapping *motor name → written homing offset*.</retdesc></Docstring>
+Centre each motor range around its current position.
+
+The function computes and writes a homing offset such that the present position becomes exactly one
+half-turn (e.g. `2047` on a 12-bit encoder).
+
+
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"set_timeout"} anchor={"lerobot.motors.motors_bus.SerialMotorsBus.set_timeout"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/motors/motors_bus.py#L693"} parameters={[{"name": "timeout_ms", "val": ": int | None = None"}]}>
+<paramsdesc>- **timeout_ms** (int | None, optional) -- Timeout in *milliseconds*. If `None` (default) the method falls
+  back to :pyattr:`default_timeout`.</paramsdesc></Docstring>
+Change the packet timeout used by the SDK.
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"setup_motor"} anchor={"lerobot.motors.motors_bus.SerialMotorsBus.setup_motor"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/motors/motors_bus.py#L589"} parameters={[{"name": "motor", "val": ": str"}, {"name": "initial_baudrate", "val": ": int | None = None"}, {"name": "initial_id", "val": ": int | None = None"}]}>
+<paramsdesc>- **motor** (str) -- Key of the motor in :pyattr:`motors`.
+- **initial_baudrate** (int | None, optional) -- Current baud-rate (skips scanning when provided).
+  Defaults to None.
+- **initial_id** (int | None, optional) -- Current ID (skips scanning when provided). Defaults to None.</paramsdesc><raises>- ``RuntimeError`` -- The motor could not be found or its model number
+  does not match the expected one.
+- ``ConnectionError`` -- Communication with the motor failed.</raises><raisederrors>``RuntimeError`` or ``ConnectionError``</raisederrors></Docstring>
+Assign the correct ID and baud-rate to a single motor.
+
+This helper temporarily switches to the motor's current settings, disables torque, sets the desired
+ID, and finally programs the bus' default baud-rate.
+
+
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"sync_read"} anchor={"lerobot.motors.motors_bus.SerialMotorsBus.sync_read"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/motors/motors_bus.py#L1127"} parameters={[{"name": "data_name", "val": ": str"}, {"name": "motors", "val": ": NameOrID | Sequence[NameOrID] | None = None"}, {"name": "normalize", "val": ": bool = True"}, {"name": "num_retry", "val": ": int = 0"}]}>
+<paramsdesc>- **data_name** (str) -- Register name.
+- **motors** (NameOrID | Sequence[NameOrID] | None, optional) -- Motors to query. `None` (default) reads every motor.
+- **normalize** (bool, optional) -- Normalisation flag.  Defaults to `True`.
+- **num_retry** (int, optional) -- Retry attempts.  Defaults to `0`.</paramsdesc><rettype>dict[str, Value]</rettype><retdesc>Mapping *motor name → value*.</retdesc></Docstring>
+Read the same register from several motors at once.
+
+
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"sync_write"} anchor={"lerobot.motors.motors_bus.SerialMotorsBus.sync_write"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/motors/motors_bus.py#L1220"} parameters={[{"name": "data_name", "val": ": str"}, {"name": "values", "val": ": Value | dict[str, Value]"}, {"name": "normalize", "val": ": bool = True"}, {"name": "num_retry", "val": ": int = 0"}]}>
+<paramsdesc>- **data_name** (str) -- Register name.
+- **values** (Value | dict[str, Value]) -- Either a single value (applied to every motor) or a mapping
+  *motor name → value*.
+- **normalize** (bool, optional) -- If `True` (default) convert values from the user range to raw units.
+- **num_retry** (int, optional) -- Retry attempts.  Defaults to `0`.</paramsdesc></Docstring>
+Write the same register on multiple motors.
+
+Contrary to :pymeth:`write`, this *does not* expects a response status packet emitted by the motor, which
+can allow for lost packets. It is faster than :pymeth:`write` and should typically be used when
+frequency matters and losing some packets is acceptable (e.g. teleoperation loops).
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"torque_disabled"} anchor={"lerobot.motors.motors_bus.SerialMotorsBus.torque_disabled"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/motors/motors_bus.py#L676"} parameters={[{"name": "motors", "val": ": str | list[str] | None = None"}]}>
+</Docstring>
+Context-manager that guarantees torque is re-enabled.
+
+This helper is useful to temporarily disable torque when configuring motors.
+
+Examples:
+>>> with bus.torque_disabled():
+...     # Safe operations here
+...     pass
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"write"} anchor={"lerobot.motors.motors_bus.SerialMotorsBus.write"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/motors/motors_bus.py#L1066"} parameters={[{"name": "data_name", "val": ": str"}, {"name": "motor", "val": ": str"}, {"name": "value", "val": ": Value"}, {"name": "normalize", "val": ": bool = True"}, {"name": "num_retry", "val": ": int = 0"}]}>
+<paramsdesc>- **data_name** (str) -- Register name.
+- **motor** (str) -- Motor name.
+- **value** (Value) -- Value to write.  If *normalize* is `True` the value is first converted to raw
+  units.
+- **normalize** (bool, optional) -- Enable or disable normalisation. Defaults to `True`.
+- **num_retry** (int, optional) -- Retry attempts.  Defaults to `0`.</paramsdesc></Docstring>
+Write a value to a single motor's register.
+
+Contrary to :pymeth:`sync_write`, this expects a response status packet emitted by the motor, which
+provides a guarantee that the value was written to the register successfully. In consequence, it is
+slower than :pymeth:`sync_write` but it is more reliable. It should typically be used when configuring
+motors.
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"write_calibration"} anchor={"lerobot.motors.motors_bus.SerialMotorsBus.write_calibration"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/motors/motors_bus.py#L743"} parameters={[{"name": "calibration_dict", "val": ": dict[str, MotorCalibration]"}, {"name": "cache", "val": ": bool = True"}]}>
+<paramsdesc>- **calibration_dict** (dict[str, MotorCalibration]) -- Calibration obtained from
+  :pymeth:`read_calibration` or crafted by the user.
+- **cache** (bool, optional) -- Save the calibration to :pyattr:`calibration`. Defaults to True.</paramsdesc></Docstring>
+Write calibration parameters to the motors and optionally cache them.
+
+
+
+
+</div></div>
+
+## Motor[[lerobot.motors.Motor]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.motors.Motor"} anchor={"lerobot.motors.Motor"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/motors/motors_bus.py#L185"} parameters={[{"name": "id", "val": ": int"}, {"name": "model", "val": ": str"}, {"name": "norm_mode", "val": ": MotorNormMode"}, {"name": "motor_type_str", "val": ": str | None = None"}, {"name": "recv_id", "val": ": int | None = None"}]}>
+</Docstring>
+
+
+</div>
+
+## MotorCalibration[[lerobot.motors.MotorCalibration]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.motors.MotorCalibration"} anchor={"lerobot.motors.MotorCalibration"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/motors/motors_bus.py#L176"} parameters={[{"name": "id", "val": ": int"}, {"name": "drive_mode", "val": ": int"}, {"name": "homing_offset", "val": ": int"}, {"name": "range_min", "val": ": int"}, {"name": "range_max", "val": ": int"}]}>
+</Docstring>
+
+
+</div>
+
+## MotorNormMode[[lerobot.motors.MotorNormMode]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.motors.MotorNormMode"} anchor={"lerobot.motors.MotorNormMode"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/motors/motors_bus.py#L169"} parameters={[{"name": "*values", "val": ""}]}>
+</Docstring>
+
+
+</div>
+
+<!--HF DOCBUILD BODY END-->
+
+HF_DOC_BODY_END
+

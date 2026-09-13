@@ -1,0 +1,189 @@
+<script lang="ts">
+import {onMount} from "svelte";
+import Tip from "$lib/Tip.svelte";
+import CopyLLMTxtMenu from "$lib/CopyLLMTxtMenu.svelte";
+import Youtube from "$lib/Youtube.svelte";
+import Docstring from "$lib/Docstring.svelte";
+import CodeBlock from "$lib/CodeBlock.svelte";
+import CodeBlockFw from "$lib/CodeBlockFw.svelte";
+import DocNotebookDropdown from "$lib/DocNotebookDropdown.svelte";
+import CourseFloatingBanner from "$lib/CourseFloatingBanner.svelte";
+import IconCopyLink from "$lib/IconCopyLink.svelte";
+import FrameworkContent from "$lib/FrameworkContent.svelte";
+import Markdown from "$lib/Markdown.svelte";
+import Question from "$lib/Question.svelte";
+import FrameworkSwitchCourse from "$lib/FrameworkSwitchCourse.svelte";
+import InferenceApi from "$lib/InferenceApi.svelte";
+import TokenizersLanguageContent from "$lib/TokenizersLanguageContent.svelte";
+import ExampleCodeBlock from "$lib/ExampleCodeBlock.svelte";
+import Added from "$lib/Added.svelte";
+import Changed from "$lib/Changed.svelte";
+import Deprecated from "$lib/Deprecated.svelte";
+import PipelineIcon from "$lib/PipelineIcon.svelte";
+import PipelineTag from "$lib/PipelineTag.svelte";
+import Heading from "$lib/Heading.svelte";
+import HfOptions from "$lib/HfOptions.svelte";
+import HfOption from "$lib/HfOption.svelte";
+import EditOnGithub from "$lib/EditOnGithub.svelte";
+import InferenceSnippet from "$lib/InferenceSnippet/InferenceSnippet.svelte";
+import MermaidChart from "$lib/MermaidChart.svelte";
+let fw: "pt" | "tf" = "pt";
+onMount(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    fw = urlParams.get("fw") || "pt";
+});
+</script>
+<svelte:head>
+  <meta name="hf:doc:metadata" content={metadata} >
+</svelte:head>
+
+<!--HF DOCBUILD BODY START-->
+
+HF_DOC_BODY_START
+
+<CopyLLMTxtMenu containerStyle="float: right; margin-left: 10px; display: inline-flex; position: relative; z-index: 10;"></CopyLLMTxtMenu>
+
+# π₀ (Pi0)
+
+π₀ 是来自 Physical Intelligence 的**用于通用机器人控制的视觉-语言-action 模型**。LeRobot 实现改编自其开源的 [OpenPI](https://github.com/Physical-Intelligence/openpi) 仓库。
+
+## 模型概述
+
+π₀ 是 [Physical Intelligence](https://www.physicalintelligence.company/blog/pi0) 开发的首个通用机器人基础模型，代表了机器人技术的一项突破。与那些为重复运动编程的狭窄专用传统机器人程序不同，π₀ 被设计为一个通用 policy，能够理解视觉输入、解读自然语言指令，并在多样化任务中控制各种不同的机器人。
+
+<img
+  src="https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/lerobot/lerobot-pi0%20(1).png"
+  alt="An overview of Pi0"
+  width="85%"
+/>
+
+### Physical Intelligence 的愿景
+
+正如 Physical Intelligence 所描述的，尽管 AI 在数字领域（从下棋到药物发现）已取得显著成功，但在物理世界中，人类智能仍大幅领先于 AI。用莫拉维克悖论的话来说，赢一盘棋对 AI 而言是一个“简单”问题，但叠一件衬衫或清理一张桌子却需要解决一些有史以来最困难的工程问题。π₀ 代表了在开发人工物理智能方面迈出的第一步，使用户能够像使用大语言模型那样，直接要求机器人执行他们想要的任何任务。
+
+### 架构与方法
+
+π₀ 融合了多项关键创新：
+
+- **流匹配（Flow Matching）**：使用一种新方法，通过流匹配（扩散模型的一种变体）为预训练的 VLM 增加连续 action 输出
+- **跨本体训练**：在来自 8 个不同机器人平台的数据上训练，包括 UR5e、Bimanual UR5e、Franka、Bimanual Trossen、Bimanual ARX、Mobile Trossen 和 Mobile Fibocom
+- **互联网规模预训练**：从预训练的 30 亿参数视觉-语言模型中继承语义知识
+- **高频控制**：以最高 50 Hz 输出电机命令，用于实时灵巧操作
+
+## 安装要求
+
+1. 按照我们的[安装指南](./installation)安装 LeRobot。
+2. 通过运行以下命令安装 Pi0 依赖：
+
+   ```bash
+   pip install -e ".[pi]"
+   ```
+
+## 训练数据与能力
+
+π₀ 在迄今为止最大的机器人交互 dataset 上训练，融合了三个关键数据源：
+
+1. **互联网规模预训练**：来自网络的视觉-语言数据，用于语义理解
+2. **Open X-Embodiment dataset**：开源的机器人操作 dataset
+3. **Physical Intelligence dataset**：涵盖 8 种不同机器人的大规模多样化灵巧任务 dataset
+
+## 用法
+
+要在 LeRobot 中使用 π₀，请将 policy 类型指定为：
+
+```python
+policy.type=pi0
+```
+
+## 训练
+
+要训练 π₀，你可以使用标准的 LeRobot 训练脚本并配置合适的参数：
+
+```bash
+lerobot-train \
+    --dataset.repo_id=your_dataset \
+    --policy.type=pi0 \
+    --output_dir=./outputs/pi0_training \
+    --job_name=pi0_training \
+    --policy.pretrained_path=lerobot/pi0_base \
+    --policy.repo_id=your_repo_id \
+    --policy.compile_model=true \
+    --policy.gradient_checkpointing=true \
+    --policy.dtype=bfloat16 \
+    --policy.freeze_vision_encoder=false \
+    --policy.train_expert_only=false \
+    --steps=3000 \
+    --policy.device=cuda \
+    --batch_size=32
+```
+
+### 关键训练参数
+
+- **`--policy.compile_model=true`**：启用模型编译以加快训练
+- **`--policy.gradient_checkpointing=true`**：在训练期间显著减少内存占用
+- **`--policy.dtype=bfloat16`**：使用混合精度训练以提高效率
+- **`--batch_size=32`**：训练的批次大小，请根据你的 GPU 内存进行调整
+- **`--policy.pretrained_path=lerobot/pi0_base`**：你想 fine-tune 的基础 π₀ 模型，选项包括：
+  - [lerobot/pi0_base](https://huggingface.co/lerobot/pi0_base)
+  - [lerobot/pi0_libero](https://huggingface.co/lerobot/pi0_libero)（专门在 Libero dataset 上训练）
+
+### 训练参数说明
+
+| 参数               | 默认值 | 说明                                 |
+| ----------------------- | ------- | ------------------------------------------- |
+| `freeze_vision_encoder` | `false` | 不冻结视觉编码器            |
+| `train_expert_only`     | `false` | 不冻结 VLM，训练所有参数 |
+
+**💡 提示**：设置 `train_expert_only=true` 会冻结 VLM，仅训练 action expert 和投影层，从而在降低内存占用的情况下进行 fine-tune。
+
+## relative action
+
+默认情况下，π₀ 预测 absolute action。你可以启用**relative action**，让模型预测相对于当前机器人 state 的偏移量。对于某些设置，这可以提高训练稳定性。
+
+要使用 relative action，首先通过 CLI 在相对空间中重新计算 dataset 统计信息：
+
+```bash
+lerobot-edit-dataset \
+    --repo_id your_dataset \
+    --operation.type recompute_stats \
+    --operation.relative_action true \
+    --operation.chunk_size 50 \
+    --operation.relative_exclude_joints "['gripper']" \
+    --push_to_hub true
+```
+
+或在 Python 中等效地执行：
+
+```python
+from lerobot.datasets import LeRobotDataset, recompute_stats
+
+dataset = LeRobotDataset("your_dataset")
+recompute_stats(dataset, relative_action=True, chunk_size=50, relative_exclude_joints=["gripper"])
+dataset.push_to_hub()
+```
+
+`chunk_size` 应与你的 policy 的 `chunk_size` 匹配（π₀ 默认为 50）。`relative_exclude_joints` 列出应保持绝对空间的关节名称（例如 gripper 命令）。使用 `--push_to_hub true` 将更新后的统计信息上传到 Hub。
+
+然后启用 relative action 进行训练：
+
+```bash
+lerobot-train \
+    --dataset.repo_id=your_dataset \
+    --policy.type=pi0 \
+    --policy.use_relative_actions=true \
+    --policy.relative_exclude_joints='["gripper"]' \
+    ...
+```
+
+## 许可证
+
+该模型遵循 **Apache 2.0 许可证**，与原始的 [OpenPI 仓库](https://github.com/Physical-Intelligence/openpi)一致。
+
+
+
+<EditOnGithub source="https://github.com/huggingface/lerobot/blob/main/docs/source/pi0.mdx" />
+
+<!--HF DOCBUILD BODY END-->
+
+HF_DOC_BODY_END
+

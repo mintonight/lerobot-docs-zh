@@ -1,0 +1,231 @@
+<script lang="ts">
+import {onMount} from "svelte";
+import Tip from "$lib/Tip.svelte";
+import CopyLLMTxtMenu from "$lib/CopyLLMTxtMenu.svelte";
+import Youtube from "$lib/Youtube.svelte";
+import Docstring from "$lib/Docstring.svelte";
+import CodeBlock from "$lib/CodeBlock.svelte";
+import CodeBlockFw from "$lib/CodeBlockFw.svelte";
+import DocNotebookDropdown from "$lib/DocNotebookDropdown.svelte";
+import CourseFloatingBanner from "$lib/CourseFloatingBanner.svelte";
+import IconCopyLink from "$lib/IconCopyLink.svelte";
+import FrameworkContent from "$lib/FrameworkContent.svelte";
+import Markdown from "$lib/Markdown.svelte";
+import Question from "$lib/Question.svelte";
+import FrameworkSwitchCourse from "$lib/FrameworkSwitchCourse.svelte";
+import InferenceApi from "$lib/InferenceApi.svelte";
+import TokenizersLanguageContent from "$lib/TokenizersLanguageContent.svelte";
+import ExampleCodeBlock from "$lib/ExampleCodeBlock.svelte";
+import Added from "$lib/Added.svelte";
+import Changed from "$lib/Changed.svelte";
+import Deprecated from "$lib/Deprecated.svelte";
+import PipelineIcon from "$lib/PipelineIcon.svelte";
+import PipelineTag from "$lib/PipelineTag.svelte";
+import Heading from "$lib/Heading.svelte";
+import HfOptions from "$lib/HfOptions.svelte";
+import HfOption from "$lib/HfOption.svelte";
+import EditOnGithub from "$lib/EditOnGithub.svelte";
+import InferenceSnippet from "$lib/InferenceSnippet/InferenceSnippet.svelte";
+import MermaidChart from "$lib/MermaidChart.svelte";
+let fw: "pt" | "tf" = "pt";
+onMount(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    fw = urlParams.get("fw") || "pt";
+});
+</script>
+<svelte:head>
+  <meta name="hf:doc:metadata" content={metadata} >
+</svelte:head>
+
+<!--HF DOCBUILD BODY START-->
+
+HF_DOC_BODY_START
+
+<CopyLLMTxtMenu containerStyle="float: right; margin-left: 10px; display: inline-flex; position: relative; z-index: 10;"></CopyLLMTxtMenu>
+
+# TOPReward
+
+TOPReward 是一个 **零样本奖励模型**，它从现成的视觉-语言模型 (VLM) 中提取 token 对数概率，作为机器人奖励信号。给定视频轨迹和任务指令，它返回 VLM 对指令为真的对数似然——无需 fine-tune。
+
+**论文**：[TOPReward: Token Probabilities as Hidden Zero-Shot Rewards for Robotics](https://arxiv.org/abs/2602.19313)
+**项目**：[topreward.github.io](https://topreward.github.io/webpage/)
+**原始代码**：[github.com/TOPReward/TOPReward](https://github.com/TOPReward/TOPReward)
+**默认骨干**：[Qwen/Qwen3-VL-8B-Instruct](https://huggingface.co/Qwen/Qwen3-VL-8B-Instruct)
+
+## 概述
+
+TOPReward 询问一个通用 VLM 任务指令的可能性有多大，**以机器人尝试完成该任务的视频为条件**。具体来说，给定：
+
+- 一段轨迹视频（一系列帧）。
+- 一条任务指令（例如 _"open the drawer"_）。
+
+它会构建如下形式的聊天提示
+
+```text
+<video>
+"The above video shows a robot manipulation trajectory that completes the
+ following task: <instruction> Decide whether the above statement is True
+ or not. The answer is: True"
+```
+
+将其前向传播通过 VLM，对除最后一个 token 之外的所有内容进行标签掩码，然后读回该 token 的对数概率——默认是结束后缀模板的字面量 `"True"`。所得的 `log P("True" | video + prompt + instruction)` 就是奖励。
+
+由于该方法仅依赖于一个冻结的 VLM，TOPReward 是 **零样本** 的：没有需要托管的 fine-tune 权重。LeRobot 中的“模型”是围绕 `transformers` 的 `Qwen3VLForConditionalGeneration` 加上标签掩码逻辑的一个小封装。处理器持有分词器并构建完整的聊天提示（EO-1/Robometer 模式）。
+
+## LeRobot 集成涵盖的内容
+
+- 通过 LeRobot 进行标准 `reward_model.type=topreward` 配置。
+- 通过 `transformers` `Qwen3VLForConditionalGeneration` API 加载 VLM。
+- 处理器中的提示组装 + 分词（与上游 `QwenClient.compute_instruction_reward` 匹配）。
+- `compute_reward()` 为每个样本返回一个标量对数概率。
+- LeRobot 奖励模型保存/加载——`save_pretrained` 仅写入 `config.json`（VLM 由 `vlm_name` 标识）。
+- 一个离线标注脚本，为 RA-BC 和叠加写入 `topreward_progress.parquet`（SARM 兼容模式）。
+
+当前的 LeRobot 移植版本仅支持 **Qwen3-VL 客户端**。其他上游客户端（Gemini、OpenAI、Gemma、Molmo）可作为后续附加项添加。
+
+## 安装要求
+
+1. 按照[安装指南](./installation)安装 LeRobot。
+2. 安装 TOPReward 可选附加项：
+
+```bash
+pip install -e ".[topreward]"
+```
+
+或者，从源码检出使用 `uv` 时：
+
+```bash
+uv sync --extra topreward
+```
+
+这会引入 `transformers`。首次运行 TOPReward 时，Hugging Face 还会从 Hub 下载 VLM 权重（Qwen3-VL-8B-Instruct 约 16 GB）。强烈建议使用 GPU。
+
+## 模型输入和输出
+
+TOPReward 期望：
+
+- 一段轨迹视频或一系列帧。
+- 一段自然语言任务描述。
+
+在 LeRobot dataset 中，预处理器读取：
+
+| 配置字段              | 默认值                     | 含义                                       |
+| ------------------------- | --------------------------- | --------------------------------------------- |
+| `reward_model.image_key`  | `observation.images.top`    | TOPReward 使用的相机 observation          |
+| `reward_model.task_key`   | `task`                      | 补充数据中任务字符串的键 |
+| `reward_model.max_frames` | `16`                        | 每个样本的帧数上限                      |
+| `reward_model.fps`        | `2.0`                       | 传递给 Qwen 视频处理器的元数据   |
+| `reward_model.vlm_name`   | `Qwen/Qwen3-VL-8B-Instruct` | 底层 VLM 的 Hugging Face Hub id     |
+
+该模型返回：
+
+- `compute_reward(batch)`：每个样本一个对数概率。越高 = 任务-视频对齐越好。当 `success_threshold` 为有限值时，改为返回二值化阈值结果。
+
+## 用法
+
+### 直接加载奖励模型
+
+```python
+from lerobot.rewards.topreward import TOPRewardConfig, TOPRewardModel
+
+cfg = TOPRewardConfig(
+    vlm_name="Qwen/Qwen3-VL-8B-Instruct",
+    device="cuda",
+)
+reward_model = TOPRewardModel(cfg)
+```
+
+### 使用奖励工厂
+
+```python
+from lerobot.rewards import make_reward_model, make_reward_model_config, make_reward_pre_post_processors
+
+cfg = make_reward_model_config(
+    "topreward",
+    vlm_name="Qwen/Qwen3-VL-8B-Instruct",
+    device="cuda",
+    image_key="observation.images.top",
+)
+reward_model = make_reward_model(cfg)
+preprocessor, postprocessor = make_reward_pre_post_processors(cfg)
+```
+
+预处理器对完整提示（视频 + 前缀 + 指令后缀）进行分词，在 `observation.topreward.*` 下写入 Qwen-VL 张量 + `prompt_length`。模型读取这些张量，基于 `prompt_length` 进行标签掩码，并提取对数概率奖励。
+
+### 离线 dataset 标注
+
+为 RA-BC 训练和叠加视频写入一个 `topreward_progress.parquet`：
+
+```bash
+# Sparse-dense (15 anchors per episode, matches upstream)
+uv run python -m lerobot.rewards.topreward.compute_rabc_weights \
+    --dataset-repo-id lerobot/libero_10_image \
+    --num-samples 15 \
+    --device cuda
+```
+
+然后为任意 episode 渲染进度叠加：
+
+```bash
+uv run examples/dataset/create_progress_videos.py \
+    --repo-id lerobot/libero_10_image \
+    --episode 0 \
+    --progress-file topreward_progress.parquet \
+    --gif
+```
+
+## 配置说明
+
+### 提示旋钮
+
+默认提示与上游论文一致：
+
+```text
+prompt_prefix = "The above video shows a robot manipulation trajectory that completes the following task: "
+prompt_suffix_template = "{instruction} Decide whether the above statement is True or not. The answer is: True"
+```
+
+两者都暴露在 `TOPRewardConfig` 上以供消融实验。后缀模板 **必须** 包含 `{instruction}`。
+
+### 聊天模板
+
+`add_chat_template=True` 在分词之前用分词器的聊天模板包装完整提示（包括指令）。默认为 `False`，与上游论文的主要实验一致。
+
+## 限制
+
+- 当前的 LeRobot 移植版本 **仅支持 inference 且为零样本**；`forward()` 未被重写，`is_trainable` 返回 `False`。
+- 仅支持 **Qwen3-VL 系列**；其他上游客户端不在范围内。
+- TOPReward 继承底层 VLM 的偏见。
+
+## 参考文献
+
+- [TOPReward 项目页面](https://topreward.github.io/webpage/)
+- [TOPReward 论文](https://arxiv.org/abs/2602.19313)
+- [原始 TOPReward 代码](https://github.com/TOPReward/TOPReward)
+- [Qwen3-VL-8B-Instruct](https://huggingface.co/Qwen/Qwen3-VL-8B-Instruct)
+
+## 引用
+
+```bibtex
+@article{chen2026topreward,
+  title={TOPReward: Token Probabilities as Hidden Zero-Shot Rewards for Robotics},
+  author={Chen, Shirui and Harrison, Cole and Lee, Ying-Chun and Yang, Angela Jin and
+          Ren, Zhongzheng and Ratliff, Lillian J and Duan, Jiafei and Fox, Dieter and
+          Krishna, Ranjay},
+  journal={arXiv preprint arXiv:2602.19313},
+  year={2026}
+}
+```
+
+## 许可证
+
+原始 TOPReward 代码库采用 MIT 许可证。LeRobot 移植版本遵循 LeRobot Apache 2.0 许可证；所封装的 Qwen3-VL 权重受原始 Qwen 许可证约束。
+
+
+
+<EditOnGithub source="https://github.com/huggingface/lerobot/blob/main/docs/source/topreward.mdx" />
+
+<!--HF DOCBUILD BODY END-->
+
+HF_DOC_BODY_END
+

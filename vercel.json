@@ -1,0 +1,8 @@
+{
+  "framework": null,
+  "outputDirectory": "site",
+  "cleanUrls": true,
+  "redirects": [
+    { "source": "/", "destination": "/docs/lerobot/main/en/", "permanent": false }
+  ]
+}

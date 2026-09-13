@@ -1,0 +1,571 @@
+{
+ "file": "cameras.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1933,
+   "text": "# Cameras",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1935,
+   "end": 1985,
+   "text": "LeRobot offers multiple options for video capture:",
+   "tokens": []
+  },
+  {
+   "id": 2,
+   "kind": "table",
+   "start": 1987,
+   "end": 2046,
+   "text": "| Class             | Supported Cameras                   |",
+   "tokens": []
+  },
+  {
+   "id": 3,
+   "kind": "table",
+   "start": 2107,
+   "end": 2166,
+   "text": "| ⟦0⟧    | Phone, built-in laptop, USB webcams |",
+   "tokens": [
+    "`OpenCVCamera`"
+   ]
+  },
+  {
+   "id": 4,
+   "kind": "table",
+   "start": 2167,
+   "end": 2226,
+   "text": "| ⟦0⟧       | Network-connected cameras           |",
+   "tokens": [
+    "`ZMQCamera`"
+   ]
+  },
+  {
+   "id": 5,
+   "kind": "table",
+   "start": 2227,
+   "end": 2286,
+   "text": "| ⟦0⟧ | Intel RealSense (with depth)        |",
+   "tokens": [
+    "`RealSenseCamera`"
+   ]
+  },
+  {
+   "id": 6,
+   "kind": "table",
+   "start": 2287,
+   "end": 2346,
+   "text": "| ⟦0⟧   | Reachy 2 robot cameras              |",
+   "tokens": [
+    "`Reachy2Camera`"
+   ]
+  },
+  {
+   "id": 7,
+   "kind": "quote",
+   "start": 2348,
+   "end": 2500,
+   "text": "> [!TIP]\n> For ⟦0⟧ compatibility details, see the [Video I/O with OpenCV Overview](⟦1⟧).",
+   "tokens": [
+    "`OpenCVCamera`",
+    "https://docs.opencv.org/4.x/d0/da7/videoio_overview.html"
+   ]
+  },
+  {
+   "id": 8,
+   "kind": "heading",
+   "start": 2502,
+   "end": 2522,
+   "text": "### Find your camera",
+   "tokens": []
+  },
+  {
+   "id": 9,
+   "kind": "para",
+   "start": 2524,
+   "end": 2649,
+   "text": "Every camera requires a unique identifier to be instantiated, allowing you to distinguish between multiple connected devices.",
+   "tokens": []
+  },
+  {
+   "id": 10,
+   "kind": "para",
+   "start": 2651,
+   "end": 2914,
+   "text": "⟦0⟧ and ⟦1⟧ support auto-discovery. Run the command below to list available devices and their identifiers. Note that these identifiers may change after rebooting your computer or re-plugging the camera, depending on your operating system.",
+   "tokens": [
+    "`OpenCVCamera`",
+    "`RealSenseCamera`"
+   ]
+  },
+  {
+   "id": 11,
+   "kind": "para",
+   "start": 3000,
+   "end": 3075,
+   "text": "The output will look something like this if you have two cameras connected:",
+   "tokens": []
+  },
+  {
+   "id": 12,
+   "kind": "quote",
+   "start": 3333,
+   "end": 3675,
+   "text": "> [!WARNING]\n> When using Intel RealSense cameras in ⟦0⟧, you could get this [error](⟦1⟧): ⟦2⟧, this can be solved by running the same command with ⟦3⟧ permissions. Note that using RealSense cameras in ⟦4⟧ is unstable.",
+   "tokens": [
+    "`macOS`",
+    "https://github.com/IntelRealSense/librealsense/issues/12307",
+    "`Error finding RealSense cameras: failed to set power state`",
+    "`sudo`",
+    "`macOS`"
+   ]
+  },
+  {
+   "id": 13,
+   "kind": "para",
+   "start": 3677,
+   "end": 3839,
+   "text": "⟦0⟧ and ⟦1⟧ do not support auto-discovery. They must be configured manually by providing their network address and port or robot SDK settings.",
+   "tokens": [
+    "`ZMQCamera`",
+    "`Reachy2Camera`"
+   ]
+  },
+  {
+   "id": 14,
+   "kind": "heading",
+   "start": 3841,
+   "end": 3855,
+   "text": "## Use cameras",
+   "tokens": []
+  },
+  {
+   "id": 15,
+   "kind": "heading",
+   "start": 3857,
+   "end": 3879,
+   "text": "### Frame access modes",
+   "tokens": []
+  },
+  {
+   "id": 16,
+   "kind": "para",
+   "start": 3881,
+   "end": 3950,
+   "text": "All camera classes implement three access modes for capturing frames:",
+   "tokens": []
+  },
+  {
+   "id": 17,
+   "kind": "table",
+   "start": 3952,
+   "end": 4198,
+   "text": "| Method                    | Behavior                                                                                                                                                   | Blocks?        | Best For                                 |",
+   "tokens": []
+  },
+  {
+   "id": 18,
+   "kind": "table",
+   "start": 4446,
+   "end": 4692,
+   "text": "| ⟦0⟧                  | Waits for the camera hardware to return a frame. May block for a long time depending on the camera and SDK.                                                | Yes            | Simple scripts, sequential capture       |",
+   "tokens": [
+    "`read()`"
+   ]
+  },
+  {
+   "id": 19,
+   "kind": "table",
+   "start": 4693,
+   "end": 4939,
+   "text": "| ⟦0⟧  | Returns the latest unconsumed frame from background thread. Blocks only if buffer is empty, up to ⟦1⟧. Raises ⟦2⟧ if no frame arrives. | With a timeout | Control loops synchronized to camera FPS |",
+   "tokens": [
+    "`async_read(timeout_ms)`",
+    "`timeout_ms`",
+    "`TimeoutError`"
+   ]
+  },
+  {
+   "id": 20,
+   "kind": "table",
+   "start": 4940,
+   "end": 5186,
+   "text": "| ⟦0⟧ | Peeks at the most recent frame in buffer (may be stale). Raises ⟦1⟧ if frame is older than ⟦2⟧.                                        | No             | UI visualization, logging, monitoring    |",
+   "tokens": [
+    "`read_latest(max_age_ms)`",
+    "`TimeoutError`",
+    "`max_age_ms`"
+   ]
+  },
+  {
+   "id": 21,
+   "kind": "heading",
+   "start": 5188,
+   "end": 5206,
+   "text": "### Usage examples",
+   "tokens": []
+  },
+  {
+   "id": 22,
+   "kind": "para",
+   "start": 5208,
+   "end": 5322,
+   "text": "The following examples show how to use the camera API to configure and capture frames from different camera types.",
+   "tokens": []
+  },
+  {
+   "id": 23,
+   "kind": "list",
+   "start": 5324,
+   "end": 5398,
+   "text": "- **Blocking and non-blocking frame capture** using an OpenCV-based camera",
+   "tokens": []
+  },
+  {
+   "id": 24,
+   "kind": "list",
+   "start": 5399,
+   "end": 5460,
+   "text": "- **Color and depth capture** using an Intel RealSense camera",
+   "tokens": []
+  },
+  {
+   "id": 25,
+   "kind": "quote",
+   "start": 5462,
+   "end": 5602,
+   "text": "> [!WARNING]\n> Failing to cleanly disconnect cameras can cause resource leaks. Use the context manager protocol to ensure automatic cleanup:",
+   "tokens": []
+  },
+  {
+   "id": 26,
+   "kind": "quote",
+   "start": 5674,
+   "end": 5783,
+   "text": "> You can also call ⟦0⟧ and ⟦1⟧ manually, but always use a ⟦2⟧ block for the latter.",
+   "tokens": [
+    "`connect()`",
+    "`disconnect()`",
+    "`finally`"
+   ]
+  },
+  {
+   "id": 27,
+   "kind": "para",
+   "start": 8582,
+   "end": 8994,
+   "text": "Manual color controls disable the corresponding automatic exposure or white-balance mode. Their\nsupported ranges vary by camera model; an invalid value raises an error at connection time that\nincludes the range reported by the sensor. Requesting an unsupported control also raises an error.\nOmitted controls leave the sensor's existing automatic or manual setting unchanged. These options\nrequire ⟦0⟧.",
+   "tokens": [
+    "`use_rgb=True`"
+   ]
+  },
+  {
+   "id": 28,
+   "kind": "para",
+   "start": 8996,
+   "end": 9157,
+   "text": "Manual color controls require a dedicated RGB module. Cameras without one, such as the RealSense\nD405, do not support them and raise an error at connection time.",
+   "tokens": []
+  },
+  {
+   "id": 29,
+   "kind": "heading",
+   "start": 9185,
+   "end": 9207,
+   "text": "### Working with depth",
+   "tokens": []
+  },
+  {
+   "id": 30,
+   "kind": "para",
+   "start": 9209,
+   "end": 9632,
+   "text": "The Intel RealSense and Reachy 2 cameras can capture both color and depth in lockstep. Calling ⟦0⟧ returns the **color** frame as ⟦1⟧ ⟦2⟧. Calling ⟦3⟧ returns the **depth map** as ⟦4⟧ ⟦5⟧, where each pixel value is the distance from the sensor expressed in **millimetres**. A pixel value of ⟦6⟧ typically means \"no measurement available\" (out-of-range, occluded, or low-confidence).",
+   "tokens": [
+    "`read()`",
+    "`(H, W, 3)`",
+    "`uint8`",
+    "`read_depth()`",
+    "`(H, W, 1)`",
+    "`uint16`",
+    "`0`"
+   ]
+  },
+  {
+   "id": 31,
+   "kind": "para",
+   "start": 9634,
+   "end": 9861,
+   "text": "During recording, the control loop peeks the freshest buffered frames non-blockingly via ⟦0⟧ (color) and ⟦1⟧ (depth), adding the depth map as a sibling feature (e.g. ⟦2⟧ next to ⟦3⟧).",
+   "tokens": [
+    "`read_latest()`",
+    "`read_latest_depth()`",
+    "`front_depth`",
+    "`front`"
+   ]
+  },
+  {
+   "id": 32,
+   "kind": "para",
+   "start": 9863,
+   "end": 10037,
+   "text": "For how depth streams are stored and encoded when recording a dataset, see the [Depth streams](⟦0⟧) section of the video encoding guide.",
+   "tokens": [
+    "./video_encoding_parameters#depth-streams"
+   ]
+  },
+  {
+   "id": 33,
+   "kind": "heading",
+   "start": 10039,
+   "end": 10065,
+   "text": "## Use your phone's camera",
+   "tokens": []
+  },
+  {
+   "id": 34,
+   "kind": "para",
+   "start": 10126,
+   "end": 10204,
+   "text": "To use your iPhone as a camera on macOS, enable the Continuity Camera feature:",
+   "tokens": []
+  },
+  {
+   "id": 35,
+   "kind": "list",
+   "start": 10206,
+   "end": 10292,
+   "text": "- Ensure your Mac is running macOS 13 or later, and your iPhone is on iOS 16 or later.",
+   "tokens": []
+  },
+  {
+   "id": 36,
+   "kind": "list",
+   "start": 10293,
+   "end": 10339,
+   "text": "- Sign in both devices with the same Apple ID.",
+   "tokens": []
+  },
+  {
+   "id": 37,
+   "kind": "list",
+   "start": 10340,
+   "end": 10437,
+   "text": "- Connect your devices with a USB cable or turn on Wi-Fi and Bluetooth for a wireless connection.",
+   "tokens": []
+  },
+  {
+   "id": 38,
+   "kind": "para",
+   "start": 10439,
+   "end": 10544,
+   "text": "For more details, visit [Apple support](⟦0⟧).",
+   "tokens": [
+    "https://support.apple.com/en-gb/guide/mac-help/mchl77879b8a/mac"
+   ]
+  },
+  {
+   "id": 39,
+   "kind": "para",
+   "start": 10594,
+   "end": 10693,
+   "text": "If you want to use your phone as a camera using OBS, follow these steps to set up a virtual camera.",
+   "tokens": []
+  },
+  {
+   "id": 40,
+   "kind": "list",
+   "start": 10695,
+   "end": 10843,
+   "text": "1. _(Linux only) Install ⟦0⟧ and ⟦1⟧_. These packages create virtual camera devices and verify their settings. Install with:",
+   "tokens": [
+    "`v4l2loopback-dkms`",
+    "`v4l-utils`"
+   ]
+  },
+  {
+   "id": 41,
+   "kind": "list",
+   "start": 10903,
+   "end": 11019,
+   "text": "2. _Install the [DroidCam app](⟦0⟧) on your phone_. This app is available for both iOS and Android.",
+   "tokens": [
+    "https://droidcam.app"
+   ]
+  },
+  {
+   "id": 42,
+   "kind": "list",
+   "start": 11020,
+   "end": 11083,
+   "text": "3. _Download and install [OBS Studio](⟦0⟧)_.",
+   "tokens": [
+    "https://obsproject.com"
+   ]
+  },
+  {
+   "id": 43,
+   "kind": "list",
+   "start": 11084,
+   "end": 11162,
+   "text": "4. _Download and install the [DroidCam OBS plugin](⟦0⟧)_.",
+   "tokens": [
+    "https://droidcam.app/obs"
+   ]
+  },
+  {
+   "id": 44,
+   "kind": "list",
+   "start": 11163,
+   "end": 11185,
+   "text": "5. _Start OBS Studio_.",
+   "tokens": []
+  },
+  {
+   "id": 45,
+   "kind": "list",
+   "start": 11187,
+   "end": 11351,
+   "text": "6. _Add your phone as a source_. Follow the instructions [here](⟦0⟧). Be sure to set the resolution to ⟦1⟧ to avoid the watermarks.",
+   "tokens": [
+    "https://droidcam.app/obs/usage",
+    "`640x480`"
+   ]
+  },
+  {
+   "id": 46,
+   "kind": "list",
+   "start": 11352,
+   "end": 11575,
+   "text": "7. _Adjust resolution settings_. In OBS Studio, go to ⟦0⟧ or ⟦1⟧. Change the ⟦2⟧ and the ⟦3⟧ to ⟦4⟧ by manually typing it.",
+   "tokens": [
+    "`File > Settings > Video`",
+    "`OBS > Preferences... > Video`",
+    "`Base(Canvas) Resolution`",
+    "`Output(Scaled) Resolution`",
+    "`640x480`"
+   ]
+  },
+  {
+   "id": 47,
+   "kind": "list",
+   "start": 11576,
+   "end": 11697,
+   "text": "8. _Start virtual camera_. In OBS Studio, follow the instructions [here](⟦0⟧).",
+   "tokens": [
+    "https://obsproject.com/kb/virtual-camera-guide"
+   ]
+  },
+  {
+   "id": 48,
+   "kind": "list",
+   "start": 11698,
+   "end": 11750,
+   "text": "9. _Verify the virtual camera setup and resolution_.",
+   "tokens": []
+  },
+  {
+   "id": 49,
+   "kind": "list",
+   "start": 11751,
+   "end": 11819,
+   "text": "   - **Linux**: Use ⟦0⟧ to list devices and check resolution:",
+   "tokens": [
+    "`v4l2-ctl`"
+   ]
+  },
+  {
+   "id": 50,
+   "kind": "para",
+   "start": 12002,
+   "end": 12067,
+   "text": "     You should see ⟦0⟧ listed and resolution ⟦1⟧.",
+   "tokens": [
+    "`VirtualCam`",
+    "`640x480`"
+   ]
+  },
+  {
+   "id": 51,
+   "kind": "list",
+   "start": 12068,
+   "end": 12158,
+   "text": "   - **macOS**: Open Photo Booth or FaceTime and select \"OBS Virtual Camera\" as the input.",
+   "tokens": []
+  },
+  {
+   "id": 52,
+   "kind": "list",
+   "start": 12159,
+   "end": 12331,
+   "text": "   - **Windows**: The native Camera app doesn't support virtual cameras. Use a video conferencing app (Zoom, Teams) or run ⟦0⟧ directly to verify.",
+   "tokens": [
+    "`lerobot-find-cameras opencv`"
+   ]
+  },
+  {
+   "id": 53,
+   "kind": "para",
+   "start": 12333,
+   "end": 12394,
+   "text": "⟦0⟧\n⟦1⟧⟦2⟧Troubleshooting⟦3⟧⟦4⟧",
+   "tokens": [
+    "<details>",
+    "<summary>",
+    "<strong>",
+    "</strong>",
+    "</summary>"
+   ]
+  },
+  {
+   "id": 54,
+   "kind": "quote",
+   "start": 12396,
+   "end": 12441,
+   "text": "> The virtual camera resolution is incorrect.",
+   "tokens": []
+  },
+  {
+   "id": 55,
+   "kind": "para",
+   "start": 12443,
+   "end": 12541,
+   "text": "Delete the virtual camera source and recreate it. The resolution cannot be changed after creation.",
+   "tokens": []
+  },
+  {
+   "id": 56,
+   "kind": "quote",
+   "start": 12543,
+   "end": 12703,
+   "text": "> Error reading frame in background thread for OpenCVCamera(X): OpenCVCamera(X) frame width=640 or height=480 do not match configured width=1920 or height=1080.",
+   "tokens": []
+  },
+  {
+   "id": 57,
+   "kind": "para",
+   "start": 12705,
+   "end": 12896,
+   "text": "This error is caused by OBS Virtual Camera advertising a ⟦0⟧ resolution despite rescaling. The only fix for now is to comment out the width and height check in ⟦1⟧.",
+   "tokens": [
+    "`1920x1080`",
+    "`_postprocess_image()`"
+   ]
+  },
+  {
+   "id": 58,
+   "kind": "para",
+   "start": 12936,
+   "end": 13058,
+   "text": "If everything is set up correctly, your phone will appear as a standard OpenCV camera and can be used with ⟦0⟧.",
+   "tokens": [
+    "`OpenCVCamera`"
+   ]
+  }
+ ]
+}

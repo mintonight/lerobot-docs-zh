@@ -1,0 +1,83 @@
+<script lang="ts">
+import {onMount} from "svelte";
+import Tip from "$lib/Tip.svelte";
+import CopyLLMTxtMenu from "$lib/CopyLLMTxtMenu.svelte";
+import Youtube from "$lib/Youtube.svelte";
+import Docstring from "$lib/Docstring.svelte";
+import CodeBlock from "$lib/CodeBlock.svelte";
+import CodeBlockFw from "$lib/CodeBlockFw.svelte";
+import DocNotebookDropdown from "$lib/DocNotebookDropdown.svelte";
+import CourseFloatingBanner from "$lib/CourseFloatingBanner.svelte";
+import IconCopyLink from "$lib/IconCopyLink.svelte";
+import FrameworkContent from "$lib/FrameworkContent.svelte";
+import Markdown from "$lib/Markdown.svelte";
+import Question from "$lib/Question.svelte";
+import FrameworkSwitchCourse from "$lib/FrameworkSwitchCourse.svelte";
+import InferenceApi from "$lib/InferenceApi.svelte";
+import TokenizersLanguageContent from "$lib/TokenizersLanguageContent.svelte";
+import ExampleCodeBlock from "$lib/ExampleCodeBlock.svelte";
+import Added from "$lib/Added.svelte";
+import Changed from "$lib/Changed.svelte";
+import Deprecated from "$lib/Deprecated.svelte";
+import PipelineIcon from "$lib/PipelineIcon.svelte";
+import PipelineTag from "$lib/PipelineTag.svelte";
+import Heading from "$lib/Heading.svelte";
+import HfOptions from "$lib/HfOptions.svelte";
+import HfOption from "$lib/HfOption.svelte";
+import EditOnGithub from "$lib/EditOnGithub.svelte";
+import InferenceSnippet from "$lib/InferenceSnippet/InferenceSnippet.svelte";
+import MermaidChart from "$lib/MermaidChart.svelte";
+let fw: "pt" | "tf" = "pt";
+onMount(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    fw = urlParams.get("fw") || "pt";
+});
+</script>
+<svelte:head>
+  <meta name="hf:doc:metadata" content={metadata} >
+</svelte:head>
+
+<!--HF DOCBUILD BODY START-->
+
+HF_DOC_BODY_START
+
+<CopyLLMTxtMenu containerStyle="float: right; margin-left: 10px; display: inline-flex; position: relative; z-index: 10;"></CopyLLMTxtMenu>
+
+# LeLab - LeRobot 指南
+
+LeLab 是构建在 LeRobot 库之上的图形用户界面，旨在让机器人技术变得易用，无需记住 CLI 命令。在单个应用中，你可以配置机器人、对其进行 teleoperation、采集 dataset、在本地或通过 HF Jobs 在云 GPU 上训练 policy，并将训练好的模型部署回机器人。这是从一台未开箱的 SO-101 到可用 policy 的最简单途径，也是任何学习 LeRobot 工作流的人的绝佳伴侣。源代码和问题都托管在 GitHub 上：[huggingface/leLab](https://github.com/huggingface/leLab)。
+
+> [!TIP]
+> 目前 LeLab 仅与 SO-ARM101 兼容
+
+<Youtube id="VqyKUuW9V1g" />
+
+### 安装
+
+需要 [`uv`](https://docs.astral.sh/uv/getting-started/installation/)。一条命令即可完成安装和启动：
+
+```
+uv tool install git+https://github.com/huggingface/leLab.git && lelab
+```
+
+安装后，随时在终端中运行 `lelab` 即可启动应用。
+
+### 功能
+
+- **添加机器人** — 选择臂的类型（leader arm/follower arm），从中间位置 calibrate 每个关节，并挂载相机。
+- **teleoperation** — 用 leader arm 控制 follower arm，并实时查看臂的 3D 可视化。
+- **dataset 录制** — 定义任务描述、episode 数和 episode/重置时长。按下空格键在 episode 之间推进。建议录制 30 个以上 episode。
+- **本地训练** — 使用选定的 dataset、policy 类型、批次大小和步数，直接在自己的机器上训练 policy。
+- **使用 HF Jobs 进行云端训练** — 通过 [HF Jobs](https://huggingface.co/docs/huggingface_hub/en/guides/jobs) 在强大的 GPU 上以透明的价格进行训练。先运行 `hf auth login`。有关硬件/批次大小的建议，请参阅 [Compute HW Guide](hardware_guide)。
+- **训练可视化** — 在应用中实时查看进度，checkpoint 会自动保存。
+- **运行训练好的 policy** — 从你的作业列表中选择任意模型，一键在机器人上运行 inference。
+- **使用社区 dataset** — 提供任意 Hugging Face dataset ID，即可在你没有自己录制的 dataset 上进行训练。
+
+
+
+<EditOnGithub source="https://github.com/huggingface/lerobot/blob/main/docs/source/lelab.mdx" />
+
+<!--HF DOCBUILD BODY END-->
+
+HF_DOC_BODY_END
+

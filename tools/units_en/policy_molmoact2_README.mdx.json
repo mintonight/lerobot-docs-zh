@@ -1,0 +1,87 @@
+{
+ "file": "policy_molmoact2_README.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1935,
+   "text": "# MolmoAct2",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1937,
+   "end": 2135,
+   "text": "This repository contains the LeRobot policy implementation of\n[MolmoAct2](⟦0⟧), ported into LeRobot for\ntraining, evaluation, checkpointing, and dataset compatibility.",
+   "tokens": [
+    "https://allenai.org/blog/molmoact2"
+   ]
+  },
+  {
+   "id": 2,
+   "kind": "para",
+   "start": 2137,
+   "end": 2353,
+   "text": "This implementation currently supports training and evaluation for the regular\nMolmoAct2 model. MolmoAct2-Think, which supports adaptive depth reasoning, is\nnot included in this LeRobot policy yet and is coming soon.",
+   "tokens": []
+  },
+  {
+   "id": 3,
+   "kind": "para",
+   "start": 2355,
+   "end": 2506,
+   "text": "For the original MolmoAct2 training code used for the experiments reported in\nthe paper, see [allenai/molmoact2](⟦0⟧).",
+   "tokens": [
+    "https://github.com/allenai/molmoact2"
+   ]
+  },
+  {
+   "id": 4,
+   "kind": "heading",
+   "start": 2508,
+   "end": 2528,
+   "text": "## LIBERO Evaluation",
+   "tokens": []
+  },
+  {
+   "id": 5,
+   "kind": "para",
+   "start": 2530,
+   "end": 2753,
+   "text": "Important: we found that ⟦0⟧ does not reliably let the LIBERO\nscene stabilize and can degrade measured success. All LIBERO evaluation results\nreported for this LeRobot implementation use ⟦1⟧.",
+   "tokens": [
+    "`num_steps_wait=10`",
+    "`num_steps_wait=50`"
+   ]
+  },
+  {
+   "id": 6,
+   "kind": "heading",
+   "start": 2755,
+   "end": 2766,
+   "text": "## Citation",
+   "tokens": []
+  },
+  {
+   "id": 7,
+   "kind": "heading",
+   "start": 3550,
+   "end": 3560,
+   "text": "## License",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "para",
+   "start": 3562,
+   "end": 3817,
+   "text": "This model is licensed under Apache 2.0. It is intended for research and\neducational use in accordance with\n[Ai2's Responsible Use Guidelines](⟦0⟧),\nconsistent with [allenai/molmoact2](⟦1⟧).",
+   "tokens": [
+    "https://allenai.org/responsible-use",
+    "https://github.com/allenai/molmoact2"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,45 @@
+{
+ "file": "api/configs.mdx",
+ "units": [
+  {
+   "id": 0,
+   "zh": "# 配置"
+  },
+  {
+   "id": 1,
+   "zh": "LeRobot 配置是由 [draccus](⟦0⟧) 解析的普通 dataclass，因此每个\n字段都可以从 CLI 设置。⟦1⟧ 是 ⟦2⟧ 的顶层对象。"
+  },
+  {
+   "id": 2,
+   "zh": "多态配置（policy、机器人、环境）使用 ⟦0⟧：子类通过 ⟦1⟧ 注册\n自身，然后就可以在命令行上按该名称选择。"
+  },
+  {
+   "id": 3,
+   "zh": "## TrainPipelineConfig ⟦0⟧"
+  },
+  {
+   "id": 4,
+   "zh": "## PreTrainedConfig ⟦0⟧"
+  },
+  {
+   "id": 5,
+   "zh": "⟦0⟧- **n_obs_steps** -- 传递给 policy 的 observation 所对应的环境步数（取\n  当前步及其之前的额外步）。\n- **input_features** -- 定义 policy 输入数据 PolicyFeature 的字典。键表示\n  输入数据名称，值是 PolicyFeature，由 FeatureType 和 shape 属性组成。\n- **output_features** -- 定义 policy 输出数据 PolicyFeature 的字典。键表示\n  输出数据名称，值是 PolicyFeature，由 FeatureType 和 shape 属性组成。\n- **normalization_mapping** -- 一个字典，将 FeatureType 的 str 值（例如 “STATE”、“VISUAL”）映射到\n  相应的 NormalizationMode（例如 NormalizationMode.MIN_MAX）⟦1⟧⟦2⟧"
+  },
+  {
+   "id": 6,
+   "zh": "policy 模型的基类配置类。"
+  },
+  {
+   "id": 7,
+   "zh": "## DatasetConfig ⟦0⟧"
+  },
+  {
+   "id": 8,
+   "zh": "## EvalConfig ⟦0⟧"
+  },
+  {
+   "id": 9,
+   "zh": "## WandBConfig ⟦0⟧"
+  }
+ ]
+}

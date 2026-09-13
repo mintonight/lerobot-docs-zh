@@ -1,0 +1,670 @@
+{
+ "file": "using_dataset_tools.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1945,
+   "text": "# Using Dataset Tools",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1947,
+   "end": 2058,
+   "text": "This guide covers the dataset tools utilities available in LeRobot for modifying and editing existing datasets.",
+   "tokens": []
+  },
+  {
+   "id": 2,
+   "kind": "heading",
+   "start": 2060,
+   "end": 2071,
+   "text": "## Overview",
+   "tokens": []
+  },
+  {
+   "id": 3,
+   "kind": "para",
+   "start": 2073,
+   "end": 2134,
+   "text": "LeRobot provides several utilities for manipulating datasets:",
+   "tokens": []
+  },
+  {
+   "id": 4,
+   "kind": "list",
+   "start": 2136,
+   "end": 2200,
+   "text": "1. **Delete Episodes** - Remove specific episodes from a dataset",
+   "tokens": []
+  },
+  {
+   "id": 5,
+   "kind": "list",
+   "start": 2201,
+   "end": 2271,
+   "text": "2. **Split Dataset** - Divide a dataset into multiple smaller datasets",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "list",
+   "start": 2272,
+   "end": 2441,
+   "text": "3. **Merge Datasets** - Combine multiple datasets into one. The datasets must have identical features, and episodes are concatenated in the order specified in ⟦0⟧",
+   "tokens": [
+    "`repo_ids`"
+   ]
+  },
+  {
+   "id": 7,
+   "kind": "list",
+   "start": 2442,
+   "end": 2493,
+   "text": "4. **Add Features** - Add new features to a dataset",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "list",
+   "start": 2494,
+   "end": 2549,
+   "text": "5. **Remove Features** - Remove features from a dataset",
+   "tokens": []
+  },
+  {
+   "id": 9,
+   "kind": "list",
+   "start": 2550,
+   "end": 2642,
+   "text": "6. **Modify Tasks** - Change the natural-language task descriptions associated with episodes",
+   "tokens": []
+  },
+  {
+   "id": 10,
+   "kind": "list",
+   "start": 2643,
+   "end": 2794,
+   "text": "7. **Convert to Video** - Convert image-based datasets to video format for efficient storage (RGB and depth cameras are encoded with separate encoders)",
+   "tokens": []
+  },
+  {
+   "id": 11,
+   "kind": "list",
+   "start": 2795,
+   "end": 2909,
+   "text": "8. **Re-encode Videos** - Re-encode an existing video dataset's RGB and/or depth streams with new encoder settings",
+   "tokens": []
+  },
+  {
+   "id": 12,
+   "kind": "list",
+   "start": 2910,
+   "end": 3016,
+   "text": "9. **Show the Info of Datasets** - Show the summary of datasets information such as number of episode etc.",
+   "tokens": []
+  },
+  {
+   "id": 13,
+   "kind": "para",
+   "start": 3018,
+   "end": 3191,
+   "text": "The core implementation is in ⟦0⟧.\nAn example script detailing how to use the tools API is available in ⟦1⟧.",
+   "tokens": [
+    "`lerobot.datasets.dataset_tools`",
+    "`examples/dataset/use_dataset_tools.py`"
+   ]
+  },
+  {
+   "id": 14,
+   "kind": "heading",
+   "start": 3193,
+   "end": 3235,
+   "text": "## Command-Line Tool: lerobot-edit-dataset",
+   "tokens": []
+  },
+  {
+   "id": 15,
+   "kind": "para",
+   "start": 3237,
+   "end": 3448,
+   "text": "⟦0⟧ is a command-line script for editing datasets. It can be used to delete episodes, split datasets, merge datasets, add features, remove features, and convert image datasets to video format.",
+   "tokens": [
+    "`lerobot-edit-dataset`"
+   ]
+  },
+  {
+   "id": 16,
+   "kind": "para",
+   "start": 3450,
+   "end": 3544,
+   "text": "Run ⟦0⟧ for more information on the configuration of each operation.",
+   "tokens": [
+    "`lerobot-edit-dataset --help`"
+   ]
+  },
+  {
+   "id": 17,
+   "kind": "heading",
+   "start": 3546,
+   "end": 3564,
+   "text": "### Usage Examples",
+   "tokens": []
+  },
+  {
+   "id": 18,
+   "kind": "heading",
+   "start": 3566,
+   "end": 3586,
+   "text": "#### Delete Episodes",
+   "tokens": []
+  },
+  {
+   "id": 19,
+   "kind": "para",
+   "start": 3588,
+   "end": 3677,
+   "text": "Remove specific episodes from a dataset. This is useful for filtering out undesired data.",
+   "tokens": []
+  },
+  {
+   "id": 20,
+   "kind": "heading",
+   "start": 4145,
+   "end": 4163,
+   "text": "#### Split Dataset",
+   "tokens": []
+  },
+  {
+   "id": 21,
+   "kind": "para",
+   "start": 4165,
+   "end": 4204,
+   "text": "Divide a dataset into multiple subsets.",
+   "tokens": []
+  },
+  {
+   "id": 22,
+   "kind": "para",
+   "start": 4608,
+   "end": 4839,
+   "text": "There are no constraints on the split names, they can be determined by the user. Resulting datasets are saved under the repo id with the split name appended, e.g. ⟦0⟧, ⟦1⟧, ⟦2⟧.",
+   "tokens": [
+    "`lerobot/pusht_train`",
+    "`lerobot/pusht_task1`",
+    "`lerobot/pusht_task2`"
+   ]
+  },
+  {
+   "id": 23,
+   "kind": "heading",
+   "start": 4841,
+   "end": 4860,
+   "text": "#### Merge Datasets",
+   "tokens": []
+  },
+  {
+   "id": 24,
+   "kind": "para",
+   "start": 4862,
+   "end": 4910,
+   "text": "Combine multiple datasets into a single dataset.",
+   "tokens": []
+  },
+  {
+   "id": 25,
+   "kind": "heading",
+   "start": 5144,
+   "end": 5164,
+   "text": "#### Remove Features",
+   "tokens": []
+  },
+  {
+   "id": 26,
+   "kind": "para",
+   "start": 5166,
+   "end": 5197,
+   "text": "Remove features from a dataset.",
+   "tokens": []
+  },
+  {
+   "id": 27,
+   "kind": "heading",
+   "start": 5388,
+   "end": 5405,
+   "text": "#### Modify Tasks",
+   "tokens": []
+  },
+  {
+   "id": 28,
+   "kind": "para",
+   "start": 5407,
+   "end": 5555,
+   "text": "Change the natural-language task descriptions attached to episodes. This is useful for fixing typos, standardizing wording, or re-labeling episodes.",
+   "tokens": []
+  },
+  {
+   "id": 29,
+   "kind": "quote",
+   "start": 5557,
+   "end": 5859,
+   "text": "> [!WARNING]\n> ⟦0⟧ modifies the dataset **in-place** (updating ⟦1⟧, the ⟦2⟧ column in the data files, the ⟦3⟧ column in the episode metadata, and ⟦4⟧ in ⟦5⟧). The ⟦6⟧ and ⟦7⟧ parameters are ignored for this operation.",
+   "tokens": [
+    "`modify_tasks`",
+    "`meta/tasks.parquet`",
+    "`task_index`",
+    "`tasks`",
+    "`total_tasks`",
+    "`meta/info.json`",
+    "`--new_repo_id`",
+    "`--new_root`"
+   ]
+  },
+  {
+   "id": 30,
+   "kind": "para",
+   "start": 6810,
+   "end": 6825,
+   "text": "**Parameters:**",
+   "tokens": []
+  },
+  {
+   "id": 31,
+   "kind": "list",
+   "start": 6827,
+   "end": 6917,
+   "text": "- ⟦0⟧: A single task string used as the default for episodes not otherwise covered.",
+   "tokens": [
+    "`new_task`"
+   ]
+  },
+  {
+   "id": 32,
+   "kind": "list",
+   "start": 6918,
+   "end": 6979,
+   "text": "- ⟦0⟧: Mapping from episode index to task string.",
+   "tokens": [
+    "`episode_tasks`"
+   ]
+  },
+  {
+   "id": 33,
+   "kind": "list",
+   "start": 6980,
+   "end": 7165,
+   "text": "- ⟦0⟧: Mapping from existing task strings to their replacements, applied to episodes whose current task matches a key. Every key must be an existing task in the dataset.",
+   "tokens": [
+    "`task_replacements`"
+   ]
+  },
+  {
+   "id": 34,
+   "kind": "para",
+   "start": 7167,
+   "end": 7274,
+   "text": "The modes can be combined in a single run. Per episode, the task is resolved with the following precedence:",
+   "tokens": []
+  },
+  {
+   "id": 35,
+   "kind": "para",
+   "start": 7276,
+   "end": 7342,
+   "text": "⟦0⟧ > ⟦1⟧ > ⟦2⟧ > original task",
+   "tokens": [
+    "`episode_tasks`",
+    "`task_replacements`",
+    "`new_task`"
+   ]
+  },
+  {
+   "id": 36,
+   "kind": "para",
+   "start": 7344,
+   "end": 7484,
+   "text": "At least one of ⟦0⟧, ⟦1⟧, or ⟦2⟧ must be specified. An episode that ends up with no task raises an error.",
+   "tokens": [
+    "`new_task`",
+    "`episode_tasks`",
+    "`task_replacements`"
+   ]
+  },
+  {
+   "id": 37,
+   "kind": "heading",
+   "start": 7486,
+   "end": 7507,
+   "text": "#### Convert to Video",
+   "tokens": []
+  },
+  {
+   "id": 38,
+   "kind": "para",
+   "start": 7509,
+   "end": 7846,
+   "text": "Convert an image-based dataset to video format, creating a new LeRobotDataset where images are stored as videos. This is useful for reducing storage requirements and improving data loading performance. The new dataset will have the exact same structure as the original, but with images encoded as MP4 videos in the proper LeRobot format.",
+   "tokens": []
+  },
+  {
+   "id": 39,
+   "kind": "para",
+   "start": 9946,
+   "end": 9961,
+   "text": "**Parameters:**",
+   "tokens": []
+  },
+  {
+   "id": 40,
+   "kind": "list",
+   "start": 9963,
+   "end": 10066,
+   "text": "- ⟦0⟧: Custom output directory (optional - by default uses ⟦1⟧ or ⟦2⟧)",
+   "tokens": [
+    "`output_dir`",
+    "`new_repo_id`",
+    "`{repo_id}_video`"
+   ]
+  },
+  {
+   "id": 41,
+   "kind": "list",
+   "start": 10067,
+   "end": 10275,
+   "text": "- ⟦0⟧: Video encoder settings applied to RGB cameras — all sub-fields accessible via ⟦1⟧. See [Video Encoding Parameters](⟦2⟧) for more details.",
+   "tokens": [
+    "`rgb_encoder`",
+    "`--operation.rgb_encoder.<field>`",
+    "./video_encoding_parameters"
+   ]
+  },
+  {
+   "id": 42,
+   "kind": "list",
+   "start": 10276,
+   "end": 10775,
+   "text": "- ⟦0⟧: Video encoder settings applied to depth-map cameras (e.g. from an Intel RealSense). In addition to the standard encoder fields it exposes the depth quantization knobs (⟦1⟧, ⟦2⟧, ⟦3⟧, ⟦4⟧), accessible via ⟦5⟧. These quantization settings are persisted to the dataset metadata so depth can be dequantized back to physical units on load. See the [Depth streams](⟦6⟧) section for details.",
+   "tokens": [
+    "`depth_encoder`",
+    "`depth_min`",
+    "`depth_max`",
+    "`shift`",
+    "`use_log`",
+    "`--operation.depth_encoder.<field>`",
+    "./video_encoding_parameters#depth-streams"
+   ]
+  },
+  {
+   "id": 43,
+   "kind": "list",
+   "start": 10776,
+   "end": 10857,
+   "text": "- ⟦0⟧: List of specific episodes to convert (default: all episodes)",
+   "tokens": [
+    "`episode_indices`"
+   ]
+  },
+  {
+   "id": 44,
+   "kind": "list",
+   "start": 10858,
+   "end": 10929,
+   "text": "- ⟦0⟧: Number of parallel workers for processing (default: 4)",
+   "tokens": [
+    "`num_workers`"
+   ]
+  },
+  {
+   "id": 45,
+   "kind": "para",
+   "start": 10931,
+   "end": 11289,
+   "text": "**Note:** The resulting dataset will be a proper LeRobotDataset with all cameras encoded as videos in the ⟦0⟧ directory, with parquet files containing only metadata (no raw image data). Depth-map cameras are detected automatically and routed to the ⟦1⟧, while RGB cameras use the ⟦2⟧. All episodes, stats, and tasks are preserved.",
+   "tokens": [
+    "`videos/`",
+    "`depth_encoder`",
+    "`rgb_encoder`"
+   ]
+  },
+  {
+   "id": 46,
+   "kind": "heading",
+   "start": 11291,
+   "end": 11312,
+   "text": "#### Re-encode Videos",
+   "tokens": []
+  },
+  {
+   "id": 47,
+   "kind": "para",
+   "start": 11314,
+   "end": 11597,
+   "text": "Re-encode the videos of an existing video dataset with different encoder settings, without going back to raw frames. RGB videos use the ⟦0⟧ and depth videos use the ⟦1⟧. Provide only the encoder(s) you want to re-encode; the other stream type is left untouched.",
+   "tokens": [
+    "`rgb_encoder`",
+    "`depth_encoder`"
+   ]
+  },
+  {
+   "id": 48,
+   "kind": "para",
+   "start": 12163,
+   "end": 12178,
+   "text": "**Parameters:**",
+   "tokens": []
+  },
+  {
+   "id": 49,
+   "kind": "list",
+   "start": 12180,
+   "end": 12278,
+   "text": "- ⟦0⟧: Encoder settings applied to every RGB video. Omit to skip re-encoding RGB videos.",
+   "tokens": [
+    "`rgb_encoder`"
+   ]
+  },
+  {
+   "id": 50,
+   "kind": "list",
+   "start": 12279,
+   "end": 12383,
+   "text": "- ⟦0⟧: Encoder settings applied to every depth video. Omit to skip re-encoding depth videos.",
+   "tokens": [
+    "`depth_encoder`"
+   ]
+  },
+  {
+   "id": 51,
+   "kind": "list",
+   "start": 12384,
+   "end": 12443,
+   "text": "- ⟦0⟧: Number of parallel workers for processing.",
+   "tokens": [
+    "`num_workers`"
+   ]
+  },
+  {
+   "id": 52,
+   "kind": "quote",
+   "start": 12445,
+   "end": 12728,
+   "text": "> [!NOTE]\n> When re-encoding depth videos, the existing depth quantization parameters (⟦0⟧, ⟦1⟧, ⟦2⟧, ⟦3⟧) and the ⟦4⟧ flag are **preserved** — re-encoding only changes the codec/quality of the stored stream, not how depth is dequantized on load.",
+   "tokens": [
+    "`depth_min`",
+    "`depth_max`",
+    "`shift`",
+    "`use_log`",
+    "`is_depth_map`"
+   ]
+  },
+  {
+   "id": 53,
+   "kind": "heading",
+   "start": 12730,
+   "end": 12766,
+   "text": "### Show the information of datasets",
+   "tokens": []
+  },
+  {
+   "id": 54,
+   "kind": "para",
+   "start": 12768,
+   "end": 12903,
+   "text": "Show the information of datasets such as number of episode, number of frame, File size and so on.\nNo change will be made to the dataset",
+   "tokens": []
+  },
+  {
+   "id": 55,
+   "kind": "para",
+   "start": 13229,
+   "end": 13244,
+   "text": "**Parameters:**",
+   "tokens": []
+  },
+  {
+   "id": 56,
+   "kind": "list",
+   "start": 13246,
+   "end": 13354,
+   "text": "- ⟦0⟧: The flag to control show or no show dataset information with feature details.(default=false)",
+   "tokens": [
+    "`parameters`"
+   ]
+  },
+  {
+   "id": 57,
+   "kind": "heading",
+   "start": 13356,
+   "end": 13371,
+   "text": "### Push to Hub",
+   "tokens": []
+  },
+  {
+   "id": 58,
+   "kind": "para",
+   "start": 13373,
+   "end": 13492,
+   "text": "Add the ⟦0⟧ flag to any command to automatically upload the resulting dataset to the Hugging Face Hub:",
+   "tokens": [
+    "`--push_to_hub true`"
+   ]
+  },
+  {
+   "id": 59,
+   "kind": "para",
+   "start": 13717,
+   "end": 13821,
+   "text": "There is also a tool for adding features to a dataset that is not yet covered in ⟦0⟧.",
+   "tokens": [
+    "`lerobot-edit-dataset`"
+   ]
+  },
+  {
+   "id": 60,
+   "kind": "heading",
+   "start": 13823,
+   "end": 13846,
+   "text": "# Dataset Visualization",
+   "tokens": []
+  },
+  {
+   "id": 61,
+   "kind": "heading",
+   "start": 13848,
+   "end": 13871,
+   "text": "## Online Visualization",
+   "tokens": []
+  },
+  {
+   "id": 62,
+   "kind": "para",
+   "start": 13873,
+   "end": 14132,
+   "text": "When you record a dataset using ⟦0⟧, it automatically uploads to the Hugging Face Hub unless you specify otherwise. To view the dataset online, use our **LeRobot Dataset Visualizer**, available at:\n⟦1⟧",
+   "tokens": [
+    "`lerobot`",
+    "https://huggingface.co/spaces/lerobot/visualize_dataset"
+   ]
+  },
+  {
+   "id": 63,
+   "kind": "heading",
+   "start": 14134,
+   "end": 14156,
+   "text": "## Local Visualization",
+   "tokens": []
+  },
+  {
+   "id": 64,
+   "kind": "para",
+   "start": 14158,
+   "end": 14241,
+   "text": "You can also visualize episodes from a dataset locally using our command-line tool.",
+   "tokens": []
+  },
+  {
+   "id": 65,
+   "kind": "para",
+   "start": 14243,
+   "end": 14273,
+   "text": "**From the Hugging Face Hub:**",
+   "tokens": []
+  },
+  {
+   "id": 66,
+   "kind": "para",
+   "start": 14362,
+   "end": 14567,
+   "text": "For a private or gated dataset, authenticate first with ⟦0⟧, or set the\n⟦1⟧ environment variable. The Hub client then discovers the credential\nautomatically; no token argument is needed.",
+   "tokens": [
+    "`hf auth login`",
+    "`HF_TOKEN`"
+   ]
+  },
+  {
+   "id": 67,
+   "kind": "para",
+   "start": 14569,
+   "end": 14704,
+   "text": "**From a local folder:**\nAdd the ⟦0⟧ option and set ⟦1⟧. For example, to search in ⟦2⟧:",
+   "tokens": [
+    "`--root`",
+    "`--mode local`",
+    "`./my_local_data_dir/lerobot/pusht`"
+   ]
+  },
+  {
+   "id": 68,
+   "kind": "para",
+   "start": 14845,
+   "end": 14970,
+   "text": "Once executed, the tool opens ⟦0⟧ and displays the camera streams, robot states, and actions for the selected episode.",
+   "tokens": [
+    "`rerun.io`"
+   ]
+  },
+  {
+   "id": 69,
+   "kind": "para",
+   "start": 14972,
+   "end": 15238,
+   "text": "To use [Foxglove](⟦0⟧) instead of Rerun, install the extra add ⟦1⟧. This starts a WebSocket server (connect the Foxglove app to ⟦2⟧) that serves the episode as a seekable timeline you can play/pause and scrub.",
+   "tokens": [
+    "https://foxglove.dev",
+    "`--display-mode foxglove`",
+    "`ws://127.0.0.1:8765`"
+   ]
+  },
+  {
+   "id": 70,
+   "kind": "para",
+   "start": 15240,
+   "end": 15320,
+   "text": "For advanced usage—including visualizing datasets stored on a remote server—run:",
+   "tokens": []
+  }
+ ]
+}

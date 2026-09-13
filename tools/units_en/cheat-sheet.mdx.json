@@ -1,0 +1,351 @@
+{
+ "file": "cheat-sheet.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1937,
+   "text": "# Cheat sheet",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1939,
+   "end": 2077,
+   "text": "All of the LeRobot commands in one place. If you forgot how to use a specific command or want to learn about a new one you can do it here.",
+   "tokens": []
+  },
+  {
+   "id": 2,
+   "kind": "quote",
+   "start": 2079,
+   "end": 2189,
+   "text": "> [!WARNING]\n> For all of the commands listed below remember to change the ports/names/ids to your own values!",
+   "tokens": []
+  },
+  {
+   "id": 3,
+   "kind": "quote",
+   "start": 2191,
+   "end": 2416,
+   "text": "> [!TIP]\n> Another great way to look at all the commands and get them configured for your specific setup is to use this [Jupyter Notebook](⟦0⟧).",
+   "tokens": [
+    "https://github.com/huggingface/lerobot/blob/main/examples/notebooks/quickstart.ipynb"
+   ]
+  },
+  {
+   "id": 4,
+   "kind": "heading",
+   "start": 2418,
+   "end": 2444,
+   "text": "### Setup and installation",
+   "tokens": []
+  },
+  {
+   "id": 5,
+   "kind": "para",
+   "start": 2446,
+   "end": 2559,
+   "text": "For installation please look at [LeRobot Installation](⟦0⟧).",
+   "tokens": [
+    "https://huggingface.co/docs/lerobot/main/en/installation"
+   ]
+  },
+  {
+   "id": 6,
+   "kind": "heading",
+   "start": 2561,
+   "end": 2577,
+   "text": "### Useful tools",
+   "tokens": []
+  },
+  {
+   "id": 7,
+   "kind": "heading",
+   "start": 2579,
+   "end": 2595,
+   "text": "###### Find port",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "para",
+   "start": 2597,
+   "end": 2845,
+   "text": "Use this to identify which serial ports your robots are connected to. Follow the instructions in your terminal: you will be asked to unplug the USB cable and press Enter. The script will then detect and print the correct serial port for that robot.",
+   "tokens": []
+  },
+  {
+   "id": 9,
+   "kind": "heading",
+   "start": 2878,
+   "end": 2897,
+   "text": "###### Find cameras",
+   "tokens": []
+  },
+  {
+   "id": 10,
+   "kind": "para",
+   "start": 2899,
+   "end": 3091,
+   "text": "Quickly find camera indices and verify their output. This command prints camera information to the terminal and saves test frames from each detected camera to ⟦0⟧",
+   "tokens": [
+    "`lerobot/outputs/captured_images`"
+   ]
+  },
+  {
+   "id": 11,
+   "kind": "heading",
+   "start": 3127,
+   "end": 3142,
+   "text": "### Calibration",
+   "tokens": []
+  },
+  {
+   "id": 12,
+   "kind": "para",
+   "start": 3144,
+   "end": 3345,
+   "text": "In most cases you will need to perform calibration just once for each robot and teleoperation device. Before performing the calibration make sure that all the joints are roughly in the middle position.",
+   "tokens": []
+  },
+  {
+   "id": 13,
+   "kind": "para",
+   "start": 3477,
+   "end": 3613,
+   "text": "Make sure that you use the same IDs used during calibration later for the other scripts. That's how LeRobot finds the calibration files.",
+   "tokens": []
+  },
+  {
+   "id": 14,
+   "kind": "heading",
+   "start": 3615,
+   "end": 3632,
+   "text": "### Teleoperation",
+   "tokens": []
+  },
+  {
+   "id": 15,
+   "kind": "para",
+   "start": 3634,
+   "end": 3700,
+   "text": "Teleoperating with two cameras and displaying the data with Rerun.",
+   "tokens": []
+  },
+  {
+   "id": 16,
+   "kind": "heading",
+   "start": 4133,
+   "end": 4156,
+   "text": "### Recording a dataset",
+   "tokens": []
+  },
+  {
+   "id": 17,
+   "kind": "para",
+   "start": 4158,
+   "end": 4307,
+   "text": "The dataset is automatically uploaded to the server and saved under repo_id, make sure you are logged in to your HF account with CLI:\n⟦0⟧",
+   "tokens": [
+    "`hf auth login`"
+   ]
+  },
+  {
+   "id": 18,
+   "kind": "para",
+   "start": 4309,
+   "end": 4417,
+   "text": "You can get the token from: [⟦0⟧](⟦1⟧)",
+   "tokens": [
+    "https://huggingface.co/settings/tokens",
+    "https://huggingface.co/settings/tokens"
+   ]
+  },
+  {
+   "id": 19,
+   "kind": "para",
+   "start": 5029,
+   "end": 5163,
+   "text": "While collecting the dataset you can control the process with your keyboard:\nControl the data recording flow using keyboard shortcuts:",
+   "tokens": []
+  },
+  {
+   "id": 20,
+   "kind": "list",
+   "start": 5165,
+   "end": 5230,
+   "text": "- Press **Right Arrow (⟦0⟧)**: Save episode and move to the next.",
+   "tokens": [
+    "`→`"
+   ]
+  },
+  {
+   "id": 21,
+   "kind": "list",
+   "start": 5231,
+   "end": 5294,
+   "text": "- Press **Left Arrow (⟦0⟧)**: Delete current episode and retry.",
+   "tokens": [
+    "`←`"
+   ]
+  },
+  {
+   "id": 22,
+   "kind": "list",
+   "start": 5295,
+   "end": 5355,
+   "text": "- Press **Escape (⟦0⟧)**: Stop, encode videos, and upload.",
+   "tokens": [
+    "`ESC`"
+   ]
+  },
+  {
+   "id": 23,
+   "kind": "heading",
+   "start": 5357,
+   "end": 5376,
+   "text": "### Recording depth",
+   "tokens": []
+  },
+  {
+   "id": 24,
+   "kind": "para",
+   "start": 5378,
+   "end": 5544,
+   "text": "Intel RealSense cameras (⟦0⟧) record a depth stream when you set ⟦1⟧. Depth is quantized to 12-bit codes and stored as its own video.",
+   "tokens": [
+    "`type: intelrealsense`",
+    "`use_depth: true`"
+   ]
+  },
+  {
+   "id": 25,
+   "kind": "heading",
+   "start": 6014,
+   "end": 6043,
+   "text": "### Video encoding parameters",
+   "tokens": []
+  },
+  {
+   "id": 26,
+   "kind": "para",
+   "start": 6045,
+   "end": 6164,
+   "text": "RGB and depth streams are encoded independently via the ⟦0⟧ and ⟦1⟧ keys.",
+   "tokens": [
+    "`--dataset.rgb_encoder.*`",
+    "`--dataset.depth_encoder.*`"
+   ]
+  },
+  {
+   "id": 27,
+   "kind": "heading",
+   "start": 6441,
+   "end": 6453,
+   "text": "### Training",
+   "tokens": []
+  },
+  {
+   "id": 28,
+   "kind": "para",
+   "start": 6455,
+   "end": 6567,
+   "text": "Depending on your hardware training the policy might take a few hours. That's how you train simple ⟦0⟧ policy:",
+   "tokens": [
+    "`ACT`"
+   ]
+  },
+  {
+   "id": 29,
+   "kind": "list",
+   "start": 6873,
+   "end": 6926,
+   "text": "- Policy Types: ⟦0⟧, ⟦1⟧, ⟦2⟧, ⟦3⟧",
+   "tokens": [
+    "`act`",
+    "`diffusion`",
+    "`smolvla`",
+    "`pi05`"
+   ]
+  },
+  {
+   "id": 30,
+   "kind": "list",
+   "start": 6927,
+   "end": 6983,
+   "text": "- Devices: ⟦0⟧ (NVIDIA), ⟦1⟧ (Apple Silicon), ⟦2⟧",
+   "tokens": [
+    "`cuda`",
+    "`mps`",
+    "`cpu`"
+   ]
+  },
+  {
+   "id": 31,
+   "kind": "para",
+   "start": 6985,
+   "end": 7118,
+   "text": "If you want to fine-tune a specific model you can provide the path to the model. In this case path is enough and type can be skipped.",
+   "tokens": []
+  },
+  {
+   "id": 32,
+   "kind": "para",
+   "start": 7394,
+   "end": 7680,
+   "text": "No local GPU? Add ⟦0⟧ (e.g. ⟦1⟧) to either command and ⟦2⟧ runs it on [Hugging Face Jobs](⟦3⟧) instead — it uploads a local-only dataset for you and pushes the trained model. List flavors with ⟦4⟧.",
+   "tokens": [
+    "`--job.target=<flavor>`",
+    "`a10g-small`",
+    "`lerobot-train`",
+    "https://huggingface.co/docs/hub/jobs",
+    "`hf jobs hardware`"
+   ]
+  },
+  {
+   "id": 33,
+   "kind": "para",
+   "start": 7682,
+   "end": 7897,
+   "text": "To resume, point ⟦0⟧ at a checkpoint and add ⟦1⟧. It accepts a local path or a Hub repo id (the latest checkpoint is fetched), and works locally or on a job by adding ⟦2⟧:",
+   "tokens": [
+    "`--config_path`",
+    "`--resume=true`",
+    "`--job.target=<flavor>`"
+   ]
+  },
+  {
+   "id": 34,
+   "kind": "heading",
+   "start": 8001,
+   "end": 8014,
+   "text": "### Inference",
+   "tokens": []
+  },
+  {
+   "id": 35,
+   "kind": "para",
+   "start": 8016,
+   "end": 8391,
+   "text": "Inference means running the trained policy/model on a robot. For that we use ⟦0⟧. You will need to provide a path to your policy. It can be a local path or a path to Hugging Face for example \"lerobot/folding_latest\". Your cameras configuration needs to match what was used when collecting the dataset. Duration is in seconds if unspecified, it will run forever.",
+   "tokens": [
+    "`lerobot-rollout`"
+   ]
+  },
+  {
+   "id": 36,
+   "kind": "quote",
+   "start": 8393,
+   "end": 8632,
+   "text": "> [!TIP]\n> If you are using the previous release V0.5.1 instead of ⟦0⟧ you need to use ⟦1⟧. More information [here](⟦2⟧).",
+   "tokens": [
+    "`lerobot-rollout`",
+    "`lerobot-record`",
+    "https://huggingface.co/docs/lerobot/v0.5.1/en/il_robots#run-inference-and-evaluate-your-policy"
+   ]
+  }
+ ]
+}

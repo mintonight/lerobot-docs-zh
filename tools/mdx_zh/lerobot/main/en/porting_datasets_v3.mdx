@@ -1,0 +1,375 @@
+<script lang="ts">
+import {onMount} from "svelte";
+import Tip from "$lib/Tip.svelte";
+import CopyLLMTxtMenu from "$lib/CopyLLMTxtMenu.svelte";
+import Youtube from "$lib/Youtube.svelte";
+import Docstring from "$lib/Docstring.svelte";
+import CodeBlock from "$lib/CodeBlock.svelte";
+import CodeBlockFw from "$lib/CodeBlockFw.svelte";
+import DocNotebookDropdown from "$lib/DocNotebookDropdown.svelte";
+import CourseFloatingBanner from "$lib/CourseFloatingBanner.svelte";
+import IconCopyLink from "$lib/IconCopyLink.svelte";
+import FrameworkContent from "$lib/FrameworkContent.svelte";
+import Markdown from "$lib/Markdown.svelte";
+import Question from "$lib/Question.svelte";
+import FrameworkSwitchCourse from "$lib/FrameworkSwitchCourse.svelte";
+import InferenceApi from "$lib/InferenceApi.svelte";
+import TokenizersLanguageContent from "$lib/TokenizersLanguageContent.svelte";
+import ExampleCodeBlock from "$lib/ExampleCodeBlock.svelte";
+import Added from "$lib/Added.svelte";
+import Changed from "$lib/Changed.svelte";
+import Deprecated from "$lib/Deprecated.svelte";
+import PipelineIcon from "$lib/PipelineIcon.svelte";
+import PipelineTag from "$lib/PipelineTag.svelte";
+import Heading from "$lib/Heading.svelte";
+import HfOptions from "$lib/HfOptions.svelte";
+import HfOption from "$lib/HfOption.svelte";
+import EditOnGithub from "$lib/EditOnGithub.svelte";
+import InferenceSnippet from "$lib/InferenceSnippet/InferenceSnippet.svelte";
+import MermaidChart from "$lib/MermaidChart.svelte";
+let fw: "pt" | "tf" = "pt";
+onMount(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    fw = urlParams.get("fw") || "pt";
+});
+</script>
+<svelte:head>
+  <meta name="hf:doc:metadata" content={metadata} >
+</svelte:head>
+
+<!--HF DOCBUILD BODY START-->
+
+HF_DOC_BODY_START
+
+<CopyLLMTxtMenu containerStyle="float: right; margin-left: 10px; display: inline-flex; position: relative; z-index: 10;"></CopyLLMTxtMenu>
+
+# 将大型 dataset 迁移到 LeRobot Dataset v3.0
+
+本教程介绍如何将大规模机器人 dataset 迁移到 LeRobot Dataset v3.0 格式。我们将以 **DROID 1.0.1** dataset 作为主要示例，它演示了如何在 SLURM 集群上处理带有数千个分片的数 TB 级 dataset。
+
+## 文件组织：v2.1 与 v3.0
+
+Dataset v3.0 从根本上改变了数据的组织和存储方式：
+
+**v2.1 结构（基于 episode）**：
+
+```
+dataset/
+├── data/chunk-000/episode_000000.parquet
+├── data/chunk-000/episode_000001.parquet
+├── videos/chunk-000/camera/episode_000000.mp4
+└── meta/episodes.jsonl
+```
+
+**v3.0 结构（基于文件）**：
+
+```
+dataset/
+├── data/chunk-000/file-000.parquet        # Multiple episodes per file
+├── videos/camera/chunk-000/file-000.mp4   # Consolidated video chunks
+└── meta/episodes/chunk-000/file-000.parquet  # Structured metadata
+```
+
+这种从单个 episode 文件到基于文件的分块的转变，大幅提升了性能并降低了存储开销。
+
+## Dataset v3.0 的新特性
+
+Dataset v3.0 为处理大型 dataset 带来了显著改进：
+
+### 🏗️ **增强的文件组织**
+
+- **基于文件的结构**：episode 现在被分组为分块文件，而非单个 episode 文件
+- **可配置文件大小**：针对数据和视频文件
+- **改进的存储效率**：更好的压缩和更低的开销
+
+### 📊 **现代元数据管理**
+
+- **基于 Parquet 的元数据**：用高效的 parquet 格式取代 JSON Lines
+- **结构化 episode 访问**：通过 `dataset.meta.episodes` 直接访问 pandas DataFrame
+- **逐 episode 统计**：在 episode 级别增强的统计跟踪
+
+### 🚀 **性能增强**
+
+- **内存映射访问**：通过 PyArrow 内存映射改进 RAM 使用
+- **更快的加载**：显著缩短 dataset 初始化时间
+- **更好的可扩展性**：为包含数百万个 episode 的 dataset 而设计
+
+## 前置条件
+
+在迁移大型 dataset 之前，请确保你具备：
+
+- **已安装 LeRobot** 并支持 v3.0。请遵循我们的[安装指南](./installation)。
+- **足够的存储空间**：原始 dataset 可能非常大（例如 DROID 需要 2TB）
+- **集群访问权限**（大型 dataset 推荐）：SLURM 或类似的任务调度器
+- **dataset 特定依赖**：对于 DROID，你需要 TensorFlow Dataset 工具
+
+## 了解 DROID dataset
+
+[DROID 1.0.1](https://droid-dataset.github.io/droid/the-droid-dataset) 是一个大规模机器人 dataset 的绝佳示例：
+
+- **大小**：1.7TB（RLDS 格式）、8.7TB（原始数据）
+- **结构**：2048 个预定义的 TensorFlow dataset 分片
+- **内容**：来自 Franka Emika Panda 机器人的 76,000+ 条机器人操作轨迹
+- **范围**：跨多个环境和物体的真实世界操作任务
+- **格式**：最初为 TensorFlow Records/RLDS 格式，需要转换为 LeRobot 格式
+- **托管**：Google Cloud Storage，可通过 `gsutil` 公开访问
+
+该 dataset 包含多样的操作 demonstration，包括：
+
+- 多个相机视角（腕部相机、外部相机）
+- 自然语言任务描述
+- 机器人本体感受 state 和 action
+- 成功/失败标注
+
+### DROID 特征模式
+
+```python
+DROID_FEATURES = {
+    # Episode markers
+    "is_first": {"dtype": "bool", "shape": (1,)},
+    "is_last": {"dtype": "bool", "shape": (1,)},
+    "is_terminal": {"dtype": "bool", "shape": (1,)},
+
+    # Language instructions
+    "language_instruction": {"dtype": "string", "shape": (1,)},
+    "language_instruction_2": {"dtype": "string", "shape": (1,)},
+    "language_instruction_3": {"dtype": "string", "shape": (1,)},
+
+    # Robot state
+    "observation.state.gripper_position": {"dtype": "float32", "shape": (1,)},
+    "observation.state.cartesian_position": {"dtype": "float32", "shape": (6,)},
+    "observation.state.joint_position": {"dtype": "float32", "shape": (7,)},
+
+    # Camera observations
+    "observation.images.wrist_left": {"dtype": "image"},
+    "observation.images.exterior_1_left": {"dtype": "image"},
+    "observation.images.exterior_2_left": {"dtype": "image"},
+
+    # Actions
+    "action.gripper_position": {"dtype": "float32", "shape": (1,)},
+    "action.cartesian_position": {"dtype": "float32", "shape": (6,)},
+    "action.joint_position": {"dtype": "float32", "shape": (7,)},
+
+    # Standard LeRobot format
+    "observation.state": {"dtype": "float32", "shape": (8,)},  # joints + gripper
+    "action": {"dtype": "float32", "shape": (8,)},  # joints + gripper
+}
+```
+
+## 方法 1：单机迁移
+
+### 步骤 1：安装依赖
+
+对于 DROID 而言：
+
+```bash
+pip install tensorflow
+pip install tensorflow_datasets
+```
+
+对于其他 dataset，请安装适合你源格式的读取器。
+
+### 步骤 2：下载原始数据
+
+使用 `gsutil` 从 Google Cloud Storage 下载 DROID：
+
+```bash
+# Install Google Cloud SDK if not already installed
+# https://cloud.google.com/sdk/docs/install
+
+# Download the full RLDS dataset (1.7TB)
+gsutil -m cp -r gs://gresearch/robotics/droid/1.0.1 /your/data/
+
+# Or download just the 100-episode sample (2GB) for testing
+gsutil -m cp -r gs://gresearch/robotics/droid_100 /your/data/
+```
+
+> [!WARNING]
+> 大型 dataset 需要大量时间和存储空间：
+>
+> - **完整 DROID (1.7TB)**：取决于带宽，下载需要数天
+> - **处理时间**：本地迁移完整 dataset 需要 7 天以上
+> - **上传时间**：推送到 Hugging Face Hub 需要 3 天以上
+> - **本地存储**：处理后的 LeRobot 格式约 400GB
+
+### 步骤 3：迁移 dataset
+
+```bash
+python examples/port_datasets/port_droid.py \
+    --raw-dir /your/data/droid/1.0.1 \
+    --repo-id your_id/droid_1.0.1 \
+    --push-to-hub
+```
+
+### 开发与测试
+
+在开发阶段，你可以迁移单个分片：
+
+```bash
+python examples/port_datasets/port_droid.py \
+    --raw-dir /your/data/droid/1.0.1 \
+    --repo-id your_id/droid_1.0.1_test \
+    --num-shards 2048 \
+    --shard-index 0
+```
+
+这种方法适用于较小的 dataset 或测试，但大型 dataset 需要集群计算。
+
+## 方法 2：SLURM 集群迁移（推荐）
+
+对于 DROID 这样的大型 dataset，跨多个节点的并行处理可大幅缩短处理时间。
+
+### 步骤 1：安装集群依赖
+
+```bash
+pip install datatrove  # Hugging Face's distributed processing library
+```
+
+### 步骤 2：配置你的 SLURM 环境
+
+查找你的分区信息：
+
+```bash
+sinfo --format="%R"  # List available partitions
+sinfo -N -p your_partition -h -o "%N cpus=%c mem=%m"  # Check resources
+```
+
+选择一个 **CPU 分区** - dataset 迁移不需要 GPU。
+
+### 步骤 3：启动并行迁移任务
+
+```bash
+python examples/port_datasets/slurm_port_shards.py \
+    --raw-dir /your/data/droid/1.0.1 \
+    --repo-id your_id/droid_1.0.1 \
+    --logs-dir /your/logs \
+    --job-name port_droid \
+    --partition your_partition \
+    --workers 2048 \
+    --cpus-per-task 8 \
+    --mem-per-cpu 1950M
+```
+
+#### 参数指南
+
+- **`--workers`**：并行任务数量（DROID 的分片数量最多 2048）
+- **`--cpus-per-task`**：建议 8 个 CPU 以并行化帧编码
+- **`--mem-per-cpu`**：加载原始帧约需 16GB 总 RAM（8×1950M）
+
+> [!TIP]
+> 先使用较少的 worker（例如 100）测试你的集群配置，然后再启动数千个任务。
+
+### 步骤 4：监控进度
+
+查看正在运行的任务：
+
+```bash
+squeue -u $USER
+```
+
+监控总体进度：
+
+```bash
+jobs_status /your/logs
+```
+
+查看单个任务日志：
+
+```bash
+less /your/logs/port_droid/slurm_jobs/JOB_ID_WORKER_ID.out
+```
+
+调试失败的任务：
+
+```bash
+failed_logs /your/logs/port_droid
+```
+
+### 步骤 5：聚合分片
+
+所有迁移任务完成后：
+
+```bash
+python examples/port_datasets/slurm_aggregate_shards.py \
+    --repo-id your_id/droid_1.0.1 \
+    --logs-dir /your/logs \
+    --job-name aggr_droid \
+    --partition your_partition \
+    --workers 2048 \
+    --cpus-per-task 8 \
+    --mem-per-cpu 1950M
+```
+
+### 步骤 6：上传到 Hub
+
+```bash
+python examples/port_datasets/slurm_upload.py \
+    --repo-id your_id/droid_1.0.1 \
+    --logs-dir /your/logs \
+    --job-name upload_droid \
+    --partition your_partition \
+    --workers 50 \
+    --cpus-per-task 4 \
+    --mem-per-cpu 1950M
+```
+
+> [!NOTE]
+> 上传使用较少的 worker（50），因为它是网络受限而非计算受限。
+
+## Dataset v3.0 文件结构
+
+你完成后的 dataset 将具有这种现代结构：
+
+```
+dataset/
+├── meta/
+│   ├── episodes/
+│   │   └── chunk-000/
+│   │       └── file-000.parquet    # Episode metadata
+│   ├── tasks.parquet               # Task definitions
+│   ├── stats.json                  # Aggregated statistics
+│   └── info.json                   # Dataset information
+├── data/
+│   └── chunk-000/
+│       └── file-000.parquet        # Consolidated episode data
+└── videos/
+    └── camera_key/
+        └── chunk-000/
+            └── file-000.mp4        # Consolidated video files
+```
+
+这用高效的、大小最优的分块取代了旧的每 episode 一文件结构。
+
+## 从 Dataset v2.1 迁移
+
+如果你有 v2.1 格式的现有 dataset，请使用迁移工具：
+
+```bash
+python src/lerobot/scripts/convert_dataset_v21_to_v30.py \
+    --repo-id your_id/existing_dataset
+```
+
+这会自动：
+
+- 将文件结构转换为 v3.0 格式
+- 将元数据从 JSON Lines 迁移到 parquet
+- 聚合统计量并创建逐 episode 统计
+- 更新版本信息
+
+## 性能优势
+
+Dataset v3.0 为大型 dataset 提供了显著改进：
+
+- **更快的加载**：初始化时间减少 3-5 倍
+- **内存效率**：通过内存映射改善 RAM 使用
+- **可扩展处理**：高效处理数百万个 episode
+- **存储优化**：减少文件数量并改进压缩
+
+
+
+<EditOnGithub source="https://github.com/huggingface/lerobot/blob/main/docs/source/porting_datasets_v3.mdx" />
+
+<!--HF DOCBUILD BODY END-->
+
+HF_DOC_BODY_END
+

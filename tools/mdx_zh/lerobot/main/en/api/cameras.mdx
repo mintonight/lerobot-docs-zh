@@ -1,0 +1,190 @@
+<script lang="ts">
+import {onMount} from "svelte";
+import Tip from "$lib/Tip.svelte";
+import CopyLLMTxtMenu from "$lib/CopyLLMTxtMenu.svelte";
+import Youtube from "$lib/Youtube.svelte";
+import Docstring from "$lib/Docstring.svelte";
+import CodeBlock from "$lib/CodeBlock.svelte";
+import CodeBlockFw from "$lib/CodeBlockFw.svelte";
+import DocNotebookDropdown from "$lib/DocNotebookDropdown.svelte";
+import CourseFloatingBanner from "$lib/CourseFloatingBanner.svelte";
+import IconCopyLink from "$lib/IconCopyLink.svelte";
+import FrameworkContent from "$lib/FrameworkContent.svelte";
+import Markdown from "$lib/Markdown.svelte";
+import Question from "$lib/Question.svelte";
+import FrameworkSwitchCourse from "$lib/FrameworkSwitchCourse.svelte";
+import InferenceApi from "$lib/InferenceApi.svelte";
+import TokenizersLanguageContent from "$lib/TokenizersLanguageContent.svelte";
+import ExampleCodeBlock from "$lib/ExampleCodeBlock.svelte";
+import Added from "$lib/Added.svelte";
+import Changed from "$lib/Changed.svelte";
+import Deprecated from "$lib/Deprecated.svelte";
+import PipelineIcon from "$lib/PipelineIcon.svelte";
+import PipelineTag from "$lib/PipelineTag.svelte";
+import Heading from "$lib/Heading.svelte";
+import HfOptions from "$lib/HfOptions.svelte";
+import HfOption from "$lib/HfOption.svelte";
+import EditOnGithub from "$lib/EditOnGithub.svelte";
+import InferenceSnippet from "$lib/InferenceSnippet/InferenceSnippet.svelte";
+import MermaidChart from "$lib/MermaidChart.svelte";
+let fw: "pt" | "tf" = "pt";
+onMount(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    fw = urlParams.get("fw") || "pt";
+});
+</script>
+<svelte:head>
+  <meta name="hf:doc:metadata" content={metadata} >
+</svelte:head>
+
+<!--HF DOCBUILD BODY START-->
+
+HF_DOC_BODY_START
+
+<CopyLLMTxtMenu containerStyle="float: right; margin-left: 10px; display: inline-flex; position: relative; z-index: 10;"></CopyLLMTxtMenu>
+
+# 相机
+
+相机提供 policy 所看到的图像 observation。每个后端——OpenCV、Intel RealSense、Reachy 2——都
+实现了 `Camera` 接口，因此更换硬件不会改变读取帧的代码。
+
+有关选择与配置相机的说明，请参阅 [相机指南](../cameras)、
+以及针对核心集合之外设备的[第三方相机与传感器](../third_party_sensors)。
+
+## Camera [[lerobot.cameras.Camera]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.cameras.Camera"} anchor={"lerobot.cameras.Camera"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/cameras/camera.py#L26"} parameters={[{"name": "config", "val": ": CameraConfig"}]}>
+<paramsdesc>- **fps** (int | None) -- 配置的每秒帧数
+- **width** (int | None) -- 帧宽（像素）
+- **height** (int | None) -- 帧高（像素）</paramsdesc></Docstring>
+相机实现的基类。
+
+为不同后端的相机操作定义标准接口。
+子类必须实现所有抽象方法。
+
+管理相机的基本属性（FPS、分辨率）和核心操作：
+- 连接/断开连接
+- 帧捕获（同步/异步/最新）
+
+
+
+
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"connect"} anchor={"lerobot.cameras.Camera.connect"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/cameras/camera.py#L99"} parameters={[{"name": "warmup", "val": ": bool = True"}]}>
+<paramsdesc>- **warmup** -- 如果为 True（默认），返回前会捕获一帧预热帧。对于需要时间
+  调整捕获设置的相机很有用。
+  如果为 False，则跳过预热帧。</paramsdesc></Docstring>
+建立与相机的连接。
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"disconnect"} anchor={"lerobot.cameras.Camera.disconnect"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/cameras/camera.py#L181"} parameters={[]}>
+</Docstring>
+断开与相机的连接并释放资源。
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"read"} anchor={"lerobot.cameras.Camera.read"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/cameras/camera.py#L110"} parameters={[]}>
+<rettype>np.ndarray</rettype><retdesc> 捕获的帧，以 numpy 数组形式返回。</retdesc></Docstring>
+同步捕获并返回来自相机的单帧。
+
+这是一个阻塞调用，会等待硬件及其 SDK。
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"async_read"} anchor={"lerobot.cameras.Camera.async_read"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/cameras/camera.py#L121"} parameters={[{"name": "timeout_ms", "val": ": float = Ellipsis"}]}>
+<paramsdesc>- **timeout_ms** -- 等待新帧的最长时间（毫秒）。
+  默认为 200ms（0.2s）。</paramsdesc><rettype>np.ndarray</rettype><retdesc> 捕获的帧，以 numpy 数组形式返回。</retdesc><raises>- 如果在 `timeout_ms` 内没有新帧到达，则抛出 ``TimeoutError``。</raises><raisederrors>``TimeoutError``</raisederrors></Docstring>
+返回最新的新帧。
+
+此方法获取后台线程捕获的最新帧。
+如果缓冲区中已有新帧可用（自上次调用以来捕获的），
+它会立即返回。
+
+仅当缓冲区为空或最新帧
+已被上一次 `async_read` 调用消耗时，它才会阻塞至多 `timeout_ms`。
+
+本质上，此方法返回最新的未消耗帧，必要时会等待
+新帧在指定超时时间内到达。
+
+用法：
+- 非常适合控制环路，因为它能确保每个被处理的帧
+都是新鲜的，从而有效地让你的循环与相机的 FPS 同步。
+- 超时的常见原因包括：相机 FPS 极低、处理负载过重、
+或相机已断开连接。
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"find_cameras"} anchor={"lerobot.cameras.Camera.find_cameras"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/cameras/camera.py#L89"} parameters={[]}>
+<rettype>List[Dict[str, Any]]</rettype><retdesc> 字典列表，
+其中每个字典包含有关检测到的相机的信息。</retdesc></Docstring>
+检测连接到系统的可用相机。
+
+
+
+
+
+</div></div>
+
+## CameraConfig [[lerobot.cameras.CameraConfig]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.cameras.CameraConfig"} anchor={"lerobot.cameras.CameraConfig"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/cameras/configs.py#L60"} parameters={[{"name": "fps", "val": ": int | None = None"}, {"name": "width", "val": ": int | None = None"}, {"name": "height", "val": ": int | None = None"}]}>
+</Docstring>
+
+
+</div>
+
+## make_cameras_from_configs [[lerobot.cameras.make_cameras_from_configs]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"lerobot.cameras.make_cameras_from_configs"} anchor={"lerobot.cameras.make_cameras_from_configs"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/cameras/utils.py#L25"} parameters={[{"name": "camera_configs", "val": ": dict"}]}>
+</Docstring>
+
+
+</div>
+
+
+<EditOnGithub source="https://github.com/huggingface/lerobot/blob/main/docs/source/api/cameras.mdx" />
+
+<!--HF DOCBUILD BODY END-->
+
+HF_DOC_BODY_END
+

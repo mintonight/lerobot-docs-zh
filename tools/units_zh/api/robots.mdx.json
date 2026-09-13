@@ -1,0 +1,573 @@
+{
+ "file": "api/robots.mdx",
+ "units": [
+  {
+   "id": 0,
+   "zh": "# 机器人"
+  },
+  {
+   "id": 1,
+   "zh": "LeRobot 中的每个机器人都实现了 ⟦0⟧ 接口：连接、读取 observation、发送 action、\n断开连接。针对该接口编写 policy 或录制脚本，意味着它无需修改即可适用于任何受支持的\n机械臂。"
+  },
+  {
+   "id": 2,
+   "zh": "本页是生成的参考文档。关于接线、calibration 和首次运行的说明，请从\n硬件指南开始——[SO-101](⟦0⟧)、[LeKiwi](⟦1⟧)、[Hope Jr](⟦2⟧)、[Reachy 2](⟦3⟧)、\n[OpenArm](⟦4⟧)——或查看[机器人模仿学习](⟦5⟧)了解端到端工作流程。要添加\n你自己的机器人，请参阅[接入你自己的硬件](⟦6⟧)。"
+  },
+  {
+   "id": 3,
+   "zh": "## Robot ⟦0⟧"
+  },
+  {
+   "id": 4,
+   "zh": "抽象基类。子类实现下面的每个方法；这里描述的契约是\npolicy 或录制循环可以依赖的。"
+  },
+  {
+   "id": 5,
+   "zh": "⟦0⟧- **config_class** (RobotConfig) -- 此机器人预期的配置类。\n- **name** (str) -- 用于标识此机器人类型的唯一机器人名称。⟦1⟧⟦2⟧"
+  },
+  {
+   "id": 6,
+   "zh": "所有与 LeRobot 兼容的机器人的基础抽象类。"
+  },
+  {
+   "id": 7,
+   "zh": "此类提供了用于与物理机器人交互的标准化接口。\n子类必须实现所有抽象方法和属性才能使用。"
+  },
+  {
+   "id": 8,
+   "zh": "⟦0⟧- **calibrate** (bool) -- 如果为 True，则在连接后，如果机器人未\n  calibration 或需要 calibrate，则自动对其进行 calibration（这取决于硬件）。⟦1⟧⟦2⟧"
+  },
+  {
+   "id": 9,
+   "zh": "与机器人建立通信。"
+  },
+  {
+   "id": 10,
+   "zh": "⟦0⟧\n与机器人断开连接并执行任何必要的清理。"
+  },
+  {
+   "id": 11,
+   "zh": "对机器人应用任何一次性或运行时配置。\n这可能包括设置电机参数、控制模式或初始 state。"
+  },
+  {
+   "id": 12,
+   "zh": "如适用则 calibrate 机器人。否则，这应为空操作。"
+  },
+  {
+   "id": 13,
+   "zh": "此方法应收集任何必要的数据（例如电机偏移量），并相应更新\n:pyattr:⟦0⟧ 字典。"
+  },
+  {
+   "id": 14,
+   "zh": "⟦0⟧⟦1⟧ 表示机器人当前感官 state 的扁平字典。其结构\n应与 :pymeth:⟦2⟧ 匹配。⟦3⟧⟦4⟧"
+  },
+  {
+   "id": 15,
+   "zh": "从机器人检索当前 observation。"
+  },
+  {
+   "id": 16,
+   "zh": "⟦0⟧- **action** (RobotAction) -- 表示期望 action 的字典。其结构应与\n  :pymeth:⟦1⟧ 匹配。⟦2⟧⟦3⟧⟦4⟧ 实际发送给电机、可能被裁剪或修改的 action，例如受"
+  },
+  {
+   "id": 17,
+   "zh": "速度安全限制。⟦0⟧⟦1⟧"
+  },
+  {
+   "id": 18,
+   "zh": "向机器人发送 action 命令。"
+  },
+  {
+   "id": 19,
+   "zh": "描述机器人所产生 observation 的结构和类型的字典。\n其结构（键）应与 :pymeth:⟦0⟧ 返回的结构匹配。\n该字典的值应为以下之一："
+  },
+  {
+   "id": 20,
+   "zh": "- 如果值是简单值，则为该值的类型，例如单一本体感受值（关节的位置/速度）用 ⟦0⟧"
+  },
+  {
+   "id": 21,
+   "zh": "- 如果值是数组类型，则表示形状的元组，例如图像用 ⟦0⟧"
+  },
+  {
+   "id": 22,
+   "zh": "注意：无论机器人是否已连接，都应能调用此属性。"
+  },
+  {
+   "id": 23,
+   "zh": "描述机器人所期望 action 的结构和类型的字典。其结构\n（键）应与传递给 :pymeth:⟦0⟧ 的结构匹配。该字典的值\n应为：如果值是简单值，则为该值的类型，例如单一本体感受值\n（关节的目标位置/速度）用 ⟦1⟧"
+  },
+  {
+   "id": 24,
+   "zh": "注意：无论机器人是否已连接，都应能调用此属性。"
+  },
+  {
+   "id": 25,
+   "zh": "机器人当前是否已连接。如果为 ⟦0⟧，调用 :pymeth:⟦1⟧ 或\n:pymeth:⟦2⟧ 应抛出错误。"
+  },
+  {
+   "id": 26,
+   "zh": "⟦0⟧\n机器人当前是否已 calibration。如不适用，应始终为 ⟦1⟧"
+  },
+  {
+   "id": 27,
+   "zh": "## RobotConfig ⟦0⟧"
+  },
+  {
+   "id": 28,
+   "zh": "## make_robot_from_config ⟦0⟧"
+  },
+  {
+   "id": 29,
+   "zh": "## SO-100 和 SO-101 follower arm ⟦0⟧"
+  },
+  {
+   "id": 30,
+   "zh": "⟦0⟧ 和 ⟦1⟧ 是同一个 ⟦2⟧ 类的别名；这两款机械臂的区别在于它们的\n配置，而非控制代码。⟦3⟧ 和 ⟦4⟧ 同样是 ⟦5⟧ 的\n别名。"
+  },
+  {
+   "id": 31,
+   "zh": "通用 SO follower arm 基类，实现了 SO-100/101/10X 的通用功能。\n设计为通过每种硬件型号的 ⟦0⟧ 和 ⟦1⟧ 进行子类化。"
+  },
+  {
+   "id": 32,
+   "zh": "我们假设在连接时，机械臂处于静止位置，\n并且可以安全地禁用力矩以运行 calibration。"
+  },
+  {
+   "id": 33,
+   "zh": "⟦0⟧⟦1⟧ 发送给电机、可能被裁剪的 action。⟦2⟧⟦3⟧- ⟦4⟧ -- 如果机器人未连接。⟦5⟧⟦6⟧⟦7⟧\n命令机械臂移动到目标关节配置。"
+  },
+  {
+   "id": 34,
+   "zh": "relative action 幅度可能会根据配置参数\n⟦0⟧ 进行裁剪。在这种情况下，发送的 action 与原始 action 不同。\n因此，此函数始终返回实际发送的 action。"
+  },
+  {
+   "id": 35,
+   "zh": "## BiSOFollower ⟦0⟧"
+  },
+  {
+   "id": 36,
+   "zh": "两个 SO follower arm 作为一个双臂机器人驱动。"
+  },
+  {
+   "id": 37,
+   "zh": "由 TheRobotStudio 设计的[双臂 SO follower arm](⟦0⟧)"
+  },
+  {
+   "id": 38,
+   "zh": "⟦0⟧\nBi SO Follower 机器人的配置类。"
+  },
+  {
+   "id": 39,
+   "zh": "## KochFollower ⟦0⟧"
+  },
+  {
+   "id": 40,
+   "zh": "- [Koch v1.0](⟦0⟧)，包含与不包含腕到肘\n  扩展件，由 [Tau Robotics](⟦1⟧) 的 Alexander Koch 开发"
+  },
+  {
+   "id": 41,
+   "zh": "- [Koch v1.1](⟦0⟧)，由 Jess Moss 开发"
+  },
+  {
+   "id": 42,
+   "zh": "我们假设在连接时，机械臂处于静止位置，\n并且可以安全地禁用力矩以运行 calibration。"
+  },
+  {
+   "id": 43,
+   "zh": "⟦0⟧- **action** (RobotAction) -- 电机的目标位置。⟦1⟧⟦2⟧⟦3⟧ 发送给电机、可能被裁剪的 action。⟦4⟧⟦5⟧"
+  },
+  {
+   "id": 44,
+   "zh": "命令机械臂移动到目标关节配置。"
+  },
+  {
+   "id": 45,
+   "zh": "relative action 幅度可能会根据配置参数\n⟦0⟧ 进行裁剪。在这种情况下，发送的 action 与原始 action 不同。\n因此，此函数始终返回实际发送的 action。"
+  },
+  {
+   "id": 46,
+   "zh": "## LeKiwi ⟦0⟧"
+  },
+  {
+   "id": 47,
+   "zh": "⟦0⟧ 在机器人本身上运行。⟦1⟧ 是主机端代理，它通过网络与其通信\n并呈现相同的 ⟦2⟧ 接口。"
+  },
+  {
+   "id": 48,
+   "zh": "该机器人包含一个三轮全向移动底座和一个远程 follower arm。\nleader arm 本地连接（在笔记本电脑上），其关节位置被记录，然后\n（在应用安全钳制后）转发给远程 follower arm。\n同时，使用键盘 teleoperation 为轮子生成原始速度命令。"
+  },
+  {
+   "id": 49,
+   "zh": "⟦0⟧⟦1⟧ 发送给电机、可能被裁剪的 action。⟦2⟧⟦3⟧- ⟦4⟧ -- 如果机器人未连接。⟦5⟧⟦6⟧⟦7⟧\n命令 LeKiwi 移动到目标关节配置。"
+  },
+  {
+   "id": 50,
+   "zh": "relative action 幅度可能会根据配置参数\n⟦0⟧ 进行裁剪。在这种情况下，发送的 action 与原始 action 不同。\n因此，此函数始终返回实际发送的 action。"
+  },
+  {
+   "id": 51,
+   "zh": "⟦0⟧\n与远程移动机器人建立 ZMQ 套接字"
+  },
+  {
+   "id": 52,
+   "zh": "⟦0⟧\n清理 ZMQ 通信"
+  },
+  {
+   "id": 53,
+   "zh": "从远程机器人捕获 observation：当前 follower arm 位置、\n当前轮速（转换为机体坐标系速度：x、y、theta），\n以及一帧相机画面。通过 ZMQ 接收，并转换为机体坐标系速度"
+  },
+  {
+   "id": 54,
+   "zh": "⟦0⟧- **action** (RobotAction) -- 包含电机目标位置的数组。⟦1⟧⟦2⟧⟦3⟧ 发送给电机、可能被裁剪的 action。⟦4⟧⟦5⟧- ⟦6⟧ -- 如果机器人未连接。⟦7⟧⟦8⟧⟦9⟧"
+  },
+  {
+   "id": 55,
+   "zh": "命令 LeKiwi 移动到目标关节配置。转换为电机空间并通过 ZMQ 发送"
+  },
+  {
+   "id": 56,
+   "zh": "## OpenArmFollower ⟦0⟧"
+  },
+  {
+   "id": 57,
+   "zh": "OpenArms follower arm 机器人，使用 CAN 总线通信控制带 gripper 的 7 自由度机械臂。\n该机械臂使用 MIT 控制模式下的 Damiao 电机。"
+  },
+  {
+   "id": 58,
+   "zh": "为 OpenArms 机器人运行 calibration 程序。"
+  },
+  {
+   "id": 59,
+   "zh": "calibration 程序："
+  },
+  {
+   "id": 60,
+   "zh": "1. 禁用力矩"
+  },
+  {
+   "id": 61,
+   "zh": "2. 要求用户将机械臂置于下垂位置并闭合 gripper"
+  },
+  {
+   "id": 62,
+   "zh": "3. 将此设置为零位"
+  },
+  {
+   "id": 63,
+   "zh": "4. 记录每个关节的运动范围"
+  },
+  {
+   "id": 64,
+   "zh": "5. 保存 calibration"
+  },
+  {
+   "id": 65,
+   "zh": "⟦0⟧\n使用适当的设置配置电机。"
+  },
+  {
+   "id": 66,
+   "zh": "连接到机器人并可选择进行 calibration。"
+  },
+  {
+   "id": 67,
+   "zh": "我们假设在连接时，机械臂处于安全的静止位置，\n并且如果需要，可以安全地禁用力矩以运行 calibration。"
+  },
+  {
+   "id": 68,
+   "zh": "⟦0⟧\n与机器人断开连接。"
+  },
+  {
+   "id": 69,
+   "zh": "从机器人获取当前 observation，包括位置、速度和力矩。"
+  },
+  {
+   "id": 70,
+   "zh": "在一次 CAN 刷新周期内读取所有电机 state（位置/速度/力矩），\n而不是进行 3 次单独的读取。"
+  },
+  {
+   "id": 71,
+   "zh": "⟦0⟧- **action** -- 包含电机位置的字典（例如 \"joint_1.pos\"、\"joint_2.pos\"）\n- **custom_kp** -- 可选的每个电机自定义 kp 增益（例如 ⟦1⟧）\n- **custom_kd** -- 可选的每个电机自定义 kd 增益（例如 ⟦2⟧）⟦3⟧⟦4⟧ 实际发送的 action（可能被裁剪）⟦5⟧⟦6⟧"
+  },
+  {
+   "id": 72,
+   "zh": "向机器人发送 action 命令。"
+  },
+  {
+   "id": 73,
+   "zh": "action 幅度可能会根据安全限制被裁剪。"
+  },
+  {
+   "id": 74,
+   "zh": "## BiOpenArmFollower ⟦0⟧"
+  },
+  {
+   "id": 75,
+   "zh": "双臂 OpenArm follower arm"
+  },
+  {
+   "id": 76,
+   "zh": "⟦0⟧\nBi OpenArm Follower 机器人的配置类。"
+  },
+  {
+   "id": 77,
+   "zh": "## OmxFollower ⟦0⟧"
+  },
+  {
+   "id": 78,
+   "zh": "- [OMX](⟦0⟧)，\n  扩展件，由 [ROBOTIS](⟦1⟧) 的 Woojin Wie 和 Junha Cha 开发"
+  },
+  {
+   "id": 79,
+   "zh": "对于出厂已 calibration 的 OMX 机器人："
+  },
+  {
+   "id": 80,
+   "zh": "- 如果软件包中的默认 calibration 与电机不匹配，则从电机读取并保存"
+  },
+  {
+   "id": 81,
+   "zh": "- 这样就能使用预 calibration 的机器人，无需手动 calibrate"
+  },
+  {
+   "id": 82,
+   "zh": "- 如果不存在 calibration 文件，则使用出厂默认值（homing_offset=0、range_min=0、range_max=4095）"
+  },
+  {
+   "id": 83,
+   "zh": "⟦0⟧- **action** (RobotAction) -- 电机的目标位置。⟦1⟧⟦2⟧⟦3⟧ 发送给电机、可能被裁剪的 action。⟦4⟧⟦5⟧"
+  },
+  {
+   "id": 84,
+   "zh": "命令机械臂移动到目标关节配置。"
+  },
+  {
+   "id": 85,
+   "zh": "relative action 幅度可能会根据配置参数\n⟦0⟧ 进行裁剪。在这种情况下，发送的 action 与原始 action 不同。\n因此，此函数始终返回实际发送的 action。"
+  },
+  {
+   "id": 86,
+   "zh": "## Reachy2Robot ⟦0⟧"
+  },
+  {
+   "id": 87,
+   "zh": "[Reachy 2](⟦0⟧)，由 Pollen Robotics 开发。"
+  },
+  {
+   "id": 88,
+   "zh": "## UnitreeG1 ⟦0⟧"
+  },
+  {
+   "id": 89,
+   "zh": "## Hope Jr ⟦0⟧"
+  },
+  {
+   "id": 90,
+   "zh": "Hope Jr 人形机器人以两个独立的机器人形式呈现：一个臂和一个手。"
+  },
+  {
+   "id": 91,
+   "zh": "我们假设在连接时，机械臂处于静止位置，\n并且可以安全地禁用力矩以运行 calibration。"
+  },
+  {
+   "id": 92,
+   "zh": "## RebotB601Follower ⟦0⟧"
+  },
+  {
+   "id": 93,
+   "zh": "⟦0⟧\nSeeed Studio reBot B601-DM follower arm（6 自由度 + gripper，Damiao CAN 电机）。"
+  },
+  {
+   "id": 94,
+   "zh": "电机通信由 ⟦0⟧ 软件包通过 CAN 总线处理，\n可通过 Damiao 串行桥接器或 SocketCAN 适配器接入。"
+  },
+  {
+   "id": 95,
+   "zh": "⟦0⟧\n禁用电机的力矩，以便可以用手移动机械臂（只读调试）。"
+  },
+  {
+   "id": 96,
+   "zh": "⟦0⟧\n命令机械臂移动到目标关节配置。"
+  },
+  {
+   "id": 97,
+   "zh": "位置以度为单位表示。relative action 幅度可能会\n根据 ⟦0⟧ 被裁剪，因此始终返回实际发送的\naction。"
+  },
+  {
+   "id": 98,
+   "zh": "⟦0⟧\nreBot B601-DM follower arm 机器人注册的配置。"
+  },
+  {
+   "id": 99,
+   "zh": "## BiRebotB601Follower ⟦0⟧"
+  },
+  {
+   "id": 100,
+   "zh": "⟦0⟧\n双臂 Seeed Studio reBot B601-DM follower arm。"
+  },
+  {
+   "id": 101,
+   "zh": "组合两个单臂 ⟦0⟧ 实例。每个臂的 observation 和\naction 键都带有 ⟦1⟧ / ⟦2⟧ 前缀命名空间。"
+  },
+  {
+   "id": 102,
+   "zh": "⟦0⟧\n双臂 reBot B601-DM follower arm 机器人的配置类。"
+  },
+  {
+   "id": 103,
+   "zh": "## EarthRoverMiniPlus ⟦0⟧"
+  },
+  {
+   "id": 104,
+   "zh": "⟦0⟧- **config** -- 机器人配置\n- **sdk_base_url** -- Frodobots SDK 服务器的基础 URL，取自\n  ⟦1⟧（默认：⟦2⟧）⟦3⟧⟦4⟧"
+  },
+  {
+   "id": 105,
+   "zh": "通过 Frodobots SDK HTTP API 控制的 EarthRover Mini Plus 机器人。"
+  },
+  {
+   "id": 106,
+   "zh": "该机器人通过 Frodobots SDK 使用基于云的控制，而非直接的\n硬件连接。相机通过 Agora 云经 WebRTC 传输，控制\n命令通过 HTTP POST 请求发送。"
+  },
+  {
+   "id": 107,
+   "zh": "该机器人支持："
+  },
+  {
+   "id": 108,
+   "zh": "- 通过 SDK HTTP 端点访问的双相机（前和后）"
+  },
+  {
+   "id": 109,
+   "zh": "- 线速度和角速度控制"
+  },
+  {
+   "id": 110,
+   "zh": "- 电池和方向遥测"
+  },
+  {
+   "id": 111,
+   "zh": "⟦0⟧\n基于 SDK 的机器人无需 calibration。"
+  },
+  {
+   "id": 112,
+   "zh": "⟦0⟧\n配置机器人（对基于 SDK 的机器人为空操作）。"
+  },
+  {
+   "id": 113,
+   "zh": "⟦0⟧- **calibrate** -- 不用于基于 SDK 的机器人（为 API 兼容性而保留）⟦1⟧⟦2⟧- ⟦3⟧ -- 如果机器人已连接"
+  },
+  {
+   "id": 114,
+   "zh": "- ⟦0⟧ -- 如果无法连接到 SDK 服务器 ⟦1⟧⟦2⟧⟦3⟧\n通过 Frodobots SDK 连接到机器人。"
+  },
+  {
+   "id": 115,
+   "zh": "⟦0⟧- ⟦1⟧ -- 如果机器人未连接 ⟦2⟧⟦3⟧⟦4⟧"
+  },
+  {
+   "id": 116,
+   "zh": "与机器人断开连接。"
+  },
+  {
+   "id": 117,
+   "zh": "停止机器人并关闭与 SDK 的连接。"
+  },
+  {
+   "id": 118,
+   "zh": "⟦0⟧⟦1⟧ 包含以下内容的 observation："
+  },
+  {
+   "id": 119,
+   "zh": "- front：RGB 格式的前相机图像 (480, 640, 3)"
+  },
+  {
+   "id": 120,
+   "zh": "- rear：RGB 格式的后相机图像 (480, 640, 3)"
+  },
+  {
+   "id": 121,
+   "zh": "- speed: float - 当前速度（原始 SDK 值）"
+  },
+  {
+   "id": 122,
+   "zh": "- battery_level: float - 电池电量 (0-100)"
+  },
+  {
+   "id": 123,
+   "zh": "- orientation: float - 机器人方向（以度为单位）"
+  },
+  {
+   "id": 124,
+   "zh": "- gps_latitude: float - GPS 纬度坐标"
+  },
+  {
+   "id": 125,
+   "zh": "- gps_longitude: float - GPS 经度坐标"
+  },
+  {
+   "id": 126,
+   "zh": "- gps_signal: float - GPS 信号强度（百分比）"
+  },
+  {
+   "id": 127,
+   "zh": "- signal_level: float - 网络信号级别 (0-5)"
+  },
+  {
+   "id": 128,
+   "zh": "- vibration: float - 振动传感器读数"
+  },
+  {
+   "id": 129,
+   "zh": "- lamp: float - 灯的 state（0=关，1=开）"
+  },
+  {
+   "id": 130,
+   "zh": "- accelerometer_x/y/z: float - 加速度计各轴（原始 SDK 值）"
+  },
+  {
+   "id": 131,
+   "zh": "- gyroscope_x/y/z: float - 陀螺仪各轴（原始 SDK 值）"
+  },
+  {
+   "id": 132,
+   "zh": "- magnetometer_filtered_x/y/z: float - 磁力计各轴（原始 SDK 值）"
+  },
+  {
+   "id": 133,
+   "zh": "- wheel_rpm_0/1/2/3: float - 轮子转速 ⟦0⟧⟦1⟧- ⟦2⟧ -- 如果机器人未连接 ⟦3⟧⟦4⟧⟦5⟧\n从 SDK 获取当前机器人 observation。"
+  },
+  {
+   "id": 134,
+   "zh": "相机帧从 SDK 端点 /v2/front 和 /v2/rear 检索。\n帧从 base64 解码，并从 BGR 格式转换为 RGB 格式。\n机器人遥测从 /data 端点检索。\n传感器数组（加速度计、陀螺仪、磁力计、转速）各自包含形式为\n[values..., timestamp] 的条目；使用每个数组中最新的读数。"
+  },
+  {
+   "id": 135,
+   "zh": "注意：\n相机帧从 SDK 端点 /v2/front 和 /v2/rear 检索。\n帧从 base64 解码，并从 BGR 格式转换为 RGB 格式。\n机器人遥测从 /data 端点检索。\n所有 SDK 值都被归一化到适合 dataset 记录的范围内。"
+  },
+  {
+   "id": 136,
+   "zh": "⟦0⟧- **action** -- 包含以下键的 action 字典：\n  - linear_velocity：目标线速度 (-1 至 1)\n  - angular_velocity：目标角速度 (-1 至 1)⟦1⟧⟦2⟧⟦3⟧ 已发送的 action（与 action_features 键匹配）⟦4⟧⟦5⟧- ⟦6⟧ -- 如果机器人未连接 ⟦7⟧⟦8⟧⟦9⟧"
+  },
+  {
+   "id": 137,
+   "zh": "通过 SDK 向机器人发送 action。"
+  },
+  {
+   "id": 138,
+   "zh": "注意：\naction 通过 POST /control 端点发送到 SDK。\nSDK 期望命令在 [-1, 1] 范围内。"
+  },
+  {
+   "id": 139,
+   "zh": "⟦0⟧- **sdk_url** -- Frodobots SDK 服务器的 URL（默认：⟦1⟧）⟦2⟧⟦3⟧"
+  },
+  {
+   "id": 140,
+   "zh": "使用 Frodobots SDK 的 EarthRover Mini Plus 机器人配置。"
+  },
+  {
+   "id": 141,
+   "zh": "该机器人通过 Frodobots SDK HTTP API 使用基于云的控制。\n相机帧通过 SDK HTTP 端点直接访问。"
+  }
+ ]
+}

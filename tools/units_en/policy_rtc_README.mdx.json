@@ -1,0 +1,65 @@
+{
+ "file": "policy_rtc_README.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1950,
+   "text": "# Real-Time Chunking (RTC)",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1952,
+   "end": 2094,
+   "text": "This module contains the LeRobot implementation of **Real-Time Chunking (RTC)**, an inference-time technique for flow-matching based policies.",
+   "tokens": []
+  },
+  {
+   "id": 2,
+   "kind": "para",
+   "start": 2096,
+   "end": 2285,
+   "text": "**Note**: RTC is not a policy itself, but rather an inference enhancement that works with flow-matching based policies including [π₀](⟦0⟧), [π₀.₅](⟦1⟧), and [SmolVLA](⟦2⟧).",
+   "tokens": [
+    "../pi0/",
+    "../pi05/",
+    "../smolvla/"
+   ]
+  },
+  {
+   "id": 3,
+   "kind": "heading",
+   "start": 2292,
+   "end": 2303,
+   "text": "## Citation",
+   "tokens": []
+  },
+  {
+   "id": 4,
+   "kind": "para",
+   "start": 2305,
+   "end": 2361,
+   "text": "If you use Real-Time Chunking in your work, please cite:",
+   "tokens": []
+  },
+  {
+   "id": 5,
+   "kind": "heading",
+   "start": 3017,
+   "end": 3027,
+   "text": "## License",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "para",
+   "start": 3029,
+   "end": 3121,
+   "text": "This implementation follows the **Apache 2.0 License**, consistent with the LeRobot project.",
+   "tokens": []
+  }
+ ]
+}

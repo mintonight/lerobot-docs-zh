@@ -1,0 +1,479 @@
+{
+ "file": "robocasa.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1937,
+   "text": "# RoboCasa365",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1939,
+   "end": 2306,
+   "text": "[RoboCasa365](⟦0⟧) is a large-scale simulation framework for training and benchmarking **generalist robots** in everyday kitchen tasks. It ships 365 diverse manipulation tasks across 2,500 kitchen environments, 3,200+ object assets and 600+ hours of human demonstration data, on a PandaOmron 12-DOF mobile manipulator (Franka arm on a holonomic base).",
+   "tokens": [
+    "https://robocasa.ai"
+   ]
+  },
+  {
+   "id": 2,
+   "kind": "list",
+   "start": 2308,
+   "end": 2425,
+   "text": "- Paper: [RoboCasa: Large-Scale Simulation of Everyday Tasks for Generalist Robots](⟦0⟧)",
+   "tokens": [
+    "https://arxiv.org/abs/2406.02523"
+   ]
+  },
+  {
+   "id": 3,
+   "kind": "list",
+   "start": 2426,
+   "end": 2493,
+   "text": "- GitHub: [robocasa/robocasa](⟦0⟧)",
+   "tokens": [
+    "https://github.com/robocasa/robocasa"
+   ]
+  },
+  {
+   "id": 4,
+   "kind": "list",
+   "start": 2494,
+   "end": 2547,
+   "text": "- Project website: [robocasa.ai](⟦0⟧)",
+   "tokens": [
+    "https://robocasa.ai"
+   ]
+  },
+  {
+   "id": 5,
+   "kind": "list",
+   "start": 2548,
+   "end": 2646,
+   "text": "- Pretrained policy: [⟦0⟧](⟦1⟧)",
+   "tokens": [
+    "`lerobot/smolvla_robocasa`",
+    "https://huggingface.co/lerobot/smolvla_robocasa"
+   ]
+  },
+  {
+   "id": 6,
+   "kind": "list",
+   "start": 2647,
+   "end": 2782,
+   "text": "- Single-task dataset (CloseFridge): [⟦0⟧](⟦1⟧)",
+   "tokens": [
+    "`pepijn223/robocasa_CloseFridge`",
+    "https://huggingface.co/datasets/pepijn223/robocasa_CloseFridge"
+   ]
+  },
+  {
+   "id": 7,
+   "kind": "heading",
+   "start": 2961,
+   "end": 2979,
+   "text": "## Available tasks",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "para",
+   "start": 2981,
+   "end": 3130,
+   "text": "RoboCasa365 organizes its 365 tasks into two families and three upstream benchmark groups that LeRobot exposes as first-class ⟦0⟧ shortcuts:",
+   "tokens": [
+    "`--env.task`"
+   ]
+  },
+  {
+   "id": 9,
+   "kind": "table",
+   "start": 3132,
+   "end": 3235,
+   "text": "| Family    | Tasks | Description                                                                     |",
+   "tokens": []
+  },
+  {
+   "id": 10,
+   "kind": "table",
+   "start": 3340,
+   "end": 3443,
+   "text": "| Atomic    | ~65   | Single-skill tasks: pick-and-place, door/drawer manipulation, appliance control |",
+   "tokens": []
+  },
+  {
+   "id": 11,
+   "kind": "table",
+   "start": 3444,
+   "end": 3547,
+   "text": "| Composite | ~300  | Multi-step tasks across 60+ categories: cooking, cleaning, organizing, etc.     |",
+   "tokens": []
+  },
+  {
+   "id": 12,
+   "kind": "para",
+   "start": 3549,
+   "end": 3699,
+   "text": "**Atomic task examples:** ⟦0⟧, ⟦1⟧, ⟦2⟧, ⟦3⟧, ⟦4⟧, ⟦5⟧, ⟦6⟧.",
+   "tokens": [
+    "`CloseFridge`",
+    "`OpenDrawer`",
+    "`OpenCabinet`",
+    "`TurnOnMicrowave`",
+    "`TurnOffStove`",
+    "`NavigateKitchen`",
+    "`PickPlaceCounterToStove`"
+   ]
+  },
+  {
+   "id": 13,
+   "kind": "para",
+   "start": 3701,
+   "end": 3876,
+   "text": "**Composite task categories:** baking, boiling, brewing, chopping, clearing table, defrosting food, loading dishwasher, making tea, microwaving food, washing dishes, and more.",
+   "tokens": []
+  },
+  {
+   "id": 14,
+   "kind": "para",
+   "start": 3878,
+   "end": 3911,
+   "text": "⟦0⟧ accepts three forms:",
+   "tokens": [
+    "`--env.task`"
+   ]
+  },
+  {
+   "id": 15,
+   "kind": "list",
+   "start": 3913,
+   "end": 3949,
+   "text": "- a single task name (⟦0⟧)",
+   "tokens": [
+    "`CloseFridge`"
+   ]
+  },
+  {
+   "id": 16,
+   "kind": "list",
+   "start": 3950,
+   "end": 4021,
+   "text": "- a comma-separated list (⟦0⟧)",
+   "tokens": [
+    "`CloseFridge,OpenBlenderLid,PickPlaceCoffee`"
+   ]
+  },
+  {
+   "id": 17,
+   "kind": "list",
+   "start": 4022,
+   "end": 4270,
+   "text": "- a benchmark-group shortcut — ⟦0⟧, ⟦1⟧, ⟦2⟧, ⟦3⟧, ⟦4⟧, ⟦5⟧, ⟦6⟧ — which auto-expands to the upstream task list and auto-sets the dataset ⟦7⟧ (⟦8⟧ or ⟦9⟧).",
+   "tokens": [
+    "`atomic_seen`",
+    "`composite_seen`",
+    "`composite_unseen`",
+    "`pretrain50`",
+    "`pretrain100`",
+    "`pretrain200`",
+    "`pretrain300`",
+    "`split`",
+    "`target`",
+    "`pretrain`"
+   ]
+  },
+  {
+   "id": 18,
+   "kind": "heading",
+   "start": 4272,
+   "end": 4287,
+   "text": "## Installation",
+   "tokens": []
+  },
+  {
+   "id": 19,
+   "kind": "para",
+   "start": 4289,
+   "end": 4639,
+   "text": "RoboCasa and its dependency ⟦0⟧ are not published on PyPI, and RoboCasa's own ⟦1⟧ hardcodes ⟦2⟧, which conflicts with this repo's ⟦3⟧. LeRobot therefore does **not** expose a ⟦4⟧ extra — install the two packages manually as editable clones (using ⟦5⟧ on ⟦6⟧ to skip its shadowed ⟦7⟧ pin):",
+   "tokens": [
+    "`robosuite`",
+    "`setup.py`",
+    "`lerobot==0.3.3`",
+    "`lerobot`",
+    "`robocasa`",
+    "`--no-deps`",
+    "`robocasa`",
+    "`lerobot`"
+   ]
+  },
+  {
+   "id": 20,
+   "kind": "para",
+   "start": 5644,
+   "end": 5732,
+   "text": "⟦0⟧\nRoboCasa requires MuJoCo. Set the rendering backend before training or evaluation:",
+   "tokens": [
+    "<Tip>"
+   ]
+  },
+  {
+   "id": 21,
+   "kind": "heading",
+   "start": 5813,
+   "end": 5834,
+   "text": "### Object registries",
+   "tokens": []
+  },
+  {
+   "id": 22,
+   "kind": "para",
+   "start": 5836,
+   "end": 6113,
+   "text": "By default the env samples objects only from the ⟦0⟧ registry (what ⟦1⟧ ships), which avoids a ⟦2⟧ crash when the objaverse / aigen packs aren't on disk. If you've downloaded the full asset set, enable the full registry at runtime:",
+   "tokens": [
+    "`lightwheel`",
+    "`--type objs_lw`",
+    "`Probabilities contain NaN`"
+   ]
+  },
+  {
+   "id": 23,
+   "kind": "heading",
+   "start": 6174,
+   "end": 6187,
+   "text": "## Evaluation",
+   "tokens": []
+  },
+  {
+   "id": 24,
+   "kind": "para",
+   "start": 6189,
+   "end": 6546,
+   "text": "All eval snippets below mirror the CI command (see ⟦0⟧). The ⟦1⟧ argument maps RoboCasa's native camera keys (⟦2⟧ / ⟦3⟧ / ⟦4⟧) onto the three-camera (⟦5⟧ / ⟦6⟧ / ⟦7⟧) input layout the released ⟦8⟧ policy was trained on.",
+   "tokens": [
+    "`.github/workflows/benchmark_tests.yml`",
+    "`--rename_map`",
+    "`robot0_agentview_left`",
+    "`robot0_eye_in_hand`",
+    "`robot0_agentview_right`",
+    "`camera1`",
+    "`camera2`",
+    "`camera3`",
+    "`smolvla_robocasa`"
+   ]
+  },
+  {
+   "id": 25,
+   "kind": "para",
+   "start": 6548,
+   "end": 6712,
+   "text": "By default, each task uses the rollout horizon registered by RoboCasa. Set ⟦0⟧ to apply the same explicit horizon to every selected task.",
+   "tokens": [
+    "`--env.episode_length=<steps>`"
+   ]
+  },
+  {
+   "id": 26,
+   "kind": "heading",
+   "start": 6714,
+   "end": 6774,
+   "text": "### Single-task evaluation (recommended for quick iteration)",
+   "tokens": []
+  },
+  {
+   "id": 27,
+   "kind": "heading",
+   "start": 7242,
+   "end": 7267,
+   "text": "### Multi-task evaluation",
+   "tokens": []
+  },
+  {
+   "id": 28,
+   "kind": "para",
+   "start": 7269,
+   "end": 7306,
+   "text": "Pass a comma-separated list of tasks:",
+   "tokens": []
+  },
+  {
+   "id": 29,
+   "kind": "heading",
+   "start": 7826,
+   "end": 7856,
+   "text": "### Benchmark-group evaluation",
+   "tokens": []
+  },
+  {
+   "id": 30,
+   "kind": "para",
+   "start": 7858,
+   "end": 7941,
+   "text": "Run an entire upstream group (e.g. all 18 ⟦0⟧ tasks with ⟦1⟧):",
+   "tokens": [
+    "`atomic_seen`",
+    "`split=target`"
+   ]
+  },
+  {
+   "id": 31,
+   "kind": "heading",
+   "start": 8409,
+   "end": 8444,
+   "text": "### Recommended evaluation episodes",
+   "tokens": []
+  },
+  {
+   "id": 32,
+   "kind": "para",
+   "start": 8446,
+   "end": 8549,
+   "text": "**20 episodes per task** for reproducible benchmarking. Matches the protocol used in published results.",
+   "tokens": []
+  },
+  {
+   "id": 33,
+   "kind": "heading",
+   "start": 8551,
+   "end": 8579,
+   "text": "## Policy inputs and outputs",
+   "tokens": []
+  },
+  {
+   "id": 34,
+   "kind": "para",
+   "start": 8581,
+   "end": 8649,
+   "text": "**Observations** (raw RoboCasa camera names are preserved verbatim):",
+   "tokens": []
+  },
+  {
+   "id": 35,
+   "kind": "list",
+   "start": 8651,
+   "end": 8815,
+   "text": "- ⟦0⟧ — 16-dim proprioceptive state (base position, base quaternion, relative end-effector position, relative end-effector quaternion, gripper qpos)",
+   "tokens": [
+    "`observation.state`"
+   ]
+  },
+  {
+   "id": 36,
+   "kind": "list",
+   "start": 8816,
+   "end": 8897,
+   "text": "- ⟦0⟧ — left agent view, 256×256 HWC uint8",
+   "tokens": [
+    "`observation.images.robot0_agentview_left`"
+   ]
+  },
+  {
+   "id": 37,
+   "kind": "list",
+   "start": 8898,
+   "end": 8978,
+   "text": "- ⟦0⟧ — wrist camera view, 256×256 HWC uint8",
+   "tokens": [
+    "`observation.images.robot0_eye_in_hand`"
+   ]
+  },
+  {
+   "id": 38,
+   "kind": "list",
+   "start": 8979,
+   "end": 9062,
+   "text": "- ⟦0⟧ — right agent view, 256×256 HWC uint8",
+   "tokens": [
+    "`observation.images.robot0_agentview_right`"
+   ]
+  },
+  {
+   "id": 39,
+   "kind": "para",
+   "start": 9064,
+   "end": 9076,
+   "text": "**Actions:**",
+   "tokens": []
+  },
+  {
+   "id": 40,
+   "kind": "list",
+   "start": 9078,
+   "end": 9240,
+   "text": "- Continuous control in ⟦0⟧ — base motion (4D) + control mode (1D) + end-effector position (3D) + end-effector rotation (3D) + gripper (1D).",
+   "tokens": [
+    "`Box(-1, 1, shape=(12,))`"
+   ]
+  },
+  {
+   "id": 41,
+   "kind": "heading",
+   "start": 9242,
+   "end": 9253,
+   "text": "## Training",
+   "tokens": []
+  },
+  {
+   "id": 42,
+   "kind": "heading",
+   "start": 9255,
+   "end": 9278,
+   "text": "### Single-task example",
+   "tokens": []
+  },
+  {
+   "id": 43,
+   "kind": "para",
+   "start": 9280,
+   "end": 9429,
+   "text": "A ready-to-use single-task dataset is on the Hub:\n[⟦0⟧](⟦1⟧).",
+   "tokens": [
+    "`pepijn223/robocasa_CloseFridge`",
+    "https://huggingface.co/datasets/pepijn223/robocasa_CloseFridge"
+   ]
+  },
+  {
+   "id": 44,
+   "kind": "para",
+   "start": 9431,
+   "end": 9473,
+   "text": "Fine-tune a SmolVLA base on ⟦0⟧:",
+   "tokens": [
+    "`CloseFridge`"
+   ]
+  },
+  {
+   "id": 45,
+   "kind": "para",
+   "start": 9947,
+   "end": 9981,
+   "text": "Evaluate the resulting checkpoint:",
+   "tokens": []
+  },
+  {
+   "id": 46,
+   "kind": "heading",
+   "start": 10167,
+   "end": 10199,
+   "text": "## Reproducing published results",
+   "tokens": []
+  },
+  {
+   "id": 47,
+   "kind": "para",
+   "start": 10201,
+   "end": 10541,
+   "text": "The released checkpoint [⟦0⟧](⟦1⟧) is evaluated with the commands in the [Evaluation](⟦2⟧) section. CI runs a 10-atomic-task smoke eval (one episode each) on every PR touching the benchmark, picking fixture-centric tasks that don't require the objaverse asset pack.",
+   "tokens": [
+    "`lerobot/smolvla_robocasa`",
+    "https://huggingface.co/lerobot/smolvla_robocasa",
+    "#evaluation"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,367 @@
+{
+ "file": "omx.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1929,
+   "text": "# OMX",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "heading",
+   "start": 2076,
+   "end": 2107,
+   "text": "## Order and Assemble the parts",
+   "tokens": []
+  },
+  {
+   "id": 2,
+   "kind": "para",
+   "start": 2109,
+   "end": 2180,
+   "text": "First, assemble the OMX hardware following the official assembly guide.",
+   "tokens": []
+  },
+  {
+   "id": 3,
+   "kind": "para",
+   "start": 2182,
+   "end": 2252,
+   "text": "OMX Assembly Guide: ⟦0⟧",
+   "tokens": [
+    "https://ai.robotis.com/omx/assembly_guide_omx.html"
+   ]
+  },
+  {
+   "id": 4,
+   "kind": "para",
+   "start": 2254,
+   "end": 2458,
+   "text": "OMX robots are shipped preconfigured from the factory. Motor IDs, communication parameters, and joint offsets are already set, so no additional motor setup or calibration is required before using LeRobot.",
+   "tokens": []
+  },
+  {
+   "id": 5,
+   "kind": "heading",
+   "start": 2460,
+   "end": 2480,
+   "text": "## Install LeRobot 🤗",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "para",
+   "start": 2482,
+   "end": 2549,
+   "text": "To install LeRobot, follow our [Installation Guide](⟦0⟧)",
+   "tokens": [
+    "./installation"
+   ]
+  },
+  {
+   "id": 7,
+   "kind": "para",
+   "start": 2551,
+   "end": 2624,
+   "text": "In addition to these instructions, you need to install the Dynamixel SDK:",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "heading",
+   "start": 2669,
+   "end": 2689,
+   "text": "## Connect the robot",
+   "tokens": []
+  },
+  {
+   "id": 9,
+   "kind": "para",
+   "start": 2691,
+   "end": 2752,
+   "text": "To find the port for each bus servo adapter, run this script:",
+   "tokens": []
+  },
+  {
+   "id": 10,
+   "kind": "para",
+   "start": 2785,
+   "end": 3063,
+   "text": "This command runs and when prompted, disconnect the USB cable from either the leader or follower arm and press Enter. The output will show 'The port of this MotorsBus is [port]'. This identifies the port for the disconnected arm. Repeat for the other arm to identify both ports.",
+   "tokens": []
+  },
+  {
+   "id": 11,
+   "kind": "para",
+   "start": 3113,
+   "end": 3137,
+   "text": "Example output on macOS:",
+   "tokens": []
+  },
+  {
+   "id": 12,
+   "kind": "para",
+   "start": 3485,
+   "end": 3586,
+   "text": "Where the found port is: ⟦0⟧ corresponding to your leader or follower arm.",
+   "tokens": [
+    "`/dev/tty.usbmodem575E0032081`"
+   ]
+  },
+  {
+   "id": 13,
+   "kind": "para",
+   "start": 3623,
+   "end": 3906,
+   "text": "On Linux, we strongly recommend using udev rules to assign persistent and human-readable device names to the OMX leader and follower arms. This avoids issues where device names such as ttyACM0 and ttyACM1 change when the robot is unplugged, replugged, or when the system is rebooted.",
+   "tokens": []
+  },
+  {
+   "id": 14,
+   "kind": "heading",
+   "start": 3908,
+   "end": 3947,
+   "text": "#### 1. Find your device serial numbers",
+   "tokens": []
+  },
+  {
+   "id": 15,
+   "kind": "para",
+   "start": 3949,
+   "end": 4281,
+   "text": "You should have obtained the port numbers like ../../ttyACM? for the leader and follower using ⟦0⟧. You can match those results with the serial numbers using the ⟦1⟧ command.\nTo create udev rules, you need the unique serial number for each OMX device. The easiest way is to list devices under:",
+   "tokens": [
+    "`lerobot-find-port`",
+    "`ls -l /dev/serial/by-id/`"
+   ]
+  },
+  {
+   "id": 16,
+   "kind": "para",
+   "start": 4321,
+   "end": 4352,
+   "text": "You will see output similar to:",
+   "tokens": []
+  },
+  {
+   "id": 17,
+   "kind": "para",
+   "start": 4523,
+   "end": 4625,
+   "text": "In each line, the serial number is the long string after ⟦0⟧ and before ⟦1⟧.",
+   "tokens": [
+    "`usb-ROBOTIS_OpenRB-150_`",
+    "`-if00`"
+   ]
+  },
+  {
+   "id": 18,
+   "kind": "para",
+   "start": 4627,
+   "end": 4678,
+   "text": "Follower serial: ⟦0⟧",
+   "tokens": [
+    "`228BDD7B503059384C2E3120FF0A2B19`"
+   ]
+  },
+  {
+   "id": 19,
+   "kind": "para",
+   "start": 4680,
+   "end": 4729,
+   "text": "Leader serial: ⟦0⟧",
+   "tokens": [
+    "`67E1ED68503059384C2E3120FF092234`"
+   ]
+  },
+  {
+   "id": 20,
+   "kind": "heading",
+   "start": 4731,
+   "end": 4759,
+   "text": "#### 2. Create the udev rule",
+   "tokens": []
+  },
+  {
+   "id": 21,
+   "kind": "para",
+   "start": 4761,
+   "end": 4789,
+   "text": "Create a new udev rule file:",
+   "tokens": []
+  },
+  {
+   "id": 22,
+   "kind": "para",
+   "start": 4845,
+   "end": 4933,
+   "text": "Paste the following lines, replacing the serial numbers with the values you found above:",
+   "tokens": []
+  },
+  {
+   "id": 23,
+   "kind": "para",
+   "start": 5182,
+   "end": 5218,
+   "text": "Save the file and reload udev rules:",
+   "tokens": []
+  },
+  {
+   "id": 24,
+   "kind": "para",
+   "start": 5290,
+   "end": 5330,
+   "text": "Now unplug and replug both devices once.",
+   "tokens": []
+  },
+  {
+   "id": 25,
+   "kind": "heading",
+   "start": 5332,
+   "end": 5359,
+   "text": "#### 3. Verify the symlinks",
+   "tokens": []
+  },
+  {
+   "id": 26,
+   "kind": "para",
+   "start": 5361,
+   "end": 5406,
+   "text": "Check that the persistent device names exist:",
+   "tokens": []
+  },
+  {
+   "id": 27,
+   "kind": "para",
+   "start": 5461,
+   "end": 5510,
+   "text": "You should see them pointing to ttyACM\\* devices:",
+   "tokens": []
+  },
+  {
+   "id": 28,
+   "kind": "para",
+   "start": 5583,
+   "end": 5642,
+   "text": "These names remain stable across reboots and reconnections.",
+   "tokens": []
+  },
+  {
+   "id": 29,
+   "kind": "heading",
+   "start": 5670,
+   "end": 5684,
+   "text": "## Teleoperate",
+   "tokens": []
+  },
+  {
+   "id": 30,
+   "kind": "para",
+   "start": 5686,
+   "end": 5790,
+   "text": "After identifying the correct ports, you can directly teleoperate the follower arm using the leader arm.",
+   "tokens": []
+  },
+  {
+   "id": 31,
+   "kind": "heading",
+   "start": 5842,
+   "end": 5872,
+   "text": "### Teleoperate without camera",
+   "tokens": []
+  },
+  {
+   "id": 32,
+   "kind": "para",
+   "start": 6104,
+   "end": 6295,
+   "text": "During teleoperation, motions of the leader arm are mirrored in real time by the follower arm. OMX is already preconfigured, teleoperation can begin immediately without any calibration steps.",
+   "tokens": []
+  },
+  {
+   "id": 33,
+   "kind": "heading",
+   "start": 6297,
+   "end": 6324,
+   "text": "### Teleoperate with camera",
+   "tokens": []
+  },
+  {
+   "id": 34,
+   "kind": "para",
+   "start": 6326,
+   "end": 6437,
+   "text": "You can also enable camera input during teleoperation by providing a camera configuration for the follower arm.",
+   "tokens": []
+  },
+  {
+   "id": 35,
+   "kind": "para",
+   "start": 6803,
+   "end": 7032,
+   "text": "When the camera is enabled, the camera stream is displayed in real time and synchronized with the robot state. This setup is useful for visual monitoring and can be reused later for demonstration recording and imitation learning.",
+   "tokens": []
+  },
+  {
+   "id": 36,
+   "kind": "heading",
+   "start": 7069,
+   "end": 7099,
+   "text": "### Teleoperate without camera",
+   "tokens": []
+  },
+  {
+   "id": 37,
+   "kind": "para",
+   "start": 7325,
+   "end": 7516,
+   "text": "During teleoperation, motions of the leader arm are mirrored in real time by the follower arm. OMX is already preconfigured, teleoperation can begin immediately without any calibration steps.",
+   "tokens": []
+  },
+  {
+   "id": 38,
+   "kind": "heading",
+   "start": 7518,
+   "end": 7545,
+   "text": "### Teleoperate with camera",
+   "tokens": []
+  },
+  {
+   "id": 39,
+   "kind": "para",
+   "start": 7547,
+   "end": 7658,
+   "text": "You can also enable camera input during teleoperation by providing a camera configuration for the follower arm.",
+   "tokens": []
+  },
+  {
+   "id": 40,
+   "kind": "para",
+   "start": 8018,
+   "end": 8247,
+   "text": "When the camera is enabled, the camera stream is displayed in real time and synchronized with the robot state. This setup is useful for visual monitoring and can be reused later for demonstration recording and imitation learning.",
+   "tokens": []
+  },
+  {
+   "id": 41,
+   "kind": "para",
+   "start": 8275,
+   "end": 8336,
+   "text": "Congrats 🎉, your robot is all set to learn a task on its own.",
+   "tokens": []
+  },
+  {
+   "id": 42,
+   "kind": "quote",
+   "start": 8338,
+   "end": 8446,
+   "text": "> If you have any questions or need help, please reach out on [Discord](⟦0⟧).",
+   "tokens": [
+    "https://discord.com/invite/robotis"
+   ]
+  }
+ ]
+}

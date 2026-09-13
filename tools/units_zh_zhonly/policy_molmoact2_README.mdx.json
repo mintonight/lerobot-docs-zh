@@ -1,0 +1,14 @@
+{
+ "file": "policy_molmoact2_README.mdx",
+ "units": [
+  {"id": 0, "zh": "# MolmoAct2"},
+  {"id": 1, "zh": "该仓库包含 [MolmoAct2](⟦0⟧) 的 LeRobot 策略实现，已移植到 LeRobot 中以实现训练、评估、检查点保存和数据集兼容性。"},
+  {"id": 2, "zh": "该实现目前支持对标准 MolmoAct2 模型进行训练和评估。支持自适应深度推理的 MolmoAct2-Think 尚未包含在此 LeRobot 策略中，敬请期待。"},
+  {"id": 3, "zh": "如需论文中所报告实验使用的原始 MolmoAct2 训练代码，请参阅 [allenai/molmoact2](⟦0⟧)。"},
+  {"id": 4, "zh": "## LIBERO 评估"},
+  {"id": 5, "zh": "重要提示：我们发现 ⟦0⟧ 无法可靠地让 LIBERO 场景稳定下来，并可能降低测得的成功率。此 LeRobot 实现报告的所有 LIBERO 评估结果都使用 ⟦1⟧。"},
+  {"id": 6, "zh": "## 引用"},
+  {"id": 7, "zh": "## 许可证"},
+  {"id": 8, "zh": "该模型采用 Apache 2.0 许可证。它旨在根据 [Ai2 的负责任使用指南](⟦0⟧) 用于研究和教育用途，与 [allenai/molmoact2](⟦1⟧) 保持一致。"}
+ ]
+}

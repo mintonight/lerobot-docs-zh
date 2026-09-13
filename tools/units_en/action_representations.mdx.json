@@ -1,0 +1,446 @@
+{
+ "file": "action_representations.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1948,
+   "text": "# Action Representations",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1950,
+   "end": 2090,
+   "text": "This guide explains the different ways robot actions can be represented in LeRobot, how they relate to each other, and when to use each one.",
+   "tokens": []
+  },
+  {
+   "id": 2,
+   "kind": "heading",
+   "start": 2092,
+   "end": 2128,
+   "text": "## Joint Space vs End-Effector Space",
+   "tokens": []
+  },
+  {
+   "id": 3,
+   "kind": "para",
+   "start": 2130,
+   "end": 2241,
+   "text": "Before discussing action representations, it helps to understand the two coordinate spaces actions can live in.",
+   "tokens": []
+  },
+  {
+   "id": 4,
+   "kind": "heading",
+   "start": 2243,
+   "end": 2258,
+   "text": "### Joint Space",
+   "tokens": []
+  },
+  {
+   "id": 5,
+   "kind": "para",
+   "start": 2260,
+   "end": 2399,
+   "text": "Joint-space actions directly specify target positions for each motor. For a 6-DOF arm with a gripper, a joint-space action might look like:",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "para",
+   "start": 2542,
+   "end": 2722,
+   "text": "Joint space is the default in LeRobot. It is simple, requires no kinematics model, and maps directly to motor commands. Most beginner setups (SO-100, Koch) use joint-space actions.",
+   "tokens": []
+  },
+  {
+   "id": 7,
+   "kind": "heading",
+   "start": 2724,
+   "end": 2751,
+   "text": "### End-Effector (EE) Space",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "para",
+   "start": 2753,
+   "end": 2884,
+   "text": "End-effector-space actions specify the desired position and orientation of the robot's tool tip (gripper) in Cartesian coordinates:",
+   "tokens": []
+  },
+  {
+   "id": 9,
+   "kind": "para",
+   "start": 2974,
+   "end": 3177,
+   "text": "EE space is more intuitive for tasks like pick-and-place because it directly describes where the gripper should go, but it requires a kinematics model (URDF) to convert between EE poses and joint angles.",
+   "tokens": []
+  },
+  {
+   "id": 10,
+   "kind": "heading",
+   "start": 3179,
+   "end": 3208,
+   "text": "### Converting Between Spaces",
+   "tokens": []
+  },
+  {
+   "id": 11,
+   "kind": "para",
+   "start": 3210,
+   "end": 3408,
+   "text": "LeRobot provides processor steps for converting between joint and EE spaces using forward and inverse kinematics. These are built on top of ⟦0⟧, which loads a URDF model of your robot.",
+   "tokens": [
+    "`RobotKinematics`"
+   ]
+  },
+  {
+   "id": 12,
+   "kind": "para",
+   "start": 4088,
+   "end": 4311,
+   "text": "See [⟦0⟧](⟦1⟧) for a complete working example of recording, replaying, and evaluating with EE-space actions on an SO-100 arm.",
+   "tokens": [
+    "`examples/so100_to_so100_EE/`",
+    "https://github.com/huggingface/lerobot/tree/main/examples/so100_to_so100_EE"
+   ]
+  },
+  {
+   "id": 13,
+   "kind": "heading",
+   "start": 4313,
+   "end": 4353,
+   "text": "## Absolute, Relative, and Delta Actions",
+   "tokens": []
+  },
+  {
+   "id": 14,
+   "kind": "para",
+   "start": 4355,
+   "end": 4557,
+   "text": "Regardless of whether you work in joint space or EE space, the action values can be expressed in three different ways. The terminology follows [UMI (Chi et al., 2024)](⟦0⟧).",
+   "tokens": [
+    "https://arxiv.org/abs/2402.10329"
+   ]
+  },
+  {
+   "id": 15,
+   "kind": "heading",
+   "start": 4559,
+   "end": 4597,
+   "text": "### Absolute Actions (LeRobot default)",
+   "tokens": []
+  },
+  {
+   "id": 16,
+   "kind": "para",
+   "start": 4599,
+   "end": 4650,
+   "text": "Each action specifies the target position directly.",
+   "tokens": []
+  },
+  {
+   "id": 17,
+   "kind": "para",
+   "start": 4652,
+   "end": 4690,
+   "text": "**Example** (joint space, chunk of 4):",
+   "tokens": []
+  },
+  {
+   "id": 18,
+   "kind": "para",
+   "start": 4949,
+   "end": 5115,
+   "text": "Each value is a target position in the robot's coordinate frame. Simple and direct, but requires a consistent global coordinate frame. This is the default in LeRobot.",
+   "tokens": []
+  },
+  {
+   "id": 19,
+   "kind": "heading",
+   "start": 5117,
+   "end": 5160,
+   "text": "### Relative Actions (used by OpenPI / pi0)",
+   "tokens": []
+  },
+  {
+   "id": 20,
+   "kind": "para",
+   "start": 5162,
+   "end": 5312,
+   "text": "Each action in the chunk is an offset from the **current state at the moment of prediction**. All actions in the chunk share the same reference point:",
+   "tokens": []
+  },
+  {
+   "id": 21,
+   "kind": "para",
+   "start": 5639,
+   "end": 5772,
+   "text": "The conversion is straightforward: ⟦0⟧. To recover absolute: ⟦1⟧.",
+   "tokens": [
+    "`relative = absolute - current_state`",
+    "`absolute = relative + current_state`"
+   ]
+  },
+  {
+   "id": 22,
+   "kind": "para",
+   "start": 5774,
+   "end": 6026,
+   "text": "**Why use relative actions?** The model learns to predict offsets centered around zero, which is easier to normalize and leads to more stable training. Because every chunk references the same current state, there is no error accumulation across chunks.",
+   "tokens": []
+  },
+  {
+   "id": 23,
+   "kind": "heading",
+   "start": 6028,
+   "end": 6070,
+   "text": "### Delta Actions (sequential differences)",
+   "tokens": []
+  },
+  {
+   "id": 24,
+   "kind": "para",
+   "start": 6072,
+   "end": 6173,
+   "text": "Each action is an offset from the **previous action** (or from the current state for the first step):",
+   "tokens": []
+  },
+  {
+   "id": 25,
+   "kind": "para",
+   "start": 6459,
+   "end": 6679,
+   "text": "Here each step is relative to the one before it. To recover absolute positions you must sum all previous deltas, which means errors accumulate over time. UMI explicitly argues against this representation for this reason.",
+   "tokens": []
+  },
+  {
+   "id": 26,
+   "kind": "heading",
+   "start": 6681,
+   "end": 6702,
+   "text": "### Visual Comparison",
+   "tokens": []
+  },
+  {
+   "id": 27,
+   "kind": "para",
+   "start": 6704,
+   "end": 7139,
+   "text": "The figure below (based on a figure from [UMI, Chi et al., 2024](⟦0⟧)) illustrates the key difference. With **relative trajectory**, every action in the chunk points back to the same origin (current state), so a new inference step cleanly resets the reference. With **delta**, each action depends on the previous one, so errors accumulate. **Absolute** actions require a consistent global coordinate frame.",
+   "tokens": [
+    "https://arxiv.org/abs/2402.10329"
+   ]
+  },
+  {
+   "id": 28,
+   "kind": "heading",
+   "start": 7366,
+   "end": 7402,
+   "text": "## Using Relative Actions in LeRobot",
+   "tokens": []
+  },
+  {
+   "id": 29,
+   "kind": "para",
+   "start": 7404,
+   "end": 7594,
+   "text": "LeRobot provides ⟦0⟧ to convert between absolute and relative actions inside the processor pipeline. This is how pi0, pi0.5, and pi0_fast support relative actions.",
+   "tokens": [
+    "`RelativeActionsProcessorStep`"
+   ]
+  },
+  {
+   "id": 30,
+   "kind": "quote",
+   "start": 7596,
+   "end": 8136,
+   "text": "> **Note:** All pi models (pi0, pi0.5, pi0*fast) apply relative conversion \\_before* normalization (⟦0⟧), so the normalizer always sees delta (relative) values. This means **relative action stats are required** for all of them when training with ⟦1⟧. In pi0_fast the ⟦2⟧ only modifies the action — the state observation is unchanged — so ⟦3⟧ still runs before the state tokenizer and the tokenizer continues to receive normalized state as expected.",
+   "tokens": [
+    "`relative → normalize`",
+    "`use_relative_actions=true`",
+    "`RelativeActionsProcessorStep`",
+    "`NormalizerProcessorStep`"
+   ]
+  },
+  {
+   "id": 31,
+   "kind": "heading",
+   "start": 8138,
+   "end": 8154,
+   "text": "### How it works",
+   "tokens": []
+  },
+  {
+   "id": 32,
+   "kind": "para",
+   "start": 8156,
+   "end": 8268,
+   "text": "During **training** (preprocessing), actions are converted from absolute to relative before the model sees them:",
+   "tokens": []
+  },
+  {
+   "id": 33,
+   "kind": "para",
+   "start": 8350,
+   "end": 8469,
+   "text": "During **inference** (postprocessing), model predictions are converted back to absolute before being sent to the robot:",
+   "tokens": []
+  },
+  {
+   "id": 34,
+   "kind": "para",
+   "start": 8546,
+   "end": 8740,
+   "text": "The ⟦0⟧ reads the cached current state from its paired ⟦1⟧, so the two must be wired together (handled automatically by the policy factory).",
+   "tokens": [
+    "`AbsoluteActionsProcessorStep`",
+    "`RelativeActionsProcessorStep`"
+   ]
+  },
+  {
+   "id": 35,
+   "kind": "heading",
+   "start": 8742,
+   "end": 8812,
+   "text": "### Enabling relative actions for the pi family (pi0, pi0.5, pi0_fast)",
+   "tokens": []
+  },
+  {
+   "id": 36,
+   "kind": "para",
+   "start": 8814,
+   "end": 8881,
+   "text": "**Step 1**: Precompute relative action statistics for your dataset:",
+   "tokens": []
+  },
+  {
+   "id": 37,
+   "kind": "para",
+   "start": 9112,
+   "end": 9160,
+   "text": "**Step 2**: Train with relative actions enabled:",
+   "tokens": []
+  },
+  {
+   "id": 38,
+   "kind": "para",
+   "start": 9344,
+   "end": 9544,
+   "text": "The ⟦0⟧ parameter specifies joints that should remain in absolute space. For example, gripper commands are typically binary (open/close) and don't benefit from relative encoding.",
+   "tokens": [
+    "`relative_exclude_joints`"
+   ]
+  },
+  {
+   "id": 39,
+   "kind": "heading",
+   "start": 9546,
+   "end": 9585,
+   "text": "### Combining relative actions with RTC",
+   "tokens": []
+  },
+  {
+   "id": 40,
+   "kind": "para",
+   "start": 9587,
+   "end": 10202,
+   "text": "[RTC](⟦0⟧) runs policy inference at high frequency and sends actions to the robot as they are predicted rather than waiting for a full chunk. Relative actions and RTC are fully compatible: because every chunk in relative mode references the **same** current state (captured at the start of inference), each predicted action in the chunk remains a valid offset even if the robot has already moved. No special handling is needed — ⟦1⟧ caches the state once per inference call and ⟦2⟧ applies it to every action in the streamed output.",
+   "tokens": [
+    "https://arxiv.org/abs/2506.07339",
+    "`RelativeActionsProcessorStep`",
+    "`AbsoluteActionsProcessorStep`"
+   ]
+  },
+  {
+   "id": 41,
+   "kind": "heading",
+   "start": 10204,
+   "end": 10248,
+   "text": "### Combining relative actions with EE space",
+   "tokens": []
+  },
+  {
+   "id": 42,
+   "kind": "para",
+   "start": 10250,
+   "end": 10422,
+   "text": "Relative actions work in both joint space and EE space. For example, if your dataset stores EE actions, relative encoding converts them to offsets from the current EE pose:",
+   "tokens": []
+  },
+  {
+   "id": 43,
+   "kind": "heading",
+   "start": 10729,
+   "end": 10759,
+   "text": "## Processing Pipeline Summary",
+   "tokens": []
+  },
+  {
+   "id": 44,
+   "kind": "para",
+   "start": 10761,
+   "end": 10922,
+   "text": "Here is how the different processors compose. Each arrow is a processor step, and they can be chained in a ⟦0⟧ or ⟦1⟧:",
+   "tokens": [
+    "`RobotProcessorPipeline`",
+    "`PolicyProcessorPipeline`"
+   ]
+  },
+  {
+   "id": 45,
+   "kind": "para",
+   "start": 11894,
+   "end": 12080,
+   "text": "A typical training preprocessor might chain: ⟦0⟧. A typical inference postprocessor: ⟦1⟧.",
+   "tokens": [
+    "`raw absolute joint actions → relative → normalize`",
+    "`unnormalize → absolute → (optionally IK to joints)`"
+   ]
+  },
+  {
+   "id": 46,
+   "kind": "heading",
+   "start": 12082,
+   "end": 12095,
+   "text": "## References",
+   "tokens": []
+  },
+  {
+   "id": 47,
+   "kind": "list",
+   "start": 12097,
+   "end": 12296,
+   "text": "- [Universal Manipulation Interface (UMI)](⟦0⟧) - Chi et al., 2024. Defines the relative trajectory action representation and compares it with absolute and delta actions.",
+   "tokens": [
+    "https://arxiv.org/abs/2402.10329"
+   ]
+  },
+  {
+   "id": 48,
+   "kind": "list",
+   "start": 12297,
+   "end": 12397,
+   "text": "- [Introduction to Processors](⟦0⟧) - How processor pipelines work in LeRobot.",
+   "tokens": [
+    "./introduction_processors"
+   ]
+  },
+  {
+   "id": 49,
+   "kind": "list",
+   "start": 12398,
+   "end": 12578,
+   "text": "- [⟦0⟧](⟦1⟧) - Complete example of recording and evaluating with EE-space actions.",
+   "tokens": [
+    "`examples/so100_to_so100_EE/`",
+    "https://github.com/huggingface/lerobot/tree/main/examples/so100_to_so100_EE"
+   ]
+  }
+ ]
+}

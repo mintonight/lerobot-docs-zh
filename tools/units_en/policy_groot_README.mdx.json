@@ -1,0 +1,372 @@
+{
+ "file": "policy_groot_README.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1784,
+   "end": 1801,
+   "text": "## Research Paper",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1803,
+   "end": 1909,
+   "text": "GR00T N1 technical report (covers the GR00T N1.x family, including N1.7): ⟦0⟧",
+   "tokens": [
+    "https://arxiv.org/abs/2503.14734"
+   ]
+  },
+  {
+   "id": 2,
+   "kind": "para",
+   "start": 1911,
+   "end": 1977,
+   "text": "GR00T N1.7 model card: ⟦0⟧",
+   "tokens": [
+    "https://huggingface.co/nvidia/GR00T-N1.7-3B"
+   ]
+  },
+  {
+   "id": 3,
+   "kind": "para",
+   "start": 1979,
+   "end": 2072,
+   "text": "GR00T N1.5 research page (earlier version): ⟦0⟧",
+   "tokens": [
+    "https://research.nvidia.com/labs/gear/gr00t-n1_5/"
+   ]
+  },
+  {
+   "id": 4,
+   "kind": "quote",
+   "start": 2074,
+   "end": 2216,
+   "text": "> GR00T N1.5 support was removed from LeRobot; the last release supporting it is ⟦0⟧.\n> Current releases support GR00T N1.7 only.",
+   "tokens": [
+    "`lerobot==0.5.1`"
+   ]
+  },
+  {
+   "id": 5,
+   "kind": "heading",
+   "start": 2218,
+   "end": 2231,
+   "text": "## Repository",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "para",
+   "start": 2233,
+   "end": 2276,
+   "text": "Code: ⟦0⟧",
+   "tokens": [
+    "https://github.com/NVIDIA/Isaac-GR00T"
+   ]
+  },
+  {
+   "id": 7,
+   "kind": "heading",
+   "start": 2278,
+   "end": 2289,
+   "text": "## Citation",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "heading",
+   "start": 3242,
+   "end": 3265,
+   "text": "## Additional Resources",
+   "tokens": []
+  },
+  {
+   "id": 9,
+   "kind": "para",
+   "start": 3267,
+   "end": 3313,
+   "text": "Blog: ⟦0⟧",
+   "tokens": [
+    "https://developer.nvidia.com/isaac/gr00t"
+   ]
+  },
+  {
+   "id": 10,
+   "kind": "para",
+   "start": 3315,
+   "end": 3335,
+   "text": "Hugging Face Models:",
+   "tokens": []
+  },
+  {
+   "id": 11,
+   "kind": "list",
+   "start": 3337,
+   "end": 3394,
+   "text": "- GR00T N1.7: ⟦0⟧",
+   "tokens": [
+    "https://huggingface.co/nvidia/GR00T-N1.7-3B"
+   ]
+  },
+  {
+   "id": 12,
+   "kind": "list",
+   "start": 3395,
+   "end": 3475,
+   "text": "- GR00T N1.7 LIBERO checkpoints: ⟦0⟧",
+   "tokens": [
+    "https://huggingface.co/nvidia/GR00T-N1.7-LIBERO"
+   ]
+  },
+  {
+   "id": 13,
+   "kind": "para",
+   "start": 3477,
+   "end": 3544,
+   "text": "⟦0⟧\n⟦1⟧⟦2⟧Original-vs-LeRobot parity test⟦3⟧⟦4⟧",
+   "tokens": [
+    "<details>",
+    "<summary>",
+    "<b>",
+    "</b>",
+    "</summary>"
+   ]
+  },
+  {
+   "id": 14,
+   "kind": "heading",
+   "start": 3546,
+   "end": 3580,
+   "text": "## Original-vs-LeRobot parity test",
+   "tokens": []
+  },
+  {
+   "id": 15,
+   "kind": "para",
+   "start": 3582,
+   "end": 3866,
+   "text": "⟦0⟧ verifies this LeRobot\nreimplementation of GR00T N1.7 (Qwen3-VL backbone + flow-matching action head)\nagainst NVIDIA's original ⟦1⟧ package with two comparisons, each parametrized\nover every embodiment tag present in the checkpoint:",
+   "tokens": [
+    "`tests/policies/groot/test_groot_vs_original.py`",
+    "`gr00t`"
+   ]
+  },
+  {
+   "id": 16,
+   "kind": "list",
+   "start": 3868,
+   "end": 4237,
+   "text": "1. **Model parity** — given byte-identical pre-processed inputs and the same\n   flow-matching seed (recorded in each artifact), both implementations must produce\n   the **same raw model output** (⟦0⟧, the normalized\n   flow-matching prediction). Output shapes must match exactly; any action-horizon\n   or action-dim mismatch fails the test.",
+   "tokens": [
+    "`get_action(...)[\"action_pred\"]`"
+   ]
+  },
+  {
+   "id": 17,
+   "kind": "list",
+   "start": 4238,
+   "end": 4697,
+   "text": "2. **Preprocessor parity** — given the identical raw observations (per-camera\n   frames, state vectors, language instruction), LeRobot's own preprocessor pipeline\n   (real Qwen3-VL chat template / tokenizer / image packing + checkpoint-driven\n   state normalization, no mocks) must produce the **same collated model inputs**\n   (⟦0⟧, ⟦1⟧, ⟦2⟧, ⟦3⟧, ⟦4⟧,\n   ⟦5⟧) as the original package's processor.",
+   "tokens": [
+    "`input_ids`",
+    "`attention_mask`",
+    "`pixel_values`",
+    "`image_grid_thw`",
+    "`state`",
+    "`embodiment_id`"
+   ]
+  },
+  {
+   "id": 18,
+   "kind": "heading",
+   "start": 4699,
+   "end": 4723,
+   "text": "### Why two environments",
+   "tokens": []
+  },
+  {
+   "id": 19,
+   "kind": "para",
+   "start": 4725,
+   "end": 5103,
+   "text": "The original ⟦0⟧ package pins ⟦1⟧ (Python 3.10); this\nintegration requires ⟦2⟧ (Qwen3-VL). Under 5.x, ⟦3⟧\nis itself a defaulted dataclass, so the original config dataclasses fail to import\n(⟦4⟧). The two implementations therefore\n**cannot be imported in the same Python process**.",
+   "tokens": [
+    "`gr00t`",
+    "`transformers==4.57.3`",
+    "`transformers>=5.x`",
+    "`PretrainedConfig`",
+    "`non-default argument follows default argument`"
+   ]
+  },
+  {
+   "id": 20,
+   "kind": "para",
+   "start": 5105,
+   "end": 5171,
+   "text": "So the test uses a **producer / consumer** split across two venvs:",
+   "tokens": []
+  },
+  {
+   "id": 21,
+   "kind": "list",
+   "start": 5173,
+   "end": 5643,
+   "text": "1. **Producer** — ⟦0⟧, run in the _original_\n   gr00t venv. For each embodiment it builds dummy inputs generically from the\n   checkpoint metadata (state dims from ⟦1⟧; camera/language keys from\n   the processor modality configs), runs the original model, and saves to one ⟦2⟧\n   per tag: the raw observations (⟦3⟧ keys), the exact collated inputs\n   (⟦4⟧ keys), the seed, and the raw ⟦5⟧.",
+   "tokens": [
+    "`tests/policies/groot/utils/dump_original_n1_7.py`",
+    "`statistics.json`",
+    "`.npz`",
+    "`raw::`",
+    "`in::`",
+    "`action_pred`"
+   ]
+  },
+  {
+   "id": 22,
+   "kind": "list",
+   "start": 5644,
+   "end": 6037,
+   "text": "2. **Consumer** — the pytest above, run in the _LeRobot_ venv. It discovers every\n   ⟦0⟧; the model-parity case replays the byte-identical collated inputs through\n   the LeRobot model with the recorded seed and asserts the outputs match, and the\n   preprocessor-parity case replays the raw observations through LeRobot's full\n   preprocessor pipeline and asserts the collated tensors match.",
+   "tokens": [
+    "`.npz`"
+   ]
+  },
+  {
+   "id": 23,
+   "kind": "quote",
+   "start": 6039,
+   "end": 6235,
+   "text": "> Artifacts generated by older versions of the dump script contain no ⟦0⟧\n> fields; the preprocessor-parity case then **skips** with a regeneration hint.\n> Re-run the producer to refresh them.",
+   "tokens": [
+    "`raw::`"
+   ]
+  },
+  {
+   "id": 24,
+   "kind": "heading",
+   "start": 6237,
+   "end": 6258,
+   "text": "### Fairness controls",
+   "tokens": []
+  },
+  {
+   "id": 25,
+   "kind": "list",
+   "start": 6260,
+   "end": 6749,
+   "text": "- **Same pre-processed inputs (model parity)** — the original processor's ⟦0⟧,\n  ⟦1⟧, ⟦2⟧, ⟦3⟧, ⟦4⟧, ⟦5⟧ are\n  fed verbatim to the LeRobot model (no re-tokenization / re-normalization), so the\n  model comparison isolates the model. LeRobot's own tokenization / image packing is\n  covered separately by the preprocessor-parity case, which compares its output\n  against those same collated tensors from identical raw observations.",
+   "tokens": [
+    "`input_ids`",
+    "`pixel_values`",
+    "`image_grid_thw`",
+    "`attention_mask`",
+    "`state`",
+    "`embodiment_id`"
+   ]
+  },
+  {
+   "id": 26,
+   "kind": "list",
+   "start": 6750,
+   "end": 7043,
+   "text": "- **Same precision + attention kernel** — both sides run **fp32 + SDPA**. The\n  original defaults to ⟦0⟧ (flash_attention_2 + bf16); the\n  producer forces SDPA + fp32. (With the defaults the gap is ~3e-2 — pure\n  kernel/rounding noise, not an implementation difference.)",
+   "tokens": [
+    "`use_flash_attention=True`"
+   ]
+  },
+  {
+   "id": 27,
+   "kind": "list",
+   "start": 7044,
+   "end": 7231,
+   "text": "- **Same flow-matching seed** — fixed right before sampling on both sides; the\n  producer records it in each artifact (⟦0⟧, default 42) and the consumer\n  replays the recorded value.",
+   "tokens": [
+    "`--seed`"
+   ]
+  },
+  {
+   "id": 28,
+   "kind": "heading",
+   "start": 7233,
+   "end": 7247,
+   "text": "### How to run",
+   "tokens": []
+  },
+  {
+   "id": 29,
+   "kind": "para",
+   "start": 8167,
+   "end": 8379,
+   "text": "The ⟦0⟧ artifacts are local-only (gitignored, ~6–10 MB each) and are regenerated by\nthe producer; they are never committed. The tests **skip** (do not fail) on CI or\nwhen the checkpoint / artifacts are absent.",
+   "tokens": [
+    "`.npz`"
+   ]
+  },
+  {
+   "id": 30,
+   "kind": "heading",
+   "start": 8381,
+   "end": 8410,
+   "text": "#### Env knobs (all optional)",
+   "tokens": []
+  },
+  {
+   "id": 31,
+   "kind": "table",
+   "start": 8412,
+   "end": 8532,
+   "text": "| Var                                       | Default                          | Purpose                               |",
+   "tokens": []
+  },
+  {
+   "id": 32,
+   "kind": "table",
+   "start": 8654,
+   "end": 8774,
+   "text": "| ⟦0⟧                   | ⟦1⟧ | directory of per-tag ⟦2⟧ artifacts |",
+   "tokens": [
+    "`GROOT_N1_7_PARITY_DIR`",
+    "`tests/policies/groot/artifacts`",
+    "`.npz`"
+   ]
+  },
+  {
+   "id": 33,
+   "kind": "table",
+   "start": 8775,
+   "end": 8895,
+   "text": "| ⟦0⟧                  | auto (HF cache)                  | override checkpoint dir               |",
+   "tokens": [
+    "`GROOT_N1_7_LIBERO_CKPT`"
+   ]
+  },
+  {
+   "id": 34,
+   "kind": "table",
+   "start": 8896,
+   "end": 9016,
+   "text": "| ⟦0⟧                     | ⟦1⟧ if available              | ⟦2⟧ or ⟦3⟧                       |",
+   "tokens": [
+    "`GROOT_PARITY_DEVICE`",
+    "`cuda`",
+    "`cpu`",
+    "`cuda`"
+   ]
+  },
+  {
+   "id": 35,
+   "kind": "table",
+   "start": 9017,
+   "end": 9137,
+   "text": "| ⟦0⟧ / ⟦1⟧ | ⟦2⟧                           | comparison tolerance                  |",
+   "tokens": [
+    "`GROOT_PARITY_ATOL`",
+    "`GROOT_PARITY_RTOL`",
+    "`1e-3`"
+   ]
+  }
+ ]
+}

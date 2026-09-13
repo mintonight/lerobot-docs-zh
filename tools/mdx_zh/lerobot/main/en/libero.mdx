@@ -1,0 +1,268 @@
+<script lang="ts">
+import {onMount} from "svelte";
+import Tip from "$lib/Tip.svelte";
+import CopyLLMTxtMenu from "$lib/CopyLLMTxtMenu.svelte";
+import Youtube from "$lib/Youtube.svelte";
+import Docstring from "$lib/Docstring.svelte";
+import CodeBlock from "$lib/CodeBlock.svelte";
+import CodeBlockFw from "$lib/CodeBlockFw.svelte";
+import DocNotebookDropdown from "$lib/DocNotebookDropdown.svelte";
+import CourseFloatingBanner from "$lib/CourseFloatingBanner.svelte";
+import IconCopyLink from "$lib/IconCopyLink.svelte";
+import FrameworkContent from "$lib/FrameworkContent.svelte";
+import Markdown from "$lib/Markdown.svelte";
+import Question from "$lib/Question.svelte";
+import FrameworkSwitchCourse from "$lib/FrameworkSwitchCourse.svelte";
+import InferenceApi from "$lib/InferenceApi.svelte";
+import TokenizersLanguageContent from "$lib/TokenizersLanguageContent.svelte";
+import ExampleCodeBlock from "$lib/ExampleCodeBlock.svelte";
+import Added from "$lib/Added.svelte";
+import Changed from "$lib/Changed.svelte";
+import Deprecated from "$lib/Deprecated.svelte";
+import PipelineIcon from "$lib/PipelineIcon.svelte";
+import PipelineTag from "$lib/PipelineTag.svelte";
+import Heading from "$lib/Heading.svelte";
+import HfOptions from "$lib/HfOptions.svelte";
+import HfOption from "$lib/HfOption.svelte";
+import EditOnGithub from "$lib/EditOnGithub.svelte";
+import InferenceSnippet from "$lib/InferenceSnippet/InferenceSnippet.svelte";
+import MermaidChart from "$lib/MermaidChart.svelte";
+let fw: "pt" | "tf" = "pt";
+onMount(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    fw = urlParams.get("fw") || "pt";
+});
+</script>
+<svelte:head>
+  <meta name="hf:doc:metadata" content={metadata} >
+</svelte:head>
+
+<!--HF DOCBUILD BODY START-->
+
+HF_DOC_BODY_START
+
+<CopyLLMTxtMenu containerStyle="float: right; margin-left: 10px; display: inline-flex; position: relative; z-index: 10;"></CopyLLMTxtMenu>
+
+# LIBERO
+
+LIBERO 是一个 benchmark，旨在研究**终身机器人学习**——即机器人需要随着时间的推移不断与用户一起学习和适应，而不是只做一次预训练。它提供了一组标准化的操作任务，侧重于**知识迁移**：即机器人能多大程度地将已学到的知识应用到新情境中。通过在 LIBERO 上评估，不同的算法可以被公平比较，研究者也可以借鉴彼此的工作。
+
+- 论文：[Benchmarking Knowledge Transfer for Lifelong Robot Learning](https://arxiv.org/abs/2306.03310)
+- GitHub：[Lifelong-Robot-Learning/LIBERO](https://github.com/Lifelong-Robot-Learning/LIBERO)
+- 项目网站：[libero-project.github.io](https://libero-project.github.io)
+
+![An overview of the LIBERO benchmark](https://libero-project.github.io/assets/img/libero/fig1.png)
+
+## 可用任务
+
+LIBERO 包含**五个任务套件**，共覆盖**130 个任务**，从简单的物体操作到复杂的多步骤场景：
+
+| 套件 | CLI 名称 | 任务数 | 描述 |
+| -------------- | ---------------- | ----- | -------------------------------------------------- |
+| LIBERO-Spatial | `libero_spatial` | 10 | 需要对空间关系进行 inference 的任务 |
+| LIBERO-Object | `libero_object` | 10 | 以操作不同物体为核心的任务 |
+| LIBERO-Goal | `libero_goal` | 10 | 目标条件化任务，目标会发生变化 |
+| LIBERO-90 | `libero_90` | 90 | 来自 LIBERO-100 集合的短视界任务 |
+| LIBERO-Long | `libero_10` | 10 | 来自 LIBERO-100 集合的长视界任务 |
+
+## 安装
+
+在按照 LeRobot 安装说明操作之后：
+
+```bash
+pip install -e ".[libero]"
+```
+
+<Tip>
+LIBERO 需要 Linux（`sys_platform == 'linux'`）。LeRobot 使用 MuJoCo 进行 simulation — 在训练或评估之前设置渲染后端：
+
+```bash
+export MUJOCO_GL=egl  # for headless servers (HPC, cloud)
+```
+
+</Tip>
+
+## 评估
+
+### 默认评估（推荐）
+
+在四个标准套件上进行评估（每个任务 10 个 episode）：
+
+```bash
+lerobot-eval \
+  --policy.path="your-policy-id" \
+  --env.type=libero \
+  --env.task=libero_spatial,libero_object,libero_goal,libero_10 \
+  --eval.batch_size=1 \
+  --eval.n_episodes=10 \
+  --env.max_parallel_tasks=1
+```
+
+### 单套件评估
+
+在单个 LIBERO 套件上评估：
+
+```bash
+lerobot-eval \
+  --policy.path="your-policy-id" \
+  --env.type=libero \
+  --env.task=libero_object \
+  --eval.batch_size=2 \
+  --eval.n_episodes=3
+```
+
+- `--env.task` 选择套件（`libero_object`、`libero_spatial` 等）。
+- `--env.task_ids` 限制为特定的任务索引（`[0]`、`[1,2,3]` 等）。省略则运行套件中的所有任务。
+- `--eval.batch_size` 控制并行运行多少个环境。
+- `--eval.n_episodes` 设置每个任务运行多少个 episode。
+
+### 多套件评估
+
+通过传入逗号分隔的列表，一次在多套件上对 policy 进行 benchmark：
+
+```bash
+lerobot-eval \
+  --policy.path="your-policy-id" \
+  --env.type=libero \
+  --env.task=libero_object,libero_spatial \
+  --eval.batch_size=1 \
+  --eval.n_episodes=2
+```
+
+### 控制模式
+
+LIBERO 支持两种控制模式 — `relative`（默认）和 `absolute`。不同的 VLA checkpoint 使用不同的 action 参数化方式进行训练，因此请确保模式与你的 policy 匹配：
+
+```bash
+--env.control_mode=relative   # or "absolute"
+```
+
+### 重置性能
+
+默认情况下，LeRobot 保留 LIBERO 的硬重置行为。启用固定初始
+state 后，你可以选择软重置，从而跳过在每个 episode 上重建 simulation 器
+模型和渲染器：
+
+```bash
+--env.init_states=true --env.hard_reset=false
+```
+
+软重置更快，但在环境的稳定步骤之后不会与硬重置逐位相同，因此相机 observation 和 policy 结果可能
+略有差异。复现 benchmark 结果时请使用硬重置。
+
+### policy 输入与输出
+
+**observation：**
+
+- `observation.state` — 8 维本体感觉特征（end-effector 位置、轴角方向、gripper qpos）
+- `observation.images.image` — 主相机视图（`agentview_image`），HWC uint8
+- `observation.images.image2` — 腕部相机视图（`robot0_eye_in_hand_image`），HWC uint8
+
+<Tip warning={true}>
+  LeRobot 强制视觉特征使用 `.images.*` 前缀。请确保你的
+  policy 配置 `input_features` 使用相同的命名键，并且你的 dataset
+  元数据键遵循这一约定。如果你的数据包含不同的键，
+  你必须重命名 observation 以匹配 policy 的期望，因为
+  命名键被编码在归一化统计信息层中。
+</Tip>
+
+**action：**
+
+- 在 `Box(-1, 1, shape=(7,))` 中的连续控制 — 6D end-effector 增量 + 1D gripper
+
+### 推荐的评估 episode 数
+
+为了可复现的 benchmark，请在全部四个标准套件（Spatial、Object、Goal、Long）中使用**每个任务 10 个 episode**。这样总共有 400 个 episode，与已发布结果所用的协议一致。不同评估随机种子下的成功率可能相差几个百分点，因此我们建议对 3 个种子取平均。
+
+<Tip>
+  要在相同的 episode 上比较两个 policy，请使用相同的 `--seed`，保持
+  `--env.init_states=true`，并在单个批次中运行每个任务
+  （`--eval.batch_size` 等于每个任务的 episode 数）。
+</Tip>
+
+## 训练
+
+### dataset
+
+两个预处理好的 LIBERO dataset 与 LeRobot 完全兼容。它们包含相同的 demonstration 和相同的模式，区别仅在于相机帧的存储方式：
+
+|                     | [lerobot/libero](https://huggingface.co/datasets/lerobot/libero) | [HuggingFaceVLA/libero](https://huggingface.co/datasets/HuggingFaceVLA/libero) |
+| ------------------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| episode / 帧 / 任务 | 1,693 / 273,465 / 40 | 1,693 / 273,465 / 40 |
+| 相机 | 2× 256×256×3 | 2× 256×256×3 |
+| state / action 维度 | 8 / 7 | 8 / 7 |
+| dataset 格式 | v3.0 | v3.0 |
+| 相机编码 | MP4 视频 | parquet 中的 PNG |
+| 下载大小 | **1.9 GB** | 69.9 GB |
+| 额外依赖 | 视频后端（`torchcodec` 或 `pyav`） | 无 |
+
+**我们推荐 [lerobot/libero](https://huggingface.co/datasets/lerobot/libero)**：**下载体积小 37 倍**，**加载速度相当**（每个工作进程约 330 样本/秒）。视频重新编码略有损失；如果无法安装视频解码后端，请使用基于图像的版本。
+
+作为参考，以下是 Physical Intelligence 发布的原始 dataset：
+
+- [physical-intelligence/libero](https://huggingface.co/datasets/physical-intelligence/libero)
+
+<Tip>
+在报告结果时固定 `--dataset.revision=<commit-sha>` — Hub dataset 可能会被重新上传，只有针对相同的数据修订版，成功率才有可比性。
+</Tip>
+
+### 示例训练命令
+
+在推荐的 dataset 上训练 SmolVLA：
+
+```bash
+lerobot-train \
+  --policy.type=smolvla \
+  --policy.load_vlm_weights=true \
+  --policy.push_to_hub=false \
+  --dataset.repo_id=lerobot/libero \
+  --dataset.video_backend=torchcodec \
+  --output_dir=./outputs/libero_smolvla \
+  --steps=100000 \
+  --batch_size=64
+```
+
+要在 Hub 上分享结果，请将 `--policy.push_to_hub=false` 替换为 `--policy.repo_id=${HF_USER}/libero-smolvla`。按照[评估](#evaluation)一节所示，使用 `lerobot-eval` 评估保存的 checkpoint。
+
+## 复现已发布的结果
+
+我们在 LIBERO benchmark 上复现 Pi0.5 的结果。我们使用 Physical Intelligence 的 LIBERO 基础模型（`pi05_libero`），并使用 [HuggingFace LIBERO dataset](https://huggingface.co/datasets/HuggingFaceVLA/libero)，在 8 块 H100 GPU 上以 bfloat16 精度额外 fine-tune 6k 步，批次大小为 256。
+
+fine-tune 后的模型：[lerobot/pi05_libero_finetuned](https://huggingface.co/lerobot/pi05_libero_finetuned)
+
+### 评估命令
+
+```bash
+lerobot-eval \
+  --output_dir=./eval_logs/ \
+  --env.type=libero \
+  --env.task=libero_spatial,libero_object,libero_goal,libero_10 \
+  --eval.batch_size=1 \
+  --eval.n_episodes=10 \
+  --policy.path=pi05_libero_finetuned \
+  --policy.n_action_steps=10 \
+  --env.max_parallel_tasks=1
+```
+
+我们设置 `n_action_steps=10`，与原始 OpenPI 实现保持一致。
+
+### 结果
+
+| 模型 | LIBERO Spatial | LIBERO Object | LIBERO Goal | LIBERO 10 | 平均 |
+| ------------------- | -------------- | ------------- | ----------- | --------- | -------- |
+| **Pi0.5 (LeRobot)** | 97.0 | 99.0 | 98.0 | 96.0 | **97.5** |
+
+这些结果与 Physical Intelligence 报告的[原始结果](https://github.com/Physical-Intelligence/openpi/tree/main/examples/libero#results)一致：
+
+| 模型 | LIBERO Spatial | LIBERO Object | LIBERO Goal | LIBERO 10 | 平均 |
+| ------------------ | -------------- | ------------- | ----------- | --------- | --------- |
+| **Pi0.5 (OpenPI)** | 98.8 | 98.2 | 98.0 | 92.4 | **96.85** |
+
+
+
+<EditOnGithub source="https://github.com/huggingface/lerobot/blob/main/docs/source/libero.mdx" />
+
+<!--HF DOCBUILD BODY END-->
+
+HF_DOC_BODY_END
+

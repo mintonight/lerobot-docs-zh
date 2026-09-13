@@ -1,0 +1,470 @@
+{
+ "file": "rtc.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1950,
+   "text": "# Real-Time Chunking (RTC)",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1952,
+   "end": 2346,
+   "text": "Real-Time Chunking (RTC) allows large, flow-matching based robotic policies, such as [Pi0](⟦0⟧), [Pi0.5](⟦1⟧), and [SmolVLA](⟦2⟧), to produce smooth, continuous, and reactive motion despite having high inference latency. LeRobot provides the original inference-time guided mode and, for compatible Pi05 checkpoints, training-time action conditioning with cheap hard-prefix inference.",
+   "tokens": [
+    "./pi0",
+    "./pi05",
+    "./smolvla"
+   ]
+  },
+  {
+   "id": 2,
+   "kind": "para",
+   "start": 2348,
+   "end": 2758,
+   "text": "These policies generate chunks of future actions (e.g., 50 steps at a time) instead of single actions.\nBecause the models are large, producing each chunk takes longer than the time it takes the robot to execute it.\nNaively executing chunks leads to problems such as pauses, jerky transitions, or sudden changes in strategy whenever the next chunk arrives late or disagrees with the previously executed actions.",
+   "tokens": []
+  },
+  {
+   "id": 3,
+   "kind": "para",
+   "start": 2760,
+   "end": 2994,
+   "text": "RTC solves this by asynchronously generating the next chunk while the robot continues executing the current one, and by guiding the new chunk so it aligns smoothly with the portion of the previous chunk that has already been executed.",
+   "tokens": []
+  },
+  {
+   "id": 4,
+   "kind": "heading",
+   "start": 2996,
+   "end": 3025,
+   "text": "## How RTC Works (simplified)",
+   "tokens": []
+  },
+  {
+   "id": 5,
+   "kind": "para",
+   "start": 3027,
+   "end": 3356,
+   "text": "RTC lets the robot think ahead while it’s still moving. When the robot is carrying out one chunk of actions, RTC starts creating the next chunk early.\nBut since the robot has already moved a bit by the time the new chunk is ready, RTC has to make sure the new chunk still lines up smoothly with what the robot is currently doing.",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "para",
+   "start": 3358,
+   "end": 3609,
+   "text": "To do this, RTC treats the beginning of the new chunk like an inpainting or “fill-in-the-gaps” problem:\nit gently adjusts the first part of the new chunk so it blends naturally with the robot’s ongoing motion. The result is no pauses, no sudden jumps.",
+   "tokens": []
+  },
+  {
+   "id": 7,
+   "kind": "para",
+   "start": 3611,
+   "end": 3850,
+   "text": "In technical terms, RTC adds a guidance term to the flow-matching denoising process that forces the overlapping timesteps of the new chunk to stay close to the executed portion of the previous chunk, typically using a soft transition mask.",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "heading",
+   "start": 3852,
+   "end": 3866,
+   "text": "## Quick Start",
+   "tokens": []
+  },
+  {
+   "id": 9,
+   "kind": "heading",
+   "start": 3868,
+   "end": 3884,
+   "text": "### Installation",
+   "tokens": []
+  },
+  {
+   "id": 10,
+   "kind": "para",
+   "start": 3886,
+   "end": 3959,
+   "text": "RTC is built into LeRobot. Just install the policy dependencies you need:",
+   "tokens": []
+  },
+  {
+   "id": 11,
+   "kind": "heading",
+   "start": 4059,
+   "end": 4081,
+   "text": "### Using RTC with Pi0",
+   "tokens": []
+  },
+  {
+   "id": 12,
+   "kind": "para",
+   "start": 4083,
+   "end": 4291,
+   "text": "You can use ⟦0⟧ for RTC deployment on real robots.\nThe snippet below provides a simplified pseudo-example of how RTC operates with Pi0 in your pipeline:",
+   "tokens": [
+    "`lerobot-rollout --strategy.type=base --inference.type=rtc`"
+   ]
+  },
+  {
+   "id": 13,
+   "kind": "heading",
+   "start": 5798,
+   "end": 5815,
+   "text": "## Key Parameters",
+   "tokens": []
+  },
+  {
+   "id": 14,
+   "kind": "para",
+   "start": 5817,
+   "end": 5866,
+   "text": "⟦0⟧ has the following parameters to tune:",
+   "tokens": [
+    "`RTCConfig`"
+   ]
+  },
+  {
+   "id": 15,
+   "kind": "para",
+   "start": 5868,
+   "end": 5925,
+   "text": "**⟦0⟧** selects the action-prefix conditioning method:",
+   "tokens": [
+    "`mode`"
+   ]
+  },
+  {
+   "id": 16,
+   "kind": "list",
+   "start": 5927,
+   "end": 6054,
+   "text": "- ⟦0⟧ (default) applies the original Jacobian guidance during denoising and works with ordinary flow-matching checkpoints.",
+   "tokens": [
+    "`guided`"
+   ]
+  },
+  {
+   "id": 17,
+   "kind": "list",
+   "start": 6055,
+   "end": 6268,
+   "text": "- ⟦0⟧ hard-inpaints the previous chunk's prefix with per-action flow timesteps. It currently requires a Pi05 checkpoint trained with ⟦1⟧ and avoids the guidance backward pass.",
+   "tokens": [
+    "`trained`",
+    "`policy.rtc_training_max_delay > 0`"
+   ]
+  },
+  {
+   "id": 18,
+   "kind": "para",
+   "start": 6270,
+   "end": 6606,
+   "text": "For trained mode, both ⟦0⟧ and the rollout backend's\n⟦1⟧ must be at least the checkpoint's\n⟦2⟧, and ⟦3⟧ must not exceed\n⟦4⟧ (the ⟦5⟧ bound from the RTC\npaper); rollout validates this before connecting the robot.",
+   "tokens": [
+    "`execution_horizon`",
+    "`inference.queue_threshold`",
+    "`rtc_training_max_delay`",
+    "`execution_horizon`",
+    "`chunk_size - rtc_training_max_delay`",
+    "`d <= s <= H - d`"
+   ]
+  },
+  {
+   "id": 19,
+   "kind": "para",
+   "start": 6608,
+   "end": 6778,
+   "text": "**⟦0⟧**: How many timesteps from the previous chunk to maintain consistency with. Higher values mean smoother transitions but potentially less reactivity.",
+   "tokens": [
+    "`execution_horizon`"
+   ]
+  },
+  {
+   "id": 20,
+   "kind": "para",
+   "start": 6780,
+   "end": 6806,
+   "text": "Typical values: 8-12 steps",
+   "tokens": []
+  },
+  {
+   "id": 21,
+   "kind": "para",
+   "start": 6855,
+   "end": 7151,
+   "text": "**⟦0⟧**: How strongly to enforce consistency with the previous chunk. This is a hyperparameter that can be tuned to balance the smoothness of the transitions and the reactivity of the policy. For 10 steps flow matching (SmolVLA, Pi0, Pi0.5), a value of 10.0 is an optimal value.",
+   "tokens": [
+    "`max_guidance_weight`"
+   ]
+  },
+  {
+   "id": 22,
+   "kind": "para",
+   "start": 7153,
+   "end": 7238,
+   "text": "**⟦0⟧**: How to weight consistency across the overlap region.",
+   "tokens": [
+    "`prefix_attention_schedule`"
+   ]
+  },
+  {
+   "id": 23,
+   "kind": "list",
+   "start": 7240,
+   "end": 7306,
+   "text": "- ⟦0⟧: Linear decay from inference_delay to execution_horizon",
+   "tokens": [
+    "`LINEAR`"
+   ]
+  },
+  {
+   "id": 24,
+   "kind": "list",
+   "start": 7307,
+   "end": 7367,
+   "text": "- ⟦0⟧: Exponential decay (recommended for getting started)",
+   "tokens": [
+    "`EXP`"
+   ]
+  },
+  {
+   "id": 25,
+   "kind": "list",
+   "start": 7368,
+   "end": 7421,
+   "text": "- ⟦0⟧: Full weight across entire execution_horizon",
+   "tokens": [
+    "`ONES`"
+   ]
+  },
+  {
+   "id": 26,
+   "kind": "list",
+   "start": 7422,
+   "end": 7486,
+   "text": "- ⟦0⟧: Binary (full weight up to inference_delay, then zero)",
+   "tokens": [
+    "`ZEROS`"
+   ]
+  },
+  {
+   "id": 27,
+   "kind": "para",
+   "start": 7488,
+   "end": 7664,
+   "text": "**⟦0⟧**: How many timesteps of inference latency your system has. This is passed to ⟦1⟧ rather than the config, since it may vary at runtime.",
+   "tokens": [
+    "`inference_delay`",
+    "`predict_action_chunk()`"
+   ]
+  },
+  {
+   "id": 28,
+   "kind": "heading",
+   "start": 7666,
+   "end": 7688,
+   "text": "## Testing RTC Offline",
+   "tokens": []
+  },
+  {
+   "id": 29,
+   "kind": "para",
+   "start": 7690,
+   "end": 7778,
+   "text": "Before running on a real robot, test RTC with dataset samples to visualize how it works:",
+   "tokens": []
+  },
+  {
+   "id": 30,
+   "kind": "para",
+   "start": 8014,
+   "end": 8182,
+   "text": "Add ⟦0⟧ when evaluating a compatible training-time RTC Pi05\ncheckpoint. Unsupported policies reject trained mode instead of falling back to\nguided RTC.",
+   "tokens": [
+    "`--rtc.mode=trained`"
+   ]
+  },
+  {
+   "id": 31,
+   "kind": "para",
+   "start": 8184,
+   "end": 8497,
+   "text": "The script generates a visualization of the denoising process, comparing standard generation (left) with RTC (right). In the RTC plots, you can see how the first few steps (blue/purple lines) are guided to match the red ground truth trajectory (previous chunk's tail), ensuring a smooth transition between chunks.",
+   "tokens": []
+  },
+  {
+   "id": 32,
+   "kind": "heading",
+   "start": 8714,
+   "end": 8746,
+   "text": "## Testing RTC with a Real Robot",
+   "tokens": []
+  },
+  {
+   "id": 33,
+   "kind": "para",
+   "start": 9370,
+   "end": 9543,
+   "text": "For a training-time RTC Pi05 checkpoint, change the mode to ⟦0⟧. The\ncheckpoint records its maximum supported delay, and rollout validates measured\nlatency against it:",
+   "tokens": [
+    "`trained`"
+   ]
+  },
+  {
+   "id": 34,
+   "kind": "heading",
+   "start": 9946,
+   "end": 9999,
+   "text": "## How It Differs from the Async Inference in LeRobot",
+   "tokens": []
+  },
+  {
+   "id": 35,
+   "kind": "para",
+   "start": 10001,
+   "end": 10108,
+   "text": "Both RTC and [async inference](⟦0⟧) improve real-time robot control, but they solve different problems.",
+   "tokens": [
+    "./async"
+   ]
+  },
+  {
+   "id": 36,
+   "kind": "table",
+   "start": 10110,
+   "end": 10258,
+   "text": "| Aspect        | Async Inference                                                            | RTC                                                 |",
+   "tokens": []
+  },
+  {
+   "id": 37,
+   "kind": "table",
+   "start": 10408,
+   "end": 10556,
+   "text": "| **Problem**   | Idle frames while waiting for inference                                    | Discontinuities between action chunks               |",
+   "tokens": []
+  },
+  {
+   "id": 38,
+   "kind": "table",
+   "start": 10557,
+   "end": 10705,
+   "text": "| **Solution**  | Decouple prediction from execution                                         | Guide new chunks to continue smoothly from previous |",
+   "tokens": []
+  },
+  {
+   "id": 39,
+   "kind": "table",
+   "start": 10706,
+   "end": 10854,
+   "text": "| **Benefit**   | No waiting, continuous action                                              | Smooth transitions, natural motion                  |",
+   "tokens": []
+  },
+  {
+   "id": 40,
+   "kind": "table",
+   "start": 10855,
+   "end": 11003,
+   "text": "| **Best Used** | Async inference is best used with large models with high inference latency | Flow-matching based policies                        |",
+   "tokens": []
+  },
+  {
+   "id": 41,
+   "kind": "para",
+   "start": 11005,
+   "end": 11065,
+   "text": "**Use both together** for maximum smoothness and reactivity!",
+   "tokens": []
+  },
+  {
+   "id": 42,
+   "kind": "heading",
+   "start": 11067,
+   "end": 11094,
+   "text": "## Advanced: Debug Tracking",
+   "tokens": []
+  },
+  {
+   "id": 43,
+   "kind": "para",
+   "start": 11096,
+   "end": 11190,
+   "text": "RTC includes built-in debug tracking to help you understand what's happening during inference:",
+   "tokens": []
+  },
+  {
+   "id": 44,
+   "kind": "para",
+   "start": 11566,
+   "end": 11653,
+   "text": "See ⟦0⟧ for a complete example of offline RTC visualization.",
+   "tokens": [
+    "`examples/rtc/eval_dataset.py`"
+   ]
+  },
+  {
+   "id": 45,
+   "kind": "heading",
+   "start": 11655,
+   "end": 11668,
+   "text": "## References",
+   "tokens": []
+  },
+  {
+   "id": 46,
+   "kind": "list",
+   "start": 11670,
+   "end": 11855,
+   "text": "- [Smooth-As-Butter Robot Policies](⟦0⟧) - Excellent technical explanation with real robot results",
+   "tokens": [
+    "https://alexander-soare.github.io/robotics/2025/08/05/smooth-as-butter-robot-policies.html"
+   ]
+  },
+  {
+   "id": 47,
+   "kind": "list",
+   "start": 11856,
+   "end": 12002,
+   "text": "- [Physical Intelligence - Real-Time Chunking](⟦0⟧) - Original paper and research",
+   "tokens": [
+    "https://www.physicalintelligence.company/research/real_time_chunking"
+   ]
+  },
+  {
+   "id": 48,
+   "kind": "list",
+   "start": 12003,
+   "end": 12156,
+   "text": "- [Kinetix RTC Implementation](⟦0⟧) - Reference implementation from Physical Intelligence",
+   "tokens": [
+    "https://github.com/Physical-Intelligence/real-time-chunking-kinetix"
+   ]
+  },
+  {
+   "id": 49,
+   "kind": "list",
+   "start": 12157,
+   "end": 12291,
+   "text": "- [Training-Time Action Conditioning](⟦0⟧) - Efficient RTC with clean-prefix conditioning during training",
+   "tokens": [
+    "https://arxiv.org/abs/2512.05964"
+   ]
+  },
+  {
+   "id": 50,
+   "kind": "list",
+   "start": 12292,
+   "end": 12399,
+   "text": "- [RLDX-1](⟦0⟧) - PyTorch reference used for the training-time RTC integration",
+   "tokens": [
+    "https://github.com/RLWRLD/RLDX-1"
+   ]
+  }
+ ]
+}

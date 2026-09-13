@@ -1,0 +1,394 @@
+{
+ "file": "metaworld.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1936,
+   "text": "# Meta-World",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1938,
+   "end": 2310,
+   "text": "Meta-World is an open-source simulation benchmark for **multi-task and meta reinforcement learning** in continuous-control robotic manipulation. It bundles 50 diverse manipulation tasks using everyday objects and a common tabletop Sawyer arm, providing a standardized playground to test whether algorithms can learn many different tasks and generalize quickly to new ones.",
+   "tokens": []
+  },
+  {
+   "id": 2,
+   "kind": "list",
+   "start": 2312,
+   "end": 2448,
+   "text": "- Paper: [Meta-World: A Benchmark and Evaluation for Multi-Task and Meta Reinforcement Learning paper](⟦0⟧)",
+   "tokens": [
+    "https://arxiv.org/abs/1910.10897"
+   ]
+  },
+  {
+   "id": 3,
+   "kind": "list",
+   "start": 2449,
+   "end": 2536,
+   "text": "- GitHub: [Farama-Foundation/Metaworld](⟦0⟧)",
+   "tokens": [
+    "https://github.com/Farama-Foundation/Metaworld"
+   ]
+  },
+  {
+   "id": 4,
+   "kind": "list",
+   "start": 2537,
+   "end": 2608,
+   "text": "- Project website: [metaworld.farama.org](⟦0⟧)",
+   "tokens": [
+    "https://metaworld.farama.org"
+   ]
+  },
+  {
+   "id": 5,
+   "kind": "heading",
+   "start": 2681,
+   "end": 2699,
+   "text": "## Available tasks",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "para",
+   "start": 2701,
+   "end": 2856,
+   "text": "Meta-World provides 50 tasks organized into difficulty groups. In LeRobot, you can evaluate on individual tasks, difficulty groups, or the full MT50 suite:",
+   "tokens": []
+  },
+  {
+   "id": 7,
+   "kind": "table",
+   "start": 2858,
+   "end": 2960,
+   "text": "| Group      | CLI name             | Tasks | Description                                            |",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "table",
+   "start": 3064,
+   "end": 3166,
+   "text": "| Easy       | ⟦0⟧               | 28    | Tasks with simple dynamics and single-step goals       |",
+   "tokens": [
+    "`easy`"
+   ]
+  },
+  {
+   "id": 9,
+   "kind": "table",
+   "start": 3167,
+   "end": 3269,
+   "text": "| Medium     | ⟦0⟧             | 11    | Tasks requiring multi-step reasoning                   |",
+   "tokens": [
+    "`medium`"
+   ]
+  },
+  {
+   "id": 10,
+   "kind": "table",
+   "start": 3270,
+   "end": 3372,
+   "text": "| Hard       | ⟦0⟧               | 6     | Tasks with complex contacts and precise manipulation   |",
+   "tokens": [
+    "`hard`"
+   ]
+  },
+  {
+   "id": 11,
+   "kind": "table",
+   "start": 3373,
+   "end": 3475,
+   "text": "| Very Hard  | ⟦0⟧          | 5     | The most challenging tasks in the suite                |",
+   "tokens": [
+    "`very_hard`"
+   ]
+  },
+  {
+   "id": 12,
+   "kind": "table",
+   "start": 3476,
+   "end": 3578,
+   "text": "| MT50 (all) | Comma-separated list | 50    | All 50 tasks — the most challenging multi-task setting |",
+   "tokens": []
+  },
+  {
+   "id": 13,
+   "kind": "para",
+   "start": 3580,
+   "end": 3667,
+   "text": "You can also pass individual task names directly (e.g., ⟦0⟧, ⟦1⟧).",
+   "tokens": [
+    "`assembly-v3`",
+    "`dial-turn-v3`"
+   ]
+  },
+  {
+   "id": 14,
+   "kind": "para",
+   "start": 3669,
+   "end": 3968,
+   "text": "We provide a LeRobot-ready dataset for Meta-World MT50 on the HF Hub: [lerobot/metaworld_mt50](⟦0⟧). This dataset is formatted for the MT50 evaluation that uses all 50 tasks with fixed object/goal positions and one-hot task vectors for consistency.",
+   "tokens": [
+    "https://huggingface.co/datasets/lerobot/metaworld_mt50"
+   ]
+  },
+  {
+   "id": 15,
+   "kind": "heading",
+   "start": 3970,
+   "end": 3985,
+   "text": "## Installation",
+   "tokens": []
+  },
+  {
+   "id": 16,
+   "kind": "para",
+   "start": 3987,
+   "end": 4041,
+   "text": "After following the LeRobot installation instructions:",
+   "tokens": []
+  },
+  {
+   "id": 17,
+   "kind": "para",
+   "start": 4086,
+   "end": 4299,
+   "text": "⟦0⟧\nIf you encounter an ⟦1⟧ when running Meta-World environments, this is a mismatch between Meta-World and your Gymnasium version. Fix it with:",
+   "tokens": [
+    "<Tip warning={true}>",
+    "`AssertionError: ['human', 'rgb_array', 'depth_array']`"
+   ]
+  },
+  {
+   "id": 18,
+   "kind": "heading",
+   "start": 4353,
+   "end": 4366,
+   "text": "## Evaluation",
+   "tokens": []
+  },
+  {
+   "id": 19,
+   "kind": "heading",
+   "start": 4368,
+   "end": 4404,
+   "text": "### Default evaluation (recommended)",
+   "tokens": []
+  },
+  {
+   "id": 20,
+   "kind": "para",
+   "start": 4406,
+   "end": 4487,
+   "text": "Evaluate on the medium difficulty split (a good balance of coverage and compute):",
+   "tokens": []
+  },
+  {
+   "id": 21,
+   "kind": "heading",
+   "start": 4646,
+   "end": 4672,
+   "text": "### Single-task evaluation",
+   "tokens": []
+  },
+  {
+   "id": 22,
+   "kind": "para",
+   "start": 4674,
+   "end": 4702,
+   "text": "Evaluate on a specific task:",
+   "tokens": []
+  },
+  {
+   "id": 23,
+   "kind": "heading",
+   "start": 4866,
+   "end": 4891,
+   "text": "### Multi-task evaluation",
+   "tokens": []
+  },
+  {
+   "id": 24,
+   "kind": "para",
+   "start": 4893,
+   "end": 4945,
+   "text": "Evaluate across multiple tasks or difficulty groups:",
+   "tokens": []
+  },
+  {
+   "id": 25,
+   "kind": "list",
+   "start": 5143,
+   "end": 5271,
+   "text": "- ⟦0⟧ accepts explicit task lists (comma-separated) or difficulty groups (e.g., ⟦1⟧, ⟦2⟧, ⟦3⟧, ⟦4⟧).",
+   "tokens": [
+    "`--env.task`",
+    "`easy`",
+    "`medium`",
+    "`hard`",
+    "`very_hard`"
+   ]
+  },
+  {
+   "id": 26,
+   "kind": "list",
+   "start": 5272,
+   "end": 5341,
+   "text": "- ⟦0⟧ controls how many environments run in parallel.",
+   "tokens": [
+    "`--eval.batch_size`"
+   ]
+  },
+  {
+   "id": 27,
+   "kind": "list",
+   "start": 5342,
+   "end": 5403,
+   "text": "- ⟦0⟧ sets how many episodes to run per task.",
+   "tokens": [
+    "`--eval.n_episodes`"
+   ]
+  },
+  {
+   "id": 28,
+   "kind": "heading",
+   "start": 5405,
+   "end": 5434,
+   "text": "### Policy inputs and outputs",
+   "tokens": []
+  },
+  {
+   "id": 29,
+   "kind": "para",
+   "start": 5436,
+   "end": 5453,
+   "text": "**Observations:**",
+   "tokens": []
+  },
+  {
+   "id": 30,
+   "kind": "list",
+   "start": 5455,
+   "end": 5528,
+   "text": "- ⟦0⟧ — single camera view (⟦1⟧), 480x480 HWC uint8",
+   "tokens": [
+    "`observation.image`",
+    "`corner2`"
+   ]
+  },
+  {
+   "id": 31,
+   "kind": "list",
+   "start": 5529,
+   "end": 5613,
+   "text": "- ⟦0⟧ — 4-dim proprioceptive state (end-effector position + gripper)",
+   "tokens": [
+    "`observation.state`"
+   ]
+  },
+  {
+   "id": 32,
+   "kind": "para",
+   "start": 5615,
+   "end": 5627,
+   "text": "**Actions:**",
+   "tokens": []
+  },
+  {
+   "id": 33,
+   "kind": "list",
+   "start": 5629,
+   "end": 5714,
+   "text": "- Continuous control in ⟦0⟧ — 3D end-effector delta + 1D gripper",
+   "tokens": [
+    "`Box(-1, 1, shape=(4,))`"
+   ]
+  },
+  {
+   "id": 34,
+   "kind": "heading",
+   "start": 5716,
+   "end": 5751,
+   "text": "### Recommended evaluation episodes",
+   "tokens": []
+  },
+  {
+   "id": 35,
+   "kind": "para",
+   "start": 5753,
+   "end": 6022,
+   "text": "For reproducible benchmarking, use **10 episodes per task**. For the full MT50 suite this gives 500 total episodes. If you care about generalization, run on the full MT50 — it is intentionally challenging and reveals strengths/weaknesses better than a few narrow tasks.",
+   "tokens": []
+  },
+  {
+   "id": 36,
+   "kind": "heading",
+   "start": 6024,
+   "end": 6035,
+   "text": "## Training",
+   "tokens": []
+  },
+  {
+   "id": 37,
+   "kind": "heading",
+   "start": 6037,
+   "end": 6065,
+   "text": "### Example training command",
+   "tokens": []
+  },
+  {
+   "id": 38,
+   "kind": "para",
+   "start": 6067,
+   "end": 6122,
+   "text": "Train a SmolVLA policy on a subset of Meta-World tasks:",
+   "tokens": []
+  },
+  {
+   "id": 39,
+   "kind": "heading",
+   "start": 6529,
+   "end": 6546,
+   "text": "## Practical tips",
+   "tokens": []
+  },
+  {
+   "id": 40,
+   "kind": "list",
+   "start": 6548,
+   "end": 6671,
+   "text": "- Use the one-hot task conditioning for multi-task training (MT10/MT50 conventions) so policies have explicit task context.",
+   "tokens": []
+  },
+  {
+   "id": 41,
+   "kind": "list",
+   "start": 6672,
+   "end": 6837,
+   "text": "- Inspect the dataset task descriptions and the ⟦0⟧ keys when writing post-processing or logging so your success metrics line up with the benchmark.",
+   "tokens": [
+    "`info[\"is_success\"]`"
+   ]
+  },
+  {
+   "id": 42,
+   "kind": "list",
+   "start": 6838,
+   "end": 6919,
+   "text": "- Adjust ⟦0⟧, ⟦1⟧, and ⟦2⟧ to match your compute budget.",
+   "tokens": [
+    "`batch_size`",
+    "`steps`",
+    "`env_eval_freq`"
+   ]
+  }
+ ]
+}

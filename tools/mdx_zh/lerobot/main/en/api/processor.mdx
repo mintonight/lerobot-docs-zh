@@ -1,0 +1,534 @@
+<script lang="ts">
+import {onMount} from "svelte";
+import Tip from "$lib/Tip.svelte";
+import CopyLLMTxtMenu from "$lib/CopyLLMTxtMenu.svelte";
+import Youtube from "$lib/Youtube.svelte";
+import Docstring from "$lib/Docstring.svelte";
+import CodeBlock from "$lib/CodeBlock.svelte";
+import CodeBlockFw from "$lib/CodeBlockFw.svelte";
+import DocNotebookDropdown from "$lib/DocNotebookDropdown.svelte";
+import CourseFloatingBanner from "$lib/CourseFloatingBanner.svelte";
+import IconCopyLink from "$lib/IconCopyLink.svelte";
+import FrameworkContent from "$lib/FrameworkContent.svelte";
+import Markdown from "$lib/Markdown.svelte";
+import Question from "$lib/Question.svelte";
+import FrameworkSwitchCourse from "$lib/FrameworkSwitchCourse.svelte";
+import InferenceApi from "$lib/InferenceApi.svelte";
+import TokenizersLanguageContent from "$lib/TokenizersLanguageContent.svelte";
+import ExampleCodeBlock from "$lib/ExampleCodeBlock.svelte";
+import Added from "$lib/Added.svelte";
+import Changed from "$lib/Changed.svelte";
+import Deprecated from "$lib/Deprecated.svelte";
+import PipelineIcon from "$lib/PipelineIcon.svelte";
+import PipelineTag from "$lib/PipelineTag.svelte";
+import Heading from "$lib/Heading.svelte";
+import HfOptions from "$lib/HfOptions.svelte";
+import HfOption from "$lib/HfOption.svelte";
+import EditOnGithub from "$lib/EditOnGithub.svelte";
+import InferenceSnippet from "$lib/InferenceSnippet/InferenceSnippet.svelte";
+import MermaidChart from "$lib/MermaidChart.svelte";
+let fw: "pt" | "tf" = "pt";
+onMount(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    fw = urlParams.get("fw") || "pt";
+});
+</script>
+<svelte:head>
+  <meta name="hf:doc:metadata" content={metadata} >
+</svelte:head>
+
+<!--HF DOCBUILD BODY START-->
+
+HF_DOC_BODY_START
+
+<CopyLLMTxtMenu containerStyle="float: right; margin-left: 10px; display: inline-flex; position: relative; z-index: 10;"></CopyLLMTxtMenu>
+
+# 处理器
+
+处理器是机器人、dataset 和 policy 之间的数据转换层。流水线是一系列
+`ProcessorStep` 的链；每个步骤声明它如何转换数据和特征契约。
+
+概念请参阅[机器人处理器简介](../introduction_processors)，
+编写步骤请参阅[实现你自己的处理器](../implement_your_own_processor)，
+当流水线行为异常时请参阅[调试处理器流水线](../debug_processor_pipeline)。
+
+## ProcessorStep [[lerobot.processor.ProcessorStep]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.processor.ProcessorStep"} anchor={"lerobot.processor.ProcessorStep"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/processor/pipeline.py#L150"} parameters={[]}>
+</Docstring>
+数据处理流水线中单个步骤的抽象基类。
+
+每个步骤必须实现 `__call__` 方法，以对数据转换执行其变换，
+并实现 `transform_features` 方法，以描述它如何
+改变数据特征的形状或类型。
+
+子类可以选择通过实现 `state_dict` 和 `load_state_dict` 来支持有 state。
+
+
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"get_config"} anchor={"lerobot.processor.ProcessorStep.get_config"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/processor/pipeline.py#L191"} parameters={[]}>
+<retdesc> 可 JSON 序列化的配置参数字典。</retdesc></Docstring>
+返回该步骤的配置以进行序列化。
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"load_state_dict"} anchor={"lerobot.processor.ProcessorStep.load_state_dict"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/processor/pipeline.py#L207"} parameters={[{"name": "state", "val": ": dict[str, torch.Tensor]"}]}>
+<paramsdesc>- **state** -- state 张量的字典。</paramsdesc></Docstring>
+从 state 字典加载该步骤的 state。
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"reset"} anchor={"lerobot.processor.ProcessorStep.reset"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/processor/pipeline.py#L219"} parameters={[]}>
+</Docstring>
+重置处理器步骤的内部 state（如果有）。
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"save_artifacts"} anchor={"lerobot.processor.ProcessorStep.save_artifacts"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/processor/pipeline.py#L215"} parameters={[{"name": "save_directory", "val": ": Path"}]}>
+</Docstring>
+保存非张量资产，并将构造函数参数映射到相对路径。
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"state_dict"} anchor={"lerobot.processor.ProcessorStep.state_dict"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/processor/pipeline.py#L199"} parameters={[]}>
+<retdesc> 一个将 state 名称映射到张量的字典。</retdesc></Docstring>
+返回该步骤的 state（例如，学习到的参数、运行均值）。
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"transform_features"} anchor={"lerobot.processor.ProcessorStep.transform_features"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/processor/pipeline.py#L223"} parameters={[{"name": "features", "val": ": dict[PipelineFeatureType, dict[str, PolicyFeature]]"}]}>
+<paramsdesc>- **features** -- 描述 observation、action 等输入特征的字典。</paramsdesc><retdesc> 描述此步骤变换后输出特征的字典。</retdesc></Docstring>
+定义此步骤如何修改流水线特征的描述。
+
+此方法用于在数据流经流水线时跟踪数据形状、数据类型或模态的变化，
+而无需处理实际数据。
+
+
+
+
+
+
+</div></div>
+
+## DataProcessorPipeline [[lerobot.processor.DataProcessorPipeline]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.processor.DataProcessorPipeline"} anchor={"lerobot.processor.DataProcessorPipeline"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/processor/pipeline.py#L264"} parameters={[{"name": "steps", "val": ": Sequence[ProcessorStep] = <factory>"}, {"name": "name", "val": ": str = 'DataProcessorPipeline'"}, {"name": "to_transition", "val": ": Callable[[TInput], EnvTransition] = <factory>"}, {"name": "to_output", "val": ": Callable[[EnvTransition], TOutput] = <factory>"}, {"name": "before_step_hooks", "val": ": list[Callable[[int, EnvTransition], None]] = <factory>"}, {"name": "after_step_hooks", "val": ": list[Callable[[int, EnvTransition], None]] = <factory>"}]}>
+<paramsdesc>- **steps** -- 构成流水线的 `ProcessorStep` 对象序列。
+- **name** -- 流水线的描述性名称。
+- **to_transition** -- 将原始输入数据转换为标准 `EnvTransition` 格式的函数。
+- **to_output** -- 将最终 `EnvTransition` 转换为所需输出格式的函数。
+- **before_step_hooks** -- 在每个步骤执行前调用的函数列表。
+- **after_step_hooks** -- 在每个步骤执行后调用的函数列表。</paramsdesc></Docstring>
+用于处理数据的顺序流水线，与 Hugging Face Hub 集成。
+
+此类将多个 `ProcessorStep` 实例串联起来，形成一个完整的
+数据处理工作流。它是通用的，允许自定义输入和输出类型，
+这些类型由 `to_transition` 和 `to_output` 转换器处理。
+
+
+
+
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"from_config"} anchor={"lerobot.processor.DataProcessorPipeline.from_config"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/processor/pipeline.py#L785"} parameters={[{"name": "config", "val": ": dict[str, Any]"}, {"name": "state_dict", "val": ": dict[str, dict[str, torch.Tensor]] | None = None"}, {"name": "overrides", "val": ": dict[str, Any] | None = None"}, {"name": "to_transition", "val": ": Callable[[TInput], EnvTransition] | None = None"}, {"name": "to_output", "val": ": Callable[[EnvTransition], TOutput] | None = None"}]}>
+<paramsdesc>- **config** -- 与保存的处理器 JSON 结构相同的配置字典。
+- **state_dict** -- 可选的内存中流水线 state，按无后缀 state 键分组。
+- **overrides** -- 可选构造函数覆盖，以注册表名称或类名为键。
+- **to_transition** -- 可选的转换器，从输入数据转换为 `EnvTransition`。
+- **to_output** -- 可选的转换器，从 `EnvTransition` 转换为输出数据。</paramsdesc><retdesc> 根据配置和可选 state 构建的处理器流水线。</retdesc></Docstring>
+从内存中的配置和可选 state 张量构建流水线。
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"from_pretrained"} anchor={"lerobot.processor.DataProcessorPipeline.from_pretrained"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/processor/pipeline.py#L638"} parameters={[{"name": "pretrained_model_name_or_path", "val": ": str | Path"}, {"name": "config_filename", "val": ": str"}, {"name": "force_download", "val": ": bool = False"}, {"name": "resume_download", "val": ": bool | None = None"}, {"name": "proxies", "val": ": dict[str, str] | None = None"}, {"name": "token", "val": ": str | bool | None = None"}, {"name": "cache_dir", "val": ": str | Path | None = None"}, {"name": "local_files_only", "val": ": bool = False"}, {"name": "revision", "val": ": str | None = None"}, {"name": "overrides", "val": ": dict[str, Any] | None = None"}, {"name": "to_transition", "val": ": Callable[[TInput], EnvTransition] | None = None"}, {"name": "to_output", "val": ": Callable[[EnvTransition], TOutput] | None = None"}, {"name": "**kwargs", "val": ""}]}>
+<paramsdesc>- **pretrained_model_name_or_path** -- Hugging Face Hub 上仓库的标识符，
+  本地目录的路径，或单个配置文件的路径。
+- **config_filename** -- 流水线 JSON 配置文件的名称。始终必需，
+  以防止存在多个配置（例如，预处理器与后处理器）时产生歧义。
+- **force_download** -- 是否强制（重新）下载文件。
+- **resume_download** -- 是否恢复先前中断的下载。
+- **proxies** -- 要使用的代理服务器字典。
+- **token** -- 用作私有 Hub 仓库 HTTP bearer 授权的令牌。
+- **cache_dir** -- 用于存储下载文件的特定缓存文件夹路径。
+- **local_files_only** -- 如果为 True，则避免从 Hub 下载文件。
+- **revision** -- 要使用的特定模型版本（例如，分支名、标签名或提交 id）。
+- **overrides** -- 用于覆盖特定步骤配置的字典。键应
+  与步骤的类名或注册表名匹配。
+- **to_transition** -- 将输入数据转换为 `EnvTransition` 的自定义函数。
+- **to_output** -- 将最终 `EnvTransition` 转换为输出格式的自定义函数。
+- ****kwargs** -- 附加参数（未使用）。</paramsdesc><retdesc> 加载了指定配置和 state 的 `DataProcessorPipeline` 实例。</retdesc><raises>- ``FileNotFoundError`` -- 如果找不到配置文件。
+- ``ValueError`` -- 如果配置有歧义或实例化失败。
+- ``ImportError`` -- 如果无法导入某个步骤的类。
+- ``KeyError`` -- 如果某个覆盖键与流水线中的任何步骤都不匹配。
+- ``ProcessorMigrationError`` -- 如果模型需要迁移为处理器格式。</raises><raisederrors>``FileNotFoundError`` or ``ValueError`` or ``ImportError`` or ``KeyError`` or ``ProcessorMigrationError``</raisederrors></Docstring>
+从本地目录、单个文件或 Hugging Face Hub 仓库加载流水线。
+
+此方法实现了一个简化的加载流水线，并带有智能迁移检测：
+
+**简化的加载 policy**：
+1. **配置加载**（_load_config）：
+   - **目录**：从目录加载指定的 config_filename
+   - **单个文件**：直接加载文件（忽略 config_filename）
+   - **Hub 仓库**：从 Hub 下载指定的 config_filename
+
+2. **配置验证**（_validate_loaded_config）：
+   - 格式验证：确保配置是有效的处理器格式
+   - 迁移检测：引导用户迁移旧的 LeRobot 模型
+   - 清晰错误：提供可操作的错误消息
+
+3. **步骤构建**（_build_steps_with_overrides）：
+   - 类解析：注册表查找或动态导入
+   - 覆盖合并：用户参数覆盖已保存的配置
+   - state 加载：为有 state 步骤加载 .safetensors 文件
+
+4. **覆盖验证**（_validate_overrides_used）：
+   - 确保所有用户覆盖都已应用（捕获拼写错误）
+   - 提供带有可用键的有用错误消息
+
+**迁移检测**：
+- **智能检测**：分析 JSON 文件以检测旧的 LeRobot 模型
+- **精准定位**：避免对其他 HuggingFace 模型产生误报
+- **清晰指引**：提供要运行的确切迁移命令
+- **错误模式**：始终抛出 ProcessorMigrationError，以便用户明确采取行动
+
+<ExampleCodeBlock anchor="lerobot.processor.DataProcessorPipeline.from_pretrained.example">
+
+**加载示例**：
+```python
+# Directory loading
+pipeline = DataProcessorPipeline.from_pretrained("/models/my_model", config_filename="processor.json")
+
+# Single file loading
+pipeline = DataProcessorPipeline.from_pretrained(
+    "/models/my_model/processor.json", config_filename="processor.json"
+)
+
+# Hub loading
+pipeline = DataProcessorPipeline.from_pretrained("user/repo", config_filename="processor.json")
+
+# Multiple configs (preprocessor/postprocessor)
+preprocessor = DataProcessorPipeline.from_pretrained(
+    "model", config_filename="policy_preprocessor.json"
+)
+postprocessor = DataProcessorPipeline.from_pretrained(
+    "model", config_filename="policy_postprocessor.json"
+)
+```
+
+</ExampleCodeBlock>
+
+**覆盖系统**：
+- **键匹配**：使用注册表名称或类名作为覆盖键
+- **配置合并**：用户覆盖优先于已保存的配置
+- **验证**：确保所有覆盖键与实际步骤匹配（捕获拼写错误）
+- **示例**：overrides={"NormalizeStep": {"device": "cuda"}}
+
+
+
+
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"get_config"} anchor={"lerobot.processor.DataProcessorPipeline.get_config"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/processor/pipeline.py#L442"} parameters={[]}>
+<retdesc> 与 `save_pretrained()` 以 JSON 写入内容相同的字典。</retdesc></Docstring>
+返回可 JSON 序列化的流水线配置。
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"load_state_dict"} anchor={"lerobot.processor.DataProcessorPipeline.load_state_dict"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/processor/pipeline.py#L506"} parameters={[{"name": "state_dict", "val": ": dict[str, dict[str, torch.Tensor]]"}]}>
+<paramsdesc>- **state_dict** -- 将无后缀 state 键映射到步骤 state 字典的字典。</paramsdesc><raises>- ``KeyError`` -- 如果加载时发现缺少预期 state 或出现意外的额外 state。</raises><raisederrors>``KeyError``</raisederrors></Docstring>
+将流水线 state 张量加载到现有步骤中。
+
+
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"process_action"} anchor={"lerobot.processor.DataProcessorPipeline.process_action"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/processor/pipeline.py#L1771"} parameters={[{"name": "action", "val": ": PolicyAction | RobotAction | EnvAction"}]}>
+<paramsdesc>- **action** -- action 数据。</paramsdesc><retdesc> 处理后的 action。</retdesc></Docstring>
+仅通过流水线处理转换中的 action 部分。
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"process_complementary_data"} anchor={"lerobot.processor.DataProcessorPipeline.process_complementary_data"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/processor/pipeline.py#L1838"} parameters={[{"name": "complementary_data", "val": ": dict[str, Any]"}]}>
+<paramsdesc>- **complementary_data** -- 补充数据字典。</paramsdesc><retdesc> 处理后的补充数据字典。</retdesc></Docstring>
+仅通过流水线处理转换中的补充数据部分。
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"process_done"} anchor={"lerobot.processor.DataProcessorPipeline.process_done"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/processor/pipeline.py#L1799"} parameters={[{"name": "done", "val": ": bool | torch.Tensor"}]}>
+<paramsdesc>- **done** -- done 标志。</paramsdesc><retdesc> 处理后的 done 标志。</retdesc></Docstring>
+仅通过流水线处理转换中的 done 标志。
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"process_info"} anchor={"lerobot.processor.DataProcessorPipeline.process_info"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/processor/pipeline.py#L1825"} parameters={[{"name": "info", "val": ": dict[str, Any]"}]}>
+<paramsdesc>- **info** -- info 字典。</paramsdesc><retdesc> 处理后的 info 字典。</retdesc></Docstring>
+仅通过流水线处理转换中的 info 字典。
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"process_observation"} anchor={"lerobot.processor.DataProcessorPipeline.process_observation"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/processor/pipeline.py#L1758"} parameters={[{"name": "observation", "val": ": RobotObservation"}]}>
+<paramsdesc>- **observation** -- observation 字典。</paramsdesc><retdesc> 处理后的 observation 字典。</retdesc></Docstring>
+仅通过流水线处理转换中的 observation 部分。
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"process_reward"} anchor={"lerobot.processor.DataProcessorPipeline.process_reward"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/processor/pipeline.py#L1786"} parameters={[{"name": "reward", "val": ": float | torch.Tensor"}]}>
+<paramsdesc>- **reward** -- 奖励值。</paramsdesc><retdesc> 处理后的奖励。</retdesc></Docstring>
+仅通过流水线处理转换中的奖励部分。
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"process_truncated"} anchor={"lerobot.processor.DataProcessorPipeline.process_truncated"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/processor/pipeline.py#L1812"} parameters={[{"name": "truncated", "val": ": bool | torch.Tensor"}]}>
+<paramsdesc>- **truncated** -- truncated 标志。</paramsdesc><retdesc> 处理后的 truncated 标志。</retdesc></Docstring>
+仅通过流水线处理转换中的 truncated 标志。
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"register_after_step_hook"} anchor={"lerobot.processor.DataProcessorPipeline.register_after_step_hook"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/processor/pipeline.py#L1682"} parameters={[{"name": "fn", "val": ": Callable[[int, EnvTransition], None]"}]}>
+<paramsdesc>- **fn** -- 一个接受步骤索引和当前转换的可调用对象。</paramsdesc></Docstring>
+注册一个在每个步骤之后调用的函数。
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"register_before_step_hook"} anchor={"lerobot.processor.DataProcessorPipeline.register_before_step_hook"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/processor/pipeline.py#L1658"} parameters={[{"name": "fn", "val": ": Callable[[int, EnvTransition], None]"}]}>
+<paramsdesc>- **fn** -- 一个接受步骤索引和当前转换的可调用对象。</paramsdesc></Docstring>
+注册一个在每个步骤之前调用的函数。
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"reset"} anchor={"lerobot.processor.DataProcessorPipeline.reset"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/processor/pipeline.py#L1706"} parameters={[]}>
+</Docstring>
+重置流水线中所有有 state 步骤的 state。
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"save_pretrained"} anchor={"lerobot.processor.DataProcessorPipeline.save_pretrained"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/processor/pipeline.py#L586"} parameters={[{"name": "save_directory", "val": ": str | Path | None = None"}, {"name": "repo_id", "val": ": str | None = None"}, {"name": "push_to_hub", "val": ": bool = False"}, {"name": "card_kwargs", "val": ": dict[str, Any] | None = None"}, {"name": "config_filename", "val": ": str | None = None"}, {"name": "**push_to_hub_kwargs", "val": ""}]}>
+<paramsdesc>- **save_directory** -- 保存流水线的目录。如果为 None，则保存到
+  HF_LEROBOT_HOME/processors/{sanitized_pipeline_name}。
+- **repo_id** -- 你在 Hub 上的仓库 ID。仅在 `push_to_hub=true` 时使用。
+- **push_to_hub** -- 保存后是否将对象推送到 Hugging Face Hub。
+- **card_kwargs** -- 传递给卡片模板以自定义卡片的附加参数。
+- **config_filename** -- JSON 配置文件的名称。如果为 None，则根据流水线的 `name` 属性生成名称。
+- ****push_to_hub_kwargs** -- 传递给 push_to_hub 方法的附加关键字参数。</paramsdesc></Docstring>
+将流水线的配置和 state 保存到目录。
+
+此方法创建一个 JSON 配置文件，用于定义流水线的结构
+（名称和步骤）。对于每个有 state 步骤，它还会保存一个 `.safetensors` 文件，
+其中包含其 state 字典。
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"state_dict"} anchor={"lerobot.processor.DataProcessorPipeline.state_dict"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/processor/pipeline.py#L479"} parameters={[]}>
+<retdesc> 将无后缀 state 键映射到克隆的步骤 state 字典的字典。</retdesc></Docstring>
+返回按 state 键分组的流水线 state 张量。
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"step_through"} anchor={"lerobot.processor.DataProcessorPipeline.step_through"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/processor/pipeline.py#L334"} parameters={[{"name": "data", "val": ": TInput"}]}>
+<paramsdesc>- **data** -- 输入数据。</paramsdesc><yielddesc>`EnvTransition` 对象，从初始 state 开始，然后在
+每个处理步骤之后。</yielddesc></Docstring>
+逐步处理数据，在每个阶段产出转换。
+
+这是一个生成器方法，可用于调试和检查数据通过流水线时的中间
+state。
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"transform_features"} anchor={"lerobot.processor.DataProcessorPipeline.transform_features"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/processor/pipeline.py#L1735"} parameters={[{"name": "initial_features", "val": ": dict[PipelineFeatureType, dict[str, PolicyFeature]]"}]}>
+<paramsdesc>- **initial_features** -- 描述初始特征的字典。</paramsdesc><retdesc> 所有变换后的最终特征描述。</retdesc></Docstring>
+按顺序应用所有步骤的特征变换。
+
+此方法将特征描述字典传播通过每个步骤的
+`transform_features` 方法，使流水线能够在不处理任何真实数据的情况下静态确定
+输出特征规范。
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"unregister_after_step_hook"} anchor={"lerobot.processor.DataProcessorPipeline.unregister_after_step_hook"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/processor/pipeline.py#L1690"} parameters={[{"name": "fn", "val": ": Callable[[int, EnvTransition], None]"}]}>
+<paramsdesc>- **fn** -- 之前注册的确切函数对象。</paramsdesc><raises>- ``ValueError`` -- 如果列表中找不到该钩子。</raises><raisederrors>``ValueError``</raisederrors></Docstring>
+注销一个 'after_step' 钩子。
+
+
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"unregister_before_step_hook"} anchor={"lerobot.processor.DataProcessorPipeline.unregister_before_step_hook"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/processor/pipeline.py#L1666"} parameters={[{"name": "fn", "val": ": Callable[[int, EnvTransition], None]"}]}>
+<paramsdesc>- **fn** -- 之前注册的确切函数对象。</paramsdesc><raises>- ``ValueError`` -- 如果列表中找不到该钩子。</raises><raisederrors>``ValueError``</raisederrors></Docstring>
+注销一个 'before_step' 钩子。
+
+
+
+
+
+
+
+
+</div></div>
+
+## PolicyProcessorPipeline [[lerobot.processor.DataProcessorPipeline]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"lerobot.processor.DataProcessorPipeline"} anchor={"lerobot.processor.DataProcessorPipeline"} parameters={[{"name": "*args", "val": ""}, {"name": "**kwargs", "val": ""}]}>
+</Docstring>
+
+
+</div>
+
+
+<EditOnGithub source="https://github.com/huggingface/lerobot/blob/main/docs/source/api/processor.mdx" />
+
+<!--HF DOCBUILD BODY END-->
+
+HF_DOC_BODY_END
+

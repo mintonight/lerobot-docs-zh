@@ -1,0 +1,577 @@
+{
+ "file": "phone_teleop.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1931,
+   "text": "# Phone",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1933,
+   "end": 1987,
+   "text": "Use your phone (iOS or Android) to control your robot.",
+   "tokens": []
+  },
+  {
+   "id": 2,
+   "kind": "para",
+   "start": 1989,
+   "end": 2020,
+   "text": "**In this guide you'll learn:**",
+   "tokens": []
+  },
+  {
+   "id": 3,
+   "kind": "list",
+   "start": 2022,
+   "end": 2059,
+   "text": "- How to connect an iOS/Android phone",
+   "tokens": []
+  },
+  {
+   "id": 4,
+   "kind": "list",
+   "start": 2060,
+   "end": 2121,
+   "text": "- How phone pose is mapped to robot end‑effector (EE) targets",
+   "tokens": []
+  },
+  {
+   "id": 5,
+   "kind": "list",
+   "start": 2122,
+   "end": 2184,
+   "text": "- How to tweak safety limits, gripper control, and IK settings",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "para",
+   "start": 2186,
+   "end": 2261,
+   "text": "To use phone to control your robot, install the relevant dependencies with:",
+   "tokens": []
+  },
+  {
+   "id": 7,
+   "kind": "heading",
+   "start": 2303,
+   "end": 2317,
+   "text": "## Get started",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "heading",
+   "start": 2319,
+   "end": 2342,
+   "text": "### Supported platforms",
+   "tokens": []
+  },
+  {
+   "id": 9,
+   "kind": "list",
+   "start": 2344,
+   "end": 2523,
+   "text": "- iOS: Uses the HEBI Mobile I/O app (ARKit pose + buttons). Download the app first, open it and the examples will discover it on your network and stream the phone pose and inputs.",
+   "tokens": []
+  },
+  {
+   "id": 10,
+   "kind": "list",
+   "start": 2524,
+   "end": 2697,
+   "text": "- Android: Uses the ⟦0⟧ package (WebXR). When you start the Python process, it prints a local URL. Open the link on your phone, tap Start, then use Move to stream pose.",
+   "tokens": [
+    "`teleop`"
+   ]
+  },
+  {
+   "id": 11,
+   "kind": "para",
+   "start": 2699,
+   "end": 2705,
+   "text": "Links:",
+   "tokens": []
+  },
+  {
+   "id": 12,
+   "kind": "list",
+   "start": 2707,
+   "end": 2784,
+   "text": "- Android WebXR library: [⟦0⟧ on PyPI](⟦1⟧)",
+   "tokens": [
+    "`teleop`",
+    "https://pypi.org/project/teleop/"
+   ]
+  },
+  {
+   "id": 13,
+   "kind": "list",
+   "start": 2785,
+   "end": 2856,
+   "text": "- iOS app: [HEBI Mobile I/O](⟦0⟧)",
+   "tokens": [
+    "https://docs.hebi.us/tools.html#mobile-io"
+   ]
+  },
+  {
+   "id": 14,
+   "kind": "heading",
+   "start": 2858,
+   "end": 2892,
+   "text": "### Phone orientation and controls",
+   "tokens": []
+  },
+  {
+   "id": 15,
+   "kind": "list",
+   "start": 2894,
+   "end": 3150,
+   "text": "- Orientation: hold the phone with the screen facing up and the top edge pointing in the same direction as the robot gripper. This ensures calibration aligns the phone’s frame with the robot frame so motion feels natural, see the image below for reference.",
+   "tokens": []
+  },
+  {
+   "id": 16,
+   "kind": "list",
+   "start": 3151,
+   "end": 3168,
+   "text": "- Enable/disable:",
+   "tokens": []
+  },
+  {
+   "id": 17,
+   "kind": "list",
+   "start": 3169,
+   "end": 3272,
+   "text": "  - iOS: Hold ⟦0⟧ to enable teleoperation, release to stop. The first press captures a reference pose.",
+   "tokens": [
+    "`B1`"
+   ]
+  },
+  {
+   "id": 18,
+   "kind": "list",
+   "start": 3273,
+   "end": 3379,
+   "text": "  - Android: Press and hold the ⟦0⟧ button, release to stop. The first press captures a reference pose.",
+   "tokens": [
+    "`Move`"
+   ]
+  },
+  {
+   "id": 19,
+   "kind": "list",
+   "start": 3380,
+   "end": 3398,
+   "text": "- Gripper control:",
+   "tokens": []
+  },
+  {
+   "id": 20,
+   "kind": "list",
+   "start": 3399,
+   "end": 3465,
+   "text": "  - iOS: Analog input ⟦0⟧ controls the gripper as velocity input.",
+   "tokens": [
+    "`A3`"
+   ]
+  },
+  {
+   "id": 21,
+   "kind": "list",
+   "start": 3466,
+   "end": 3608,
+   "text": "  - Android: Buttons ⟦0⟧ and ⟦1⟧ act like increment/decrement (A opens, B closes). You can tune velocity in the ⟦2⟧ step.",
+   "tokens": [
+    "`A`",
+    "`B`",
+    "`GripperVelocityToJoint`"
+   ]
+  },
+  {
+   "id": 22,
+   "kind": "heading",
+   "start": 3803,
+   "end": 3834,
+   "text": "### Step 1: Choose the platform",
+   "tokens": []
+  },
+  {
+   "id": 23,
+   "kind": "para",
+   "start": 3836,
+   "end": 4058,
+   "text": "Modify the examples to use ⟦0⟧ or ⟦1⟧ in ⟦2⟧. The API is identical across platforms, only the input source differs. All examples are under ⟦3⟧ and have ⟦4⟧ variants.",
+   "tokens": [
+    "`PhoneOS.IOS`",
+    "`PhoneOS.ANDROID`",
+    "`PhoneConfig`",
+    "`examples/`",
+    "`phone_so100_*.py`"
+   ]
+  },
+  {
+   "id": 24,
+   "kind": "para",
+   "start": 4060,
+   "end": 4082,
+   "text": "Teleoperation example:",
+   "tokens": []
+  },
+  {
+   "id": 25,
+   "kind": "heading",
+   "start": 4329,
+   "end": 4362,
+   "text": "### Step 2: Connect and calibrate",
+   "tokens": []
+  },
+  {
+   "id": 26,
+   "kind": "para",
+   "start": 4364,
+   "end": 4525,
+   "text": "When ⟦0⟧ is created and ⟦1⟧ is called, calibration is prompted automatically. Hold the phone in the orientation described above, then:",
+   "tokens": [
+    "`Phone(teleop_config)`",
+    "`connect()`"
+   ]
+  },
+  {
+   "id": 27,
+   "kind": "list",
+   "start": 4527,
+   "end": 4584,
+   "text": "- iOS: press and hold ⟦0⟧ to capture the reference pose.",
+   "tokens": [
+    "`B1`"
+   ]
+  },
+  {
+   "id": 28,
+   "kind": "list",
+   "start": 4585,
+   "end": 4664,
+   "text": "- Android: press ⟦0⟧ button on the WebXR page to capture the reference pose.",
+   "tokens": [
+    "`Move`"
+   ]
+  },
+  {
+   "id": 29,
+   "kind": "para",
+   "start": 4666,
+   "end": 4916,
+   "text": "Why calibrate? We capture the current pose so subsequent poses are expressed in a robot aligned frame. When you again press the button to enable control, the position is recaptured to avoid drift when your phone is repositioned while it was disabled.",
+   "tokens": []
+  },
+  {
+   "id": 30,
+   "kind": "heading",
+   "start": 4918,
+   "end": 4944,
+   "text": "### Step 3: Run an example",
+   "tokens": []
+  },
+  {
+   "id": 31,
+   "kind": "para",
+   "start": 4946,
+   "end": 5049,
+   "text": "Run on of the examples scripts to teleoperate, record a dataset, replay a dataset or evaluate a policy.",
+   "tokens": []
+  },
+  {
+   "id": 32,
+   "kind": "para",
+   "start": 5051,
+   "end": 5152,
+   "text": "All scripts assume you configured your robot (e.g., SO-100 follower) and set the correct serial port.",
+   "tokens": []
+  },
+  {
+   "id": 33,
+   "kind": "para",
+   "start": 5154,
+   "end": 5548,
+   "text": "Additionally you need to **copy the URDF of the robot into the examples folder**. For the examples in this tutorial (using SO100/SO101), copy the ⟦0⟧ folder from the [SO-ARM100 repo](⟦1⟧) into the ⟦2⟧ directory, so that the URDF file path becomes ⟦3⟧.",
+   "tokens": [
+    "`SO101`",
+    "https://github.com/TheRobotStudio/SO-ARM100/blob/main/Simulation/SO101",
+    "`examples/phone_to_so100/`",
+    "`examples/phone_to_so100/SO101/so101_new_calib.urdf`"
+   ]
+  },
+  {
+   "id": 34,
+   "kind": "list",
+   "start": 5550,
+   "end": 5584,
+   "text": "- Run this example to teleoperate:",
+   "tokens": []
+  },
+  {
+   "id": 35,
+   "kind": "para",
+   "start": 5656,
+   "end": 5682,
+   "text": "After running the example:",
+   "tokens": []
+  },
+  {
+   "id": 36,
+   "kind": "list",
+   "start": 5684,
+   "end": 5800,
+   "text": "- Android: after starting the script, open the printed local URL on your phone, tap Start, then press and hold Move.",
+   "tokens": []
+  },
+  {
+   "id": 37,
+   "kind": "list",
+   "start": 5801,
+   "end": 5879,
+   "text": "- iOS: open HEBI Mobile I/O first; B1 enables motion. A3 controls the gripper.",
+   "tokens": []
+  },
+  {
+   "id": 38,
+   "kind": "para",
+   "start": 5881,
+   "end": 6251,
+   "text": "Additionally you can customize mapping or safety limits by editing the processor steps shown in the examples. You can also remap inputs (e.g., use a different analog input) or adapt the pipeline to other robots (e.g., LeKiwi) by modifying the input and kinematics steps. More about this in the [Processors for Robots and Teleoperators](⟦0⟧) guide.",
+   "tokens": [
+    "./processors_robots_teleop"
+   ]
+  },
+  {
+   "id": 39,
+   "kind": "list",
+   "start": 6253,
+   "end": 6352,
+   "text": "- Run this example to record a dataset, which saves absolute end effector observations and actions:",
+   "tokens": []
+  },
+  {
+   "id": 40,
+   "kind": "list",
+   "start": 6419,
+   "end": 6466,
+   "text": "- Run this example to replay recorded episodes:",
+   "tokens": []
+  },
+  {
+   "id": 41,
+   "kind": "list",
+   "start": 6533,
+   "end": 6584,
+   "text": "- Run this example to evaluate a pretrained policy:",
+   "tokens": []
+  },
+  {
+   "id": 42,
+   "kind": "heading",
+   "start": 6653,
+   "end": 6693,
+   "text": "### Important pipeline steps and options",
+   "tokens": []
+  },
+  {
+   "id": 43,
+   "kind": "list",
+   "start": 6695,
+   "end": 6978,
+   "text": "- Kinematics are used in multiple steps. We use [Placo](⟦0⟧) which is a wrapper around Pinocchio for handling our kinematics. We construct the kinematics object by passing the robot's URDF and target frame. We set ⟦1⟧ to the gripper frame.",
+   "tokens": [
+    "https://github.com/Rhoban/placo",
+    "`target_frame_name`"
+   ]
+  },
+  {
+   "id": 44,
+   "kind": "list",
+   "start": 7180,
+   "end": 7345,
+   "text": "- The ⟦0⟧ step converts the calibrated phone pose and inputs into target deltas and gripper commands, below is shown what the step outputs.",
+   "tokens": [
+    "`MapPhoneActionToRobotAction`"
+   ]
+  },
+  {
+   "id": 45,
+   "kind": "list",
+   "start": 7833,
+   "end": 8064,
+   "text": "- The ⟦0⟧ step converts target deltas to an absolute desired EE pose, storing a reference on enable, the ⟦1⟧ are the step sizes for the EE pose and can be modified to change the motion speed.",
+   "tokens": [
+    "`EEReferenceAndDelta`",
+    "`end_effector_step_sizes`"
+   ]
+  },
+  {
+   "id": 46,
+   "kind": "list",
+   "start": 8294,
+   "end": 8616,
+   "text": "- The ⟦0⟧ step clamps EE motion to a workspace and checks for large ee step jumps to ensure safety. The ⟦1⟧ are the bounds for the EE pose and can be modified to change the workspace. The ⟦2⟧ are the step limits for the EE pose and can be modified to change the safety limits.",
+   "tokens": [
+    "`EEBoundsAndSafety`",
+    "`end_effector_bounds`",
+    "`max_ee_step_m`"
+   ]
+  },
+  {
+   "id": 47,
+   "kind": "list",
+   "start": 8767,
+   "end": 8973,
+   "text": "- The ⟦0⟧ step turns a velocity‑like gripper input into absolute gripper position using the current measured state. The ⟦1⟧ is the factor by which the velocity is multiplied.",
+   "tokens": [
+    "`GripperVelocityToJoint`",
+    "`speed_factor`"
+   ]
+  },
+  {
+   "id": 48,
+   "kind": "heading",
+   "start": 9038,
+   "end": 9071,
+   "text": "#### Different IK initial guesses",
+   "tokens": []
+  },
+  {
+   "id": 49,
+   "kind": "para",
+   "start": 9073,
+   "end": 9221,
+   "text": "We use different IK initial guesses in the kinematic steps. As initial guess either the current measured joints or the previous IK solution is used.",
+   "tokens": []
+  },
+  {
+   "id": 50,
+   "kind": "list",
+   "start": 9223,
+   "end": 9350,
+   "text": "- Closed loop (used in record/eval): sets ⟦0⟧ so IK starts from the measured joints each frame.",
+   "tokens": [
+    "`initial_guess_current_joints=True`"
+   ]
+  },
+  {
+   "id": 51,
+   "kind": "list",
+   "start": 9547,
+   "end": 9761,
+   "text": "- Open loop (used in replay): sets ⟦0⟧ so IK continues from the previous IK solution rather than the measured state. This preserves action stability when we replay without feedback.",
+   "tokens": [
+    "`initial_guess_current_joints=False`"
+   ]
+  },
+  {
+   "id": 52,
+   "kind": "heading",
+   "start": 9957,
+   "end": 9985,
+   "text": "### Pipeline steps explained",
+   "tokens": []
+  },
+  {
+   "id": 53,
+   "kind": "list",
+   "start": 9987,
+   "end": 10167,
+   "text": "- MapPhoneActionToRobotAction: converts calibrated phone pose and inputs into target deltas and a gripper command. Motion is gated by an enable signal (B1 on iOS, Move on Android).",
+   "tokens": []
+  },
+  {
+   "id": 54,
+   "kind": "list",
+   "start": 10168,
+   "end": 10371,
+   "text": "- EEReferenceAndDelta: latches a reference EE pose on enable and combines it with target deltas to produce an absolute desired EE pose each frame. When disabled, it keeps sending the last commanded pose.",
+   "tokens": []
+  },
+  {
+   "id": 55,
+   "kind": "list",
+   "start": 10372,
+   "end": 10498,
+   "text": "- EEBoundsAndSafety: clamps the EE pose to a workspace and rate‑limits jumps for safety. Also declares ⟦0⟧ features.",
+   "tokens": [
+    "`action.ee.*`"
+   ]
+  },
+  {
+   "id": 56,
+   "kind": "list",
+   "start": 10499,
+   "end": 10700,
+   "text": "- InverseKinematicsEEToJoints: turns an EE pose into joint positions with IK. ⟦0⟧ is recommended for closed‑loop control; set ⟦1⟧ for open‑loop replay for stability.",
+   "tokens": [
+    "`initial_guess_current_joints=True`",
+    "`False`"
+   ]
+  },
+  {
+   "id": 57,
+   "kind": "list",
+   "start": 10701,
+   "end": 10835,
+   "text": "- GripperVelocityToJoint: integrates a velocity‑like gripper input into an absolute gripper position using the current measured state.",
+   "tokens": []
+  },
+  {
+   "id": 58,
+   "kind": "list",
+   "start": 10836,
+   "end": 10959,
+   "text": "- ForwardKinematicsJointsToEE: computes ⟦0⟧ from observed joints for logging and training on EE state.",
+   "tokens": [
+    "`observation.state.ee.*`"
+   ]
+  },
+  {
+   "id": 59,
+   "kind": "heading",
+   "start": 10961,
+   "end": 10980,
+   "text": "### Troubleshooting",
+   "tokens": []
+  },
+  {
+   "id": 60,
+   "kind": "list",
+   "start": 10982,
+   "end": 11081,
+   "text": "- iOS not discovered: ensure HEBI Mobile I/O is open and your laptop/phone are on the same network.",
+   "tokens": []
+  },
+  {
+   "id": 61,
+   "kind": "list",
+   "start": 11082,
+   "end": 11263,
+   "text": "- Android URL not reachable: check local you used ⟦0⟧ instead of ⟦1⟧, use the exact IP printed by the script and allow your browser to enter and ignore the certificate issue.",
+   "tokens": [
+    "`https`",
+    "`http`"
+   ]
+  },
+  {
+   "id": 62,
+   "kind": "list",
+   "start": 11264,
+   "end": 11377,
+   "text": "- Motion feels inverted: adjust the sign flips in ⟦0⟧ or swap axes to match your setup.",
+   "tokens": [
+    "`MapPhoneActionToRobotAction`"
+   ]
+  }
+ ]
+}

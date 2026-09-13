@@ -1,0 +1,793 @@
+{
+ "file": "pi0fast.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1944,
+   "text": "# π₀-FAST (Pi0-FAST)",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1946,
+   "end": 2099,
+   "text": "π₀-FAST is a **Vision-Language-Action model for general robot control** that uses autoregressive next-token prediction to model continuous robot actions.",
+   "tokens": []
+  },
+  {
+   "id": 2,
+   "kind": "heading",
+   "start": 2101,
+   "end": 2118,
+   "text": "## Model Overview",
+   "tokens": []
+  },
+  {
+   "id": 3,
+   "kind": "para",
+   "start": 2120,
+   "end": 2486,
+   "text": "π₀-FAST combines the power of Vision-Language Models with a novel action tokenization approach called **FAST (Frequency-space Action Sequence Tokenization)**. This enables training autoregressive VLAs on highly dexterous tasks that are impossible with standard binning-based discretization, while training **up to 5x faster** than diffusion-based approaches like π₀.",
+   "tokens": []
+  },
+  {
+   "id": 4,
+   "kind": "heading",
+   "start": 2656,
+   "end": 2669,
+   "text": "### Why FAST?",
+   "tokens": []
+  },
+  {
+   "id": 5,
+   "kind": "para",
+   "start": 2671,
+   "end": 2922,
+   "text": "Standard approaches for robot action tokenization use simple per-dimension, per-timestep binning schemes. While passable for simple behaviors, this rapidly breaks down for complex and dexterous skills that require precision and high-frequency control.",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "para",
+   "start": 2924,
+   "end": 3121,
+   "text": "FAST solves this by compressing action sequences using signal processing techniques, resulting in a dense sequence of action tokens that can be predicted autoregressively—just like language tokens.",
+   "tokens": []
+  },
+  {
+   "id": 7,
+   "kind": "heading",
+   "start": 3123,
+   "end": 3154,
+   "text": "### How FAST Tokenization Works",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "para",
+   "start": 3156,
+   "end": 3231,
+   "text": "The FAST tokenizer compresses action sequences through the following steps:",
+   "tokens": []
+  },
+  {
+   "id": 9,
+   "kind": "list",
+   "start": 3233,
+   "end": 3460,
+   "text": "1. **Normalize**: Take a continuous action chunk of shape ⟦0⟧ where ⟦1⟧ is the horizon and ⟦2⟧ is the action dimension. Normalize using one of the supported normalization methods (Quantiles recommended to handle outliers).",
+   "tokens": [
+    "`(H, D)`",
+    "`H`",
+    "`D`"
+   ]
+  },
+  {
+   "id": 10,
+   "kind": "list",
+   "start": 3462,
+   "end": 3644,
+   "text": "2. **Discrete Cosine Transform (DCT)**: Apply DCT (via scipy) to each action dimension separately. DCT is a compression algorithm commonly used in image and audio codecs (JPEG, MP3).",
+   "tokens": []
+  },
+  {
+   "id": 11,
+   "kind": "list",
+   "start": 3646,
+   "end": 3774,
+   "text": "3. **Quantization**: Round and remove insignificant coefficients for each action dimension, producing a sparse frequency matrix.",
+   "tokens": []
+  },
+  {
+   "id": 12,
+   "kind": "list",
+   "start": 3776,
+   "end": 3865,
+   "text": "4. **Flatten**: Flatten the matrix into a 1D vector, with low-frequency components first.",
+   "tokens": []
+  },
+  {
+   "id": 13,
+   "kind": "list",
+   "start": 3867,
+   "end": 4056,
+   "text": "5. **Byte Pair Encoding (BPE)**: Train a BPE tokenizer to compress the DCT coefficients into dense action tokens, typically achieving **10x compression** over prior tokenization approaches.",
+   "tokens": []
+  },
+  {
+   "id": 14,
+   "kind": "para",
+   "start": 4058,
+   "end": 4162,
+   "text": "This approach can transform **any existing VLM** into a VLA by training it to predict these FAST tokens.",
+   "tokens": []
+  },
+  {
+   "id": 15,
+   "kind": "heading",
+   "start": 4164,
+   "end": 4192,
+   "text": "## Installation Requirements",
+   "tokens": []
+  },
+  {
+   "id": 16,
+   "kind": "list",
+   "start": 4194,
+   "end": 4267,
+   "text": "1. Install LeRobot by following our [Installation Guide](⟦0⟧).",
+   "tokens": [
+    "./installation"
+   ]
+  },
+  {
+   "id": 17,
+   "kind": "list",
+   "start": 4268,
+   "end": 4311,
+   "text": "2. Install π₀-FAST dependencies by running:",
+   "tokens": []
+  },
+  {
+   "id": 18,
+   "kind": "heading",
+   "start": 4358,
+   "end": 4393,
+   "text": "## Training a Custom FAST Tokenizer",
+   "tokens": []
+  },
+  {
+   "id": 19,
+   "kind": "para",
+   "start": 4395,
+   "end": 4439,
+   "text": "You have two options for the FAST tokenizer:",
+   "tokens": []
+  },
+  {
+   "id": 20,
+   "kind": "list",
+   "start": 4441,
+   "end": 4613,
+   "text": "1. **Use the pre-trained tokenizer**: The ⟦0⟧ tokenizer was trained on 1M+ real robot action sequences and works as a general-purpose tokenizer.",
+   "tokens": [
+    "`lerobot/fast-action-tokenizer`"
+   ]
+  },
+  {
+   "id": 21,
+   "kind": "list",
+   "start": 4615,
+   "end": 4746,
+   "text": "2. **Train your own tokenizer**: For maximum performance on your specific dataset, you can finetune the tokenizer on your own data.",
+   "tokens": []
+  },
+  {
+   "id": 22,
+   "kind": "heading",
+   "start": 4748,
+   "end": 4779,
+   "text": "### Training Your Own Tokenizer",
+   "tokens": []
+  },
+  {
+   "id": 23,
+   "kind": "heading",
+   "start": 5105,
+   "end": 5133,
+   "text": "### Key Tokenizer Parameters",
+   "tokens": []
+  },
+  {
+   "id": 24,
+   "kind": "table",
+   "start": 5135,
+   "end": 5260,
+   "text": "| Parameter              | Description                                                                       | Default      |",
+   "tokens": []
+  },
+  {
+   "id": 25,
+   "kind": "table",
+   "start": 5387,
+   "end": 5512,
+   "text": "| ⟦0⟧            | LeRobot dataset repository ID                                                     | Required     |",
+   "tokens": [
+    "`--repo_id`"
+   ]
+  },
+  {
+   "id": 26,
+   "kind": "table",
+   "start": 5513,
+   "end": 5638,
+   "text": "| ⟦0⟧     | Number of future actions in each chunk                                            | ⟦1⟧         |",
+   "tokens": [
+    "`--action_horizon`",
+    "`10`"
+   ]
+  },
+  {
+   "id": 27,
+   "kind": "table",
+   "start": 5639,
+   "end": 5764,
+   "text": "| ⟦0⟧       | Comma-separated dimension ranges to encode (e.g., ⟦1⟧)                   | ⟦2⟧ |",
+   "tokens": [
+    "`--encoded_dims`",
+    "`\"0:6,7:23\"`",
+    "`\"0:6,7:23\"`"
+   ]
+  },
+  {
+   "id": 28,
+   "kind": "table",
+   "start": 5765,
+   "end": 5890,
+   "text": "| ⟦0⟧         | BPE vocabulary size                                                               | ⟦1⟧       |",
+   "tokens": [
+    "`--vocab_size`",
+    "`1024`"
+   ]
+  },
+  {
+   "id": 29,
+   "kind": "table",
+   "start": 5891,
+   "end": 6016,
+   "text": "| ⟦0⟧              | DCT scaling factor for quantization                                               | ⟦1⟧       |",
+   "tokens": [
+    "`--scale`",
+    "`10.0`"
+   ]
+  },
+  {
+   "id": 30,
+   "kind": "table",
+   "start": 6017,
+   "end": 6142,
+   "text": "| ⟦0⟧ | Normalization mode (⟦1⟧, ⟦2⟧, ⟦3⟧, ⟦4⟧, ⟦5⟧) | ⟦6⟧  |",
+   "tokens": [
+    "`--normalization_mode`",
+    "`MEAN_STD`",
+    "`MIN_MAX`",
+    "`QUANTILES`",
+    "`QUANTILE10`",
+    "`IDENTITY`",
+    "`QUANTILES`"
+   ]
+  },
+  {
+   "id": 31,
+   "kind": "table",
+   "start": 6143,
+   "end": 6268,
+   "text": "| ⟦0⟧    | Fraction of chunks to sample per episode                                          | ⟦1⟧        |",
+   "tokens": [
+    "`--sample_fraction`",
+    "`0.1`"
+   ]
+  },
+  {
+   "id": 32,
+   "kind": "heading",
+   "start": 6270,
+   "end": 6278,
+   "text": "## Usage",
+   "tokens": []
+  },
+  {
+   "id": 33,
+   "kind": "para",
+   "start": 6280,
+   "end": 6334,
+   "text": "To use π₀-FAST in LeRobot, specify the policy type as:",
+   "tokens": []
+  },
+  {
+   "id": 34,
+   "kind": "heading",
+   "start": 6372,
+   "end": 6383,
+   "text": "## Training",
+   "tokens": []
+  },
+  {
+   "id": 35,
+   "kind": "para",
+   "start": 6385,
+   "end": 6447,
+   "text": "For training π₀-FAST, you can use the LeRobot training script:",
+   "tokens": []
+  },
+  {
+   "id": 36,
+   "kind": "heading",
+   "start": 6915,
+   "end": 6942,
+   "text": "### Key Training Parameters",
+   "tokens": []
+  },
+  {
+   "id": 37,
+   "kind": "table",
+   "start": 6944,
+   "end": 7073,
+   "text": "| Parameter                              | Description                                        | Default                         |",
+   "tokens": []
+  },
+  {
+   "id": 38,
+   "kind": "table",
+   "start": 7204,
+   "end": 7333,
+   "text": "| ⟦0⟧ | Reduces memory usage significantly during training | ⟦1⟧                         |",
+   "tokens": [
+    "`--policy.gradient_checkpointing=true`",
+    "`false`"
+   ]
+  },
+  {
+   "id": 39,
+   "kind": "table",
+   "start": 7334,
+   "end": 7463,
+   "text": "| ⟦0⟧              | Use mixed precision training for efficiency        | ⟦1⟧                       |",
+   "tokens": [
+    "`--policy.dtype=bfloat16`",
+    "`float32`"
+   ]
+  },
+  {
+   "id": 40,
+   "kind": "table",
+   "start": 7464,
+   "end": 7593,
+   "text": "| ⟦0⟧                  | Number of action steps to predict (action horizon) | ⟦1⟧                            |",
+   "tokens": [
+    "`--policy.chunk_size`",
+    "`50`"
+   ]
+  },
+  {
+   "id": 41,
+   "kind": "table",
+   "start": 7594,
+   "end": 7723,
+   "text": "| ⟦0⟧              | Number of action steps to execute                  | ⟦1⟧                            |",
+   "tokens": [
+    "`--policy.n_action_steps`",
+    "`50`"
+   ]
+  },
+  {
+   "id": 42,
+   "kind": "table",
+   "start": 7724,
+   "end": 7853,
+   "text": "| ⟦0⟧           | Maximum number of FAST tokens per action chunk     | ⟦1⟧                           |",
+   "tokens": [
+    "`--policy.max_action_tokens`",
+    "`256`"
+   ]
+  },
+  {
+   "id": 43,
+   "kind": "table",
+   "start": 7854,
+   "end": 7983,
+   "text": "| ⟦0⟧       | FAST tokenizer to use                              | ⟦1⟧ |",
+   "tokens": [
+    "`--policy.action_tokenizer_name`",
+    "`lerobot/fast-action-tokenizer`"
+   ]
+  },
+  {
+   "id": 44,
+   "kind": "table",
+   "start": 7984,
+   "end": 8113,
+   "text": "| ⟦0⟧          | Enable torch.compile for faster training           | ⟦1⟧                         |",
+   "tokens": [
+    "`--policy.compile_model=true`",
+    "`false`"
+   ]
+  },
+  {
+   "id": 45,
+   "kind": "heading",
+   "start": 8115,
+   "end": 8127,
+   "text": "## Inference",
+   "tokens": []
+  },
+  {
+   "id": 46,
+   "kind": "heading",
+   "start": 8129,
+   "end": 8162,
+   "text": "### KV-Caching for Fast Inference",
+   "tokens": []
+  },
+  {
+   "id": 47,
+   "kind": "para",
+   "start": 8164,
+   "end": 8366,
+   "text": "π₀-FAST supports **KV-caching**, a widely used optimization in LLM inference. This caches the key-value pairs from the attention mechanism, avoiding redundant computation during autoregressive decoding.",
+   "tokens": []
+  },
+  {
+   "id": 48,
+   "kind": "heading",
+   "start": 8443,
+   "end": 8464,
+   "text": "### Inference Example",
+   "tokens": []
+  },
+  {
+   "id": 49,
+   "kind": "heading",
+   "start": 8690,
+   "end": 8711,
+   "text": "## Model Architecture",
+   "tokens": []
+  },
+  {
+   "id": 50,
+   "kind": "para",
+   "start": 8713,
+   "end": 8757,
+   "text": "π₀-FAST uses a PaliGemma-based architecture:",
+   "tokens": []
+  },
+  {
+   "id": 51,
+   "kind": "list",
+   "start": 8759,
+   "end": 8824,
+   "text": "- **Vision Encoder**: SigLIP vision tower for image understanding",
+   "tokens": []
+  },
+  {
+   "id": 52,
+   "kind": "list",
+   "start": 8825,
+   "end": 8921,
+   "text": "- **Language Model**: Gemma 2B for processing language instructions and predicting action tokens",
+   "tokens": []
+  },
+  {
+   "id": 53,
+   "kind": "para",
+   "start": 8923,
+   "end": 9069,
+   "text": "The model takes images, text instructions, and robot state as input, and outputs discrete FAST tokens that are decoded back to continuous actions.",
+   "tokens": []
+  },
+  {
+   "id": 54,
+   "kind": "heading",
+   "start": 9071,
+   "end": 9095,
+   "text": "## Configuration Options",
+   "tokens": []
+  },
+  {
+   "id": 55,
+   "kind": "table",
+   "start": 9097,
+   "end": 9184,
+   "text": "| Parameter            | Description                                     | Default    |",
+   "tokens": []
+  },
+  {
+   "id": 56,
+   "kind": "table",
+   "start": 9273,
+   "end": 9360,
+   "text": "| ⟦0⟧  | VLM backbone variant (⟦1⟧, ⟦2⟧) | ⟦3⟧ |",
+   "tokens": [
+    "`paligemma_variant`",
+    "`gemma_300m`",
+    "`gemma_2b`",
+    "`gemma_2b`"
+   ]
+  },
+  {
+   "id": 57,
+   "kind": "table",
+   "start": 9361,
+   "end": 9448,
+   "text": "| ⟦0⟧      | Maximum state vector dimension (padded)         | ⟦1⟧       |",
+   "tokens": [
+    "`max_state_dim`",
+    "`32`"
+   ]
+  },
+  {
+   "id": 58,
+   "kind": "table",
+   "start": 9449,
+   "end": 9536,
+   "text": "| ⟦0⟧     | Maximum action vector dimension (padded)        | ⟦1⟧       |",
+   "tokens": [
+    "`max_action_dim`",
+    "`32`"
+   ]
+  },
+  {
+   "id": 59,
+   "kind": "table",
+   "start": 9537,
+   "end": 9624,
+   "text": "| ⟦0⟧        | Sampling temperature (0.0 for greedy)           | ⟦1⟧      |",
+   "tokens": [
+    "`temperature`",
+    "`0.0`"
+   ]
+  },
+  {
+   "id": 60,
+   "kind": "table",
+   "start": 9625,
+   "end": 9712,
+   "text": "| ⟦0⟧ | Maximum decoding steps                          | ⟦1⟧      |",
+   "tokens": [
+    "`max_decoding_steps`",
+    "`256`"
+   ]
+  },
+  {
+   "id": 61,
+   "kind": "table",
+   "start": 9713,
+   "end": 9800,
+   "text": "| ⟦0⟧       | Enable KV caching for faster inference          | ⟦1⟧     |",
+   "tokens": [
+    "`use_kv_cache`",
+    "`true`"
+   ]
+  },
+  {
+   "id": 62,
+   "kind": "heading",
+   "start": 9802,
+   "end": 9823,
+   "text": "## Comparison with π₀",
+   "tokens": []
+  },
+  {
+   "id": 63,
+   "kind": "table",
+   "start": 9825,
+   "end": 9909,
+   "text": "| Feature               | π₀                        | π₀-FAST                      |",
+   "tokens": []
+  },
+  {
+   "id": 64,
+   "kind": "table",
+   "start": 9995,
+   "end": 10079,
+   "text": "| Action Representation | Flow Matching (Diffusion) | Autoregressive Tokens (FAST) |",
+   "tokens": []
+  },
+  {
+   "id": 65,
+   "kind": "table",
+   "start": 10080,
+   "end": 10164,
+   "text": "| Training Speed        | 1x                        | **5x faster**                |",
+   "tokens": []
+  },
+  {
+   "id": 66,
+   "kind": "table",
+   "start": 10165,
+   "end": 10249,
+   "text": "| Dexterity             | High                      | High                         |",
+   "tokens": []
+  },
+  {
+   "id": 67,
+   "kind": "table",
+   "start": 10250,
+   "end": 10334,
+   "text": "| Inference Method      | Iterative Denoising       | Autoregressive Decoding      |",
+   "tokens": []
+  },
+  {
+   "id": 68,
+   "kind": "table",
+   "start": 10335,
+   "end": 10419,
+   "text": "| KV-Caching            | N/A                       | Supported                    |",
+   "tokens": []
+  },
+  {
+   "id": 69,
+   "kind": "heading",
+   "start": 10421,
+   "end": 10450,
+   "text": "## Reproducing π₀Fast results",
+   "tokens": []
+  },
+  {
+   "id": 70,
+   "kind": "para",
+   "start": 10452,
+   "end": 10837,
+   "text": "We reproduce the results of π₀Fast on the LIBERO benchmark using the LeRobot implementation. We take the LeRobot PiFast base model [lerobot/pi0fast-base](⟦0⟧) and finetune for an additional 40k steps in bfloat16, with batch size of 256 on 8 H100 GPUs using the [HuggingFace LIBERO dataset](⟦1⟧).",
+   "tokens": [
+    "https://huggingface.co/lerobot/pi0fast-base",
+    "https://huggingface.co/datasets/HuggingFaceVLA/libero"
+   ]
+  },
+  {
+   "id": 71,
+   "kind": "para",
+   "start": 10839,
+   "end": 10877,
+   "text": "The finetuned model can be found here:",
+   "tokens": []
+  },
+  {
+   "id": 72,
+   "kind": "list",
+   "start": 10879,
+   "end": 10971,
+   "text": "- **π₀Fast LIBERO**: [lerobot/pi0fast-libero](⟦0⟧)",
+   "tokens": [
+    "https://huggingface.co/lerobot/pi0fast-libero"
+   ]
+  },
+  {
+   "id": 73,
+   "kind": "para",
+   "start": 10973,
+   "end": 11009,
+   "text": "With the following training command:",
+   "tokens": []
+  },
+  {
+   "id": 74,
+   "kind": "para",
+   "start": 11582,
+   "end": 11693,
+   "text": "We then evaluate the finetuned model using the LeRobot LIBERO implementation, by running the following command:",
+   "tokens": []
+  },
+  {
+   "id": 75,
+   "kind": "para",
+   "start": 12138,
+   "end": 12222,
+   "text": "**Note:** We set ⟦0⟧, similar to the original OpenPI implementation.",
+   "tokens": [
+    "`n_action_steps=10`"
+   ]
+  },
+  {
+   "id": 76,
+   "kind": "heading",
+   "start": 12224,
+   "end": 12235,
+   "text": "### Results",
+   "tokens": []
+  },
+  {
+   "id": 77,
+   "kind": "para",
+   "start": 12237,
+   "end": 12293,
+   "text": "We obtain the following results on the LIBERO benchmark:",
+   "tokens": []
+  },
+  {
+   "id": 78,
+   "kind": "table",
+   "start": 12295,
+   "end": 12380,
+   "text": "| Model       | LIBERO Spatial | LIBERO Object | LIBERO Goal | LIBERO 10 | Average  |",
+   "tokens": []
+  },
+  {
+   "id": 79,
+   "kind": "table",
+   "start": 12467,
+   "end": 12552,
+   "text": "| **π₀-fast** | 70.0           | 100.0         | 100.0       | 60.0      | **82.5** |",
+   "tokens": []
+  },
+  {
+   "id": 80,
+   "kind": "para",
+   "start": 12554,
+   "end": 12712,
+   "text": "The full evaluation output folder, including videos, is available [here](⟦0⟧)",
+   "tokens": [
+    "https://drive.google.com/drive/folders/1HXpwPTRm4hx6g1sF2P7OOqGG0TwPU7LQ?usp=sharing"
+   ]
+  },
+  {
+   "id": 81,
+   "kind": "heading",
+   "start": 12714,
+   "end": 12724,
+   "text": "## License",
+   "tokens": []
+  },
+  {
+   "id": 82,
+   "kind": "para",
+   "start": 12726,
+   "end": 12871,
+   "text": "This model follows the **Apache 2.0 License**, consistent with the original [OpenPI repository](⟦0⟧).",
+   "tokens": [
+    "https://github.com/Physical-Intelligence/openpi"
+   ]
+  },
+  {
+   "id": 83,
+   "kind": "heading",
+   "start": 12873,
+   "end": 12886,
+   "text": "## References",
+   "tokens": []
+  },
+  {
+   "id": 84,
+   "kind": "list",
+   "start": 12888,
+   "end": 13018,
+   "text": "- [FAST: Efficient Robot Action Tokenization](⟦0⟧) - Physical Intelligence Blog",
+   "tokens": [
+    "https://www.physicalintelligence.company/research/fast"
+   ]
+  },
+  {
+   "id": 85,
+   "kind": "list",
+   "start": 13019,
+   "end": 13115,
+   "text": "- [OpenPI Repository](⟦0⟧) - Original implementation",
+   "tokens": [
+    "https://github.com/Physical-Intelligence/openpi"
+   ]
+  },
+  {
+   "id": 86,
+   "kind": "list",
+   "start": 13116,
+   "end": 13225,
+   "text": "- [FAST Tokenizer on Hugging Face](⟦0⟧) - Pre-trained tokenizer",
+   "tokens": [
+    "https://huggingface.co/physical-intelligence/fast"
+   ]
+  }
+ ]
+}

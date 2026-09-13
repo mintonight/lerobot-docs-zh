@@ -1,0 +1,567 @@
+{
+ "file": "topreward.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1935,
+   "text": "# TOPReward",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1937,
+   "end": 2235,
+   "text": "TOPReward is a **zero-shot reward model** that extracts token log-probabilities from an off-the-shelf vision-language model (VLM) as a robotic reward signal. Given a video trajectory and a task instruction, it returns the VLM's log-likelihood that the instruction is true — no fine-tuning required.",
+   "tokens": []
+  },
+  {
+   "id": 2,
+   "kind": "para",
+   "start": 2237,
+   "end": 2620,
+   "text": "**Paper**: [TOPReward: Token Probabilities as Hidden Zero-Shot Rewards for Robotics](⟦0⟧)\n**Project**: [topreward.github.io](⟦1⟧)\n**Original code**: [github.com/TOPReward/TOPReward](⟦2⟧)\n**Default backbone**: [Qwen/Qwen3-VL-8B-Instruct](⟦3⟧)",
+   "tokens": [
+    "https://arxiv.org/abs/2602.19313",
+    "https://topreward.github.io/webpage/",
+    "https://github.com/TOPReward/TOPReward",
+    "https://huggingface.co/Qwen/Qwen3-VL-8B-Instruct"
+   ]
+  },
+  {
+   "id": 3,
+   "kind": "heading",
+   "start": 2622,
+   "end": 2633,
+   "text": "## Overview",
+   "tokens": []
+  },
+  {
+   "id": 4,
+   "kind": "para",
+   "start": 2635,
+   "end": 2786,
+   "text": "TOPReward asks a generic VLM how likely a task instruction is, **conditioned on the video** of a robot trying to complete that task. Concretely, given:",
+   "tokens": []
+  },
+  {
+   "id": 5,
+   "kind": "list",
+   "start": 2788,
+   "end": 2832,
+   "text": "- A trajectory video (a sequence of frames).",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "list",
+   "start": 2833,
+   "end": 2881,
+   "text": "- A task instruction (e.g. _\"open the drawer\"_).",
+   "tokens": []
+  },
+  {
+   "id": 7,
+   "kind": "para",
+   "start": 2883,
+   "end": 2918,
+   "text": "it builds a chat prompt of the form",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "para",
+   "start": 3119,
+   "end": 3390,
+   "text": "forwards it through the VLM, label-masks everything except the very last token, and reads back the log-probability of that token — by default the literal ⟦0⟧ that closes the suffix template. The resulting ⟦1⟧ is the reward.",
+   "tokens": [
+    "`\"True\"`",
+    "`log P(\"True\" | video + prompt + instruction)`"
+   ]
+  },
+  {
+   "id": 9,
+   "kind": "para",
+   "start": 3392,
+   "end": 3729,
+   "text": "Because the method only depends on a frozen VLM, TOPReward is **zero-shot**: there are no fine-tuned weights to host. The \"model\" in LeRobot is a small wrapper around ⟦0⟧' ⟦1⟧ plus the label-masking logic. The processor owns the tokeniser and builds the full chat prompt (EO-1/Robometer pattern).",
+   "tokens": [
+    "`transformers`",
+    "`Qwen3VLForConditionalGeneration`"
+   ]
+  },
+  {
+   "id": 10,
+   "kind": "heading",
+   "start": 3731,
+   "end": 3769,
+   "text": "## What the LeRobot integration covers",
+   "tokens": []
+  },
+  {
+   "id": 11,
+   "kind": "list",
+   "start": 3771,
+   "end": 3842,
+   "text": "- Standard ⟦0⟧ configuration through LeRobot.",
+   "tokens": [
+    "`reward_model.type=topreward`"
+   ]
+  },
+  {
+   "id": 12,
+   "kind": "list",
+   "start": 3843,
+   "end": 3918,
+   "text": "- VLM loading via the ⟦0⟧ ⟦1⟧ API.",
+   "tokens": [
+    "`transformers`",
+    "`Qwen3VLForConditionalGeneration`"
+   ]
+  },
+  {
+   "id": 13,
+   "kind": "list",
+   "start": 3919,
+   "end": 4029,
+   "text": "- Prompt assembly + tokenisation in the processor (matching upstream ⟦0⟧).",
+   "tokens": [
+    "`QwenClient.compute_instruction_reward`"
+   ]
+  },
+  {
+   "id": 14,
+   "kind": "list",
+   "start": 4030,
+   "end": 4090,
+   "text": "- ⟦0⟧ returns one scalar log-prob per sample.",
+   "tokens": [
+    "`compute_reward()`"
+   ]
+  },
+  {
+   "id": 15,
+   "kind": "list",
+   "start": 4091,
+   "end": 4208,
+   "text": "- LeRobot reward-model save/load — ⟦0⟧ writes only ⟦1⟧ (the VLM is identified by ⟦2⟧).",
+   "tokens": [
+    "`save_pretrained`",
+    "`config.json`",
+    "`vlm_name`"
+   ]
+  },
+  {
+   "id": 16,
+   "kind": "list",
+   "start": 4209,
+   "end": 4328,
+   "text": "- An offline labeling script that writes a ⟦0⟧ (SARM-compatible schema) for RA-BC and overlay.",
+   "tokens": [
+    "`topreward_progress.parquet`"
+   ]
+  },
+  {
+   "id": 17,
+   "kind": "para",
+   "start": 4330,
+   "end": 4481,
+   "text": "The current LeRobot port supports the **Qwen3-VL client only**. Other upstream clients (Gemini, OpenAI, Gemma, Molmo) can be added as follow-up extras.",
+   "tokens": []
+  },
+  {
+   "id": 18,
+   "kind": "heading",
+   "start": 4483,
+   "end": 4511,
+   "text": "## Installation Requirements",
+   "tokens": []
+  },
+  {
+   "id": 19,
+   "kind": "list",
+   "start": 4513,
+   "end": 4583,
+   "text": "1. Install LeRobot following the [Installation Guide](⟦0⟧).",
+   "tokens": [
+    "./installation"
+   ]
+  },
+  {
+   "id": 20,
+   "kind": "list",
+   "start": 4584,
+   "end": 4624,
+   "text": "2. Install the TOPReward optional extra:",
+   "tokens": []
+  },
+  {
+   "id": 21,
+   "kind": "para",
+   "start": 4669,
+   "end": 4706,
+   "text": "or, with ⟦0⟧ from a source checkout:",
+   "tokens": [
+    "`uv`"
+   ]
+  },
+  {
+   "id": 22,
+   "kind": "para",
+   "start": 4747,
+   "end": 4937,
+   "text": "This pulls in ⟦0⟧. The first time you run TOPReward, Hugging Face will also download the VLM weights from the Hub (~16 GB for Qwen3-VL-8B-Instruct). A GPU is strongly recommended.",
+   "tokens": [
+    "`transformers`"
+   ]
+  },
+  {
+   "id": 23,
+   "kind": "heading",
+   "start": 4939,
+   "end": 4966,
+   "text": "## Model Inputs and Outputs",
+   "tokens": []
+  },
+  {
+   "id": 24,
+   "kind": "para",
+   "start": 4968,
+   "end": 4986,
+   "text": "TOPReward expects:",
+   "tokens": []
+  },
+  {
+   "id": 25,
+   "kind": "list",
+   "start": 4988,
+   "end": 5031,
+   "text": "- A trajectory video or sequence of frames.",
+   "tokens": []
+  },
+  {
+   "id": 26,
+   "kind": "list",
+   "start": 5032,
+   "end": 5070,
+   "text": "- A natural-language task description.",
+   "tokens": []
+  },
+  {
+   "id": 27,
+   "kind": "para",
+   "start": 5072,
+   "end": 5115,
+   "text": "In LeRobot datasets the preprocessor reads:",
+   "tokens": []
+  },
+  {
+   "id": 28,
+   "kind": "table",
+   "start": 5117,
+   "end": 5224,
+   "text": "| Config field              | Default                     | Meaning                                       |",
+   "tokens": []
+  },
+  {
+   "id": 29,
+   "kind": "table",
+   "start": 5333,
+   "end": 5440,
+   "text": "| ⟦0⟧  | ⟦1⟧    | Camera observation used by TOPReward          |",
+   "tokens": [
+    "`reward_model.image_key`",
+    "`observation.images.top`"
+   ]
+  },
+  {
+   "id": 30,
+   "kind": "table",
+   "start": 5441,
+   "end": 5548,
+   "text": "| ⟦0⟧   | ⟦1⟧                      | Key in complementary data for the task string |",
+   "tokens": [
+    "`reward_model.task_key`",
+    "`task`"
+   ]
+  },
+  {
+   "id": 31,
+   "kind": "table",
+   "start": 5549,
+   "end": 5656,
+   "text": "| ⟦0⟧ | ⟦1⟧                        | Cap on frames per sample                      |",
+   "tokens": [
+    "`reward_model.max_frames`",
+    "`16`"
+   ]
+  },
+  {
+   "id": 32,
+   "kind": "table",
+   "start": 5657,
+   "end": 5764,
+   "text": "| ⟦0⟧        | ⟦1⟧                       | Metadata passed to the Qwen video processor   |",
+   "tokens": [
+    "`reward_model.fps`",
+    "`2.0`"
+   ]
+  },
+  {
+   "id": 33,
+   "kind": "table",
+   "start": 5765,
+   "end": 5872,
+   "text": "| ⟦0⟧   | ⟦1⟧ | Hugging Face Hub id of the underlying VLM     |",
+   "tokens": [
+    "`reward_model.vlm_name`",
+    "`Qwen/Qwen3-VL-8B-Instruct`"
+   ]
+  },
+  {
+   "id": 34,
+   "kind": "para",
+   "start": 5874,
+   "end": 5892,
+   "text": "The model returns:",
+   "tokens": []
+  },
+  {
+   "id": 35,
+   "kind": "list",
+   "start": 5894,
+   "end": 6072,
+   "text": "- ⟦0⟧: one log-probability per sample. Higher = better task-video alignment. When ⟦1⟧ is finite, returns the binary thresholded value instead.",
+   "tokens": [
+    "`compute_reward(batch)`",
+    "`success_threshold`"
+   ]
+  },
+  {
+   "id": 36,
+   "kind": "heading",
+   "start": 6074,
+   "end": 6082,
+   "text": "## Usage",
+   "tokens": []
+  },
+  {
+   "id": 37,
+   "kind": "heading",
+   "start": 6084,
+   "end": 6118,
+   "text": "### Load the reward model directly",
+   "tokens": []
+  },
+  {
+   "id": 38,
+   "kind": "heading",
+   "start": 6327,
+   "end": 6353,
+   "text": "### Use the reward factory",
+   "tokens": []
+  },
+  {
+   "id": 39,
+   "kind": "para",
+   "start": 6733,
+   "end": 6991,
+   "text": "The preprocessor tokenises the full prompt (video + prefix + instruction suffix), writes Qwen-VL tensors + ⟦0⟧ under ⟦1⟧. The model reads those tensors, label-masks based on ⟦2⟧, and extracts the log-prob reward.",
+   "tokens": [
+    "`prompt_length`",
+    "`observation.topreward.*`",
+    "`prompt_length`"
+   ]
+  },
+  {
+   "id": 40,
+   "kind": "heading",
+   "start": 6993,
+   "end": 7021,
+   "text": "### Offline dataset labeling",
+   "tokens": []
+  },
+  {
+   "id": 41,
+   "kind": "para",
+   "start": 7023,
+   "end": 7098,
+   "text": "Write a ⟦0⟧ for RA-BC training and overlay videos:",
+   "tokens": [
+    "`topreward_progress.parquet`"
+   ]
+  },
+  {
+   "id": 42,
+   "kind": "para",
+   "start": 7326,
+   "end": 7375,
+   "text": "Then render the progress overlay for any episode:",
+   "tokens": []
+  },
+  {
+   "id": 43,
+   "kind": "heading",
+   "start": 7559,
+   "end": 7581,
+   "text": "## Configuration Notes",
+   "tokens": []
+  },
+  {
+   "id": 44,
+   "kind": "heading",
+   "start": 7583,
+   "end": 7599,
+   "text": "### Prompt knobs",
+   "tokens": []
+  },
+  {
+   "id": 45,
+   "kind": "para",
+   "start": 7601,
+   "end": 7647,
+   "text": "The default prompt mirrors the upstream paper:",
+   "tokens": []
+  },
+  {
+   "id": 46,
+   "kind": "para",
+   "start": 7882,
+   "end": 7987,
+   "text": "Both are exposed on ⟦0⟧ for ablation. The suffix template **must** contain ⟦1⟧.",
+   "tokens": [
+    "`TOPRewardConfig`",
+    "`{instruction}`"
+   ]
+  },
+  {
+   "id": 47,
+   "kind": "heading",
+   "start": 7989,
+   "end": 8006,
+   "text": "### Chat template",
+   "tokens": []
+  },
+  {
+   "id": 48,
+   "kind": "para",
+   "start": 8008,
+   "end": 8202,
+   "text": "⟦0⟧ wraps the full prompt (including instruction) with the tokenizer's chat template before tokenisation. Default is ⟦1⟧, matching the upstream paper's main experiments.",
+   "tokens": [
+    "`add_chat_template=True`",
+    "`False`"
+   ]
+  },
+  {
+   "id": 49,
+   "kind": "heading",
+   "start": 8204,
+   "end": 8218,
+   "text": "## Limitations",
+   "tokens": []
+  },
+  {
+   "id": 50,
+   "kind": "list",
+   "start": 8220,
+   "end": 8349,
+   "text": "- The current LeRobot port is **inference-only and zero-shot**; ⟦0⟧ is not overridden and ⟦1⟧ returns ⟦2⟧.",
+   "tokens": [
+    "`forward()`",
+    "`is_trainable`",
+    "`False`"
+   ]
+  },
+  {
+   "id": 51,
+   "kind": "list",
+   "start": 8350,
+   "end": 8435,
+   "text": "- Only the **Qwen3-VL family** is supported; other upstream clients are out of scope.",
+   "tokens": []
+  },
+  {
+   "id": 52,
+   "kind": "list",
+   "start": 8436,
+   "end": 8485,
+   "text": "- TOPReward inherits the underlying VLM's biases.",
+   "tokens": []
+  },
+  {
+   "id": 53,
+   "kind": "heading",
+   "start": 8487,
+   "end": 8500,
+   "text": "## References",
+   "tokens": []
+  },
+  {
+   "id": 54,
+   "kind": "list",
+   "start": 8502,
+   "end": 8566,
+   "text": "- [TOPReward project page](⟦0⟧)",
+   "tokens": [
+    "https://topreward.github.io/webpage/"
+   ]
+  },
+  {
+   "id": 55,
+   "kind": "list",
+   "start": 8567,
+   "end": 8620,
+   "text": "- [TOPReward paper](⟦0⟧)",
+   "tokens": [
+    "https://arxiv.org/abs/2602.19313"
+   ]
+  },
+  {
+   "id": 56,
+   "kind": "list",
+   "start": 8621,
+   "end": 8688,
+   "text": "- [Original TOPReward code](⟦0⟧)",
+   "tokens": [
+    "https://github.com/TOPReward/TOPReward"
+   ]
+  },
+  {
+   "id": 57,
+   "kind": "list",
+   "start": 8689,
+   "end": 8763,
+   "text": "- [Qwen3-VL-8B-Instruct](⟦0⟧)",
+   "tokens": [
+    "https://huggingface.co/Qwen/Qwen3-VL-8B-Instruct"
+   ]
+  },
+  {
+   "id": 58,
+   "kind": "heading",
+   "start": 8765,
+   "end": 8776,
+   "text": "## Citation",
+   "tokens": []
+  },
+  {
+   "id": 59,
+   "kind": "heading",
+   "start": 9165,
+   "end": 9175,
+   "text": "## License",
+   "tokens": []
+  },
+  {
+   "id": 60,
+   "kind": "para",
+   "start": 9177,
+   "end": 9353,
+   "text": "The original TOPReward codebase is MIT-licensed. The LeRobot port follows the LeRobot Apache 2.0 license; the wrapped Qwen3-VL weights are subject to the original Qwen license.",
+   "tokens": []
+  }
+ ]
+}

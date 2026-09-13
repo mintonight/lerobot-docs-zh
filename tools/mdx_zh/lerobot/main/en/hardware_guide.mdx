@@ -1,0 +1,156 @@
+<script lang="ts">
+import {onMount} from "svelte";
+import Tip from "$lib/Tip.svelte";
+import CopyLLMTxtMenu from "$lib/CopyLLMTxtMenu.svelte";
+import Youtube from "$lib/Youtube.svelte";
+import Docstring from "$lib/Docstring.svelte";
+import CodeBlock from "$lib/CodeBlock.svelte";
+import CodeBlockFw from "$lib/CodeBlockFw.svelte";
+import DocNotebookDropdown from "$lib/DocNotebookDropdown.svelte";
+import CourseFloatingBanner from "$lib/CourseFloatingBanner.svelte";
+import IconCopyLink from "$lib/IconCopyLink.svelte";
+import FrameworkContent from "$lib/FrameworkContent.svelte";
+import Markdown from "$lib/Markdown.svelte";
+import Question from "$lib/Question.svelte";
+import FrameworkSwitchCourse from "$lib/FrameworkSwitchCourse.svelte";
+import InferenceApi from "$lib/InferenceApi.svelte";
+import TokenizersLanguageContent from "$lib/TokenizersLanguageContent.svelte";
+import ExampleCodeBlock from "$lib/ExampleCodeBlock.svelte";
+import Added from "$lib/Added.svelte";
+import Changed from "$lib/Changed.svelte";
+import Deprecated from "$lib/Deprecated.svelte";
+import PipelineIcon from "$lib/PipelineIcon.svelte";
+import PipelineTag from "$lib/PipelineTag.svelte";
+import Heading from "$lib/Heading.svelte";
+import HfOptions from "$lib/HfOptions.svelte";
+import HfOption from "$lib/HfOption.svelte";
+import EditOnGithub from "$lib/EditOnGithub.svelte";
+import InferenceSnippet from "$lib/InferenceSnippet/InferenceSnippet.svelte";
+import MermaidChart from "$lib/MermaidChart.svelte";
+let fw: "pt" | "tf" = "pt";
+onMount(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    fw = urlParams.get("fw") || "pt";
+});
+</script>
+<svelte:head>
+  <meta name="hf:doc:metadata" content={metadata} >
+</svelte:head>
+
+<!--HF DOCBUILD BODY START-->
+
+HF_DOC_BODY_START
+
+<CopyLLMTxtMenu containerStyle="float: right; margin-left: 10px; display: inline-flex; position: relative; z-index: 10;"></CopyLLMTxtMenu>
+
+# LeRobot 训练的计算硬件指南
+
+训练 LeRobot policy 的粗略规模估算：每种 policy 需要多少显存（VRAM）、训练时间大致如何，以及本地硬件不足时在哪里运行。
+
+以下数字为**参考性**数据——用于选择硬件的数量级估算，而非精确预测。吞吐量在很大程度上取决于 dataset I/O、图像分辨率、批次大小和 GPU 数量。
+
+## 按 policy 分组的显存需求
+
+policy 按主干网络规模聚簇；下面的分组为每组给出一个显存包络，而不是逐 policy 重复数字。显存大致随批次大小线性增长；AdamW（LeRobot 的默认优化器）携带的优化器 state 会在纯粹的前向+反向传播基础上额外增加约 30–100%。
+
+| 分组      | policy                                    | 峰值显存（批次 8，AdamW） | 适合的入门级 GPU             |
+| ---------- | ------------------------------------------- | ----------------------: | --------------------------------- |
+| 轻量 BC   | `act`、`vqbet`、`tdmpc`                     |                  ~2–6GB | 笔记本 GPU（RTX 3060）、L4、A10G   |
+| 扩散模型  | `diffusion`、`multi_task_dit`               |                 ~8–14GB | RTX 4070+ / L4 / A10G             |
+| 小型 VLA  | `smolvla`                                   |                ~10–16GB | RTX 4080+ / L4 / A10G             |
+| 大型 VLA  | `pi0`、`pi0_fast`、`pi05`、`xvla`、`wall_x` |                ~24–40GB | A100 40 GB 以上（24 GB 在批次 1 时较为紧张） |
+| 多模态 | `groot`、`eo1`                              |                ~24–40GB | A100 40 GB 以上                       |
+| 强化学习         | `sac`                                       |             取决于配置 | 参见 [HIL-SERL 指南](./hilserl)   |
+
+受显存限制？可以降低批次大小（大致线性关系）、使用梯度累积来恢复有效批次大小，或者对于 SmolVLA，保留 `freeze_vision_encoder=True`。
+
+## 训练时间
+
+机器人模仿学习通常可以在**dataset 上训练 5–10 个 epoch** 后收敛，而不是数十万原始步。一旦你知道了 epoch 数量，墙钟时间基本上就是：
+
+```text
+total_frames    = sum of frames over all episodes      # 50 ep × 30 fps × 30 s ≈ 45,000
+steps_per_epoch = ceil(total_frames / (num_gpus × batch_size))
+total_steps     = epochs × steps_per_epoch
+wall_clock      ≈ total_steps × per_step_time
+```
+
+每步耗时取决于 policy 和 GPU。下表中的数字是参考 benchmark——选择最接近你配置的那一行，如果你训练得时间更长或更短，则随 `total_steps` 线性缩放。
+
+### 常见场景
+
+在**约 50 个 episode 的 dataset（30 fps × 30 秒下约 4.5 万帧）上训练 5 个 epoch**的参考墙钟时间，使用默认优化器（AdamW）、640×480 图像：
+
+| 配置                                | policy         | 批次 | 墙钟时间 |
+| ------------------------------------ | -------------- | ----- | ---------: |
+| 单块 RTX 4090 / RTX 3090（24 GB）   | `act`          | 8     |  ~30–60 分钟 |
+| 单块 RTX 4090 / RTX 3090（24 GB）   | `diffusion`    | 8     |      ~2–4 小时 |
+| 单块 L4 / A10G（24 GB）             | `act`          | 8     |      ~1–2 小时 |
+| 单块 L4 / A10G（24 GB）             | `smolvla`      | 4     |      ~3–6 小时 |
+| 单块 A100 40 GB                    | `smolvla`      | 16    |      ~1–2 小时 |
+| 单块 A100 40 GB                    | `pi0` / `pi05` | 4     |      ~4–8 小时 |
+| 4× H100 80 GB 集群（`accelerate`） | `diffusion`    | 32    |  ~30–60 分钟 |
+| 4× H100 80 GB 集群（`accelerate`） | `smolvla`      | 32    |      ~1–2 小时 |
+| Apple Silicon M1/M2/M3 Max（MPS）     | `act`          | 4     |     ~6–14 小时 |
+
+这些只是数量级估算。实际运行会因图像分辨率、dataset I/O、数据加载器线程数以及具体的 GPU 型号而偏差 ±50%。它们适用于培养“这次运行是要一小时还是一天？”的直觉，而非作为 SLA 承诺。
+
+### 多 GPU 至关重要
+
+`accelerate launch --num_processes=N` 是缩短训练时间最简单的方法。每个优化器步骤处理 `N × batch_size` 个样本，所需墙钟时间与单 GPU 步骤大致相同，因此对于计算密集型的运行，4 个 GPU ≈ 4 倍加速。完整设置参见[多 GPU 训练](./multi_gpu_training)指南。
+
+在 4×H100 80 GB 集群（`accelerate launch --num_processes=4`）、5000 步、批次 32、AdamW、dataset [`imstevenpmwork/super_poulain_draft`](https://huggingface.co/datasets/imstevenpmwork/super_poulain_draft)（约 50 个 episode、约 640×480 图像）上的参考数据点：
+
+| policy      | 墙钟时间 | `update_s` | `dataloading_s` | GPU 利用率 | 值得注意的标志                                                                                                                  |
+| ----------- | ---------- | ---------: | --------------: | -------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `diffusion` | 16 分 17 秒    |      0.167 |           0.015 | ~90%     | 默认设置（从头训练）                                                                                               |
+| `smolvla`   | 27 分 49 秒    |      0.312 |           0.011 | ~80%     | `--policy.path=lerobot/smolvla_base`、`freeze_vision_encoder=false`、`train_expert_only=false`                                 |
+| `pi05`      | 3 小时 41 分     |      2.548 |           0.014 | ~95%     | `--policy.pretrained_path=lerobot/pi05_base`、`gradient_checkpointing=true`、`dtype=bfloat16`，视觉编码器 + 专家联合训练 |
+
+训练日志将完整的迭代拆分为 `dataloading_s`（`next(dl_iter)`）、`preprocessing_s`
+（图像转换和 policy 流水线）以及 `update_s`（优化器更新）。`step_s` 涵盖全部
+三个阶段并驱动 `samples_per_s`。上面的 benchmark 早于这一拆分，因此其 `dataloading_s` 包含
+预处理。
+
+### 调度与 checkpoint
+
+如果你缩短训练（例如在小型 dataset 上 5k–10k 步），请同时使用 `--policy.scheduler_decay_steps≈--steps` 缩短学习率调度。否则学习率会保持在峰值附近而永远不会衰减。`--save_freq` 也是如此。
+
+## 在哪里运行
+
+显存是首要筛选条件。在同一层级内，按预算和可用性选择——`$`–`$$$$` 列表示相对价格；请在你实际使用的云服务商上查看当前定价。
+
+| 类别                      | 显存  | 层级   | 适合                                             |
+| -------------------------- | ----- | ------ | ----------------------------------------------------------- |
+| RTX 3090 / 4090（消费级） | 24 GB | `$`    | 轻量 BC、Diffusion、SmolVLA。对于 VLA 在批次 1 时较紧张。    |
+| L4 / A10G（云）          | 24 GB | `$–$$` | 相同的显存包络；常见于 Google Cloud、RunPod、AWS `g5/g6`。 |
+| A100 40 GB                 | 40 GB | `$$$`  | 任何 policy 都能以合理的批次大小运行。                       |
+| A100 80 GB / H100 80 GB    | 80 GB | `$$$$` | 多 GPU 集群；适用于 VLA 的大批次。                 |
+| **仅 CPU**               | —     | —      | 不要训练。请使用 Colab 或租用 GPU。                       |
+
+### Hugging Face Jobs
+
+[Hugging Face Jobs](https://huggingface.co/docs/hub/jobs) 让你可以在托管的 HF 基础设施上运行训练，按秒计费，无需自备 GPU。`lerobot-train` 会为你提交并流式运行任务——只需在普通的训练命令中添加 `--job.target=<flavor>` 即可：
+
+```bash
+lerobot-train \
+  --policy.type=act --dataset.repo_id=<USER>/<DATASET> \
+  --policy.repo_id=<USER>/act_<task> \
+  --job.target=a10g-large
+```
+
+说明：
+
+- 提交前先运行一次 `hf auth login`，任务将在你的令牌下运行。
+- `--job.target` 与上面的表格对应：`t4-small`/`t4-medium`（T4，仅 ACT）、`l4x1`/`l4x4`（L4 24 GB）、`a10g-small/large/largex2/largex4`（A10G 24 GB 横向扩展）、`a100-large`（A100）。通过 `hf jobs hardware` 可查看当前包含定价的目录，或参见 [https://huggingface.co/docs/hub/jobs](https://huggingface.co/docs/hub/jobs)。
+- 任务默认有 `2d`（48 小时）的超时时间。使用 `--job.timeout=4h`（或任何其他有效的时长字符串）覆盖它以缩短或延长超时时间。命令完成后任务会自动停止。
+- 完整的操作说明——dataset 上传、checkpoint 流式传输、在任务上恢复运行——请参见[模仿学习训练指南](./il_robots#train-using-hugging-face-jobs)。
+
+
+
+<EditOnGithub source="https://github.com/huggingface/lerobot/blob/main/docs/source/hardware_guide.mdx" />
+
+<!--HF DOCBUILD BODY END-->
+
+HF_DOC_BODY_END
+

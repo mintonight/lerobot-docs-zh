@@ -1,0 +1,1277 @@
+{
+ "file": "annotation_pipeline.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1945,
+   "text": "# Annotation Pipeline",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1947,
+   "end": 2289,
+   "text": "⟦0⟧ watches each episode's video with a vision-language\nmodel (VLM) and writes natural-language annotations back into your\ndataset. It fills the two language columns from the\n[Language Columns and Recipes](⟦1⟧) page —\n⟦2⟧ and ⟦3⟧ — straight into\n⟦4⟧.",
+   "tokens": [
+    "`lerobot-annotate`",
+    "./language_and_recipes",
+    "`language_persistent`",
+    "`language_events`",
+    "`data/chunk-*/file-*.parquet`"
+   ]
+  },
+  {
+   "id": 2,
+   "kind": "para",
+   "start": 2291,
+   "end": 2439,
+   "text": "In short: point it at a LeRobot dataset, and it adds subtasks, plans,\nmemory, interjections, speech, and visual Q&A that a policy can be\ntrained on.",
+   "tokens": []
+  },
+  {
+   "id": 3,
+   "kind": "heading",
+   "start": 2441,
+   "end": 2464,
+   "text": "## How it fits together",
+   "tokens": []
+  },
+  {
+   "id": 4,
+   "kind": "para",
+   "start": 3692,
+   "end": 3890,
+   "text": "Three modules (⟦0⟧, ⟦1⟧, ⟦2⟧) all talk to **one** shared\nVLM. Each module stages its output to disk, a validator checks it, and a\nsingle writer rewrites the dataset shards in place.",
+   "tokens": [
+    "`plan`",
+    "`interjections`",
+    "`vqa`"
+   ]
+  },
+  {
+   "id": 5,
+   "kind": "heading",
+   "start": 3892,
+   "end": 3921,
+   "text": "## What the pipeline produces",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "para",
+   "start": 3923,
+   "end": 4021,
+   "text": "Each module emits a few kinds of annotation (\"styles\"), routed to one of\nthe two language columns:",
+   "tokens": []
+  },
+  {
+   "id": 7,
+   "kind": "table",
+   "start": 4023,
+   "end": 4112,
+   "text": "| Style / atom                                | Column                | Module          |",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "table",
+   "start": 4203,
+   "end": 4292,
+   "text": "| ⟦0⟧ (Pi0.7-style \"how, not what\")     | ⟦1⟧ | ⟦2⟧          |",
+   "tokens": [
+    "`subtask`",
+    "`language_persistent`",
+    "`plan`"
+   ]
+  },
+  {
+   "id": 9,
+   "kind": "table",
+   "start": 4293,
+   "end": 4382,
+   "text": "| ⟦0⟧ (initial + refresh on interjection)  | ⟦1⟧ | ⟦2⟧          |",
+   "tokens": [
+    "`plan`",
+    "`language_persistent`",
+    "`plan`"
+   ]
+  },
+  {
+   "id": 10,
+   "kind": "table",
+   "start": 4383,
+   "end": 4472,
+   "text": "| ⟦0⟧ (MEM-style compression)            | ⟦1⟧ | ⟦2⟧          |",
+   "tokens": [
+    "`memory`",
+    "`language_persistent`",
+    "`plan`"
+   ]
+  },
+  {
+   "id": 11,
+   "kind": "table",
+   "start": 4473,
+   "end": 4562,
+   "text": "| ⟦0⟧ (rephrasings of the task)        | ⟦1⟧ | ⟦2⟧          |",
+   "tokens": [
+    "`task_aug`",
+    "`language_persistent`",
+    "`plan`"
+   ]
+  },
+  {
+   "id": 12,
+   "kind": "table",
+   "start": 4653,
+   "end": 4742,
+   "text": "| speech tool-call atom (⟦0⟧, ⟦1⟧) | ⟦2⟧     | ⟦3⟧ |",
+   "tokens": [
+    "`style=null`",
+    "`say`",
+    "`language_events`",
+    "`interjections`"
+   ]
+  },
+  {
+   "id": 13,
+   "kind": "table",
+   "start": 4743,
+   "end": 4832,
+   "text": "| ⟦0⟧ (user / assistant pair)               | ⟦1⟧     | ⟦2⟧           |",
+   "tokens": [
+    "`vqa`",
+    "`language_events`",
+    "`vqa`"
+   ]
+  },
+  {
+   "id": 14,
+   "kind": "heading",
+   "start": 4834,
+   "end": 4864,
+   "text": "### How subtasks are generated",
+   "tokens": []
+  },
+  {
+   "id": 15,
+   "kind": "para",
+   "start": 4866,
+   "end": 4985,
+   "text": "The ⟦0⟧ module doesn't ask the VLM for subtasks in one shot. Instead\nit uses a two-step **describe → segment** flow:",
+   "tokens": [
+    "`plan`"
+   ]
+  },
+  {
+   "id": 16,
+   "kind": "list",
+   "start": 4987,
+   "end": 5102,
+   "text": "1. **Describe** — the VLM narrates only what it actually sees in the\n   chosen camera (no guessing about the task).",
+   "tokens": []
+  },
+  {
+   "id": 17,
+   "kind": "list",
+   "start": 5103,
+   "end": 5220,
+   "text": "2. **Segment** — that description is fed back in, and the VLM splits the\n   episode into consecutive atomic subtasks.",
+   "tokens": []
+  },
+  {
+   "id": 18,
+   "kind": "para",
+   "start": 5222,
+   "end": 5875,
+   "text": "Both passes see the episode as **timestamped contact sheets** — frames\nsampled at ⟦0⟧ (0.5s by default) and packed into JPEG\ngrids with each frame's time burned into its corner, so the VLM cites\nexact boundary times directly. This is far cheaper in vision tokens than\none image per frame, so the sampling can stay dense; episodes longer than\n⟦1⟧ are split into windows at the same density and\nmerged. Both prompts also carry a causal **event-boundary** definition (a\nnew event starts when an object becomes held / is released / reaches a new\nlocation / a lid changes state / contents move) to sharpen where cuts land.",
+   "tokens": [
+    "`frames_per_second`",
+    "`max_frames_per_prompt`"
+   ]
+  },
+  {
+   "id": 19,
+   "kind": "para",
+   "start": 5877,
+   "end": 6196,
+   "text": "Optionally, a third **seeded-relabel** pass (⟦0⟧)\nrevisits each span with its previous/current/next segment contact sheets and\nminimally corrects the label, using the first label as a prior — it keeps the\nboundaries fixed and only sharpens wording, at the cost of one extra call per\nsubtask.",
+   "tokens": [
+    "`--plan.subtask_seeded_relabel`"
+   ]
+  },
+  {
+   "id": 20,
+   "kind": "para",
+   "start": 6198,
+   "end": 6496,
+   "text": "The resulting spans are then stitched into a gap-free, full-episode\ncover, so **every frame has exactly one active subtask**. See\n[Running on Hugging Face Jobs](⟦0⟧) for the\nproduction settings (single camera, timestamped contact sheets,\nauto-windowed subtask generation).",
+   "tokens": [
+    "#running-on-hugging-face-jobs"
+   ]
+  },
+  {
+   "id": 21,
+   "kind": "heading",
+   "start": 6498,
+   "end": 6507,
+   "text": "### Tools",
+   "tokens": []
+  },
+  {
+   "id": 22,
+   "kind": "para",
+   "start": 6509,
+   "end": 6781,
+   "text": "The writer does **not** add a ⟦0⟧ column to the parquet. The tool\ncatalog lives in ⟦1⟧ instead (see [Tools](⟦2⟧)).\nAfter every run, the pipeline makes sure the canonical ⟦3⟧ schema is in\nthat list, keeping any tools you declared beforehand.",
+   "tokens": [
+    "`tools`",
+    "`meta/info.json[\"tools\"]`",
+    "./tools",
+    "`say`"
+   ]
+  },
+  {
+   "id": 23,
+   "kind": "para",
+   "start": 6783,
+   "end": 7218,
+   "text": "Want to add your own tool? Edit ⟦0⟧ directly — the\npipeline preserves whatever is already there. That makes the tool visible\nto the chat template, so the model can learn to _generate_ the call. The\nruntime layer that actually _executes_ a generated call (the ⟦1⟧\nprotocol / ⟦2⟧ under ⟦3⟧) is not part of\nthis PR — the [Tools](⟦4⟧) doc marks those pieces as\nnot-yet-implemented.",
+   "tokens": [
+    "`meta/info.json[\"tools\"]`",
+    "`Tool`",
+    "`TOOL_REGISTRY`",
+    "`src/lerobot/tools/`",
+    "./tools"
+   ]
+  },
+  {
+   "id": 24,
+   "kind": "heading",
+   "start": 7220,
+   "end": 7251,
+   "text": "## Running on Hugging Face Jobs",
+   "tokens": []
+  },
+  {
+   "id": 25,
+   "kind": "para",
+   "start": 7253,
+   "end": 7557,
+   "text": "Annotating a real dataset needs a GPU big enough to serve the VLM, so\n⟦0⟧ can dispatch itself to\n[Hugging Face Jobs](⟦1⟧) — same as\n⟦2⟧. Add ⟦3⟧ to the exact command you'd\nrun locally and it runs on that hardware instead:",
+   "tokens": [
+    "`lerobot-annotate`",
+    "https://huggingface.co/docs/hub/en/jobs",
+    "`lerobot-train`",
+    "`--job.target=<flavor>`"
+   ]
+  },
+  {
+   "id": 26,
+   "kind": "para",
+   "start": 8103,
+   "end": 8145,
+   "text": "That submits a single-GPU ⟦0⟧ job that:",
+   "tokens": [
+    "`h200`"
+   ]
+  },
+  {
+   "id": 27,
+   "kind": "list",
+   "start": 8147,
+   "end": 8221,
+   "text": "1. starts from the ⟦0⟧ image and installs ⟦1⟧ on top,",
+   "tokens": [
+    "`vllm/vllm-openai`",
+    "`lerobot`"
+   ]
+  },
+  {
+   "id": 28,
+   "kind": "list",
+   "start": 8222,
+   "end": 8300,
+   "text": "2. boots one vLLM server per GPU and drives it over the OpenAI-compatible API,",
+   "tokens": []
+  },
+  {
+   "id": 29,
+   "kind": "list",
+   "start": 8301,
+   "end": 8373,
+   "text": "3. runs the ⟦0⟧ / ⟦1⟧ / ⟦2⟧ modules across the dataset,",
+   "tokens": [
+    "`plan`",
+    "`interjections`",
+    "`vqa`"
+   ]
+  },
+  {
+   "id": 30,
+   "kind": "list",
+   "start": 8374,
+   "end": 8503,
+   "text": "4. with ⟦0⟧, uploads the result to ⟦1⟧ (or\n   back to ⟦2⟧ in place if you leave that unset).",
+   "tokens": [
+    "`--push_to_hub=true`",
+    "`--new_repo_id`",
+    "`--repo_id`"
+   ]
+  },
+  {
+   "id": 31,
+   "kind": "para",
+   "start": 8505,
+   "end": 8651,
+   "text": "The command streams the job's logs; ⟦0⟧ detaches without cancelling\nit. List the available flavors and their pricing with ⟦1⟧.",
+   "tokens": [
+    "`Ctrl-C`",
+    "`hf jobs hardware`"
+   ]
+  },
+  {
+   "id": 32,
+   "kind": "para",
+   "start": 8675,
+   "end": 8937,
+   "text": "Qwen3.6 ships with thinking enabled, which eats the token budget the\nannotator needs for its JSON answer — ⟦0⟧\nturns it off. Without ⟦1⟧ the annotated dataset is\ndiscarded when the pod exits.",
+   "tokens": [
+    "`--vlm.chat_template_kwargs='{\"enable_thinking\": false}'`",
+    "`--push_to_hub=true`"
+   ]
+  },
+  {
+   "id": 33,
+   "kind": "heading",
+   "start": 8947,
+   "end": 8962,
+   "text": "### Job options",
+   "tokens": []
+  },
+  {
+   "id": 34,
+   "kind": "table",
+   "start": 8964,
+   "end": 9097,
+   "text": "| Flag                | Default                   | What it does                                                                    |",
+   "tokens": []
+  },
+  {
+   "id": 35,
+   "kind": "table",
+   "start": 9232,
+   "end": 9365,
+   "text": "| ⟦0⟧      | ⟦1⟧                   | HF Jobs flavor to run on (e.g. ⟦2⟧, ⟦3⟧). Omitted/⟦4⟧ runs here.    |",
+   "tokens": [
+    "`--job.target`",
+    "`local`",
+    "`h200`",
+    "`h200x4`",
+    "`local`"
+   ]
+  },
+  {
+   "id": 36,
+   "kind": "table",
+   "start": 9366,
+   "end": 9499,
+   "text": "| ⟦0⟧       | ⟦1⟧ | Runtime image for the pod.                                                      |",
+   "tokens": [
+    "`--job.image`",
+    "`vllm/vllm-openai:latest`"
+   ]
+  },
+  {
+   "id": 37,
+   "kind": "table",
+   "start": 9500,
+   "end": 9633,
+   "text": "| ⟦0⟧     | ⟦1⟧                      | Wall-clock cap. Raise it for large datasets.                                    |",
+   "tokens": [
+    "`--job.timeout`",
+    "`2h`"
+   ]
+  },
+  {
+   "id": 38,
+   "kind": "table",
+   "start": 9634,
+   "end": 9767,
+   "text": "| ⟦0⟧      | ⟦1⟧                   | Submit and exit instead of streaming logs.                                      |",
+   "tokens": [
+    "`--job.detach`",
+    "`false`"
+   ]
+  },
+  {
+   "id": 39,
+   "kind": "table",
+   "start": 9768,
+   "end": 9901,
+   "text": "| ⟦0⟧ | ⟦1⟧                    | Git ref of lerobot installed on the pod — point it at a branch to test changes. |",
+   "tokens": [
+    "`--job.lerobot_ref`",
+    "`main`"
+   ]
+  },
+  {
+   "id": 40,
+   "kind": "table",
+   "start": 9902,
+   "end": 10035,
+   "text": "| ⟦0⟧        | ⟦1⟧                      | Extra tags on the job and on any dataset it pushes (⟦2⟧ is always added). |",
+   "tokens": [
+    "`--job.tags`",
+    "`[]`",
+    "`lerobot`"
+   ]
+  },
+  {
+   "id": 41,
+   "kind": "para",
+   "start": 10037,
+   "end": 10201,
+   "text": "For a bigger dataset, scale to ⟦0⟧ and raise\n⟦1⟧ / ⟦2⟧ to match, and give the job\nmore headroom with e.g. ⟦3⟧.",
+   "tokens": [
+    "`h200x4`",
+    "`--vlm.parallel_servers`",
+    "`--vlm.num_gpus`",
+    "`--job.timeout=8h`"
+   ]
+  },
+  {
+   "id": 42,
+   "kind": "para",
+   "start": 10203,
+   "end": 10409,
+   "text": "Remote runs need ⟦0⟧ (the pod pulls the dataset from the Hub;\n⟦1⟧ names a directory only your machine has). A dataset that exists\nonly in your local cache is pushed to a **private** repo first.",
+   "tokens": [
+    "`--repo_id`",
+    "`--root`"
+   ]
+  },
+  {
+   "id": 43,
+   "kind": "heading",
+   "start": 10411,
+   "end": 10425,
+   "text": "## Key options",
+   "tokens": []
+  },
+  {
+   "id": 44,
+   "kind": "para",
+   "start": 10427,
+   "end": 10582,
+   "text": "These are the flags you'll reach for most often. Run\n⟦0⟧ for everything else; the defaults are tuned for\nshort manipulation episodes.",
+   "tokens": [
+    "`lerobot-annotate --help`"
+   ]
+  },
+  {
+   "id": 45,
+   "kind": "heading",
+   "start": 10584,
+   "end": 10604,
+   "text": "### Dataset in / out",
+   "tokens": []
+  },
+  {
+   "id": 46,
+   "kind": "table",
+   "start": 10606,
+   "end": 10711,
+   "text": "| Flag              | Default | What it does                                                            |",
+   "tokens": []
+  },
+  {
+   "id": 47,
+   "kind": "table",
+   "start": 10818,
+   "end": 10923,
+   "text": "| ⟦0⟧       | —       | Hub dataset to annotate (downloaded if ⟦1⟧ unset).                 |",
+   "tokens": [
+    "`--repo_id`",
+    "`--root`"
+   ]
+  },
+  {
+   "id": 48,
+   "kind": "table",
+   "start": 10924,
+   "end": 11029,
+   "text": "| ⟦0⟧          | —       | Annotate a local dataset directory instead.                             |",
+   "tokens": [
+    "`--root`"
+   ]
+  },
+  {
+   "id": 49,
+   "kind": "table",
+   "start": 11030,
+   "end": 11135,
+   "text": "| ⟦0⟧   | —       | Push the result to a new repo (leaves the source repo untouched).       |",
+   "tokens": [
+    "`--new_repo_id`"
+   ]
+  },
+  {
+   "id": 50,
+   "kind": "table",
+   "start": 11136,
+   "end": 11241,
+   "text": "| ⟦0⟧   | ⟦1⟧ | Upload after annotating (to ⟦2⟧, else back to ⟦3⟧). |",
+   "tokens": [
+    "`--push_to_hub`",
+    "`false`",
+    "`--new_repo_id`",
+    "`--repo_id`"
+   ]
+  },
+  {
+   "id": 51,
+   "kind": "table",
+   "start": 11242,
+   "end": 11347,
+   "text": "| ⟦0⟧ | all     | Annotate just these episode indices (handy for a test run).             |",
+   "tokens": [
+    "`--only_episodes`"
+   ]
+  },
+  {
+   "id": 52,
+   "kind": "table",
+   "start": 11348,
+   "end": 11453,
+   "text": "| ⟦0⟧          | ⟦1⟧  | Seeds the RNGs that pick interjection timestamps + VQA question types.  |",
+   "tokens": [
+    "`--seed`",
+    "`1729`"
+   ]
+  },
+  {
+   "id": 53,
+   "kind": "heading",
+   "start": 11455,
+   "end": 11476,
+   "text": "### Which modules run",
+   "tokens": []
+  },
+  {
+   "id": 54,
+   "kind": "para",
+   "start": 11478,
+   "end": 11610,
+   "text": "Every module is on by default and can be toggled independently (set to\n⟦0⟧ to skip it, e.g. to iterate on one module at a time):",
+   "tokens": [
+    "`false`"
+   ]
+  },
+  {
+   "id": 55,
+   "kind": "table",
+   "start": 11612,
+   "end": 11689,
+   "text": "| Flag                      | Default | Turns off                           |",
+   "tokens": []
+  },
+  {
+   "id": 56,
+   "kind": "table",
+   "start": 11768,
+   "end": 11845,
+   "text": "| ⟦0⟧          | ⟦1⟧  | subtasks + plan + memory + task_aug |",
+   "tokens": [
+    "`--plan.enabled`",
+    "`true`"
+   ]
+  },
+  {
+   "id": 57,
+   "kind": "table",
+   "start": 11846,
+   "end": 11923,
+   "text": "| ⟦0⟧ | ⟦1⟧  | interjections + speech atoms        |",
+   "tokens": [
+    "`--interjections.enabled`",
+    "`true`"
+   ]
+  },
+  {
+   "id": 58,
+   "kind": "table",
+   "start": 11924,
+   "end": 12001,
+   "text": "| ⟦0⟧           | ⟦1⟧  | the VQA pairs                       |",
+   "tokens": [
+    "`--vqa.enabled`",
+    "`true`"
+   ]
+  },
+  {
+   "id": 59,
+   "kind": "heading",
+   "start": 12003,
+   "end": 12026,
+   "text": "### The VLM (⟦0⟧)",
+   "tokens": [
+    "`--vlm.*`"
+   ]
+  },
+  {
+   "id": 60,
+   "kind": "table",
+   "start": 12028,
+   "end": 12166,
+   "text": "| Flag                       | Default            | What it does                                                                         |",
+   "tokens": []
+  },
+  {
+   "id": 61,
+   "kind": "table",
+   "start": 12306,
+   "end": 12444,
+   "text": "| ⟦0⟧           | ⟦1⟧ | The model to serve and prompt.                                                       |",
+   "tokens": [
+    "`--vlm.model_id`",
+    "`Qwen/Qwen3.6-27B`"
+   ]
+  },
+  {
+   "id": 62,
+   "kind": "table",
+   "start": 12445,
+   "end": 12583,
+   "text": "| ⟦0⟧         | first ⟦1⟧   | Which camera every prompt is grounded on.                                            |",
+   "tokens": [
+    "`--vlm.camera_key`",
+    "`images.*`"
+   ]
+  },
+  {
+   "id": 63,
+   "kind": "table",
+   "start": 12584,
+   "end": 12722,
+   "text": "| ⟦0⟧      | auto               | The exact ⟦1⟧ command (set TP size, GPU memory, ⟦2⟧ here).  |",
+   "tokens": [
+    "`--vlm.serve_command`",
+    "`vllm serve …`",
+    "`--max-model-len`"
+   ]
+  },
+  {
+   "id": 64,
+   "kind": "table",
+   "start": 12723,
+   "end": 12861,
+   "text": "| ⟦0⟧   | ⟦1⟧                | Independent servers for round-robin routing (one per GPU).                           |",
+   "tokens": [
+    "`--vlm.parallel_servers`",
+    "`1`"
+   ]
+  },
+  {
+   "id": 65,
+   "kind": "table",
+   "start": 12862,
+   "end": 13000,
+   "text": "| ⟦0⟧           | ⟦1⟧                | GPUs per server (⟦2⟧ = one each).                                                    |",
+   "tokens": [
+    "`--vlm.num_gpus`",
+    "`0`",
+    "`0`"
+   ]
+  },
+  {
+   "id": 66,
+   "kind": "table",
+   "start": 13001,
+   "end": 13139,
+   "text": "| ⟦0⟧ | ⟦1⟧               | In-flight requests across all servers.                                               |",
+   "tokens": [
+    "`--vlm.client_concurrency`",
+    "`16`"
+   ]
+  },
+  {
+   "id": 67,
+   "kind": "table",
+   "start": 13140,
+   "end": 13278,
+   "text": "| ⟦0⟧     | ⟦1⟧              | Generation cap per call.                                                             |",
+   "tokens": [
+    "`--vlm.max_new_tokens`",
+    "`512`"
+   ]
+  },
+  {
+   "id": 68,
+   "kind": "table",
+   "start": 13279,
+   "end": 13417,
+   "text": "| ⟦0⟧        | ⟦1⟧              | Sampling temperature.                                                                |",
+   "tokens": [
+    "`--vlm.temperature`",
+    "`0.2`"
+   ]
+  },
+  {
+   "id": 69,
+   "kind": "table",
+   "start": 13418,
+   "end": 13556,
+   "text": "| ⟦0⟧   | ⟦1⟧             | Thinking-budget hint (⟦2⟧/⟦3⟧/⟦4⟧) forwarded to OpenAI-compatible servers. |",
+   "tokens": [
+    "`--vlm.reasoning_effort`",
+    "`null`",
+    "`low`",
+    "`medium`",
+    "`high`"
+   ]
+  },
+  {
+   "id": 70,
+   "kind": "heading",
+   "start": 13558,
+   "end": 13599,
+   "text": "### Subtasks / plan / memory (⟦0⟧)",
+   "tokens": [
+    "`--plan.*`"
+   ]
+  },
+  {
+   "id": 71,
+   "kind": "table",
+   "start": 13601,
+   "end": 13776,
+   "text": "| Flag                            | Default    | What it does                                                                                                                 |",
+   "tokens": []
+  },
+  {
+   "id": 72,
+   "kind": "table",
+   "start": 13953,
+   "end": 14128,
+   "text": "| ⟦0⟧      | ⟦1⟧      | Frame sampling rate for the contact sheets (⟦2⟧ = one frame every 0.5s).                                                   |",
+   "tokens": [
+    "`--plan.frames_per_second`",
+    "`2.0`",
+    "`2.0`"
+   ]
+  },
+  {
+   "id": 73,
+   "kind": "table",
+   "start": 14129,
+   "end": 14304,
+   "text": "| ⟦0⟧  | ⟦1⟧       | Frame budget per VLM call. Episodes whose sampling exceeds this are auto-windowed at the same density, then stitched.        |",
+   "tokens": [
+    "`--plan.max_frames_per_prompt`",
+    "`60`"
+   ]
+  },
+  {
+   "id": 74,
+   "kind": "table",
+   "start": 14305,
+   "end": 14480,
+   "text": "| ⟦0⟧  | ⟦1⟧        | Columns per contact-sheet grid (⟦2⟧ tiles, time row-major).                                     |",
+   "tokens": [
+    "`--plan.contact_sheet_columns`",
+    "`5`",
+    "`contact_sheet_frames_per_sheet`"
+   ]
+  },
+  {
+   "id": 75,
+   "kind": "table",
+   "start": 14481,
+   "end": 14656,
+   "text": "| ⟦0⟧         | ⟦1⟧        | Upper bound on subtasks per episode.                                                                                         |",
+   "tokens": [
+    "`--plan.plan_max_steps`",
+    "`8`"
+   ]
+  },
+  {
+   "id": 76,
+   "kind": "table",
+   "start": 14657,
+   "end": 14832,
+   "text": "| ⟦0⟧ | ⟦1⟧     | Run the describe→segment grounding pass (best subtask quality; +1 call/episode).                                             |",
+   "tokens": [
+    "`--plan.subtask_describe_first`",
+    "`true`"
+   ]
+  },
+  {
+   "id": 77,
+   "kind": "table",
+   "start": 14833,
+   "end": 15008,
+   "text": "| ⟦0⟧ | ⟦1⟧    | Second pass: re-label each subtask from its prev/current/next contact sheets, seeded with the first label (+1 call/subtask). |",
+   "tokens": [
+    "`--plan.subtask_seeded_relabel`",
+    "`false`"
+   ]
+  },
+  {
+   "id": 78,
+   "kind": "table",
+   "start": 15009,
+   "end": 15184,
+   "text": "| ⟦0⟧ | ⟦1⟧        | Frames sampled uniformly per segment sheet in the relabel pass (only used when ⟦2⟧).               |",
+   "tokens": [
+    "`--plan.subtask_relabel_frames`",
+    "`5`",
+    "`subtask_seeded_relabel=true`"
+   ]
+  },
+  {
+   "id": 79,
+   "kind": "table",
+   "start": 15185,
+   "end": 15360,
+   "text": "| ⟦0⟧              | ⟦1⟧     | Emit the numbered ⟦2⟧ rows (⟦3⟧ = subtasks + memory only).                                                            |",
+   "tokens": [
+    "`--plan.emit_plan`",
+    "`true`",
+    "`plan`",
+    "`false`"
+   ]
+  },
+  {
+   "id": 80,
+   "kind": "table",
+   "start": 15361,
+   "end": 15536,
+   "text": "| ⟦0⟧            | ⟦1⟧     | Emit the ⟦2⟧ rows (⟦3⟧ = subtasks + plan only); symmetric to ⟦4⟧.                                           |",
+   "tokens": [
+    "`--plan.emit_memory`",
+    "`true`",
+    "`memory`",
+    "`false`",
+    "`emit_plan`"
+   ]
+  },
+  {
+   "id": 81,
+   "kind": "table",
+   "start": 15537,
+   "end": 15712,
+   "text": "| ⟦0⟧     | ⟦1⟧       | How many ⟦2⟧ rephrasings to emit (⟦3⟧ disables).                                                                      |",
+   "tokens": [
+    "`--plan.n_task_rephrasings`",
+    "`10`",
+    "`task_aug`",
+    "`0`"
+   ]
+  },
+  {
+   "id": 82,
+   "kind": "table",
+   "start": 15713,
+   "end": 15888,
+   "text": "| ⟦0⟧ | ⟦1⟧ | Use the dataset task as-is (⟦2⟧), only when it's missing/short (⟦3⟧), or always re-derive from video (⟦4⟧).    |",
+   "tokens": [
+    "`--plan.derive_task_from_video`",
+    "`if_short`",
+    "`off`",
+    "`if_short`",
+    "`always`"
+   ]
+  },
+  {
+   "id": 83,
+   "kind": "heading",
+   "start": 15890,
+   "end": 15913,
+   "text": "### Interjections + VQA",
+   "tokens": []
+  },
+  {
+   "id": 84,
+   "kind": "table",
+   "start": 15915,
+   "end": 16037,
+   "text": "| Flag                                            | Default | What it does                                               |",
+   "tokens": []
+  },
+  {
+   "id": 85,
+   "kind": "table",
+   "start": 16161,
+   "end": 16283,
+   "text": "| ⟦0⟧ | ⟦1⟧     | Cap on interjection/speech pairs per episode.              |",
+   "tokens": [
+    "`--interjections.max_interjections_per_episode`",
+    "`3`"
+   ]
+  },
+  {
+   "id": 86,
+   "kind": "table",
+   "start": 16284,
+   "end": 16406,
+   "text": "| ⟦0⟧                         | ⟦1⟧   | How often VQA pairs are emitted.                           |",
+   "tokens": [
+    "`--vqa.vqa_emission_hz`",
+    "`1.0`"
+   ]
+  },
+  {
+   "id": 87,
+   "kind": "table",
+   "start": 16407,
+   "end": 16529,
+   "text": "| ⟦0⟧              | ⟦1⟧ | Ground VQA only on ⟦2⟧ (else every camera). |",
+   "tokens": [
+    "`--vqa.restrict_to_default_camera`",
+    "`false`",
+    "`--vlm.camera_key`"
+   ]
+  },
+  {
+   "id": 88,
+   "kind": "table",
+   "start": 16530,
+   "end": 16652,
+   "text": "| ⟦0⟧                | ⟦1⟧    | Episodes processed concurrently within each phase.         |",
+   "tokens": [
+    "`--executor.episode_parallelism`",
+    "`16`"
+   ]
+  },
+  {
+   "id": 89,
+   "kind": "heading",
+   "start": 16654,
+   "end": 16681,
+   "text": "## Contributing new modules",
+   "tokens": []
+  },
+  {
+   "id": 90,
+   "kind": "para",
+   "start": 16683,
+   "end": 16938,
+   "text": "The pipeline is built to grow, and **contributions are very welcome** —\na brand-new module (say, trajectory traces or affordances), a new prompt\ntemplate, a smarter grounding flow, or quality fixes to the existing\n⟦0⟧ / ⟦1⟧ / ⟦2⟧ modules.",
+   "tokens": [
+    "`plan`",
+    "`interjections`",
+    "`vqa`"
+   ]
+  },
+  {
+   "id": 91,
+   "kind": "para",
+   "start": 16940,
+   "end": 17242,
+   "text": "Every module lives under\n⟦0⟧, shares the VLM\nclient and the keyframe cache, writes its raw output to the staging\ntree, and plugs into the executor as its own phase. Got an idea? Open an\nissue or PR on [the repo](⟦1⟧).",
+   "tokens": [
+    "`src/lerobot/annotations/steerable_pipeline/modules/`",
+    "https://github.com/huggingface/lerobot"
+   ]
+  },
+  {
+   "id": 92,
+   "kind": "heading",
+   "start": 17244,
+   "end": 17277,
+   "text": "## How recipes consume the output",
+   "tokens": []
+  },
+  {
+   "id": 93,
+   "kind": "para",
+   "start": 17279,
+   "end": 17399,
+   "text": "The annotations are meant to be read by recipes (see\n[Language Columns and Recipes](⟦0⟧)). Typically:",
+   "tokens": [
+    "./language_and_recipes"
+   ]
+  },
+  {
+   "id": 94,
+   "kind": "list",
+   "start": 17401,
+   "end": 17515,
+   "text": "- low-level / high-level / memory-update branches read\n  ⟦0⟧ / ⟦1⟧ / ⟦2⟧ from ⟦3⟧.",
+   "tokens": [
+    "`subtask`",
+    "`plan`",
+    "`memory`",
+    "`language_persistent`"
+   ]
+  },
+  {
+   "id": 95,
+   "kind": "list",
+   "start": 17516,
+   "end": 17719,
+   "text": "- an interjection-response branch reads ⟦0⟧ events plus the\n  paired speech atom (merged into one assistant turn via ⟦1⟧)\n  and the matching ⟦2⟧ refresh at the same timestamp.",
+   "tokens": [
+    "`interjection`",
+    "`tool_calls_from`",
+    "`plan`"
+   ]
+  },
+  {
+   "id": 96,
+   "kind": "list",
+   "start": 17720,
+   "end": 17813,
+   "text": "- a VQA branch reads the ⟦0⟧ and ⟦1⟧ pairs from\n  ⟦2⟧.",
+   "tokens": [
+    "`(vqa, user)`",
+    "`(vqa, assistant)`",
+    "`language_events`"
+   ]
+  },
+  {
+   "id": 97,
+   "kind": "heading",
+   "start": 17815,
+   "end": 17848,
+   "text": "## Why state and events are split",
+   "tokens": []
+  },
+  {
+   "id": 98,
+   "kind": "para",
+   "start": 17850,
+   "end": 17877,
+   "text": "Two ideas shape the design:",
+   "tokens": []
+  },
+  {
+   "id": 99,
+   "kind": "list",
+   "start": 17879,
+   "end": 18232,
+   "text": "1. **Persistent state vs. exact events.** Persistent rows (⟦0⟧,\n   ⟦1⟧, ⟦2⟧) apply to the whole episode and answer \"what's true\n   right now?\". Event rows (⟦3⟧, ⟦4⟧, speech) appear only on\n   the one frame whose timestamp matches. Timestamps are copied straight\n   from the source parquet — never recomputed in floating point.",
+   "tokens": [
+    "`subtask`",
+    "`plan`",
+    "`memory`",
+    "`interjection`",
+    "`vqa`"
+   ]
+  },
+  {
+   "id": 100,
+   "kind": "list",
+   "start": 18233,
+   "end": 18422,
+   "text": "2. **One VLM pass.** All three modules share a single VLM client (the\n   OpenAI-compatible client talking to the job's vLLM server), so you pay\n   for one model load per dataset, not three.",
+   "tokens": []
+  },
+  {
+   "id": 101,
+   "kind": "heading",
+   "start": 18424,
+   "end": 18453,
+   "text": "## Re-running a single module",
+   "tokens": []
+  },
+  {
+   "id": 102,
+   "kind": "para",
+   "start": 18455,
+   "end": 18825,
+   "text": "Each module stages its raw output to\n⟦0⟧. This makes\nprompt iteration cheap: re-running one module overwrites only its own\nJSONL, then the writer recomposes the final parquet. Disable modules you\ndon't want with ⟦1⟧ (and likewise\n⟦2⟧ / ⟦3⟧) to test one at a time.",
+   "tokens": [
+    "`<root>/.annotate_staging/episode_{N:06d}/<module>.jsonl`",
+    "`--plan.enabled=false`",
+    "`--interjections.enabled`",
+    "`--vqa.enabled`"
+   ]
+  },
+  {
+   "id": 103,
+   "kind": "heading",
+   "start": 18827,
+   "end": 18855,
+   "text": "## What the validator checks",
+   "tokens": []
+  },
+  {
+   "id": 104,
+   "kind": "para",
+   "start": 18857,
+   "end": 18909,
+   "text": "Before the writer runs, ⟦0⟧ confirms:",
+   "tokens": [
+    "`StagingValidator`"
+   ]
+  },
+  {
+   "id": 105,
+   "kind": "list",
+   "start": 18911,
+   "end": 18969,
+   "text": "- every event row lands exactly on a real frame timestamp;",
+   "tokens": []
+  },
+  {
+   "id": 106,
+   "kind": "list",
+   "start": 18970,
+   "end": 19021,
+   "text": "- no speech / interjection pairs are left orphaned;",
+   "tokens": []
+  },
+  {
+   "id": 107,
+   "kind": "list",
+   "start": 19022,
+   "end": 19076,
+   "text": "- ⟦0⟧ is refreshed at every interjection timestamp;",
+   "tokens": [
+    "`plan`"
+   ]
+  },
+  {
+   "id": 108,
+   "kind": "list",
+   "start": 19077,
+   "end": 19146,
+   "text": "- ⟦0⟧ rows fall on subtask boundaries (a warning, not an error);",
+   "tokens": [
+    "`memory`"
+   ]
+  },
+  {
+   "id": 109,
+   "kind": "list",
+   "start": 19147,
+   "end": 19261,
+   "text": "- each VQA assistant ⟦0⟧ is valid JSON in one of the\n  bbox / keypoint / count / attribute / spatial shapes;",
+   "tokens": [
+    "`content`"
+   ]
+  },
+  {
+   "id": 110,
+   "kind": "list",
+   "start": 19262,
+   "end": 19329,
+   "text": "- every row goes to the column chosen by ⟦0⟧.",
+   "tokens": [
+    "`column_for_style(style)`"
+   ]
+  },
+  {
+   "id": 111,
+   "kind": "para",
+   "start": 19331,
+   "end": 19418,
+   "text": "Any error aborts the writer. Pass ⟦0⟧ to override\nwhile debugging.",
+   "tokens": [
+    "`--skip_validation=true`"
+   ]
+  },
+  {
+   "id": 112,
+   "kind": "heading",
+   "start": 19420,
+   "end": 19458,
+   "text": "## Where each module's ideas come from",
+   "tokens": []
+  },
+  {
+   "id": 113,
+   "kind": "list",
+   "start": 19460,
+   "end": 19712,
+   "text": "- **⟦0⟧ — subtasks.** Hi Robot ([Shi 2025](⟦1⟧))\n  for atom granularity (\"pick up one piece of lettuce\", \"place bowl to\n  box\"); Pi0.7 ([Physical Intelligence 2025](⟦2⟧))\n  for \"how, not what\" detail.",
+   "tokens": [
+    "`plan`",
+    "https://arxiv.org/abs/2502.19417",
+    "https://pi.website/pi07"
+   ]
+  },
+  {
+   "id": 114,
+   "kind": "list",
+   "start": 19713,
+   "end": 19883,
+   "text": "- **⟦0⟧ — memory.** MEM ([Torne 2026](⟦1⟧)):\n  keep only the minimal relevant information — preserve outcomes, drop\n  specific attributes.",
+   "tokens": [
+    "`plan`",
+    "https://arxiv.org/abs/2603.03596"
+   ]
+  },
+  {
+   "id": 115,
+   "kind": "list",
+   "start": 19884,
+   "end": 20122,
+   "text": "- **⟦0⟧.** Hi Robot's scenario taxonomy: negative task,\n  situated correction, specific constraint, preference. Speech is a\n  tool-call-only atom\n  (⟦1⟧).",
+   "tokens": [
+    "`interjections`",
+    "`tool_calls=[{type:function, function:{name:\"say\", arguments:{text:...}}}]`"
+   ]
+  },
+  {
+   "id": 116,
+   "kind": "list",
+   "start": 20123,
+   "end": 20449,
+   "text": "- **⟦0⟧.** ECoT ([Zawalski 2024](⟦1⟧)) for\n  grounded features (pixel bounding boxes ⟦2⟧,\n  keypoints) and Steerable VLA Policies\n  ([Zhao 2025](⟦3⟧)) for multi-abstraction\n  grounding. Pi0.7 also grounds answers across abstraction levels.",
+   "tokens": [
+    "`vqa`",
+    "https://arxiv.org/abs/2407.08693",
+    "`[x_min, y_min, x_max, y_max]`",
+    "https://arxiv.org/abs/2509.07626"
+   ]
+  },
+  {
+   "id": 117,
+   "kind": "para",
+   "start": 20451,
+   "end": 20594,
+   "text": "When improving a module, tweak its prompt template in\n⟦0⟧ rather than\nrewriting from scratch.",
+   "tokens": [
+    "`src/lerobot/annotations/steerable_pipeline/prompts/`"
+   ]
+  },
+  {
+   "id": 118,
+   "kind": "heading",
+   "start": 20596,
+   "end": 20624,
+   "text": "## Roughly how much it costs",
+   "tokens": []
+  },
+  {
+   "id": 119,
+   "kind": "para",
+   "start": 20626,
+   "end": 20899,
+   "text": "Per episode, the pipeline makes about ⟦0⟧ plan calls,\n⟦1⟧ interjection calls, and\n⟦2⟧ VQA calls. With the defaults (8\nsubtasks, 1 interjection, 1 Hz × 3 pairs) on a 30-second episode, that's\n~50 VLM calls.",
+   "tokens": [
+    "`max_steps`",
+    "`max_interjections_per_episode`",
+    "`vqa_emission_hz × episode_seconds`"
+   ]
+  },
+  {
+   "id": 120,
+   "kind": "para",
+   "start": 20901,
+   "end": 21176,
+   "text": "Storage stays small: ⟦0⟧ is at most tens of KB per\nepisode (parquet dictionary-encodes the one entry that repeats across\nframes), and ⟦1⟧ is empty on most frames — its size scales\nwith the number of emissions, not ⟦2⟧.",
+   "tokens": [
+    "`language_persistent`",
+    "`language_events`",
+    "`num_frames × num_emissions`"
+   ]
+  }
+ ]
+}

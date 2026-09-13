@@ -1,0 +1,365 @@
+{
+ "file": "rename_map.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1954,
+   "text": "# Rename Map and Empty Cameras",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1956,
+   "end": 2337,
+   "text": "When you train, evaluate, or record with a robot policy, your **dataset** or **environment** provides observations under one set of keys (e.g. ⟦0⟧, ⟦1⟧), while your **policy** expects another (e.g. ⟦2⟧, ⟦3⟧). The **rename map** bridges that gap without changing the policy or data source.",
+   "tokens": [
+    "`observation.images.front`",
+    "`observation.images.eagle`",
+    "`observation.images.image`",
+    "`observation.images.image2`"
+   ]
+  },
+  {
+   "id": 2,
+   "kind": "quote",
+   "start": 2339,
+   "end": 2450,
+   "text": "> **Scope:** The rename map only renames **observation** keys (images and state). Action keys are not affected.",
+   "tokens": []
+  },
+  {
+   "id": 3,
+   "kind": "heading",
+   "start": 2452,
+   "end": 2494,
+   "text": "## Why observation keys don't always match",
+   "tokens": []
+  },
+  {
+   "id": 4,
+   "kind": "para",
+   "start": 2496,
+   "end": 2597,
+   "text": "Policies have a fixed set of **input feature names** baked into their pretrained config. For example:",
+   "tokens": []
+  },
+  {
+   "id": 5,
+   "kind": "list",
+   "start": 2599,
+   "end": 2747,
+   "text": "- [pi0fast-libero](⟦0⟧) expects ⟦1⟧ and ⟦2⟧.",
+   "tokens": [
+    "https://huggingface.co/lerobot/pi0fast-libero",
+    "`observation.images.base_0_rgb`",
+    "`observation.images.left_wrist_0_rgb`"
+   ]
+  },
+  {
+   "id": 6,
+   "kind": "list",
+   "start": 2748,
+   "end": 2901,
+   "text": "- [xvla-base](⟦0⟧) expects ⟦1⟧, ⟦2⟧, and ⟦3⟧.",
+   "tokens": [
+    "https://huggingface.co/lerobot/xvla-base",
+    "`observation.images.image`",
+    "`observation.images.image2`",
+    "`observation.images.image3`"
+   ]
+  },
+  {
+   "id": 7,
+   "kind": "para",
+   "start": 2903,
+   "end": 3363,
+   "text": "Your dataset might use different names entirely (e.g. ⟦0⟧, ⟦1⟧, ⟦2⟧), and your eval environment might use yet another set. Rather than editing the policy config or renaming columns in the dataset, you pass a **rename map**: a JSON dictionary that maps source keys to the keys the policy expects. Renaming happens inside the preprocessor pipeline, so the policy always sees its expected keys.",
+   "tokens": [
+    "`observation.images.front`",
+    "`observation.images.eagle`",
+    "`observation.images.glove`"
+   ]
+  },
+  {
+   "id": 8,
+   "kind": "heading",
+   "start": 3365,
+   "end": 3388,
+   "text": "## Using the rename map",
+   "tokens": []
+  },
+  {
+   "id": 9,
+   "kind": "para",
+   "start": 3390,
+   "end": 3470,
+   "text": "Pass the mapping as a JSON string on the command line. The convention is always:",
+   "tokens": []
+  },
+  {
+   "id": 10,
+   "kind": "para",
+   "start": 3530,
+   "end": 3642,
+   "text": "where **source_key** is what the dataset or environment provides, and **policy_key** is what the policy expects.",
+   "tokens": []
+  },
+  {
+   "id": 11,
+   "kind": "para",
+   "start": 3644,
+   "end": 3748,
+   "text": "Only listed keys are renamed; everything else passes through unchanged. Order of entries doesn't matter.",
+   "tokens": []
+  },
+  {
+   "id": 12,
+   "kind": "para",
+   "start": 3750,
+   "end": 3828,
+   "text": "Supported policies: **PI0**, **PI05**, **PI0Fast**, **SmolVLA**, and **XVLA**.",
+   "tokens": []
+  },
+  {
+   "id": 13,
+   "kind": "heading",
+   "start": 3830,
+   "end": 3842,
+   "text": "### Training",
+   "tokens": []
+  },
+  {
+   "id": 14,
+   "kind": "para",
+   "start": 3844,
+   "end": 4149,
+   "text": "Suppose you fine-tune [lerobot/xvla-base](⟦0⟧) on a dataset with images under ⟦1⟧, ⟦2⟧, and ⟦3⟧. XVLA expects ⟦4⟧, ⟦5⟧, and ⟦6⟧:",
+   "tokens": [
+    "https://huggingface.co/lerobot/xvla-base",
+    "`observation.images.front`",
+    "`observation.images.eagle`",
+    "`observation.images.glove`",
+    "`observation.images.image`",
+    "`observation.images.image2`",
+    "`observation.images.image3`"
+   ]
+  },
+  {
+   "id": 15,
+   "kind": "heading",
+   "start": 4823,
+   "end": 4837,
+   "text": "### Evaluation",
+   "tokens": []
+  },
+  {
+   "id": 16,
+   "kind": "para",
+   "start": 4839,
+   "end": 5101,
+   "text": "A policy that expects ⟦0⟧ and ⟦1⟧ (e.g. [pi0fast-libero](⟦2⟧)), but the LIBERO environment returns ⟦3⟧ and ⟦4⟧:",
+   "tokens": [
+    "`observation.images.base_0_rgb`",
+    "`observation.images.left_wrist_0_rgb`",
+    "https://huggingface.co/lerobot/pi0fast-libero",
+    "`observation.images.image`",
+    "`observation.images.image2`"
+   ]
+  },
+  {
+   "id": 17,
+   "kind": "heading",
+   "start": 5349,
+   "end": 5396,
+   "text": "## Alternative: edit the policy config directly",
+   "tokens": []
+  },
+  {
+   "id": 18,
+   "kind": "para",
+   "start": 5398,
+   "end": 5570,
+   "text": "If you always use the same dataset or environment, you can **edit the policy's ⟦0⟧** so its observation keys match your data source. Then no rename map is needed.",
+   "tokens": [
+    "`config.json`"
+   ]
+  },
+  {
+   "id": 19,
+   "kind": "para",
+   "start": 5572,
+   "end": 5717,
+   "text": "The tradeoff: modifying the policy config ties it to one data source. A rename map keeps one policy usable across many datasets and environments.",
+   "tokens": []
+  },
+  {
+   "id": 20,
+   "kind": "heading",
+   "start": 5719,
+   "end": 5772,
+   "text": "## Empty cameras: fewer views than the policy expects",
+   "tokens": []
+  },
+  {
+   "id": 21,
+   "kind": "para",
+   "start": 5774,
+   "end": 5966,
+   "text": "Some policies are built for a fixed number of image inputs. If your dataset has fewer cameras, you can set **⟦0⟧** in the policy config instead of modifying the model architecture.",
+   "tokens": [
+    "`empty_cameras`"
+   ]
+  },
+  {
+   "id": 22,
+   "kind": "heading",
+   "start": 5968,
+   "end": 5984,
+   "text": "### How it works",
+   "tokens": []
+  },
+  {
+   "id": 23,
+   "kind": "para",
+   "start": 5986,
+   "end": 6074,
+   "text": "Setting ⟦0⟧ adds N placeholder image features to the policy config, named:",
+   "tokens": [
+    "`empty_cameras=N`"
+   ]
+  },
+  {
+   "id": 24,
+   "kind": "para",
+   "start": 6157,
+   "end": 6429,
+   "text": "At runtime, these keys have no corresponding data in the batch. The policy fills them with masked dummy tensors (padded with ⟦0⟧ for SigLIP-based vision encoders, with a zero attention mask), so the extra image slots are effectively ignored during training and inference.",
+   "tokens": [
+    "`-1`"
+   ]
+  },
+  {
+   "id": 25,
+   "kind": "heading",
+   "start": 6431,
+   "end": 6442,
+   "text": "### Example",
+   "tokens": []
+  },
+  {
+   "id": 26,
+   "kind": "para",
+   "start": 6444,
+   "end": 6546,
+   "text": "XVLA-base has three visual inputs and ⟦0⟧ by default. Your dataset only has two cameras:",
+   "tokens": [
+    "`empty_cameras=0`"
+   ]
+  },
+  {
+   "id": 27,
+   "kind": "list",
+   "start": 6548,
+   "end": 6582,
+   "text": "1. Set ⟦0⟧.",
+   "tokens": [
+    "`--policy.empty_cameras=1`"
+   ]
+  },
+  {
+   "id": 28,
+   "kind": "list",
+   "start": 6583,
+   "end": 6651,
+   "text": "2. The config adds a third key: ⟦0⟧.",
+   "tokens": [
+    "`observation.images.empty_camera_0`"
+   ]
+  },
+  {
+   "id": 29,
+   "kind": "list",
+   "start": 6652,
+   "end": 6709,
+   "text": "3. Use the rename map for your two real cameras as usual.",
+   "tokens": []
+  },
+  {
+   "id": 30,
+   "kind": "list",
+   "start": 6710,
+   "end": 6782,
+   "text": "4. The third slot is masked out — no fake images needed in your dataset.",
+   "tokens": []
+  },
+  {
+   "id": 31,
+   "kind": "heading",
+   "start": 6784,
+   "end": 6802,
+   "text": "## Quick reference",
+   "tokens": []
+  },
+  {
+   "id": 32,
+   "kind": "table",
+   "start": 6804,
+   "end": 6925,
+   "text": "| Goal                                    | What to do                                                                  |",
+   "tokens": []
+  },
+  {
+   "id": 33,
+   "kind": "table",
+   "start": 7048,
+   "end": 7169,
+   "text": "| Dataset keys ≠ policy keys              | ⟦0⟧                         |",
+   "tokens": [
+    "`--rename_map='{\"dataset_key\": \"policy_key\", ...}'`"
+   ]
+  },
+  {
+   "id": 34,
+   "kind": "table",
+   "start": 7170,
+   "end": 7291,
+   "text": "| Env keys ≠ policy keys (eval)           | ⟦0⟧                             |",
+   "tokens": [
+    "`--rename_map='{\"env_key\": \"policy_key\", ...}'`"
+   ]
+  },
+  {
+   "id": 35,
+   "kind": "table",
+   "start": 7292,
+   "end": 7413,
+   "text": "| Rollout with different keys (inference) | ⟦0⟧.                         |",
+   "tokens": [
+    "`--rename_map='{\"source_key\": \"policy_key\", ...}'`"
+   ]
+  },
+  {
+   "id": 36,
+   "kind": "table",
+   "start": 7414,
+   "end": 7535,
+   "text": "| Fewer cameras than policy expects       | ⟦0⟧ (supported by PI0, PI05, PI0Fast, SmolVLA, XVLA) |",
+   "tokens": [
+    "`--policy.empty_cameras=N`"
+   ]
+  },
+  {
+   "id": 37,
+   "kind": "table",
+   "start": 7536,
+   "end": 7657,
+   "text": "| Avoid passing a rename map              | Edit the policy's ⟦0⟧ so its keys match your data source          |",
+   "tokens": [
+    "`config.json`"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,265 @@
+{
+ "file": "api/teleoperators.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1939,
+   "text": "# Teleoperators",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1941,
+   "end": 2164,
+   "text": "A teleoperator produces actions for a robot to follow — a leader arm, a gamepad, a keyboard, a phone. All of\nthem implement the ⟦0⟧ interface, so a recording script written against it works with any input\ndevice.",
+   "tokens": [
+    "`Teleoperator`"
+   ]
+  },
+  {
+   "id": 2,
+   "kind": "para",
+   "start": 2166,
+   "end": 2340,
+   "text": "See [Phone teleoperation](⟦0⟧) and [Isaac Teleop](⟦1⟧) for setup guides, and\n[Imitation Learning for Robots](⟦2⟧) for the recording workflow.",
+   "tokens": [
+    "../phone_teleop",
+    "../isaac_teleop",
+    "../il_robots"
+   ]
+  },
+  {
+   "id": 3,
+   "kind": "heading",
+   "start": 2342,
+   "end": 2395,
+   "text": "## Teleoperator⟦0⟧",
+   "tokens": [
+    "[[lerobot.teleoperators.Teleoperator]]"
+   ]
+  },
+  {
+   "id": 4,
+   "kind": "docfield",
+   "start": 2776,
+   "end": 2981,
+   "text": "⟦0⟧- **config_class** (RobotConfig) -- The expected configuration class for this teleoperator.\n- **name** (str) -- The unique name used to identify this teleoperator type.⟦1⟧⟦2⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "</paramsdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 5,
+   "kind": "para",
+   "start": 2983,
+   "end": 3056,
+   "text": "The base abstract class for all LeRobot-compatible teleoperation devices.",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "para",
+   "start": 3058,
+   "end": 3223,
+   "text": "This class provides a standardized interface for interacting with physical teleoperators.\nSubclasses must implement all abstract methods and properties to be usable.",
+   "tokens": []
+  },
+  {
+   "id": 7,
+   "kind": "docfield",
+   "start": 3580,
+   "end": 3785,
+   "text": "⟦0⟧- **calibrate** (bool) -- If True, automatically calibrate the teleoperator after connecting if it's not\n  calibrated or needs calibration (this is hardware-dependant).⟦1⟧⟦2⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "</paramsdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 8,
+   "kind": "para",
+   "start": 3787,
+   "end": 3833,
+   "text": "Establish communication with the teleoperator.",
+   "tokens": []
+  },
+  {
+   "id": 9,
+   "kind": "para",
+   "start": 4157,
+   "end": 4237,
+   "text": "⟦0⟧\nDisconnect from the teleoperator and perform any necessary cleanup.",
+   "tokens": [
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 10,
+   "kind": "para",
+   "start": 4570,
+   "end": 4710,
+   "text": "Apply any one-time or runtime configuration to the teleoperator.\nThis may include setting motor parameters, control modes, or initial state.",
+   "tokens": []
+  },
+  {
+   "id": 11,
+   "kind": "para",
+   "start": 5044,
+   "end": 5117,
+   "text": "Calibrate the teleoperator if applicable. If not, this should be a no-op.",
+   "tokens": []
+  },
+  {
+   "id": 12,
+   "kind": "para",
+   "start": 5119,
+   "end": 5247,
+   "text": "This method should collect any necessary data (e.g., motor offsets) and update the\n:pyattr:⟦0⟧ dictionary accordingly.",
+   "tokens": [
+    "`calibration`"
+   ]
+  },
+  {
+   "id": 13,
+   "kind": "para",
+   "start": 5569,
+   "end": 5755,
+   "text": "⟦0⟧⟦1⟧A flat dictionary representing the teleoperator's current actions. Its\nstructure should match :pymeth:⟦2⟧.⟦3⟧⟦4⟧",
+   "tokens": [
+    "<rettype>RobotAction</rettype>",
+    "<retdesc>",
+    "`observation_features`",
+    "</retdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 14,
+   "kind": "para",
+   "start": 5757,
+   "end": 5807,
+   "text": "Retrieve the current action from the teleoperator.",
+   "tokens": []
+  },
+  {
+   "id": 15,
+   "kind": "docfield",
+   "start": 6176,
+   "end": 6460,
+   "text": "⟦0⟧- **feedback** (dict[str, Any]) -- Dictionary representing the desired feedback. Its structure should match\n  :pymeth:⟦1⟧.⟦2⟧⟦3⟧⟦4⟧The action actually sent to the motors potentially clipped or modified, e.g. by",
+   "tokens": [
+    "<paramsdesc>",
+    "`feedback_features`",
+    "</paramsdesc>",
+    "<rettype>dict[str, Any]</rettype>",
+    "<retdesc>"
+   ]
+  },
+  {
+   "id": 16,
+   "kind": "para",
+   "start": 6461,
+   "end": 6509,
+   "text": "safety limits on velocity.⟦0⟧⟦1⟧",
+   "tokens": [
+    "</retdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 17,
+   "kind": "para",
+   "start": 6511,
+   "end": 6562,
+   "text": "Send a feedback action command to the teleoperator.",
+   "tokens": []
+  },
+  {
+   "id": 18,
+   "kind": "para",
+   "start": 6913,
+   "end": 7254,
+   "text": "A dictionary describing the structure and types of the actions produced by the teleoperator. Its\nstructure (keys) should match the structure of what is returned by :pymeth:⟦0⟧. Values for\nthe dict should be the type of the value if it's a simple value, e.g. ⟦1⟧ for single\nproprioceptive value (a joint's goal position/velocity)",
+   "tokens": [
+    "`get_action`",
+    "`float`"
+   ]
+  },
+  {
+   "id": 19,
+   "kind": "para",
+   "start": 7256,
+   "end": 7356,
+   "text": "Note: this property should be able to be called regardless of whether the robot is connected or not.",
+   "tokens": []
+  },
+  {
+   "id": 20,
+   "kind": "para",
+   "start": 7706,
+   "end": 8050,
+   "text": "A dictionary describing the structure and types of the feedback actions expected by the robot. Its\nstructure (keys) should match the structure of what is passed to :pymeth:⟦0⟧. Values for\nthe dict should be the type of the value if it's a simple value, e.g. ⟦1⟧ for single\nproprioceptive value (a joint's goal position/velocity)",
+   "tokens": [
+    "`send_feedback`",
+    "`float`"
+   ]
+  },
+  {
+   "id": 21,
+   "kind": "para",
+   "start": 8052,
+   "end": 8152,
+   "text": "Note: this property should be able to be called regardless of whether the robot is connected or not.",
+   "tokens": []
+  },
+  {
+   "id": 22,
+   "kind": "para",
+   "start": 8492,
+   "end": 8638,
+   "text": "Whether the teleoperator is currently connected or not. If ⟦0⟧, calling :pymeth:⟦1⟧\nor :pymeth:⟦2⟧ should raise an error.",
+   "tokens": [
+    "`False`",
+    "`get_action`",
+    "`send_feedback`"
+   ]
+  },
+  {
+   "id": 23,
+   "kind": "para",
+   "start": 8966,
+   "end": 9077,
+   "text": "⟦0⟧\nWhether the teleoperator is currently calibrated or not. Should be always ⟦1⟧ if not applicable",
+   "tokens": [
+    "</Docstring>",
+    "`True`"
+   ]
+  },
+  {
+   "id": 24,
+   "kind": "heading",
+   "start": 9093,
+   "end": 9158,
+   "text": "## TeleoperatorConfig⟦0⟧",
+   "tokens": [
+    "[[lerobot.teleoperators.TeleoperatorConfig]]"
+   ]
+  },
+  {
+   "id": 25,
+   "kind": "heading",
+   "start": 9631,
+   "end": 9718,
+   "text": "## make_teleoperator_from_config⟦0⟧",
+   "tokens": [
+    "[[lerobot.teleoperators.make_teleoperator_from_config]]"
+   ]
+  }
+ ]
+}

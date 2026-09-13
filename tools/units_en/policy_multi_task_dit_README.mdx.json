@@ -1,0 +1,29 @@
+{
+ "file": "policy_multi_task_dit_README.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1946,
+   "text": "# Multitask DiT Policy",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "heading",
+   "start": 1948,
+   "end": 1959,
+   "text": "## Citation",
+   "tokens": []
+  },
+  {
+   "id": 2,
+   "kind": "para",
+   "start": 1961,
+   "end": 2015,
+   "text": "If you use this work, please cite the following works:",
+   "tokens": []
+  }
+ ]
+}

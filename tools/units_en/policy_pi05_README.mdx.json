@@ -1,0 +1,305 @@
+{
+ "file": "policy_pi05_README.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1937,
+   "text": "# π₀.₅ (pi05)",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1939,
+   "end": 2184,
+   "text": "This repository contains the Hugging Face port of **π₀.₅**, adapted from [OpenPI](⟦0⟧) by the Physical Intelligence.\nIt is designed as a **Vision-Language-Action model with open-world generalization**.",
+   "tokens": [
+    "https://github.com/Physical-Intelligence/openpi"
+   ]
+  },
+  {
+   "id": 2,
+   "kind": "heading",
+   "start": 2191,
+   "end": 2208,
+   "text": "## Model Overview",
+   "tokens": []
+  },
+  {
+   "id": 3,
+   "kind": "table",
+   "start": 2210,
+   "end": 2335,
+   "text": "| Feature              | π₀                                                     | π₀.₅                                      |",
+   "tokens": []
+  },
+  {
+   "id": 4,
+   "kind": "table",
+   "start": 2462,
+   "end": 2587,
+   "text": "| Time Conditioning    | Concatenates time with actions via ⟦0⟧ | Uses ⟦1⟧ for AdaRMS conditioning |",
+   "tokens": [
+    "`action_time_mlp_*`",
+    "`time_mlp_*`"
+   ]
+  },
+  {
+   "id": 5,
+   "kind": "table",
+   "start": 2588,
+   "end": 2713,
+   "text": "| AdaRMS               | Not used                                               | Used in action expert                     |",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "table",
+   "start": 2714,
+   "end": 2839,
+   "text": "| Tokenizer Length     | 48 tokens                                              | 200 tokens                                |",
+   "tokens": []
+  },
+  {
+   "id": 7,
+   "kind": "table",
+   "start": 2840,
+   "end": 2965,
+   "text": "| Discrete State Input | False (Uses ⟦0⟧ layer)                        | True                                      |",
+   "tokens": [
+    "`state_proj`"
+   ]
+  },
+  {
+   "id": 8,
+   "kind": "table",
+   "start": 2966,
+   "end": 3091,
+   "text": "| Parameter Count      | Higher (includes state embedding)                      | Lower (no state embedding)                |",
+   "tokens": []
+  },
+  {
+   "id": 9,
+   "kind": "heading",
+   "start": 3098,
+   "end": 3117,
+   "text": "## Relative Actions",
+   "tokens": []
+  },
+  {
+   "id": 10,
+   "kind": "para",
+   "start": 3119,
+   "end": 3373,
+   "text": "π₀.₅ supports training with **relative actions**, where the model learns relative offsets\nfrom the current robot state instead of absolute joint positions. This mirrors the\nrelative-action transform in OpenPI (⟦0⟧) and can improve performance.",
+   "tokens": [
+    "`DeltaActions`"
+   ]
+  },
+  {
+   "id": 11,
+   "kind": "heading",
+   "start": 3375,
+   "end": 3391,
+   "text": "### How it works",
+   "tokens": []
+  },
+  {
+   "id": 12,
+   "kind": "list",
+   "start": 3393,
+   "end": 3527,
+   "text": "1. **During preprocessing**, absolute actions are converted to relative offsets:\n   ⟦0⟧ (for selected joints).",
+   "tokens": [
+    "`relative = action - state`"
+   ]
+  },
+  {
+   "id": 13,
+   "kind": "list",
+   "start": 3528,
+   "end": 3624,
+   "text": "2. The relative actions are normalized using statistics computed from the relative distribution.",
+   "tokens": []
+  },
+  {
+   "id": 14,
+   "kind": "list",
+   "start": 3625,
+   "end": 3747,
+   "text": "3. **During postprocessing**, predicted relative actions are converted back to absolute:\n   ⟦0⟧.",
+   "tokens": [
+    "`absolute = relative + state`"
+   ]
+  },
+  {
+   "id": 15,
+   "kind": "para",
+   "start": 3749,
+   "end": 3826,
+   "text": "Joints listed in ⟦0⟧ (e.g., gripper) are kept absolute.",
+   "tokens": [
+    "`relative_exclude_joints`"
+   ]
+  },
+  {
+   "id": 16,
+   "kind": "heading",
+   "start": 3828,
+   "end": 3845,
+   "text": "### Configuration",
+   "tokens": []
+  },
+  {
+   "id": 17,
+   "kind": "table",
+   "start": 3847,
+   "end": 3973,
+   "text": "| Parameter                 | Type        | Default       | Description                                                      |",
+   "tokens": []
+  },
+  {
+   "id": 18,
+   "kind": "table",
+   "start": 4101,
+   "end": 4227,
+   "text": "| ⟦0⟧    | ⟦1⟧      | ⟦2⟧       | Enable relative-action training                                  |",
+   "tokens": [
+    "`use_relative_actions`",
+    "`bool`",
+    "`False`"
+   ]
+  },
+  {
+   "id": 19,
+   "kind": "table",
+   "start": 4228,
+   "end": 4354,
+   "text": "| ⟦0⟧ | ⟦1⟧ | ⟦2⟧ | Joint names to keep absolute (matched by substring)              |",
+   "tokens": [
+    "`relative_exclude_joints`",
+    "`list[str]`",
+    "`[\"gripper\"]`"
+   ]
+  },
+  {
+   "id": 20,
+   "kind": "table",
+   "start": 4355,
+   "end": 4481,
+   "text": "| ⟦0⟧    | ⟦1⟧ | ⟦2⟧        | Auto-populated from dataset metadata at runtime by ⟦3⟧ |",
+   "tokens": [
+    "`action_feature_names`",
+    "`list[str]`",
+    "`None`",
+    "`make_policy`"
+   ]
+  },
+  {
+   "id": 21,
+   "kind": "heading",
+   "start": 4483,
+   "end": 4503,
+   "text": "### Training example",
+   "tokens": []
+  },
+  {
+   "id": 22,
+   "kind": "para",
+   "start": 4715,
+   "end": 4783,
+   "text": "When ⟦0⟧, the training script automatically:",
+   "tokens": [
+    "`use_relative_actions=true`"
+   ]
+  },
+  {
+   "id": 23,
+   "kind": "list",
+   "start": 4785,
+   "end": 4878,
+   "text": "- Computes relative action statistics from the dataset (sampled chunk-level relative actions)",
+   "tokens": []
+  },
+  {
+   "id": 24,
+   "kind": "list",
+   "start": 4879,
+   "end": 4953,
+   "text": "- Replaces the standard action stats with relative stats for normalization",
+   "tokens": []
+  },
+  {
+   "id": 25,
+   "kind": "list",
+   "start": 4954,
+   "end": 5019,
+   "text": "- Broadcasts these stats across all ranks in distributed training",
+   "tokens": []
+  },
+  {
+   "id": 26,
+   "kind": "heading",
+   "start": 5026,
+   "end": 5054,
+   "text": "## EMA of the policy weights",
+   "tokens": []
+  },
+  {
+   "id": 27,
+   "kind": "para",
+   "start": 5056,
+   "end": 5290,
+   "text": "OpenPI maintains an exponential moving average of the weights during training (⟦0⟧ by default) and keeps the EMA copy for inference. To reproduce this with the LeRobot trainer, enable the EMA shadow with a constant decay:",
+   "tokens": [
+    "`ema_decay=0.99`"
+   ]
+  },
+  {
+   "id": 28,
+   "kind": "para",
+   "start": 5455,
+   "end": 5749,
+   "text": "Checkpoints then contain a directly loadable copy of the EMA weights in ⟦0⟧ next to the live ones. Note that the shadow is a full extra copy of the parameters on the GPU. Like OpenPI (which disables EMA in its LoRA configs), EMA is not supported together with PEFT adapters.",
+   "tokens": [
+    "`pretrained_model_ema/`"
+   ]
+  },
+  {
+   "id": 29,
+   "kind": "heading",
+   "start": 5756,
+   "end": 5767,
+   "text": "## Citation",
+   "tokens": []
+  },
+  {
+   "id": 30,
+   "kind": "para",
+   "start": 5769,
+   "end": 5838,
+   "text": "If you use this work, please cite both **OpenPI** and the π₀.₅ paper:",
+   "tokens": []
+  },
+  {
+   "id": 31,
+   "kind": "heading",
+   "start": 7134,
+   "end": 7144,
+   "text": "## License",
+   "tokens": []
+  },
+  {
+   "id": 32,
+   "kind": "para",
+   "start": 7146,
+   "end": 7290,
+   "text": "This port follows the **Apache 2.0 License**, consistent with the original [OpenPI repository](⟦0⟧).",
+   "tokens": [
+    "https://github.com/Physical-Intelligence/openpi"
+   ]
+  }
+ ]
+}

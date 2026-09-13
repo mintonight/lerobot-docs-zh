@@ -1,0 +1,1 @@
+function l(t){if(/^\/(docs|learn)/.test(t)){const s=t.slice(1).split("/"),e=s.shift(),n=s.shift(),o=(e==="learn"?/^(?:pr_\d+)$/:/^(?:(master|main)|v[\d.]+(rc\d+)?|pr_\d+)$/).test(s[0])?s.shift():"main",r=/^[a-z]{2}(-[A-Za-z]{2})?$/.test(s[0])?s.shift():"en",i=s.join("/");if(n==="lerobot"&&o==="main"&&r==="en")return`/docs/lerobot/main/en/${i}`}}export{l as g};

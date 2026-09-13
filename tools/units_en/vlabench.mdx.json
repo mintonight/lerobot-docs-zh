@@ -1,0 +1,492 @@
+{
+ "file": "vlabench.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1934,
+   "text": "# VLABench",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1936,
+   "end": 2575,
+   "text": "[VLABench](⟦0⟧) is a large-scale benchmark for **language-conditioned robotic manipulation with long-horizon reasoning**. The upstream suite covers 100 task categories across 2,000+ objects and evaluates six dimensions of robot intelligence: mesh & texture understanding, spatial reasoning, world-knowledge transfer, semantic instruction comprehension, physical-law understanding, and long-horizon planning. Built on MuJoCo / dm_control with a Franka Panda 7-DOF arm. LeRobot exposes **43 of these tasks** through ⟦1⟧ (21 primitives + 22 composites, see [Available tasks](⟦2⟧) below).",
+   "tokens": [
+    "https://github.com/OpenMOSS/VLABench",
+    "`--env.task`",
+    "#available-tasks"
+   ]
+  },
+  {
+   "id": 2,
+   "kind": "list",
+   "start": 2577,
+   "end": 2730,
+   "text": "- Paper: [VLABench: A Large-Scale Benchmark for Language-Conditioned Robotics Manipulation with Long-Horizon Reasoning](⟦0⟧)",
+   "tokens": [
+    "https://arxiv.org/abs/2412.18194"
+   ]
+  },
+  {
+   "id": 3,
+   "kind": "list",
+   "start": 2731,
+   "end": 2798,
+   "text": "- GitHub: [OpenMOSS/VLABench](⟦0⟧)",
+   "tokens": [
+    "https://github.com/OpenMOSS/VLABench"
+   ]
+  },
+  {
+   "id": 4,
+   "kind": "list",
+   "start": 2799,
+   "end": 2866,
+   "text": "- Project website: [vlabench.github.io](⟦0⟧)",
+   "tokens": [
+    "https://vlabench.github.io"
+   ]
+  },
+  {
+   "id": 5,
+   "kind": "list",
+   "start": 2867,
+   "end": 2965,
+   "text": "- Pretrained policy: [⟦0⟧](⟦1⟧)",
+   "tokens": [
+    "`lerobot/smolvla_vlabench`",
+    "https://huggingface.co/lerobot/smolvla_vlabench"
+   ]
+  },
+  {
+   "id": 6,
+   "kind": "heading",
+   "start": 3133,
+   "end": 3151,
+   "text": "## Available tasks",
+   "tokens": []
+  },
+  {
+   "id": 7,
+   "kind": "para",
+   "start": 3153,
+   "end": 3250,
+   "text": "VLABench ships two task suites covering **43 task categories** in LeRobot's ⟦0⟧ surface:",
+   "tokens": [
+    "`--env.task`"
+   ]
+  },
+  {
+   "id": 8,
+   "kind": "table",
+   "start": 3252,
+   "end": 3354,
+   "text": "| Suite     | CLI name    | Tasks | Description                                                      |",
+   "tokens": []
+  },
+  {
+   "id": 9,
+   "kind": "table",
+   "start": 3458,
+   "end": 3560,
+   "text": "| Primitive | ⟦0⟧ | 21    | Single / few-skill combinations (select, insert, physics QA)     |",
+   "tokens": [
+    "`primitive`"
+   ]
+  },
+  {
+   "id": 10,
+   "kind": "table",
+   "start": 3561,
+   "end": 3663,
+   "text": "| Composite | ⟦0⟧ | 22    | Multi-step reasoning and long-horizon planning (cook, rearrange) |",
+   "tokens": [
+    "`composite`"
+   ]
+  },
+  {
+   "id": 11,
+   "kind": "para",
+   "start": 3665,
+   "end": 4095,
+   "text": "**Primitive tasks:** ⟦0⟧, ⟦1⟧, ⟦2⟧, ⟦3⟧, ⟦4⟧, ⟦5⟧, ⟦6⟧, ⟦7⟧, ⟦8⟧, ⟦9⟧, ⟦10⟧, ⟦11⟧, and physical-reasoning tasks (⟦12⟧, ⟦13⟧, ⟦14⟧, ⟦15⟧, ⟦16⟧, ⟦17⟧, ⟦18⟧, ⟦19⟧, ⟦20⟧).",
+   "tokens": [
+    "`select_fruit`",
+    "`select_toy`",
+    "`select_chemistry_tube`",
+    "`add_condiment`",
+    "`select_book`",
+    "`select_painting`",
+    "`select_drink`",
+    "`insert_flower`",
+    "`select_billiards`",
+    "`select_ingredient`",
+    "`select_mahjong`",
+    "`select_poker`",
+    "`density_qa`",
+    "`friction_qa`",
+    "`magnetism_qa`",
+    "`reflection_qa`",
+    "`simple_cuestick_usage`",
+    "`simple_seesaw_usage`",
+    "`sound_speed_qa`",
+    "`thermal_expansion_qa`",
+    "`weight_qa`"
+   ]
+  },
+  {
+   "id": 12,
+   "kind": "para",
+   "start": 4097,
+   "end": 4507,
+   "text": "**Composite tasks:** ⟦0⟧, ⟦1⟧, ⟦2⟧, ⟦3⟧, ⟦4⟧, ⟦5⟧, ⟦6⟧, ⟦7⟧, ⟦8⟧, ⟦9⟧, ⟦10⟧, ⟦11⟧, ⟦12⟧, ⟦13⟧, ⟦14⟧, ⟦15⟧, ⟦16⟧, ⟦17⟧, ⟦18⟧, ⟦19⟧, ⟦20⟧, ⟦21⟧.",
+   "tokens": [
+    "`cluster_billiards`",
+    "`cluster_book`",
+    "`cluster_drink`",
+    "`cluster_toy`",
+    "`cook_dishes`",
+    "`cool_drink`",
+    "`find_unseen_object`",
+    "`get_coffee`",
+    "`hammer_nail`",
+    "`heat_food`",
+    "`make_juice`",
+    "`play_mahjong`",
+    "`play_math_game`",
+    "`play_poker`",
+    "`play_snooker`",
+    "`rearrange_book`",
+    "`rearrange_chemistry_tube`",
+    "`set_dining_table`",
+    "`set_study_table`",
+    "`store_food`",
+    "`take_chemistry_experiment`",
+    "`use_seesaw_complex`"
+   ]
+  },
+  {
+   "id": 13,
+   "kind": "para",
+   "start": 4509,
+   "end": 4542,
+   "text": "⟦0⟧ accepts three forms:",
+   "tokens": [
+    "`--env.task`"
+   ]
+  },
+  {
+   "id": 14,
+   "kind": "list",
+   "start": 4544,
+   "end": 4581,
+   "text": "- a single task name (⟦0⟧)",
+   "tokens": [
+    "`select_fruit`"
+   ]
+  },
+  {
+   "id": 15,
+   "kind": "list",
+   "start": 4582,
+   "end": 4633,
+   "text": "- a comma-separated list (⟦0⟧)",
+   "tokens": [
+    "`select_fruit,heat_food`"
+   ]
+  },
+  {
+   "id": 16,
+   "kind": "list",
+   "start": 4634,
+   "end": 4705,
+   "text": "- a suite shortcut (⟦0⟧, ⟦1⟧, or ⟦2⟧)",
+   "tokens": [
+    "`primitive`",
+    "`composite`",
+    "`primitive,composite`"
+   ]
+  },
+  {
+   "id": 17,
+   "kind": "heading",
+   "start": 4707,
+   "end": 4722,
+   "text": "## Installation",
+   "tokens": []
+  },
+  {
+   "id": 18,
+   "kind": "para",
+   "start": 4724,
+   "end": 5026,
+   "text": "VLABench is **not on PyPI** — its only distribution is the [OpenMOSS/VLABench](⟦0⟧) GitHub repo — so LeRobot does not expose a ⟦1⟧ extra. Install it manually as an editable clone, alongside the MuJoCo / dm_control pins VLABench needs, then fetch the mesh assets:",
+   "tokens": [
+    "https://github.com/OpenMOSS/VLABench",
+    "`vlabench`"
+   ]
+  },
+  {
+   "id": 19,
+   "kind": "para",
+   "start": 5448,
+   "end": 5572,
+   "text": "⟦0⟧\nVLABench requires Linux (⟦1⟧) and Python 3.10+. Set the MuJoCo rendering backend before running:",
+   "tokens": [
+    "<Tip>",
+    "`sys_platform == 'linux'`"
+   ]
+  },
+  {
+   "id": 20,
+   "kind": "heading",
+   "start": 5653,
+   "end": 5666,
+   "text": "## Evaluation",
+   "tokens": []
+  },
+  {
+   "id": 21,
+   "kind": "para",
+   "start": 5668,
+   "end": 5988,
+   "text": "All eval snippets below mirror the command CI runs (see ⟦0⟧). The ⟦1⟧ argument maps VLABench's ⟦2⟧ / ⟦3⟧ / ⟦4⟧ camera keys onto the three-camera (⟦5⟧ / ⟦6⟧ / ⟦7⟧) input layout the released ⟦8⟧ policy was trained on.",
+   "tokens": [
+    "`.github/workflows/benchmark_tests.yml`",
+    "`--rename_map`",
+    "`image`",
+    "`second_image`",
+    "`wrist_image`",
+    "`camera1`",
+    "`camera2`",
+    "`camera3`",
+    "`smolvla_vlabench`"
+   ]
+  },
+  {
+   "id": 22,
+   "kind": "heading",
+   "start": 5990,
+   "end": 6050,
+   "text": "### Single-task evaluation (recommended for quick iteration)",
+   "tokens": []
+  },
+  {
+   "id": 23,
+   "kind": "heading",
+   "start": 6486,
+   "end": 6511,
+   "text": "### Multi-task evaluation",
+   "tokens": []
+  },
+  {
+   "id": 24,
+   "kind": "para",
+   "start": 6513,
+   "end": 6550,
+   "text": "Pass a comma-separated list of tasks:",
+   "tokens": []
+  },
+  {
+   "id": 25,
+   "kind": "heading",
+   "start": 7021,
+   "end": 7046,
+   "text": "### Suite-wide evaluation",
+   "tokens": []
+  },
+  {
+   "id": 26,
+   "kind": "para",
+   "start": 7048,
+   "end": 7109,
+   "text": "Run an entire suite (all 21 primitives or all 22 composites):",
+   "tokens": []
+  },
+  {
+   "id": 27,
+   "kind": "para",
+   "start": 7573,
+   "end": 7588,
+   "text": "Or both suites:",
+   "tokens": []
+  },
+  {
+   "id": 28,
+   "kind": "heading",
+   "start": 8062,
+   "end": 8097,
+   "text": "### Recommended evaluation episodes",
+   "tokens": []
+  },
+  {
+   "id": 29,
+   "kind": "para",
+   "start": 8099,
+   "end": 8258,
+   "text": "**10 episodes per task** for reproducible benchmarking (210 total for the full primitive suite, 220 for composite). Matches the protocol in the VLABench paper.",
+   "tokens": []
+  },
+  {
+   "id": 30,
+   "kind": "heading",
+   "start": 8260,
+   "end": 8288,
+   "text": "## Policy inputs and outputs",
+   "tokens": []
+  },
+  {
+   "id": 31,
+   "kind": "para",
+   "start": 8290,
+   "end": 8307,
+   "text": "**Observations:**",
+   "tokens": []
+  },
+  {
+   "id": 32,
+   "kind": "list",
+   "start": 8309,
+   "end": 8394,
+   "text": "- ⟦0⟧ — 7-dim end-effector state (position xyz + Euler xyz + gripper)",
+   "tokens": [
+    "`observation.state`"
+   ]
+  },
+  {
+   "id": 33,
+   "kind": "list",
+   "start": 8395,
+   "end": 8457,
+   "text": "- ⟦0⟧ — front camera, 480×480 HWC uint8",
+   "tokens": [
+    "`observation.images.image`"
+   ]
+  },
+  {
+   "id": 34,
+   "kind": "list",
+   "start": 8458,
+   "end": 8528,
+   "text": "- ⟦0⟧ — second camera, 480×480 HWC uint8",
+   "tokens": [
+    "`observation.images.second_image`"
+   ]
+  },
+  {
+   "id": 35,
+   "kind": "list",
+   "start": 8529,
+   "end": 8597,
+   "text": "- ⟦0⟧ — wrist camera, 480×480 HWC uint8",
+   "tokens": [
+    "`observation.images.wrist_image`"
+   ]
+  },
+  {
+   "id": 36,
+   "kind": "para",
+   "start": 8599,
+   "end": 8611,
+   "text": "**Actions:**",
+   "tokens": []
+  },
+  {
+   "id": 37,
+   "kind": "list",
+   "start": 8613,
+   "end": 8712,
+   "text": "- Continuous control in ⟦0⟧ — 3D position + 3D Euler orientation + 1D gripper.",
+   "tokens": [
+    "`Box(-1, 1, shape=(7,))`"
+   ]
+  },
+  {
+   "id": 38,
+   "kind": "heading",
+   "start": 8714,
+   "end": 8725,
+   "text": "## Training",
+   "tokens": []
+  },
+  {
+   "id": 39,
+   "kind": "heading",
+   "start": 8727,
+   "end": 8739,
+   "text": "### Datasets",
+   "tokens": []
+  },
+  {
+   "id": 40,
+   "kind": "para",
+   "start": 8741,
+   "end": 8802,
+   "text": "Pre-collected VLABench datasets in LeRobot format on the Hub:",
+   "tokens": []
+  },
+  {
+   "id": 41,
+   "kind": "list",
+   "start": 8804,
+   "end": 8977,
+   "text": "- [⟦0⟧](⟦1⟧) — 5,000 episodes, 128 tasks, 480×480 images.",
+   "tokens": [
+    "`VLABench/vlabench_primitive_ft_lerobot_video`",
+    "https://huggingface.co/datasets/VLABench/vlabench_primitive_ft_lerobot_video"
+   ]
+  },
+  {
+   "id": 42,
+   "kind": "list",
+   "start": 8978,
+   "end": 9151,
+   "text": "- [⟦0⟧](⟦1⟧) — 5,977 episodes, 167 tasks, 224×224 images.",
+   "tokens": [
+    "`VLABench/vlabench_composite_ft_lerobot_video`",
+    "https://huggingface.co/datasets/VLABench/vlabench_composite_ft_lerobot_video"
+   ]
+  },
+  {
+   "id": 43,
+   "kind": "heading",
+   "start": 9153,
+   "end": 9181,
+   "text": "### Example training command",
+   "tokens": []
+  },
+  {
+   "id": 44,
+   "kind": "para",
+   "start": 9183,
+   "end": 9231,
+   "text": "Fine-tune a SmolVLA base on the primitive suite:",
+   "tokens": []
+  },
+  {
+   "id": 45,
+   "kind": "heading",
+   "start": 9716,
+   "end": 9748,
+   "text": "## Reproducing published results",
+   "tokens": []
+  },
+  {
+   "id": 46,
+   "kind": "para",
+   "start": 9750,
+   "end": 10140,
+   "text": "The released checkpoint [⟦0⟧](⟦1⟧) was trained on the primitive-suite dataset above and is evaluated with the [Single-task](⟦2⟧) / [Suite-wide](⟦3⟧) commands. CI runs a 10-primitive-task smoke eval (one episode each) on every PR touching the benchmark.",
+   "tokens": [
+    "`lerobot/smolvla_vlabench`",
+    "https://huggingface.co/lerobot/smolvla_vlabench",
+    "#single-task-evaluation-recommended-for-quick-iteration",
+    "#suite-wide-evaluation"
+   ]
+  }
+ ]
+}

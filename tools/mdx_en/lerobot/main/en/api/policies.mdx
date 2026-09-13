@@ -1,0 +1,292 @@
+<script lang="ts">
+import {onMount} from "svelte";
+import Tip from "$lib/Tip.svelte";
+import CopyLLMTxtMenu from "$lib/CopyLLMTxtMenu.svelte";
+import Youtube from "$lib/Youtube.svelte";
+import Docstring from "$lib/Docstring.svelte";
+import CodeBlock from "$lib/CodeBlock.svelte";
+import CodeBlockFw from "$lib/CodeBlockFw.svelte";
+import DocNotebookDropdown from "$lib/DocNotebookDropdown.svelte";
+import CourseFloatingBanner from "$lib/CourseFloatingBanner.svelte";
+import IconCopyLink from "$lib/IconCopyLink.svelte";
+import FrameworkContent from "$lib/FrameworkContent.svelte";
+import Markdown from "$lib/Markdown.svelte";
+import Question from "$lib/Question.svelte";
+import FrameworkSwitchCourse from "$lib/FrameworkSwitchCourse.svelte";
+import InferenceApi from "$lib/InferenceApi.svelte";
+import TokenizersLanguageContent from "$lib/TokenizersLanguageContent.svelte";
+import ExampleCodeBlock from "$lib/ExampleCodeBlock.svelte";
+import Added from "$lib/Added.svelte";
+import Changed from "$lib/Changed.svelte";
+import Deprecated from "$lib/Deprecated.svelte";
+import PipelineIcon from "$lib/PipelineIcon.svelte";
+import PipelineTag from "$lib/PipelineTag.svelte";
+import Heading from "$lib/Heading.svelte";
+import HfOptions from "$lib/HfOptions.svelte";
+import HfOption from "$lib/HfOption.svelte";
+import EditOnGithub from "$lib/EditOnGithub.svelte";
+import InferenceSnippet from "$lib/InferenceSnippet/InferenceSnippet.svelte";
+import MermaidChart from "$lib/MermaidChart.svelte";
+let fw: "pt" | "tf" = "pt";
+onMount(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    fw = urlParams.get("fw") || "pt";
+});
+</script>
+<svelte:head>
+  <meta name="hf:doc:metadata" content={metadata} >
+</svelte:head>
+
+<!--HF DOCBUILD BODY START-->
+
+HF_DOC_BODY_START
+
+<CopyLLMTxtMenu containerStyle="float: right; margin-left: 10px; display: inline-flex; position: relative; z-index: 10;"></CopyLLMTxtMenu>
+
+# Policies
+
+Every policy inherits `PreTrainedPolicy`, which combines a `torch.nn.Module` with the Hub mixin, so any
+policy can be pushed to and loaded from the Hugging Face Hub with the same two calls.
+
+Each policy has its own guide with training recipes and results — [ACT](../act), [SmolVLA](../smolvla),
+[π₀](../pi0), [π₀.₅](../pi05) and the rest are listed under Policies. To add one, see
+[Adding a Policy](../bring_your_own_policies).
+
+## PreTrainedPolicy[[lerobot.policies.PreTrainedPolicy]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.policies.PreTrainedPolicy"} anchor={"lerobot.policies.PreTrainedPolicy"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/policies/pretrained.py#L61"} parameters={[{"name": "config", "val": ": PreTrainedConfig"}, {"name": "*inputs", "val": ""}, {"name": "**kwargs", "val": ""}]}>
+</Docstring>
+
+Base class for policy models.
+
+
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"drop_queued_actions"} anchor={"lerobot.policies.PreTrainedPolicy.drop_queued_actions"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/policies/pretrained.py#L230"} parameters={[]}>
+</Docstring>
+Discard actions precomputed by earlier `select_action` calls.
+
+Forces a fresh forward pass on the next `select_action` so a mid-episode conditioning
+change (e.g. a new instruction) takes effect at once instead of after the queue drains.
+Unlike `reset`, the rest of the episode state is kept.  Call it from the thread
+that calls `select_action`.  Clears the queues named in :attr:*_action_queue_attrs*;
+a policy that keeps no action queue inherits a no-op.
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"forward"} anchor={"lerobot.policies.PreTrainedPolicy.forward"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/policies/pretrained.py#L269"} parameters={[{"name": "batch", "val": ": dict[str, Tensor]"}]}>
+<paramsdesc>- **batch** (dict[str, Tensor]) -- _description_</paramsdesc><rettype>tuple[Tensor, dict | None]</rettype><retdesc>The loss and potentially other information. Apart from the loss which
+is a Tensor, all other items should be logging-friendly, native Python types.</retdesc></Docstring>
+_summary_
+
+
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"from_pretrained"} anchor={"lerobot.policies.PreTrainedPolicy.from_pretrained"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/policies/pretrained.py#L146"} parameters={[{"name": "pretrained_name_or_path", "val": ": str | Path"}, {"name": "config", "val": ": PreTrainedConfig | None = None"}, {"name": "force_download", "val": ": bool = False"}, {"name": "resume_download", "val": ": bool | None = None"}, {"name": "proxies", "val": ": dict | None = None"}, {"name": "token", "val": ": str | bool | None = None"}, {"name": "cache_dir", "val": ": str | Path | None = None"}, {"name": "local_files_only", "val": ": bool = False"}, {"name": "revision", "val": ": str | None = None"}, {"name": "strict", "val": ": bool = False"}, {"name": "**kwargs", "val": ""}]}>
+</Docstring>
+
+The policy is set in evaluation mode by default using `policy.eval()` (dropout modules are
+deactivated). To train it, you should first set it back in training mode with `policy.train()`.
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"generate_text"} anchor={"lerobot.policies.PreTrainedPolicy.generate_text"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/policies/pretrained.py#L256"} parameters={[{"name": "batch", "val": ": dict[str, Any]"}]}>
+</Docstring>
+Run the policy's text head on a preprocessed observation batch.
+
+The request rides on `batch` as complementary data (:data:*~lerobot.utils.constants.QUERY_KIND*
+/ `QUERY_TEXT`); a `next_subtask` reply is fed straight into `set_task`, so it must be
+exactly one subtask, not a plan or a numbered list.  Returns the generated text, and must not
+mutate action-producing state (queues, observation history).
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"get_optim_params"} anchor={"lerobot.policies.PreTrainedPolicy.get_optim_params"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/policies/pretrained.py#L215"} parameters={[]}>
+</Docstring>
+
+Returns the policy-specific parameters dict to be passed on to the optimizer.
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"predict_action_chunk"} anchor={"lerobot.policies.PreTrainedPolicy.predict_action_chunk"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/policies/pretrained.py#L282"} parameters={[{"name": "batch", "val": ": dict[str, Tensor]"}, {"name": "**kwargs", "val": ": Unpack[ActionSelectKwargs]"}]}>
+</Docstring>
+Returns the action chunk (for action chunking policies) for a given observation, potentially in batch mode.
+
+Child classes using action chunking should use this method within `select_action` to form the action chunk
+cached for selection.
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"push_model_to_hub"} anchor={"lerobot.policies.PreTrainedPolicy.push_model_to_hub"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/policies/pretrained.py#L300"} parameters={[{"name": "cfg", "val": ": TrainPipelineConfig"}, {"name": "peft_model", "val": " = None"}, {"name": "state_dict", "val": ": dict[str, Tensor] | None = None"}, {"name": "dataset_meta", "val": ": LeRobotDatasetMetadata | None = None"}]}>
+<paramsdesc>- **cfg** (TrainPipelineConfig) -- The training config; saved as *train_config.json* and
+  used to render the model card.
+- **peft_model** -- The PEFT wrapper when training adapters, whose weights replace the full
+  model weights in the published repo. Defaults to None.
+- **state_dict** (dict[str, Tensor] | None) -- Ignored; weights are now gathered internally
+  when the policy is sharded. Defaults to None.
+- **dataset_meta** (LeRobotDatasetMetadata | None) -- Dataset metadata for the model card,
+  if available. Defaults to None.</paramsdesc></Docstring>
+Publish this policy to the Hub.
+
+Deprecated: use `lerobot.common.train_utils.publish_trained_model()` instead, which
+also publishes the pre/post-processors alongside the model.
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"reset"} anchor={"lerobot.policies.PreTrainedPolicy.reset"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/policies/pretrained.py#L222"} parameters={[]}>
+</Docstring>
+To be called whenever the environment is reset.
+
+Does things like clearing caches.
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"select_action"} anchor={"lerobot.policies.PreTrainedPolicy.select_action"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/policies/pretrained.py#L291"} parameters={[{"name": "batch", "val": ": dict[str, Tensor]"}, {"name": "**kwargs", "val": ": Unpack[ActionSelectKwargs]"}]}>
+</Docstring>
+Return one action to run in the environment (potentially in batch mode).
+
+When the model uses a history of observations, or outputs a sequence of actions, this method deals
+with caching.
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"supports_rtc"} anchor={"lerobot.policies.PreTrainedPolicy.supports_rtc"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/policies/pretrained.py#L248"} parameters={[]}>
+</Docstring>
+Whether this policy implements Real-Time Chunking inference semantics.
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"supports_text_generation"} anchor={"lerobot.policies.PreTrainedPolicy.supports_text_generation"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/policies/pretrained.py#L252"} parameters={[]}>
+</Docstring>
+Whether this policy implements `generate_text` (override both together).
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"wrap_with_peft"} anchor={"lerobot.policies.PreTrainedPolicy.wrap_with_peft"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/policies/pretrained.py#L340"} parameters={[{"name": "peft_config", "val": " = None"}, {"name": "peft_cli_overrides", "val": ": dict | None = None"}]}>
+<paramsdesc>- **peft_config** -- Optional PEFT adapter configuration (e.g., LoraConfig).
+  If provided, used directly (with CLI overrides applied).
+- **peft_cli_overrides** -- Optional dict of CLI overrides (method_type, target_modules, r, etc.)
+  These are merged with policy defaults to build the final config.</paramsdesc></Docstring>
+
+Wrap this policy with PEFT adapters for parameter-efficient fine-tuning.
+
+This method is the single entry point for PEFT integration. Subclasses should
+override `_get_default_peft_targets()` to provide default target modules, and
+`_validate_peft_config()` for policy-specific validation.
+
+
+
+
+</div></div>
+
+## PreTrainedConfig[[lerobot.configs.PreTrainedConfig]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.configs.PreTrainedConfig"} anchor={"lerobot.configs.PreTrainedConfig"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/configs/policies.py#L41"} parameters={[{"name": "n_obs_steps", "val": ": int = 1"}, {"name": "input_features", "val": ": dict[str, lerobot.configs.types.PolicyFeature] | None = <factory>"}, {"name": "output_features", "val": ": dict[str, lerobot.configs.types.PolicyFeature] | None = <factory>"}, {"name": "device", "val": ": str | None = None"}, {"name": "use_amp", "val": ": bool = False"}, {"name": "use_peft", "val": ": bool = False"}, {"name": "push_to_hub", "val": ": bool = True"}, {"name": "repo_id", "val": ": str | None = None"}, {"name": "private", "val": ": bool | None = None"}, {"name": "tags", "val": ": list[str] | None = None"}, {"name": "license", "val": ": str | None = None"}, {"name": "pretrained_path", "val": ": pathlib.Path | None = None"}, {"name": "pretrained_revision", "val": ": str | None = None"}]}>
+<paramsdesc>- **n_obs_steps** -- Number of environment steps worth of observations to pass to the policy (takes the
+  current step and additional steps going back).
+- **input_features** -- A dictionary defining the PolicyFeature of the input data for the policy. The key represents
+  the input data name, and the value is PolicyFeature, which consists of FeatureType and shape attributes.
+- **output_features** -- A dictionary defining the PolicyFeature of the output data for the policy. The key represents
+  the output data name, and the value is PolicyFeature, which consists of FeatureType and shape attributes.
+- **normalization_mapping** -- A dictionary that maps from a str value of FeatureType (e.g., "STATE", "VISUAL") to
+  a corresponding NormalizationMode (e.g., NormalizationMode.MIN_MAX)</paramsdesc></Docstring>
+
+Base configuration class for policy models.
+
+
+
+
+</div>
+
+## make_policy[[lerobot.policies.make_policy]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"lerobot.policies.make_policy"} anchor={"lerobot.policies.make_policy"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/policies/factory.py#L260"} parameters={[{"name": "cfg", "val": ": PreTrainedConfig"}, {"name": "ds_meta", "val": ": LeRobotDatasetMetadata | None = None"}, {"name": "env_cfg", "val": ": EnvConfig | None = None"}, {"name": "rename_map", "val": ": dict[str, str] | None = None"}, {"name": "defer_weight_load", "val": ": bool = False"}]}>
+<paramsdesc>- **cfg** (PreTrainedConfig) -- The configuration for the policy to be created. If
+  `cfg.pretrained_path` is set, the policy will be loaded with weights from that path.
+- **ds_meta** (LeRobotDatasetMetadata | None) -- Dataset metadata used to infer feature shapes and
+  types. Also provides statistics for normalization layers.
+- **env_cfg** (EnvConfig | None) -- Environment configuration used to infer feature shapes and
+  types. One of `ds_meta` or `env_cfg` must be provided.
+- **rename_map** (dict[str, str] | None) -- Optional mapping of dataset or environment feature
+  keys to match expected policy feature names (e.g., `"left"` → `"camera1"`).
+- **defer_weight_load** (bool) -- Build the exact policy `from_pretrained` would build — same
+  config resolution, same stats-derived buffers, same device placement and eval mode —
+  but skip the safetensors weight load. Used when resuming from a DCP checkpoint, whose
+  sharded weights stream in after `accelerator.prepare()` (the distributed checkpoint
+  engine overwrites the random init).</paramsdesc><rettype>PreTrainedPolicy</rettype><retdesc>An instantiated and device-placed policy model.</retdesc><raises>- ``ValueError`` -- If both or neither of `ds_meta` and `env_cfg` are provided.
+- ``NotImplementedError`` -- If attempting to use an unsupported policy-backend combination
+  (e.g., VQBeT with 'mps').</raises><raisederrors>``ValueError`` or ``NotImplementedError``</raisederrors></Docstring>
+
+Instantiate a policy model.
+
+This factory function handles the logic of creating a policy, which requires
+determining the input and output feature shapes. These shapes can be derived
+either from a `LeRobotDatasetMetadata` object or an `EnvConfig` object. The function
+can either initialize a new policy from scratch or load a pretrained one.
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+
+<!--HF DOCBUILD BODY END-->
+
+HF_DOC_BODY_END
+

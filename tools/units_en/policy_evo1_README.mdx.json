@@ -1,0 +1,31 @@
+{
+ "file": "policy_evo1_README.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1930,
+   "text": "# EVO1",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1932,
+   "end": 2162,
+   "text": "EVO1 is a Vision-Language-Action policy for robot control. The LeRobot\nintegration uses an InternVL3 vision-language backbone with a flow-matching\naction head, and supports staged training through the standard LeRobot policy\nAPIs.",
+   "tokens": []
+  },
+  {
+   "id": 2,
+   "kind": "para",
+   "start": 2164,
+   "end": 2260,
+   "text": "The upstream EVO1 project is available at\n[MINT-SJTU/Evo-1](⟦0⟧).",
+   "tokens": [
+    "https://github.com/MINT-SJTU/Evo-1"
+   ]
+  }
+ ]
+}

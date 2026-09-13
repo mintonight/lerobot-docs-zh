@@ -1,0 +1,294 @@
+<script lang="ts">
+import {onMount} from "svelte";
+import Tip from "$lib/Tip.svelte";
+import CopyLLMTxtMenu from "$lib/CopyLLMTxtMenu.svelte";
+import Youtube from "$lib/Youtube.svelte";
+import Docstring from "$lib/Docstring.svelte";
+import CodeBlock from "$lib/CodeBlock.svelte";
+import CodeBlockFw from "$lib/CodeBlockFw.svelte";
+import DocNotebookDropdown from "$lib/DocNotebookDropdown.svelte";
+import CourseFloatingBanner from "$lib/CourseFloatingBanner.svelte";
+import IconCopyLink from "$lib/IconCopyLink.svelte";
+import FrameworkContent from "$lib/FrameworkContent.svelte";
+import Markdown from "$lib/Markdown.svelte";
+import Question from "$lib/Question.svelte";
+import FrameworkSwitchCourse from "$lib/FrameworkSwitchCourse.svelte";
+import InferenceApi from "$lib/InferenceApi.svelte";
+import TokenizersLanguageContent from "$lib/TokenizersLanguageContent.svelte";
+import ExampleCodeBlock from "$lib/ExampleCodeBlock.svelte";
+import Added from "$lib/Added.svelte";
+import Changed from "$lib/Changed.svelte";
+import Deprecated from "$lib/Deprecated.svelte";
+import PipelineIcon from "$lib/PipelineIcon.svelte";
+import PipelineTag from "$lib/PipelineTag.svelte";
+import Heading from "$lib/Heading.svelte";
+import HfOptions from "$lib/HfOptions.svelte";
+import HfOption from "$lib/HfOption.svelte";
+import EditOnGithub from "$lib/EditOnGithub.svelte";
+import InferenceSnippet from "$lib/InferenceSnippet/InferenceSnippet.svelte";
+import MermaidChart from "$lib/MermaidChart.svelte";
+let fw: "pt" | "tf" = "pt";
+onMount(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    fw = urlParams.get("fw") || "pt";
+});
+</script>
+<svelte:head>
+  <meta name="hf:doc:metadata" content={metadata} >
+</svelte:head>
+
+<!--HF DOCBUILD BODY START-->
+
+HF_DOC_BODY_START
+
+<CopyLLMTxtMenu containerStyle="float: right; margin-left: 10px; display: inline-flex; position: relative; z-index: 10;"></CopyLLMTxtMenu>
+
+# policy
+
+每个 policy 都继承自 `PreTrainedPolicy`，它将 `torch.nn.Module` 与 Hub mixin 结合，因此任何
+policy 都可以通过同样的两个调用推送到 Hugging Face Hub 或从其中加载。
+
+每种 policy 都有自己的指南，包含训练配方和结果——[ACT](../act)、[SmolVLA](../smolvla)、
+[π₀](../pi0)、[π₀.₅](../pi05) 以及其他 policy 都列在 Policies 下。要添加一个 policy，请参阅
+[Adding a Policy](../bring_your_own_policies)。
+
+## PreTrainedPolicy [[lerobot.policies.PreTrainedPolicy]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.policies.PreTrainedPolicy"} anchor={"lerobot.policies.PreTrainedPolicy"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/policies/pretrained.py#L61"} parameters={[{"name": "config", "val": ": PreTrainedConfig"}, {"name": "*inputs", "val": ""}, {"name": "**kwargs", "val": ""}]}>
+</Docstring>
+
+policy 模型的基类。
+
+
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"drop_queued_actions"} anchor={"lerobot.policies.PreTrainedPolicy.drop_queued_actions"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/policies/pretrained.py#L230"} parameters={[]}>
+</Docstring>
+丢弃先前 `select_action` 调用预先计算的 action。
+
+强制在下一次 `select_action` 时进行全新的前向传播，使 episode 中途的条件
+更改（例如新的指令）立即生效，而不是在队列耗尽之后才生效。
+与 `reset` 不同，episode state 的其余部分会被保留。请从调用
+`select_action` 的线程中调用它。它会清除 :attr:*_action_queue_attrs* 中列出的队列；
+不保留 action 队列的 policy 会继承一个空操作（no-op）。
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"forward"} anchor={"lerobot.policies.PreTrainedPolicy.forward"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/policies/pretrained.py#L269"} parameters={[{"name": "batch", "val": ": dict[str, Tensor]"}]}>
+<paramsdesc>- **batch** (dict[str, Tensor]) -- _description_</paramsdesc><rettype>tuple[Tensor, dict | None]</rettype><retdesc> 损失以及可能包含的其他信息。除了损失
+是 Tensor 外，所有其他项都应是便于记录日志的原生 Python 类型。</retdesc></Docstring>
+_summary_
+
+
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"from_pretrained"} anchor={"lerobot.policies.PreTrainedPolicy.from_pretrained"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/policies/pretrained.py#L146"} parameters={[{"name": "pretrained_name_or_path", "val": ": str | Path"}, {"name": "config", "val": ": PreTrainedConfig | None = None"}, {"name": "force_download", "val": ": bool = False"}, {"name": "resume_download", "val": ": bool | None = None"}, {"name": "proxies", "val": ": dict | None = None"}, {"name": "token", "val": ": str | bool | None = None"}, {"name": "cache_dir", "val": ": str | Path | None = None"}, {"name": "local_files_only", "val": ": bool = False"}, {"name": "revision", "val": ": str | None = None"}, {"name": "strict", "val": ": bool = False"}, {"name": "**kwargs", "val": ""}]}>
+</Docstring>
+
+默认情况下，policy 使用 `policy.eval()` 设置为评估模式（dropout 模块会被
+停用）。要训练它，你应首先使用 `policy.train()` 将其重新设置为训练模式。
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"generate_text"} anchor={"lerobot.policies.PreTrainedPolicy.generate_text"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/policies/pretrained.py#L256"} parameters={[{"name": "batch", "val": ": dict[str, Any]"}]}>
+</Docstring>
+在一个预处理过的 observation 批次上运行 policy 的文本头。
+
+请求以补充数据的形式搭载在 `batch` 上（:data:*~lerobot.utils.constants.QUERY_KIND*
+/ `QUERY_TEXT`）；`next_subtask` 的回复会直接输入 `set_task`，因此它必须是
+恰好一个子任务，而不是一个计划或编号列表。返回生成的文本，并且不能
+改变产生 action 的 state（队列、observation 历史）。
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"get_optim_params"} anchor={"lerobot.policies.PreTrainedPolicy.get_optim_params"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/policies/pretrained.py#L215"} parameters={[]}>
+</Docstring>
+
+返回要传递给优化器的 policy 特定参数字典。
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"predict_action_chunk"} anchor={"lerobot.policies.PreTrainedPolicy.predict_action_chunk"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/policies/pretrained.py#L282"} parameters={[{"name": "batch", "val": ": dict[str, Tensor]"}, {"name": "**kwargs", "val": ": Unpack[ActionSelectKwargs]"}]}>
+</Docstring>
+返回给定 observation 的 action chunk（适用于 action chunking policy），可能以批处理模式返回。
+
+使用 action chunking 的子类应在 `select_action` 内使用此方法，以形成缓存的用于选择的 action chunk。
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"push_model_to_hub"} anchor={"lerobot.policies.PreTrainedPolicy.push_model_to_hub"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/policies/pretrained.py#L300"} parameters={[{"name": "cfg", "val": ": TrainPipelineConfig"}, {"name": "peft_model", "val": " = None"}, {"name": "state_dict", "val": ": dict[str, Tensor] | None = None"}, {"name": "dataset_meta", "val": ": LeRobotDatasetMetadata | None = None"}]}>
+<paramsdesc>- **cfg** (TrainPipelineConfig) -- 训练配置；保存为 *train_config.json*，并
+  用于渲染模型卡。
+- **peft_model** -- 训练适配器时的 PEFT 封装器，其权重会替换发布仓库中
+  的完整模型权重。默认值为 None。
+- **state_dict** (dict[str, Tensor] | None) -- 已忽略；当 policy 被分片时，权重现在
+  在内部收集。默认值为 None。
+- **dataset_meta** (LeRobotDatasetMetadata | None) -- 用于模型卡的 dataset 元数据，
+  如果可用。默认值为 None。</paramsdesc></Docstring>
+将此 policy 发布到 Hub。
+
+已弃用：请改用 `lerobot.common.train_utils.publish_trained_model()`，它
+也会随模型一起发布前/后处理器。
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"reset"} anchor={"lerobot.policies.PreTrainedPolicy.reset"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/policies/pretrained.py#L222"} parameters={[]}>
+</Docstring>
+每当环境被重置时都应调用。
+
+会执行清除缓存之类的操作。
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"select_action"} anchor={"lerobot.policies.PreTrainedPolicy.select_action"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/policies/pretrained.py#L291"} parameters={[{"name": "batch", "val": ": dict[str, Tensor]"}, {"name": "**kwargs", "val": ": Unpack[ActionSelectKwargs]"}]}>
+</Docstring>
+返回一个要在环境中执行的 action（可能以批处理模式）。
+
+当模型使用 observation 历史，或输出一系列 action 时，此方法处理
+缓存相关逻辑。
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"supports_rtc"} anchor={"lerobot.policies.PreTrainedPolicy.supports_rtc"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/policies/pretrained.py#L248"} parameters={[]}>
+</Docstring>
+该 policy 是否实现实时分块（Real-Time Chunking）inference 语义。
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"supports_text_generation"} anchor={"lerobot.policies.PreTrainedPolicy.supports_text_generation"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/policies/pretrained.py#L252"} parameters={[]}>
+</Docstring>
+该 policy 是否实现 `generate_text`（两者需一起覆盖）。
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"wrap_with_peft"} anchor={"lerobot.policies.PreTrainedPolicy.wrap_with_peft"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/policies/pretrained.py#L340"} parameters={[{"name": "peft_config", "val": " = None"}, {"name": "peft_cli_overrides", "val": ": dict | None = None"}]}>
+<paramsdesc>- **peft_config** -- 可选的 PEFT 适配器配置（例如 LoraConfig）。
+  如果提供，将直接使用（并应用 CLI 覆盖）。
+- **peft_cli_overrides** -- 可选的 CLI 覆盖字典（method_type、target_modules、r 等）。
+  这些会与 policy 默认值合并以构建最终配置。</paramsdesc></Docstring>
+
+用 PEFT 适配器包装此 policy，以进行参数高效的 fine-tune。
+
+此方法是 PEFT 集成的唯一入口。子类应
+覆盖 `_get_default_peft_targets()` 以提供默认的目标模块，并
+覆盖 `_validate_peft_config()` 以进行 policy 特定的验证。
+
+
+
+
+</div></div>
+
+## PreTrainedConfig [[lerobot.configs.PreTrainedConfig]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.configs.PreTrainedConfig"} anchor={"lerobot.configs.PreTrainedConfig"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/configs/policies.py#L41"} parameters={[{"name": "n_obs_steps", "val": ": int = 1"}, {"name": "input_features", "val": ": dict[str, lerobot.configs.types.PolicyFeature] | None = <factory>"}, {"name": "output_features", "val": ": dict[str, lerobot.configs.types.PolicyFeature] | None = <factory>"}, {"name": "device", "val": ": str | None = None"}, {"name": "use_amp", "val": ": bool = False"}, {"name": "use_peft", "val": ": bool = False"}, {"name": "push_to_hub", "val": ": bool = True"}, {"name": "repo_id", "val": ": str | None = None"}, {"name": "private", "val": ": bool | None = None"}, {"name": "tags", "val": ": list[str] | None = None"}, {"name": "license", "val": ": str | None = None"}, {"name": "pretrained_path", "val": ": pathlib.Path | None = None"}, {"name": "pretrained_revision", "val": ": str | None = None"}]}>
+<paramsdesc>- **n_obs_steps** -- 传递给 policy 的 observation 所对应的环境步数（取
+  当前步及其之前的额外步）。
+- **input_features** -- 定义 policy 输入数据 PolicyFeature 的字典。键表示
+  输入数据名称，值是 PolicyFeature，由 FeatureType 和 shape 属性组成。
+- **output_features** -- 定义 policy 输出数据 PolicyFeature 的字典。键表示
+  输出数据名称，值是 PolicyFeature，由 FeatureType 和 shape 属性组成。
+- **normalization_mapping** -- 一个字典，将 FeatureType 的 str 值（例如 “STATE”、“VISUAL”）映射到
+  相应的 NormalizationMode（例如 NormalizationMode.MIN_MAX）</paramsdesc></Docstring>
+
+policy 模型的基类配置类。
+
+
+
+
+</div>
+
+## make_policy [[lerobot.policies.make_policy]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"lerobot.policies.make_policy"} anchor={"lerobot.policies.make_policy"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/policies/factory.py#L260"} parameters={[{"name": "cfg", "val": ": PreTrainedConfig"}, {"name": "ds_meta", "val": ": LeRobotDatasetMetadata | None = None"}, {"name": "env_cfg", "val": ": EnvConfig | None = None"}, {"name": "rename_map", "val": ": dict[str, str] | None = None"}, {"name": "defer_weight_load", "val": ": bool = False"}]}>
+<paramsdesc>- **cfg** (PreTrainedConfig) -- 要创建的 policy 配置。如果设置了
+  `cfg.pretrained_path`，policy 将从该路径加载权重。
+- **ds_meta** (LeRobotDatasetMetadata | None) -- 用于推断特征形状和
+  类型的 dataset 元数据。还为归一化层提供统计信息。
+- **env_cfg** (EnvConfig | None) -- 用于推断特征形状和
+  类型的环境配置。必须提供 `ds_meta` 或 `env_cfg` 之一。
+- **rename_map** (dict[str, str] | None) -- 可选的映射，将 dataset 或环境特征键
+  匹配到预期的 policy 特征名称（例如 `"left"` → `"camera1"`）。
+- **defer_weight_load** (bool) -- 构建 `from_pretrained` 会构建的精确 policy——相同的
+  配置解析、相同的从统计信息派生的缓冲区、相同的设备放置和评估模式——
+  但跳过 safetensors 权重加载。用于从 DCP checkpoint 恢复时，其
+  分片权重会在 `accelerator.prepare()` 之后流入（分布式 checkpoint
+  引擎会覆盖随机初始化）。</paramsdesc><rettype>PreTrainedPolicy</rettype><retdesc> 一个已实例化并放置在设备上的 policy 模型。</retdesc><raises>- ``ValueError`` -- 如果 `ds_meta` 和 `env_cfg` 都被提供或都未提供。
+- ``NotImplementedError`` -- 如果尝试使用不受支持的 policy-后端组合
+  （例如 VQBeT 搭配 ‘mps’）。</raises><raisederrors>``ValueError`` or ``NotImplementedError``</raisederrors></Docstring>
+
+实例化一个 policy 模型。
+
+此工厂函数处理创建 policy 的逻辑，这需要
+确定输入和输出的特征形状。这些形状可以从 `LeRobotDatasetMetadata`
+对象或 `EnvConfig` 对象派生。该函数
+既可以从头初始化新 policy，也可以加载预训练的 policy。
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+
+
+<EditOnGithub source="https://github.com/huggingface/lerobot/blob/main/docs/source/api/policies.mdx" />
+
+<!--HF DOCBUILD BODY END-->
+
+HF_DOC_BODY_END
+

@@ -1,0 +1,854 @@
+{
+ "file": "lerobot-dataset-v3.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1945,
+   "text": "# LeRobotDataset v3.0",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1947,
+   "end": 2213,
+   "text": "⟦0⟧ is a standardized format for robot learning data. It provides unified access to multi-modal time-series data, sensorimotor signals and multi‑camera video, as well as rich metadata for indexing, search, and visualization on the Hugging Face Hub.",
+   "tokens": [
+    "`LeRobotDataset v3.0`"
+   ]
+  },
+  {
+   "id": 2,
+   "kind": "para",
+   "start": 2215,
+   "end": 2243,
+   "text": "This docs will guide you to:",
+   "tokens": []
+  },
+  {
+   "id": 3,
+   "kind": "list",
+   "start": 2245,
+   "end": 2294,
+   "text": "- Understand the v3.0 design and directory layout",
+   "tokens": []
+  },
+  {
+   "id": 4,
+   "kind": "list",
+   "start": 2295,
+   "end": 2336,
+   "text": "- Record a dataset and push it to the Hub",
+   "tokens": []
+  },
+  {
+   "id": 5,
+   "kind": "list",
+   "start": 2337,
+   "end": 2387,
+   "text": "- Load datasets for training with ⟦0⟧",
+   "tokens": [
+    "`LeRobotDataset`"
+   ]
+  },
+  {
+   "id": 6,
+   "kind": "list",
+   "start": 2388,
+   "end": 2457,
+   "text": "- Stream datasets without downloading using ⟦0⟧",
+   "tokens": [
+    "`StreamingLeRobotDataset`"
+   ]
+  },
+  {
+   "id": 7,
+   "kind": "list",
+   "start": 2458,
+   "end": 2520,
+   "text": "- Apply image transforms for data augmentation during training",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "list",
+   "start": 2521,
+   "end": 2565,
+   "text": "- Migrate existing ⟦0⟧ datasets to ⟦1⟧",
+   "tokens": [
+    "`v2.1`",
+    "`v3.0`"
+   ]
+  },
+  {
+   "id": 9,
+   "kind": "list",
+   "start": 2566,
+   "end": 2645,
+   "text": "- Experiment with other ⟦0⟧ formats and implementations like Lance",
+   "tokens": [
+    "`LeRobotDataset`"
+   ]
+  },
+  {
+   "id": 10,
+   "kind": "heading",
+   "start": 2647,
+   "end": 2668,
+   "text": "## What’s new in ⟦0⟧",
+   "tokens": [
+    "`v3`"
+   ]
+  },
+  {
+   "id": 11,
+   "kind": "list",
+   "start": 2670,
+   "end": 2762,
+   "text": "- **File-based storage**: Many episodes per Parquet/MP4 file (v2 used one file per episode).",
+   "tokens": []
+  },
+  {
+   "id": 12,
+   "kind": "list",
+   "start": 2763,
+   "end": 2866,
+   "text": "- **Relational metadata**: Episode boundaries and lookups are resolved through metadata, not filenames.",
+   "tokens": []
+  },
+  {
+   "id": 13,
+   "kind": "list",
+   "start": 2867,
+   "end": 2965,
+   "text": "- **Hub-native streaming**: Consume datasets directly from the Hub with ⟦0⟧.",
+   "tokens": [
+    "`StreamingLeRobotDataset`"
+   ]
+  },
+  {
+   "id": 14,
+   "kind": "list",
+   "start": 2966,
+   "end": 3070,
+   "text": "- **Lower file-system pressure**: Fewer, larger files ⇒ faster initialization and fewer issues at scale.",
+   "tokens": []
+  },
+  {
+   "id": 15,
+   "kind": "list",
+   "start": 3071,
+   "end": 3176,
+   "text": "- **Unified organization**: Clean directory layout with consistent path templates across data and videos.",
+   "tokens": []
+  },
+  {
+   "id": 16,
+   "kind": "heading",
+   "start": 3178,
+   "end": 3193,
+   "text": "## Installation",
+   "tokens": []
+  },
+  {
+   "id": 17,
+   "kind": "para",
+   "start": 3195,
+   "end": 3256,
+   "text": "⟦0⟧ will be included in ⟦1⟧.",
+   "tokens": [
+    "`LeRobotDataset v3.0`",
+    "`lerobot >= 0.4.0`"
+   ]
+  },
+  {
+   "id": 18,
+   "kind": "para",
+   "start": 3258,
+   "end": 3391,
+   "text": "Until that stable release, you can use the main branch by following the [build from source instructions](⟦0⟧).",
+   "tokens": [
+    "./installation#from-source"
+   ]
+  },
+  {
+   "id": 19,
+   "kind": "heading",
+   "start": 3393,
+   "end": 3412,
+   "text": "## Record a dataset",
+   "tokens": []
+  },
+  {
+   "id": 20,
+   "kind": "para",
+   "start": 3414,
+   "end": 3492,
+   "text": "Run the command below to record a dataset with the SO-101 and push to the Hub:",
+   "tokens": []
+  },
+  {
+   "id": 21,
+   "kind": "para",
+   "start": 4118,
+   "end": 4191,
+   "text": "See the [recording guide](⟦0⟧) for more details.",
+   "tokens": [
+    "./il_robots#record-a-dataset"
+   ]
+  },
+  {
+   "id": 22,
+   "kind": "heading",
+   "start": 4193,
+   "end": 4209,
+   "text": "## Format design",
+   "tokens": []
+  },
+  {
+   "id": 23,
+   "kind": "para",
+   "start": 4211,
+   "end": 4382,
+   "text": "A core v3 principle is **decoupling storage from the user API**: data is stored efficiently (few large files), while the public API exposes intuitive episode-level access.",
+   "tokens": []
+  },
+  {
+   "id": 24,
+   "kind": "para",
+   "start": 4384,
+   "end": 4407,
+   "text": "⟦0⟧ has three pillars:",
+   "tokens": [
+    "`v3`"
+   ]
+  },
+  {
+   "id": 25,
+   "kind": "list",
+   "start": 4409,
+   "end": 4591,
+   "text": "1. **Tabular data**: Low‑dimensional, high‑frequency signals (states, actions, timestamps) stored in **Apache Parquet**. Access is memory‑mapped or streamed via the ⟦0⟧ stack.",
+   "tokens": [
+    "`datasets`"
+   ]
+  },
+  {
+   "id": 26,
+   "kind": "list",
+   "start": 4592,
+   "end": 4757,
+   "text": "2. **Visual data**: Camera frames concatenated and encoded into **MP4**. Frames from the same episode are grouped; videos are sharded per camera for practical sizes.",
+   "tokens": []
+  },
+  {
+   "id": 27,
+   "kind": "list",
+   "start": 4758,
+   "end": 4960,
+   "text": "3. **Metadata**: JSON/Parquet records describing schema (feature names, dtypes, shapes), frame rates, normalization stats, and **episode segmentation** (start/end offsets into shared Parquet/MP4 files).",
+   "tokens": []
+  },
+  {
+   "id": 28,
+   "kind": "quote",
+   "start": 4962,
+   "end": 5170,
+   "text": "> To scale to millions of episodes, tabular rows and video frames from multiple episodes are **concatenated** into larger files. Episode‑specific views are reconstructed **via metadata**, not file boundaries.",
+   "tokens": []
+  },
+  {
+   "id": 29,
+   "kind": "para",
+   "start": 5498,
+   "end": 5599,
+   "text": "    ⟦0⟧\n      From episode‑based to file‑based datasets",
+   "tokens": [
+    "<figcaption style=\"font-size:0.9em; color:#666;\">"
+   ]
+  },
+  {
+   "id": 30,
+   "kind": "heading",
+   "start": 5638,
+   "end": 5671,
+   "text": "### Directory layout (simplified)",
+   "tokens": []
+  },
+  {
+   "id": 31,
+   "kind": "list",
+   "start": 5673,
+   "end": 5815,
+   "text": "- **⟦0⟧**: canonical schema (features, shapes/dtypes), FPS, codebase version, and **path templates** to locate data/video shards.",
+   "tokens": [
+    "`meta/info.json`"
+   ]
+  },
+  {
+   "id": 32,
+   "kind": "list",
+   "start": 5816,
+   "end": 5942,
+   "text": "- **⟦0⟧**: global feature statistics (mean/std/min/max) used for normalization; exposed as ⟦1⟧.",
+   "tokens": [
+    "`meta/stats.json`",
+    "`dataset.meta.stats`"
+   ]
+  },
+  {
+   "id": 33,
+   "kind": "list",
+   "start": 5943,
+   "end": 6056,
+   "text": "- **⟦0⟧**: natural‑language task descriptions mapped to integer IDs for task‑conditioned policies.",
+   "tokens": [
+    "`meta/tasks.jsonl`"
+   ]
+  },
+  {
+   "id": 34,
+   "kind": "list",
+   "start": 6057,
+   "end": 6173,
+   "text": "- **⟦0⟧**: per‑episode records (lengths, tasks, offsets) stored as **chunked Parquet** for scalability.",
+   "tokens": [
+    "`meta/episodes/`"
+   ]
+  },
+  {
+   "id": 35,
+   "kind": "list",
+   "start": 6174,
+   "end": 6271,
+   "text": "- **⟦0⟧**: frame‑by‑frame **Parquet** shards; each file typically contains **many episodes**.",
+   "tokens": [
+    "`data/`"
+   ]
+  },
+  {
+   "id": 36,
+   "kind": "list",
+   "start": 6272,
+   "end": 6363,
+   "text": "- **⟦0⟧**: **MP4** shards per camera; each file typically contains **many episodes**.",
+   "tokens": [
+    "`videos/`"
+   ]
+  },
+  {
+   "id": 37,
+   "kind": "heading",
+   "start": 6365,
+   "end": 6395,
+   "text": "## Load a dataset for training",
+   "tokens": []
+  },
+  {
+   "id": 38,
+   "kind": "para",
+   "start": 6397,
+   "end": 6551,
+   "text": "⟦0⟧ returns Python dictionaries of PyTorch tensors and integrates with ⟦1⟧. Here is a code example showing its use:",
+   "tokens": [
+    "`LeRobotDataset`",
+    "`torch.utils.data.DataLoader`"
+   ]
+  },
+  {
+   "id": 39,
+   "kind": "heading",
+   "start": 7792,
+   "end": 7826,
+   "text": "## Stream a dataset (no downloads)",
+   "tokens": []
+  },
+  {
+   "id": 40,
+   "kind": "para",
+   "start": 7828,
+   "end": 8073,
+   "text": "Use ⟦0⟧ to iterate directly from the Hub without local copies. This allows to stream large datasets without the need to downloading them onto disk or loading them onto memory, and is a key feature of the new dataset format.",
+   "tokens": [
+    "`StreamingLeRobotDataset`"
+   ]
+  },
+  {
+   "id": 41,
+   "kind": "para",
+   "start": 8247,
+   "end": 8417,
+   "text": "Datasets stored in an [HF Storage Bucket](⟦0⟧) (⟦1⟧) can be streamed the same way by passing ⟦2⟧:",
+   "tokens": [
+    "https://huggingface.co/docs/hub/storage-buckets",
+    "`hf://buckets/`",
+    "`repo_type=\"bucket\"`"
+   ]
+  },
+  {
+   "id": 42,
+   "kind": "para",
+   "start": 8508,
+   "end": 8677,
+   "text": "Both options are available in ⟦0⟧ through ⟦1⟧, and ⟦2⟧ to stream from a bucket instead of a Hub dataset repo:",
+   "tokens": [
+    "`lerobot-train`",
+    "`--dataset.streaming=true`",
+    "`--dataset.repo_type=bucket`"
+   ]
+  },
+  {
+   "id": 43,
+   "kind": "para",
+   "start": 9139,
+   "end": 9252,
+   "text": "    ⟦0⟧\n      Stream directly from the Hub for on‑the‑fly training.",
+   "tokens": [
+    "<figcaption style=\"font-size:0.9em; color:#666;\">"
+   ]
+  },
+  {
+   "id": 44,
+   "kind": "heading",
+   "start": 9291,
+   "end": 9310,
+   "text": "## Image transforms",
+   "tokens": []
+  },
+  {
+   "id": 45,
+   "kind": "para",
+   "start": 9312,
+   "end": 9552,
+   "text": "Image transforms are data augmentations applied to camera frames during training to improve model robustness and generalization. LeRobot supports various transforms including brightness, contrast, saturation, hue, and sharpness adjustments.",
+   "tokens": []
+  },
+  {
+   "id": 46,
+   "kind": "heading",
+   "start": 9554,
+   "end": 9608,
+   "text": "### Using transforms during dataset creation/recording",
+   "tokens": []
+  },
+  {
+   "id": 47,
+   "kind": "para",
+   "start": 9610,
+   "end": 9871,
+   "text": "Currently, transforms are applied during **training time only**, not during recording. When you create or record a dataset, the raw images are stored without transforms. This allows you to experiment with different augmentations later without re-recording data.",
+   "tokens": []
+  },
+  {
+   "id": 48,
+   "kind": "heading",
+   "start": 9873,
+   "end": 9921,
+   "text": "### Adding transforms to existing datasets (API)",
+   "tokens": []
+  },
+  {
+   "id": 49,
+   "kind": "para",
+   "start": 9923,
+   "end": 9996,
+   "text": "Use the ⟦0⟧ parameter when loading a dataset for training:",
+   "tokens": [
+    "`image_transforms`"
+   ]
+  },
+  {
+   "id": 50,
+   "kind": "heading",
+   "start": 11844,
+   "end": 11873,
+   "text": "### Available transform types",
+   "tokens": []
+  },
+  {
+   "id": 51,
+   "kind": "para",
+   "start": 11875,
+   "end": 11916,
+   "text": "LeRobot provides several transform types:",
+   "tokens": []
+  },
+  {
+   "id": 52,
+   "kind": "list",
+   "start": 11918,
+   "end": 11988,
+   "text": "- **⟦0⟧**: Adjusts brightness, contrast, saturation, and hue",
+   "tokens": [
+    "`ColorJitter`"
+   ]
+  },
+  {
+   "id": 53,
+   "kind": "list",
+   "start": 11989,
+   "end": 12046,
+   "text": "- **⟦0⟧**: Randomly adjusts image sharpness",
+   "tokens": [
+    "`SharpnessJitter`"
+   ]
+  },
+  {
+   "id": 54,
+   "kind": "list",
+   "start": 12047,
+   "end": 12103,
+   "text": "- **⟦0⟧**: No transformation (useful for testing)",
+   "tokens": [
+    "`Identity`"
+   ]
+  },
+  {
+   "id": 55,
+   "kind": "para",
+   "start": 12105,
+   "end": 12223,
+   "text": "You can also use any ⟦0⟧ transform by passing it directly to the ⟦1⟧ parameter.",
+   "tokens": [
+    "`torchvision.transforms.v2`",
+    "`image_transforms`"
+   ]
+  },
+  {
+   "id": 56,
+   "kind": "heading",
+   "start": 12225,
+   "end": 12250,
+   "text": "### Configuration options",
+   "tokens": []
+  },
+  {
+   "id": 57,
+   "kind": "list",
+   "start": 12252,
+   "end": 12312,
+   "text": "- **⟦0⟧**: Enable/disable transforms (default: ⟦1⟧)",
+   "tokens": [
+    "`enable`",
+    "`False`"
+   ]
+  },
+  {
+   "id": 58,
+   "kind": "list",
+   "start": 12313,
+   "end": 12402,
+   "text": "- **⟦0⟧**: Maximum number of transforms applied per frame (default: ⟦1⟧)",
+   "tokens": [
+    "`max_num_transforms`",
+    "`3`"
+   ]
+  },
+  {
+   "id": 59,
+   "kind": "list",
+   "start": 12403,
+   "end": 12495,
+   "text": "- **⟦0⟧**: Apply transforms in random order vs. standard order (default: ⟦1⟧)",
+   "tokens": [
+    "`random_order`",
+    "`False`"
+   ]
+  },
+  {
+   "id": 60,
+   "kind": "list",
+   "start": 12496,
+   "end": 12627,
+   "text": "- **⟦0⟧**: Sampling probability for each transform (higher = more likely, if sum of weights is not 1, they will be normalized)",
+   "tokens": [
+    "`weight`"
+   ]
+  },
+  {
+   "id": 61,
+   "kind": "list",
+   "start": 12628,
+   "end": 12698,
+   "text": "- **⟦0⟧**: Transform-specific parameters (e.g., brightness range)",
+   "tokens": [
+    "`kwargs`"
+   ]
+  },
+  {
+   "id": 62,
+   "kind": "heading",
+   "start": 12700,
+   "end": 12726,
+   "text": "### Visualizing transforms",
+   "tokens": []
+  },
+  {
+   "id": 63,
+   "kind": "para",
+   "start": 12728,
+   "end": 12800,
+   "text": "Use the visualization script to preview how transforms affect your data:",
+   "tokens": []
+  },
+  {
+   "id": 64,
+   "kind": "para",
+   "start": 12938,
+   "end": 13030,
+   "text": "This saves example images showing the effect of each transform, helping you tune parameters.",
+   "tokens": []
+  },
+  {
+   "id": 65,
+   "kind": "heading",
+   "start": 13032,
+   "end": 13050,
+   "text": "### Best practices",
+   "tokens": []
+  },
+  {
+   "id": 66,
+   "kind": "list",
+   "start": 13052,
+   "end": 13151,
+   "text": "- **Start conservative**: Begin with small ranges (e.g., brightness 0.9-1.1) and increase gradually",
+   "tokens": []
+  },
+  {
+   "id": 67,
+   "kind": "list",
+   "start": 13152,
+   "end": 13235,
+   "text": "- **Test first**: Use the visualization script to ensure transforms look reasonable",
+   "tokens": []
+  },
+  {
+   "id": 68,
+   "kind": "list",
+   "start": 13236,
+   "end": 13319,
+   "text": "- **Monitor training**: Strong augmentations can hurt performance if too aggressive",
+   "tokens": []
+  },
+  {
+   "id": 69,
+   "kind": "list",
+   "start": 13320,
+   "end": 13423,
+   "text": "- **Match your domain**: If your robot operates in varying lighting, use brightness/contrast transforms",
+   "tokens": []
+  },
+  {
+   "id": 70,
+   "kind": "list",
+   "start": 13424,
+   "end": 13513,
+   "text": "- **Combine wisely**: Using too many transforms simultaneously can make training unstable",
+   "tokens": []
+  },
+  {
+   "id": 71,
+   "kind": "heading",
+   "start": 13515,
+   "end": 13541,
+   "text": "## Migrate ⟦0⟧ → ⟦1⟧",
+   "tokens": [
+    "`v2.1`",
+    "`v3.0`"
+   ]
+  },
+  {
+   "id": 72,
+   "kind": "para",
+   "start": 13543,
+   "end": 13690,
+   "text": "A converter aggregates per‑episode files into larger shards and writes episode offsets/metadata. Convert your dataset using the instructions below.",
+   "tokens": []
+  },
+  {
+   "id": 73,
+   "kind": "para",
+   "start": 13987,
+   "end": 14003,
+   "text": "**What it does**",
+   "tokens": []
+  },
+  {
+   "id": 74,
+   "kind": "list",
+   "start": 14005,
+   "end": 14111,
+   "text": "- Aggregates parquet files: ⟦0⟧, ⟦1⟧, … → **⟦2⟧**, …",
+   "tokens": [
+    "`episode-0000.parquet`",
+    "`episode-0001.parquet`",
+    "`file-0000.parquet`"
+   ]
+  },
+  {
+   "id": 75,
+   "kind": "list",
+   "start": 14112,
+   "end": 14202,
+   "text": "- Aggregates mp4 files: ⟦0⟧, ⟦1⟧, … → **⟦2⟧**, …",
+   "tokens": [
+    "`episode-0000.mp4`",
+    "`episode-0001.mp4`",
+    "`file-0000.mp4`"
+   ]
+  },
+  {
+   "id": 76,
+   "kind": "list",
+   "start": 14203,
+   "end": 14305,
+   "text": "- Updates ⟦0⟧ (chunked Parquet) with per‑episode lengths, tasks, and byte/frame offsets.",
+   "tokens": [
+    "`meta/episodes/*`"
+   ]
+  },
+  {
+   "id": 77,
+   "kind": "heading",
+   "start": 14307,
+   "end": 14323,
+   "text": "## Common Issues",
+   "tokens": []
+  },
+  {
+   "id": 78,
+   "kind": "heading",
+   "start": 14325,
+   "end": 14368,
+   "text": "### Always call ⟦0⟧ before pushing",
+   "tokens": [
+    "`finalize()`"
+   ]
+  },
+  {
+   "id": 79,
+   "kind": "para",
+   "start": 14370,
+   "end": 14567,
+   "text": "When creating or recording datasets, you **must** call ⟦0⟧ to properly close parquet writers. See the [PR #1903](⟦1⟧) for more details.",
+   "tokens": [
+    "`dataset.finalize()`",
+    "https://github.com/huggingface/lerobot/pull/1903"
+   ]
+  },
+  {
+   "id": 80,
+   "kind": "para",
+   "start": 15007,
+   "end": 15033,
+   "text": "**Why is this necessary?**",
+   "tokens": []
+  },
+  {
+   "id": 81,
+   "kind": "para",
+   "start": 15035,
+   "end": 15144,
+   "text": "Dataset v3.0 uses incremental parquet writing with buffered metadata for efficiency. The ⟦0⟧ method:",
+   "tokens": [
+    "`finalize()`"
+   ]
+  },
+  {
+   "id": 82,
+   "kind": "list",
+   "start": 15146,
+   "end": 15193,
+   "text": "- Flushes any buffered episode metadata to disk",
+   "tokens": []
+  },
+  {
+   "id": 83,
+   "kind": "list",
+   "start": 15194,
+   "end": 15288,
+   "text": "- Closes parquet writers to write footer metadata, otherwise the parquet files will be corrupt",
+   "tokens": []
+  },
+  {
+   "id": 84,
+   "kind": "list",
+   "start": 15289,
+   "end": 15331,
+   "text": "- Ensures the dataset is valid for loading",
+   "tokens": []
+  },
+  {
+   "id": 85,
+   "kind": "para",
+   "start": 15333,
+   "end": 15437,
+   "text": "Without calling ⟦0⟧, your parquet files will be incomplete and the dataset won't load properly.",
+   "tokens": [
+    "`finalize()`"
+   ]
+  },
+  {
+   "id": 86,
+   "kind": "heading",
+   "start": 15439,
+   "end": 15475,
+   "text": "## Other formats and implementations",
+   "tokens": []
+  },
+  {
+   "id": 87,
+   "kind": "heading",
+   "start": 15477,
+   "end": 15486,
+   "text": "### Lance",
+   "tokens": []
+  },
+  {
+   "id": 88,
+   "kind": "para",
+   "start": 15488,
+   "end": 15625,
+   "text": "Lance is a useful format for multimodal AI datasets, especially for large-scale training requiring high performance IO and random access.",
+   "tokens": []
+  },
+  {
+   "id": 89,
+   "kind": "para",
+   "start": 15627,
+   "end": 15851,
+   "text": "The ⟦0⟧ package implements ⟦1⟧ (for JPEG images) and ⟦2⟧ (for mp4 videos).\nThose two storage layouts both subclass LeRobotDataset and can provide data loading speed ups.",
+   "tokens": [
+    "`lerobot-lancedb`",
+    "`LeRobotLanceDataset`",
+    "`LeRobotLanceVideoDataset`"
+   ]
+  },
+  {
+   "id": 90,
+   "kind": "para",
+   "start": 15853,
+   "end": 15921,
+   "text": "⟦0⟧ is a drop-in replacement for ⟦1⟧:",
+   "tokens": [
+    "`LeRobotLanceDataset`",
+    "`LeRobotDataset`"
+   ]
+  },
+  {
+   "id": 91,
+   "kind": "para",
+   "start": 16798,
+   "end": 16981,
+   "text": "Join the discussion on [Github](⟦0⟧) and explore the ⟦1⟧ documentation [here](⟦2⟧).",
+   "tokens": [
+    "https://github.com/huggingface/lerobot/issues/3608",
+    "`lerobot-lancedb`",
+    "https://lancedb.github.io/lerobot-lancedb/"
+   ]
+  }
+ ]
+}

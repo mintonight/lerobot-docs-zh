@@ -1,0 +1,12 @@
+# local rebuild input: sparse clone of huggingface/lerobot (recreate per README)
+source/
+
+# temp / build artifacts
+tools/.edge-profile/
+tools/build.log
+__pycache__/
+*.pyc
+
+# OS
+.DS_Store
+Thumbs.db

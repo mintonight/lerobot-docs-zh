@@ -1,0 +1,719 @@
+{
+ "file": "robotwin.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1938,
+   "text": "# RoboTwin 2.0",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1940,
+   "end": 2268,
+   "text": "RoboTwin 2.0 is a **large-scale dual-arm manipulation benchmark** built on the SAPIEN physics engine. It provides a standardized evaluation protocol for bimanual robotic policies across 50 tasks (as of upstream ⟦0⟧) with strong domain randomization (clutter, lighting, background, tabletop height, and language instructions).",
+   "tokens": [
+    "`main`"
+   ]
+  },
+  {
+   "id": 2,
+   "kind": "list",
+   "start": 2270,
+   "end": 2442,
+   "text": "- Paper: [RoboTwin 2.0: A Scalable Data Generator and Benchmark with Strong Domain Randomization for Robust Bimanual Robotic Manipulation](⟦0⟧)",
+   "tokens": [
+    "https://arxiv.org/abs/2506.18088"
+   ]
+  },
+  {
+   "id": 3,
+   "kind": "list",
+   "start": 2443,
+   "end": 2528,
+   "text": "- GitHub: [RoboTwin-Platform/RoboTwin](⟦0⟧)",
+   "tokens": [
+    "https://github.com/RoboTwin-Platform/RoboTwin"
+   ]
+  },
+  {
+   "id": 4,
+   "kind": "list",
+   "start": 2529,
+   "end": 2634,
+   "text": "- Leaderboard: [robotwin-platform.github.io/leaderboard](⟦0⟧)",
+   "tokens": [
+    "https://robotwin-platform.github.io/leaderboard"
+   ]
+  },
+  {
+   "id": 5,
+   "kind": "list",
+   "start": 2635,
+   "end": 2730,
+   "text": "- Dataset: [lerobot/robotwin_unified](⟦0⟧)",
+   "tokens": [
+    "https://huggingface.co/datasets/lerobot/robotwin_unified"
+   ]
+  },
+  {
+   "id": 6,
+   "kind": "heading",
+   "start": 2854,
+   "end": 2865,
+   "text": "## Overview",
+   "tokens": []
+  },
+  {
+   "id": 7,
+   "kind": "table",
+   "start": 2867,
+   "end": 2943,
+   "text": "| Property      | Value                                                    |",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "table",
+   "start": 3021,
+   "end": 3097,
+   "text": "| Tasks         | 50 dual-arm manipulation tasks                           |",
+   "tokens": []
+  },
+  {
+   "id": 9,
+   "kind": "table",
+   "start": 3098,
+   "end": 3174,
+   "text": "| Robot         | Aloha-AgileX bimanual (14 DOF, 7 per arm)                |",
+   "tokens": []
+  },
+  {
+   "id": 10,
+   "kind": "table",
+   "start": 3175,
+   "end": 3251,
+   "text": "| Action space  | 14-dim joint-space, continuous in ⟦0⟧              |",
+   "tokens": [
+    "`[-1, 1]`"
+   ]
+  },
+  {
+   "id": 11,
+   "kind": "table",
+   "start": 3252,
+   "end": 3328,
+   "text": "| Cameras       | ⟦0⟧, ⟦1⟧, ⟦2⟧             |",
+   "tokens": [
+    "`head_camera`",
+    "`left_camera`",
+    "`right_camera`"
+   ]
+  },
+  {
+   "id": 12,
+   "kind": "table",
+   "start": 3329,
+   "end": 3405,
+   "text": "| Simulator     | SAPIEN (not MuJoCo)                                      |",
+   "tokens": []
+  },
+  {
+   "id": 13,
+   "kind": "table",
+   "start": 3406,
+   "end": 3482,
+   "text": "| Eval protocol | 100 episodes/task, 50 demo_clean demonstrations          |",
+   "tokens": []
+  },
+  {
+   "id": 14,
+   "kind": "table",
+   "start": 3483,
+   "end": 3559,
+   "text": "| Eval settings | **Easy** (⟦0⟧) and **Hard** (⟦1⟧) |",
+   "tokens": [
+    "`demo_clean`",
+    "`demo_randomized`"
+   ]
+  },
+  {
+   "id": 15,
+   "kind": "heading",
+   "start": 3561,
+   "end": 3579,
+   "text": "## Available tasks",
+   "tokens": []
+  },
+  {
+   "id": 16,
+   "kind": "para",
+   "start": 3581,
+   "end": 3806,
+   "text": "RoboTwin 2.0 ships 50 dual-arm manipulation tasks in its upstream ⟦0⟧ directory. The canonical list is the ⟦1⟧ tuple in ⟦2⟧, mirrored verbatim from the upstream repo. Example tasks:",
+   "tokens": [
+    "`envs/`",
+    "`ROBOTWIN_TASKS`",
+    "`src/lerobot/envs/robotwin.py`"
+   ]
+  },
+  {
+   "id": 17,
+   "kind": "table",
+   "start": 3808,
+   "end": 3883,
+   "text": "| Task                     | CLI name                 | Category          |",
+   "tokens": []
+  },
+  {
+   "id": 18,
+   "kind": "table",
+   "start": 3960,
+   "end": 4035,
+   "text": "| Beat block with hammer   | ⟦0⟧      | Tool use          |",
+   "tokens": [
+    "`beat_block_hammer`"
+   ]
+  },
+  {
+   "id": 19,
+   "kind": "table",
+   "start": 4036,
+   "end": 4111,
+   "text": "| Click bell / alarm clock | ⟦0⟧             | Precision press   |",
+   "tokens": [
+    "`click_bell`"
+   ]
+  },
+  {
+   "id": 20,
+   "kind": "table",
+   "start": 4112,
+   "end": 4187,
+   "text": "| Stack blocks (2 / 3)     | ⟦0⟧ | Stacking          |",
+   "tokens": [
+    "`stack_blocks_two/three`"
+   ]
+  },
+  {
+   "id": 21,
+   "kind": "table",
+   "start": 4188,
+   "end": 4263,
+   "text": "| Stack bowls (2 / 3)      | ⟦0⟧  | Stacking          |",
+   "tokens": [
+    "`stack_bowls_two/three`"
+   ]
+  },
+  {
+   "id": 22,
+   "kind": "table",
+   "start": 4264,
+   "end": 4339,
+   "text": "| Handover block / mic     | ⟦0⟧         | Bimanual coord.   |",
+   "tokens": [
+    "`handover_block`"
+   ]
+  },
+  {
+   "id": 23,
+   "kind": "table",
+   "start": 4340,
+   "end": 4415,
+   "text": "| Lift pot                 | ⟦0⟧               | Bimanual lift     |",
+   "tokens": [
+    "`lift_pot`"
+   ]
+  },
+  {
+   "id": 24,
+   "kind": "table",
+   "start": 4416,
+   "end": 4491,
+   "text": "| Shake bottle             | ⟦0⟧           | Continuous motion |",
+   "tokens": [
+    "`shake_bottle`"
+   ]
+  },
+  {
+   "id": 25,
+   "kind": "table",
+   "start": 4492,
+   "end": 4567,
+   "text": "| Turn switch              | ⟦0⟧            | Articulated obj   |",
+   "tokens": [
+    "`turn_switch`"
+   ]
+  },
+  {
+   "id": 26,
+   "kind": "table",
+   "start": 4568,
+   "end": 4643,
+   "text": "| Stamp seal               | ⟦0⟧             | Precision place   |",
+   "tokens": [
+    "`stamp_seal`"
+   ]
+  },
+  {
+   "id": 27,
+   "kind": "table",
+   "start": 4644,
+   "end": 4719,
+   "text": "| Scan object              | ⟦0⟧            | Mobile manip.     |",
+   "tokens": [
+    "`scan_object`"
+   ]
+  },
+  {
+   "id": 28,
+   "kind": "para",
+   "start": 4721,
+   "end": 4810,
+   "text": "Pass a comma-separated list to ⟦0⟧ to run multiple tasks in a single eval sweep.",
+   "tokens": [
+    "`--env.task`"
+   ]
+  },
+  {
+   "id": 29,
+   "kind": "para",
+   "start": 4812,
+   "end": 5162,
+   "text": "⟦0⟧\n  ⟦1⟧ is currently broken upstream (its ⟦2⟧ uses\n  ⟦3⟧, which is only set inside the scripted-expert ⟦4⟧\n  path and therefore unavailable during normal policy eval). Avoid it until the\n  upstream bug is fixed, or patch the task to default ⟦5⟧ in\n  ⟦6⟧.",
+   "tokens": [
+    "<Tip warning={true}>",
+    "`open_laptop`",
+    "`check_success()`",
+    "`self.arm_tag`",
+    "`play_once()`",
+    "`self.arm_tag = \"left\"`",
+    "`load_actors()`"
+   ]
+  },
+  {
+   "id": 30,
+   "kind": "heading",
+   "start": 5171,
+   "end": 5181,
+   "text": "## Dataset",
+   "tokens": []
+  },
+  {
+   "id": 31,
+   "kind": "para",
+   "start": 5183,
+   "end": 5272,
+   "text": "The RoboTwin 2.0 dataset is available in **LeRobot v3.0 format** on the Hugging Face Hub:",
+   "tokens": []
+  },
+  {
+   "id": 32,
+   "kind": "para",
+   "start": 5308,
+   "end": 5535,
+   "text": "It contains over 100,000 pre-collected trajectories across all 50 tasks (79.6 GB, Apache 2.0 license). No format conversion is needed — it is already in the correct LeRobot v3.0 schema with video observations and action labels.",
+   "tokens": []
+  },
+  {
+   "id": 33,
+   "kind": "para",
+   "start": 5537,
+   "end": 5591,
+   "text": "You can load it directly with the HF Datasets library:",
+   "tokens": []
+  },
+  {
+   "id": 34,
+   "kind": "heading",
+   "start": 5704,
+   "end": 5719,
+   "text": "## Installation",
+   "tokens": []
+  },
+  {
+   "id": 35,
+   "kind": "para",
+   "start": 5721,
+   "end": 5841,
+   "text": "RoboTwin 2.0 requires **Linux** with an NVIDIA GPU (CUDA 12.1 recommended). Installation takes approximately 20 minutes.",
+   "tokens": []
+  },
+  {
+   "id": 36,
+   "kind": "heading",
+   "start": 5843,
+   "end": 5876,
+   "text": "### 1. Create a conda environment",
+   "tokens": []
+  },
+  {
+   "id": 37,
+   "kind": "heading",
+   "start": 5955,
+   "end": 5977,
+   "text": "### 2. Install LeRobot",
+   "tokens": []
+  },
+  {
+   "id": 38,
+   "kind": "heading",
+   "start": 6075,
+   "end": 6102,
+   "text": "### 3. Install RoboTwin 2.0",
+   "tokens": []
+  },
+  {
+   "id": 39,
+   "kind": "para",
+   "start": 6245,
+   "end": 6343,
+   "text": "The install script handles all Python dependencies including SAPIEN, CuRobo, mplib, and pytorch3d.",
+   "tokens": []
+  },
+  {
+   "id": 40,
+   "kind": "para",
+   "start": 6345,
+   "end": 6415,
+   "text": "⟦0⟧\nIf the automated install fails, install manually:",
+   "tokens": [
+    "<Tip warning={true}>"
+   ]
+  },
+  {
+   "id": 41,
+   "kind": "para",
+   "start": 6646,
+   "end": 6754,
+   "text": "Then apply the required mplib fix: in ⟦0⟧ line 807, remove ⟦1⟧ from the conditional.",
+   "tokens": [
+    "`mplib/planner.py`",
+    "`or collide`"
+   ]
+  },
+  {
+   "id": 42,
+   "kind": "heading",
+   "start": 6764,
+   "end": 6797,
+   "text": "### 4. Add RoboTwin to PYTHONPATH",
+   "tokens": []
+  },
+  {
+   "id": 43,
+   "kind": "para",
+   "start": 6799,
+   "end": 6894,
+   "text": "The RoboTwin task modules must be importable by LeRobot. From within the ⟦0⟧ directory:",
+   "tokens": [
+    "`RoboTwin/`"
+   ]
+  },
+  {
+   "id": 44,
+   "kind": "para",
+   "start": 6950,
+   "end": 7002,
+   "text": "Add this to your shell profile to make it permanent.",
+   "tokens": []
+  },
+  {
+   "id": 45,
+   "kind": "heading",
+   "start": 7004,
+   "end": 7017,
+   "text": "## Evaluation",
+   "tokens": []
+  },
+  {
+   "id": 46,
+   "kind": "heading",
+   "start": 7019,
+   "end": 7056,
+   "text": "### Standard evaluation (recommended)",
+   "tokens": []
+  },
+  {
+   "id": 47,
+   "kind": "para",
+   "start": 7058,
+   "end": 7135,
+   "text": "Evaluate a policy on a single task with the official protocol (100 episodes):",
+   "tokens": []
+  },
+  {
+   "id": 48,
+   "kind": "heading",
+   "start": 7308,
+   "end": 7335,
+   "text": "### Single-task quick check",
+   "tokens": []
+  },
+  {
+   "id": 49,
+   "kind": "heading",
+   "start": 7506,
+   "end": 7526,
+   "text": "### Multi-task sweep",
+   "tokens": []
+  },
+  {
+   "id": 50,
+   "kind": "para",
+   "start": 7528,
+   "end": 7565,
+   "text": "Evaluate on several tasks in one run:",
+   "tokens": []
+  },
+  {
+   "id": 51,
+   "kind": "heading",
+   "start": 7781,
+   "end": 7814,
+   "text": "### Full benchmark (all 50 tasks)",
+   "tokens": []
+  },
+  {
+   "id": 52,
+   "kind": "para",
+   "start": 8778,
+   "end": 8955,
+   "text": "⟦0⟧\n  ⟦1⟧ is intentionally omitted above because of the upstream\n  ⟦2⟧ bug (see the **Available tasks** section). Re-add it once the\n  upstream fix lands.",
+   "tokens": [
+    "<Tip>",
+    "`open_laptop`",
+    "`self.arm_tag`"
+   ]
+  },
+  {
+   "id": 53,
+   "kind": "heading",
+   "start": 8964,
+   "end": 8987,
+   "text": "## Camera configuration",
+   "tokens": []
+  },
+  {
+   "id": 54,
+   "kind": "para",
+   "start": 8989,
+   "end": 9032,
+   "text": "By default, all three cameras are included:",
+   "tokens": []
+  },
+  {
+   "id": 55,
+   "kind": "table",
+   "start": 9034,
+   "end": 9085,
+   "text": "| Camera key     | Description                    |",
+   "tokens": []
+  },
+  {
+   "id": 56,
+   "kind": "table",
+   "start": 9138,
+   "end": 9189,
+   "text": "| ⟦0⟧  | Torso-mounted overhead view    |",
+   "tokens": [
+    "`head_camera`"
+   ]
+  },
+  {
+   "id": 57,
+   "kind": "table",
+   "start": 9190,
+   "end": 9241,
+   "text": "| ⟦0⟧  | Left arm wrist-mounted camera  |",
+   "tokens": [
+    "`left_camera`"
+   ]
+  },
+  {
+   "id": 58,
+   "kind": "table",
+   "start": 9242,
+   "end": 9293,
+   "text": "| ⟦0⟧ | Right arm wrist-mounted camera |",
+   "tokens": [
+    "`right_camera`"
+   ]
+  },
+  {
+   "id": 59,
+   "kind": "para",
+   "start": 9295,
+   "end": 9353,
+   "text": "To use a subset of cameras, override ⟦0⟧:",
+   "tokens": [
+    "`--env.camera_names`"
+   ]
+  },
+  {
+   "id": 60,
+   "kind": "heading",
+   "start": 9574,
+   "end": 9605,
+   "text": "## Environment config reference",
+   "tokens": []
+  },
+  {
+   "id": 61,
+   "kind": "para",
+   "start": 9607,
+   "end": 9646,
+   "text": "Key parameters for ⟦0⟧:",
+   "tokens": [
+    "`RoboTwinEnvConfig`"
+   ]
+  },
+  {
+   "id": 62,
+   "kind": "table",
+   "start": 9648,
+   "end": 9752,
+   "text": "| Parameter            | Default                                  | Description                        |",
+   "tokens": []
+  },
+  {
+   "id": 63,
+   "kind": "table",
+   "start": 9858,
+   "end": 9962,
+   "text": "| ⟦0⟧               | ⟦1⟧                    | Comma-separated task name(s)       |",
+   "tokens": [
+    "`task`",
+    "`\"beat_block_hammer\"`"
+   ]
+  },
+  {
+   "id": 64,
+   "kind": "table",
+   "start": 9963,
+   "end": 10067,
+   "text": "| ⟦0⟧                | ⟦1⟧                                     | Simulation FPS                     |",
+   "tokens": [
+    "`fps`",
+    "`25`"
+   ]
+  },
+  {
+   "id": 65,
+   "kind": "table",
+   "start": 10068,
+   "end": 10172,
+   "text": "| ⟦0⟧     | ⟦1⟧                                    | Max steps per episode              |",
+   "tokens": [
+    "`episode_length`",
+    "`300`"
+   ]
+  },
+  {
+   "id": 66,
+   "kind": "table",
+   "start": 10173,
+   "end": 10277,
+   "text": "| ⟦0⟧           | ⟦1⟧                     | ⟦2⟧ or ⟦3⟧ |",
+   "tokens": [
+    "`obs_type`",
+    "`\"pixels_agent_pos\"`",
+    "`\"pixels\"`",
+    "`\"pixels_agent_pos\"`"
+   ]
+  },
+  {
+   "id": 67,
+   "kind": "table",
+   "start": 10278,
+   "end": 10382,
+   "text": "| ⟦0⟧       | ⟦1⟧ | Comma-separated active cameras     |",
+   "tokens": [
+    "`camera_names`",
+    "`\"head_camera,left_camera,right_camera\"`"
+   ]
+  },
+  {
+   "id": 68,
+   "kind": "table",
+   "start": 10383,
+   "end": 10487,
+   "text": "| ⟦0⟧ | ⟦1⟧                                    | Camera pixel height                |",
+   "tokens": [
+    "`observation_height`",
+    "`240`"
+   ]
+  },
+  {
+   "id": 69,
+   "kind": "table",
+   "start": 10488,
+   "end": 10592,
+   "text": "| ⟦0⟧  | ⟦1⟧                                    | Camera pixel width                 |",
+   "tokens": [
+    "`observation_width`",
+    "`320`"
+   ]
+  },
+  {
+   "id": 70,
+   "kind": "heading",
+   "start": 10594,
+   "end": 10619,
+   "text": "## Leaderboard submission",
+   "tokens": []
+  },
+  {
+   "id": 71,
+   "kind": "para",
+   "start": 10621,
+   "end": 10761,
+   "text": "Results can be submitted to the [RoboTwin 2.0 leaderboard](⟦0⟧). The official protocol requires:",
+   "tokens": [
+    "https://robotwin-platform.github.io/leaderboard"
+   ]
+  },
+  {
+   "id": 72,
+   "kind": "list",
+   "start": 10763,
+   "end": 10816,
+   "text": "- Training on 50 ⟦0⟧ demonstrations per task",
+   "tokens": [
+    "`demo_clean`"
+   ]
+  },
+  {
+   "id": 73,
+   "kind": "list",
+   "start": 10817,
+   "end": 10851,
+   "text": "- Evaluating 100 episodes per task",
+   "tokens": []
+  },
+  {
+   "id": 74,
+   "kind": "list",
+   "start": 10852,
+   "end": 10957,
+   "text": "- Reporting success rate separately for **Easy** (⟦0⟧) and **Hard** (⟦1⟧) settings",
+   "tokens": [
+    "`demo_clean`",
+    "`demo_randomized`"
+   ]
+  },
+  {
+   "id": 75,
+   "kind": "para",
+   "start": 10959,
+   "end": 11072,
+   "text": "For submission instructions, refer to the [RoboTwin 2.0 documentation](⟦0⟧).",
+   "tokens": [
+    "https://robotwin-platform.github.io/doc/"
+   ]
+  }
+ ]
+}

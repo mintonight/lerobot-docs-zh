@@ -1,0 +1,205 @@
+<script lang="ts">
+import {onMount} from "svelte";
+import Tip from "$lib/Tip.svelte";
+import CopyLLMTxtMenu from "$lib/CopyLLMTxtMenu.svelte";
+import Youtube from "$lib/Youtube.svelte";
+import Docstring from "$lib/Docstring.svelte";
+import CodeBlock from "$lib/CodeBlock.svelte";
+import CodeBlockFw from "$lib/CodeBlockFw.svelte";
+import DocNotebookDropdown from "$lib/DocNotebookDropdown.svelte";
+import CourseFloatingBanner from "$lib/CourseFloatingBanner.svelte";
+import IconCopyLink from "$lib/IconCopyLink.svelte";
+import FrameworkContent from "$lib/FrameworkContent.svelte";
+import Markdown from "$lib/Markdown.svelte";
+import Question from "$lib/Question.svelte";
+import FrameworkSwitchCourse from "$lib/FrameworkSwitchCourse.svelte";
+import InferenceApi from "$lib/InferenceApi.svelte";
+import TokenizersLanguageContent from "$lib/TokenizersLanguageContent.svelte";
+import ExampleCodeBlock from "$lib/ExampleCodeBlock.svelte";
+import Added from "$lib/Added.svelte";
+import Changed from "$lib/Changed.svelte";
+import Deprecated from "$lib/Deprecated.svelte";
+import PipelineIcon from "$lib/PipelineIcon.svelte";
+import PipelineTag from "$lib/PipelineTag.svelte";
+import Heading from "$lib/Heading.svelte";
+import HfOptions from "$lib/HfOptions.svelte";
+import HfOption from "$lib/HfOption.svelte";
+import EditOnGithub from "$lib/EditOnGithub.svelte";
+import InferenceSnippet from "$lib/InferenceSnippet/InferenceSnippet.svelte";
+import MermaidChart from "$lib/MermaidChart.svelte";
+let fw: "pt" | "tf" = "pt";
+onMount(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    fw = urlParams.get("fw") || "pt";
+});
+</script>
+<svelte:head>
+  <meta name="hf:doc:metadata" content={metadata} >
+</svelte:head>
+
+<!--HF DOCBUILD BODY START-->
+
+HF_DOC_BODY_START
+
+<CopyLLMTxtMenu containerStyle="float: right; margin-left: 10px; display: inline-flex; position: relative; z-index: 10;"></CopyLLMTxtMenu>
+
+# 机器人与 teleoperator 的处理器
+
+本指南介绍如何构建和修改处理流水线，将 teleoperator（例如手机）连接到机器人和 dataset。流水线标准化了不同 action/observation space 之间的转换，因此你可以无需重写胶水代码即可更换 teleoperator 和机器人。
+
+为具体起见，我们使用 Phone 到 SO‑100 follower arm 的示例，但同样的模式也适用于其他机器人。
+
+**你将学到**
+
+- 绝对与相对 EE 控制：各自含义、权衡取舍，以及如何为你的任务做选择。
+- 三条流水线模式：如何映射 teleoperation action → dataset action → 机器人命令，以及机器人 observation → dataset observation。
+- 适配器（`to_transition` / `to_output`）：它们如何将原始字典转换为 `EnvTransition` 再转换回来，以减少样板代码。
+- dataset 特征契约：步骤如何通过 `transform_features(...)` 声明特征，以及如何聚合/合并它们以进行录制。
+- 选择表示形式：何时存储关节、绝对 EE 位姿或相对 EE 增量，以及这对训练有何影响。
+- 流水线定制指南：如何安全地更换机器人/URDF，并调优边界、步长以及诸如 IK 初始化等选项。
+
+### 绝对与相对 EE 控制
+
+本指南中的示例使用绝对 end-effector（EE）位姿，因为它们易于理解。在实践中，相对 EE 增量或关节位置通常是更受青睐的学习特征。
+
+借助处理器，你可以选择 policy 要使用的学习特征。这可以是关节位置/速度、绝对 EE 或相对 EE 位置。你也可以选择存储其他特征，例如关节力矩、电机电流等。
+
+## 三条流水线
+
+我们通常会组合三条流水线。根据你的设置，如果 action 和 observation space 已经匹配，其中一些可以为空。
+每条流水线都处理不同 action 和 observation space 之间的不同转换。下面是对每条流水线的简要说明。
+
+1. 流水线 1：teleoperation action space → dataset action space（手机位姿 → EE 目标）
+2. 流水线 2：dataset action space → 机器人命令空间（EE 目标 → 关节）
+3. 流水线 3：机器人 observation space → dataset observation space（关节 → EE 位姿）
+
+下面是我们用于 Phone 到 SO-100 follower arm 示例的三条流水线示例：
+
+```python
+phone_to_robot_ee_pose_processor = RobotProcessorPipeline[RobotAction, RobotAction]( # teleop -> dataset action
+    steps=[
+        MapPhoneActionToRobotAction(platform=teleop_config.phone_os),
+        EEReferenceAndDelta(
+            kinematics=kinematics_solver, end_effector_step_sizes={"x": 0.5, "y": 0.5, "z": 0.5}, motor_names=list(robot.bus.motors.keys()),
+        ),
+        EEBoundsAndSafety(
+            end_effector_bounds={"min": [-1.0, -1.0, -1.0], "max": [1.0, 1.0, 1.0]}, max_ee_step_m=0.20,
+        ),
+        GripperVelocityToJoint(),
+    ],
+    to_transition=robot_action_to_transition,
+    to_output=transition_to_robot_action,
+)
+
+robot_ee_to_joints_processor = RobotProcessorPipeline[RobotAction, RobotAction]( # dataset action -> robot
+    steps=[
+        InverseKinematicsEEToJoints(
+            kinematics=kinematics_solver, motor_names=list(robot.bus.motors.keys()), initial_guess_current_joints=True,
+        ),
+    ],
+    to_transition=robot_action_to_transition,
+    to_output=transition_to_robot_action,
+)
+
+robot_joints_to_ee_pose = RobotProcessorPipeline[RobotObservation, RobotObservation]( # robot obs -> dataset obs
+    steps=[
+        ForwardKinematicsJointsToEE(kinematics=kinematics_solver, motor_names=list(robot.bus.motors.keys()))
+    ],
+    to_transition=observation_to_transition,
+    to_output=transition_to_observation,
+)
+```
+
+## 为什么用 to_transition / to_output
+
+为了在机器人/teleoperator 与流水线之间来回转换，我们使用 `to_transition` 和 `to_output` 流水线适配器。
+它们标准化了转换以减少样板代码，并构成了机器人、teleoperator 原始字典与流水线 `EnvTransition` 格式之间的桥梁。
+在 Phone 到 SO-100 follower arm 示例中，我们使用以下适配器：
+
+- `robot_action_to_transition`：将 teleoperation action 字典转换为流水线 transition。
+- `transition_to_robot_action`：将流水线 transition 转换为机器人 action 字典。
+- `observation_to_transition`：将机器人 observation 字典转换为流水线 transition。
+- `transition_to_observation`：将流水线 transition 转换为 observation 字典。
+
+更多细节请查看 [src/lerobot/processor/converters.py](https://github.com/huggingface/lerobot/blob/main/src/lerobot/processor/converters.py)。
+
+## dataset 特征契约
+
+dataset 特征由保存在 dataset 中的键决定。每个步骤都可以在名为 `transform_features(...)` 的契约中声明它修改哪些特征。构建好处理器后，处理器就可以用 `aggregate_pipeline_dataset_features()` 聚合所有这些特征，并用 `combine_feature_dicts(...)` 合并多个特征字典。
+
+下面是我们如何在 Phone 到 SO-100 follower arm 示例中用 `transform_features` 方法声明特征的示例：
+
+```python
+    def transform_features(
+        self, features: dict[PipelineFeatureType, dict[str, PolicyFeature]]
+    ) -> dict[PipelineFeatureType, dict[str, PolicyFeature]]:
+        # We only use the ee pose in the dataset, so we don't need the joint positions
+        for n in self.motor_names:
+            features[PipelineFeatureType.ACTION].pop(f"{n}.pos", None)
+        # We specify the dataset features of this step that we want to be stored in the dataset
+        for k in ["x", "y", "z", "wx", "wy", "wz", "gripper_pos"]:
+            features[PipelineFeatureType.ACTION][f"ee.{k}"] = PolicyFeature(
+                type=FeatureType.STATE, shape=(1,)
+            )
+        return features
+```
+
+这里我们声明在此步骤中修改哪些 PolicyFeatures，从而知道运行处理器时可以得到哪些特征。这些特征随后可以被聚合，并用于创建 dataset 特征。
+
+下面是我们如何在 Phone 到 SO-100 录制示例中聚合和合并特征的示例：
+
+```python
+features=combine_feature_dicts(
+        # Run the feature contract of the pipelines
+        # This tells you how the features would look like after the pipeline steps
+        aggregate_pipeline_dataset_features(
+            pipeline=phone_to_robot_ee_pose_processor,
+            initial_features=create_initial_features(action=phone.action_features), # <- Action features we can expect, these come from our teleop device (phone) and action processor
+            use_videos=True,
+        ),
+        aggregate_pipeline_dataset_features(
+            pipeline=robot_joints_to_ee_pose,
+            initial_features=create_initial_features(observation=robot.observation_features), # <- Observation features we can expect, these come from our robot and observation processor
+            use_videos=True,
+            patterns=["observation.state.ee"], # <- Here you could optionally filter the features we want to store in the dataset, with a specific pattern
+
+        ),
+    ),
+```
+
+工作原理：
+
+- `aggregate_pipeline_dataset_features(...)`：在整个流水线中应用 `transform_features`，并按模式过滤（当 `use_videos=True` 时包含图像，当指定 `patterns` 时包含 state 特征）。
+- `combine_feature_dicts(...)`：合并多个特征字典。
+- 使用 `record_loop(...)` 录制时，在我们调用 `add_frame(...)` 将帧添加到 dataset 之前，会先用 `build_dataset_frame(...)` 构建与 `dataset.features` 一致的帧。
+
+## 定制机器人流水线时的指导
+
+你可以将以下任何特征存储为你的 action/observation space：
+
+- 关节位置
+- 绝对 EE 位姿
+- 相对 EE 增量
+- 其他特征：关节速度、力矩等。
+
+选择你想用于 policy action 和 observation space 的内容，并相应地配置/修改流水线和步骤。
+
+### 不同的机器人
+
+- 你可以轻松复用流水线。例如，要使用另一台机器人配合手机 teleoperation，可修改示例并替换机器人的 `RobotKinematics`（URDF）和 `motor_names`，即可将你自己的机器人用于 Phone teleoperation。此外，你应确保 `target_frame_name` 指向你的 gripper/手腕。
+
+### 安全第一
+
+- 更改流水线时，先使用较紧的边界，并在使用真实机器人时实现安全步骤。
+- 建议先使用 simulation，然后再转向真实机器人。
+
+就是这样！我们希望本指南能帮助你开始定制机器人流水线。如果在任何时候遇到任何问题，欢迎加入我们的 [Discord 社区](https://discord.com/invite/s3KuuzsPFb) 寻求支持。
+
+
+
+<EditOnGithub source="https://github.com/huggingface/lerobot/blob/main/docs/source/processors_robots_teleop.mdx" />
+
+<!--HF DOCBUILD BODY END-->
+
+HF_DOC_BODY_END
+

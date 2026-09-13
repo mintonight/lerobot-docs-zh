@@ -1,0 +1,296 @@
+{
+ "file": "policy_pi0_README.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1934,
+   "text": "# π₀ (pi0)",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1936,
+   "end": 2174,
+   "text": "This repository contains the Hugging Face port of **π₀**, adapted from [OpenPI](⟦0⟧) by the Physical Intelligence.\nIt is designed as a **Vision-Language-Action model for general robot control**.",
+   "tokens": [
+    "https://github.com/Physical-Intelligence/openpi"
+   ]
+  },
+  {
+   "id": 2,
+   "kind": "heading",
+   "start": 2181,
+   "end": 2198,
+   "text": "## Model Overview",
+   "tokens": []
+  },
+  {
+   "id": 3,
+   "kind": "table",
+   "start": 2200,
+   "end": 2325,
+   "text": "| Feature              | π₀                                                     | π₀.₅                                      |",
+   "tokens": []
+  },
+  {
+   "id": 4,
+   "kind": "table",
+   "start": 2452,
+   "end": 2577,
+   "text": "| Time Conditioning    | Concatenates time with actions via ⟦0⟧ | Uses ⟦1⟧ for AdaRMS conditioning |",
+   "tokens": [
+    "`action_time_mlp_*`",
+    "`time_mlp_*`"
+   ]
+  },
+  {
+   "id": 5,
+   "kind": "table",
+   "start": 2578,
+   "end": 2703,
+   "text": "| AdaRMS               | Not used                                               | Used in action expert                     |",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "table",
+   "start": 2704,
+   "end": 2829,
+   "text": "| Tokenizer Length     | 48 tokens                                              | 200 tokens                                |",
+   "tokens": []
+  },
+  {
+   "id": 7,
+   "kind": "table",
+   "start": 2830,
+   "end": 2955,
+   "text": "| Discrete State Input | False (Uses ⟦0⟧ layer)                        | True                                      |",
+   "tokens": [
+    "`state_proj`"
+   ]
+  },
+  {
+   "id": 8,
+   "kind": "table",
+   "start": 2956,
+   "end": 3081,
+   "text": "| Parameter Count      | Higher (includes state embedding)                      | Lower (no state embedding)                |",
+   "tokens": []
+  },
+  {
+   "id": 9,
+   "kind": "heading",
+   "start": 3088,
+   "end": 3107,
+   "text": "## Relative Actions",
+   "tokens": []
+  },
+  {
+   "id": 10,
+   "kind": "para",
+   "start": 3109,
+   "end": 3361,
+   "text": "π₀ supports training with **relative actions**, where the model learns relative offsets\nfrom the current robot state instead of absolute joint positions. This mirrors the\nrelative-action transform in OpenPI (⟦0⟧) and can improve performance.",
+   "tokens": [
+    "`DeltaActions`"
+   ]
+  },
+  {
+   "id": 11,
+   "kind": "heading",
+   "start": 3363,
+   "end": 3379,
+   "text": "### How it works",
+   "tokens": []
+  },
+  {
+   "id": 12,
+   "kind": "list",
+   "start": 3381,
+   "end": 3515,
+   "text": "1. **During preprocessing**, absolute actions are converted to relative offsets:\n   ⟦0⟧ (for selected joints).",
+   "tokens": [
+    "`relative = action - state`"
+   ]
+  },
+  {
+   "id": 13,
+   "kind": "list",
+   "start": 3516,
+   "end": 3612,
+   "text": "2. The relative actions are normalized using statistics computed from the relative distribution.",
+   "tokens": []
+  },
+  {
+   "id": 14,
+   "kind": "list",
+   "start": 3613,
+   "end": 3735,
+   "text": "3. **During postprocessing**, predicted relative actions are converted back to absolute:\n   ⟦0⟧.",
+   "tokens": [
+    "`absolute = relative + state`"
+   ]
+  },
+  {
+   "id": 15,
+   "kind": "para",
+   "start": 3737,
+   "end": 3814,
+   "text": "Joints listed in ⟦0⟧ (e.g., gripper) are kept absolute.",
+   "tokens": [
+    "`relative_exclude_joints`"
+   ]
+  },
+  {
+   "id": 16,
+   "kind": "heading",
+   "start": 3816,
+   "end": 3833,
+   "text": "### Configuration",
+   "tokens": []
+  },
+  {
+   "id": 17,
+   "kind": "table",
+   "start": 3835,
+   "end": 3961,
+   "text": "| Parameter                 | Type        | Default       | Description                                                      |",
+   "tokens": []
+  },
+  {
+   "id": 18,
+   "kind": "table",
+   "start": 4089,
+   "end": 4215,
+   "text": "| ⟦0⟧    | ⟦1⟧      | ⟦2⟧       | Enable relative-action training                                  |",
+   "tokens": [
+    "`use_relative_actions`",
+    "`bool`",
+    "`False`"
+   ]
+  },
+  {
+   "id": 19,
+   "kind": "table",
+   "start": 4216,
+   "end": 4342,
+   "text": "| ⟦0⟧ | ⟦1⟧ | ⟦2⟧ | Joint names to keep absolute (matched by substring)              |",
+   "tokens": [
+    "`relative_exclude_joints`",
+    "`list[str]`",
+    "`[\"gripper\"]`"
+   ]
+  },
+  {
+   "id": 20,
+   "kind": "table",
+   "start": 4343,
+   "end": 4469,
+   "text": "| ⟦0⟧    | ⟦1⟧ | ⟦2⟧        | Auto-populated from dataset metadata at runtime by ⟦3⟧ |",
+   "tokens": [
+    "`action_feature_names`",
+    "`list[str]`",
+    "`None`",
+    "`make_policy`"
+   ]
+  },
+  {
+   "id": 21,
+   "kind": "heading",
+   "start": 4471,
+   "end": 4491,
+   "text": "### Training example",
+   "tokens": []
+  },
+  {
+   "id": 22,
+   "kind": "para",
+   "start": 4702,
+   "end": 4770,
+   "text": "When ⟦0⟧, the training script automatically:",
+   "tokens": [
+    "`use_relative_actions=true`"
+   ]
+  },
+  {
+   "id": 23,
+   "kind": "list",
+   "start": 4772,
+   "end": 4865,
+   "text": "- Computes relative action statistics from the dataset (sampled chunk-level relative actions)",
+   "tokens": []
+  },
+  {
+   "id": 24,
+   "kind": "list",
+   "start": 4866,
+   "end": 4940,
+   "text": "- Replaces the standard action stats with relative stats for normalization",
+   "tokens": []
+  },
+  {
+   "id": 25,
+   "kind": "list",
+   "start": 4941,
+   "end": 5006,
+   "text": "- Broadcasts these stats across all ranks in distributed training",
+   "tokens": []
+  },
+  {
+   "id": 26,
+   "kind": "heading",
+   "start": 5008,
+   "end": 5053,
+   "text": "### Recomputing stats for an existing dataset",
+   "tokens": []
+  },
+  {
+   "id": 27,
+   "kind": "para",
+   "start": 5055,
+   "end": 5158,
+   "text": "If you want to precompute relative action stats offline, use ⟦0⟧ from\n⟦1⟧:",
+   "tokens": [
+    "`recompute_stats`",
+    "`lerobot.datasets`"
+   ]
+  },
+  {
+   "id": 28,
+   "kind": "heading",
+   "start": 5401,
+   "end": 5412,
+   "text": "## Citation",
+   "tokens": []
+  },
+  {
+   "id": 29,
+   "kind": "para",
+   "start": 5414,
+   "end": 5481,
+   "text": "If you use this work, please cite both **OpenPI** and the π₀ paper:",
+   "tokens": []
+  },
+  {
+   "id": 30,
+   "kind": "heading",
+   "start": 6530,
+   "end": 6540,
+   "text": "## License",
+   "tokens": []
+  },
+  {
+   "id": 31,
+   "kind": "para",
+   "start": 6542,
+   "end": 6686,
+   "text": "This port follows the **Apache 2.0 License**, consistent with the original [OpenPI repository](⟦0⟧).",
+   "tokens": [
+    "https://github.com/Physical-Intelligence/openpi"
+   ]
+  }
+ ]
+}

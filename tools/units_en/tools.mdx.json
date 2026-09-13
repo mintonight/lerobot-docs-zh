@@ -1,0 +1,281 @@
+{
+ "file": "tools.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1931,
+   "text": "# Tools",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1933,
+   "end": 2153,
+   "text": "LeRobot v3.1 supports **tool calls** in policies — assistant messages can\nemit structured invocations like ⟦0⟧ that the\nruntime dispatches to a real implementation (TTS, controller, logger, …).",
+   "tokens": [
+    "`say(text=\"OK, starting now\")`"
+   ]
+  },
+  {
+   "id": 2,
+   "kind": "para",
+   "start": 2155,
+   "end": 2172,
+   "text": "This page covers:",
+   "tokens": []
+  },
+  {
+   "id": 3,
+   "kind": "list",
+   "start": 2174,
+   "end": 2206,
+   "text": "1. Where the tool catalog lives.",
+   "tokens": []
+  },
+  {
+   "id": 4,
+   "kind": "list",
+   "start": 2207,
+   "end": 2263,
+   "text": "2. How the annotation pipeline produces tool-call atoms.",
+   "tokens": []
+  },
+  {
+   "id": 5,
+   "kind": "list",
+   "start": 2264,
+   "end": 2292,
+   "text": "3. How to add your own tool.",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "heading",
+   "start": 2294,
+   "end": 2321,
+   "text": "## Where tools are declared",
+   "tokens": []
+  },
+  {
+   "id": 7,
+   "kind": "para",
+   "start": 2323,
+   "end": 2334,
+   "text": "Two layers.",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "para",
+   "start": 2336,
+   "end": 2456,
+   "text": "**The catalog** — a list of OpenAI-style function schemas — lives at\n⟦0⟧ on each dataset. Example:",
+   "tokens": [
+    "`meta/info.json[\"tools\"]`"
+   ]
+  },
+  {
+   "id": 9,
+   "kind": "para",
+   "start": 2956,
+   "end": 2998,
+   "text": "Read it via the dataset metadata accessor:",
+   "tokens": []
+  },
+  {
+   "id": 10,
+   "kind": "para",
+   "start": 3223,
+   "end": 3505,
+   "text": "If the dataset's ⟦0⟧ doesn't declare any tools, ⟦1⟧\nreturns ⟦2⟧ from ⟦3⟧ — currently a\nsingle-entry list with the canonical ⟦4⟧ schema. So unannotated\ndatasets and chat-template consumers keep working without any\nconfiguration:",
+   "tokens": [
+    "`info.json`",
+    "`meta.tools`",
+    "`DEFAULT_TOOLS`",
+    "`lerobot.datasets.language`",
+    "`say`"
+   ]
+  },
+  {
+   "id": 11,
+   "kind": "para",
+   "start": 3702,
+   "end": 4035,
+   "text": "**The implementations** — runnable Python — will live under\n⟦0⟧, one file per tool. The runtime dispatcher and\nthe canonical ⟦1⟧ implementation (wrapping Kyutai's pocket-tts) are\nnot part of the catalog layer described here; today this layer ships\nonly the schema storage and the ⟦2⟧ fallback constant.",
+   "tokens": [
+    "`src/lerobot/tools/`",
+    "`say`",
+    "`DEFAULT_TOOLS`"
+   ]
+  },
+  {
+   "id": 12,
+   "kind": "heading",
+   "start": 4037,
+   "end": 4066,
+   "text": "## Per-row tool _invocations_",
+   "tokens": []
+  },
+  {
+   "id": 13,
+   "kind": "para",
+   "start": 4068,
+   "end": 4246,
+   "text": "The catalog above describes _what can be called_. The actual _call_ — the\nfunction name plus the argument values — is stored per-row, on the\nassistant atoms in ⟦0⟧:",
+   "tokens": [
+    "`language_events`"
+   ]
+  },
+  {
+   "id": 14,
+   "kind": "para",
+   "start": 4486,
+   "end": 4552,
+   "text": "Recipes splice these into rendered messages via ⟦0⟧:",
+   "tokens": [
+    "`tool_calls_from`"
+   ]
+  },
+  {
+   "id": 15,
+   "kind": "para",
+   "start": 4899,
+   "end": 5140,
+   "text": "The model's training target is one assistant turn that carries both the\nplan text _and_ the ⟦0⟧ tool call. At inference, the runtime parses\nthe generated text back into structured ⟦1⟧ and dispatches to\nthe matching implementation.",
+   "tokens": [
+    "`say`",
+    "`tool_calls`"
+   ]
+  },
+  {
+   "id": 16,
+   "kind": "heading",
+   "start": 5142,
+   "end": 5169,
+   "text": "## How to add your own tool",
+   "tokens": []
+  },
+  {
+   "id": 17,
+   "kind": "quote",
+   "start": 5171,
+   "end": 5612,
+   "text": "> **Note:** Steps 2 and 3 below describe the runtime layer\n> (⟦0⟧, the ⟦1⟧ protocol, ⟦2⟧,\n> ⟦3⟧) which is not part of the catalog layer shipped\n> today — those modules don't yet exist in the tree. Step 1 alone is\n> enough to make the tool visible to the chat template via\n> ⟦4⟧ so the model can learn to _generate_ the call;\n> executing the call at inference requires the runtime layer.",
+   "tokens": [
+    "`src/lerobot/tools/`",
+    "`Tool`",
+    "`TOOL_REGISTRY`",
+    "`get_tools(meta)`",
+    "`meta.tools`"
+   ]
+  },
+  {
+   "id": 18,
+   "kind": "para",
+   "start": 5614,
+   "end": 5758,
+   "text": "Three steps. Concrete example: a ⟦0⟧ tool the policy\ncan call to capture an extra observation outside the regular control\nloop.",
+   "tokens": [
+    "`record_observation`"
+   ]
+  },
+  {
+   "id": 19,
+   "kind": "heading",
+   "start": 5760,
+   "end": 5791,
+   "text": "### Step 1 — declare the schema",
+   "tokens": []
+  },
+  {
+   "id": 20,
+   "kind": "para",
+   "start": 5793,
+   "end": 5990,
+   "text": "Add an entry under ⟦0⟧. Either edit the file\ndirectly on disk _before_ running the annotation pipeline (it'll be\npreserved) or hand it to ⟦1⟧ via a config flag.",
+   "tokens": [
+    "`meta/info.json[\"tools\"]`",
+    "`lerobot-annotate`"
+   ]
+  },
+  {
+   "id": 21,
+   "kind": "para",
+   "start": 6547,
+   "end": 6656,
+   "text": "The schema follows OpenAI's function-calling convention exactly, so the\nchat template can render it natively.",
+   "tokens": []
+  },
+  {
+   "id": 22,
+   "kind": "heading",
+   "start": 6658,
+   "end": 6689,
+   "text": "### Step 2 — implement the call",
+   "tokens": []
+  },
+  {
+   "id": 23,
+   "kind": "para",
+   "start": 6691,
+   "end": 6740,
+   "text": "Create ⟦0⟧:",
+   "tokens": [
+    "`src/lerobot/tools/record_observation.py`"
+   ]
+  },
+  {
+   "id": 24,
+   "kind": "para",
+   "start": 7298,
+   "end": 7490,
+   "text": "One file per tool keeps dependencies isolated — ⟦0⟧\nmight pull ⟦1⟧, while ⟦2⟧ pulls ⟦3⟧. Users installing\nonly the tools they need avoid heavy transitive deps.",
+   "tokens": [
+    "`record_observation`",
+    "`pillow`",
+    "`say`",
+    "`pocket-tts`"
+   ]
+  },
+  {
+   "id": 25,
+   "kind": "heading",
+   "start": 7492,
+   "end": 7516,
+   "text": "### Step 3 — register it",
+   "tokens": []
+  },
+  {
+   "id": 26,
+   "kind": "para",
+   "start": 7518,
+   "end": 7557,
+   "text": "Add to ⟦0⟧:",
+   "tokens": [
+    "`src/lerobot/tools/registry.py`"
+   ]
+  },
+  {
+   "id": 27,
+   "kind": "para",
+   "start": 7689,
+   "end": 7876,
+   "text": "That's it. At runtime ⟦0⟧ looks up each schema in\n⟦1⟧, instantiates the matching registered class, and returns\na name → instance dict the dispatcher can route into.",
+   "tokens": [
+    "`get_tools(meta)`",
+    "`meta.tools`"
+   ]
+  },
+  {
+   "id": 28,
+   "kind": "para",
+   "start": 7878,
+   "end": 8136,
+   "text": "If you want to use a tool _without_ writing an implementation (e.g. for\ntraining-time chat-template formatting only), step 1 alone is enough —\nthe model still learns to _generate_ the call. Steps 2 and 3 are only\nneeded to actually _execute_ it at inference.",
+   "tokens": []
+  }
+ ]
+}

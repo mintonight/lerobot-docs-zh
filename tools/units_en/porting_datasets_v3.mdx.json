@@ -1,0 +1,741 @@
+{
+ "file": "porting_datasets_v3.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1972,
+   "text": "# Porting Large Datasets to LeRobot Dataset v3.0",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1974,
+   "end": 2235,
+   "text": "This tutorial explains how to port large-scale robotic datasets to the LeRobot Dataset v3.0 format. We'll use the **DROID 1.0.1** dataset as our primary example, which demonstrates handling multi-terabyte datasets with thousands of shards across SLURM clusters.",
+   "tokens": []
+  },
+  {
+   "id": 2,
+   "kind": "heading",
+   "start": 2237,
+   "end": 2271,
+   "text": "## File Organization: v2.1 vs v3.0",
+   "tokens": []
+  },
+  {
+   "id": 3,
+   "kind": "para",
+   "start": 2273,
+   "end": 2341,
+   "text": "Dataset v3.0 fundamentally changes how data is organized and stored:",
+   "tokens": []
+  },
+  {
+   "id": 4,
+   "kind": "para",
+   "start": 2343,
+   "end": 2378,
+   "text": "**v2.1 Structure (Episode-based)**:",
+   "tokens": []
+  },
+  {
+   "id": 5,
+   "kind": "para",
+   "start": 2553,
+   "end": 2585,
+   "text": "**v3.0 Structure (File-based)**:",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "para",
+   "start": 2816,
+   "end": 2946,
+   "text": "This transition from individual episode files to file-based chunks dramatically improves performance and reduces storage overhead.",
+   "tokens": []
+  },
+  {
+   "id": 7,
+   "kind": "heading",
+   "start": 2948,
+   "end": 2977,
+   "text": "## What's New in Dataset v3.0",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "para",
+   "start": 2979,
+   "end": 3056,
+   "text": "Dataset v3.0 introduces significant improvements for handling large datasets:",
+   "tokens": []
+  },
+  {
+   "id": 9,
+   "kind": "heading",
+   "start": 3058,
+   "end": 3095,
+   "text": "### 🏗️ **Enhanced File Organization**",
+   "tokens": []
+  },
+  {
+   "id": 10,
+   "kind": "list",
+   "start": 3097,
+   "end": 3205,
+   "text": "- **File-based structure**: Episodes are now grouped into chunked files rather than individual episode files",
+   "tokens": []
+  },
+  {
+   "id": 11,
+   "kind": "list",
+   "start": 3206,
+   "end": 3261,
+   "text": "- **Configurable file sizes**: for data and video files",
+   "tokens": []
+  },
+  {
+   "id": 12,
+   "kind": "list",
+   "start": 3262,
+   "end": 3336,
+   "text": "- **Improved storage efficiency**: Better compression and reduced overhead",
+   "tokens": []
+  },
+  {
+   "id": 13,
+   "kind": "heading",
+   "start": 3338,
+   "end": 3374,
+   "text": "### 📊 **Modern Metadata Management**",
+   "tokens": []
+  },
+  {
+   "id": 14,
+   "kind": "list",
+   "start": 3376,
+   "end": 3455,
+   "text": "- **Parquet-based metadata**: Replaced JSON Lines with efficient parquet format",
+   "tokens": []
+  },
+  {
+   "id": 15,
+   "kind": "list",
+   "start": 3456,
+   "end": 3547,
+   "text": "- **Structured episode access**: Direct pandas DataFrame access via ⟦0⟧",
+   "tokens": [
+    "`dataset.meta.episodes`"
+   ]
+  },
+  {
+   "id": 16,
+   "kind": "list",
+   "start": 3548,
+   "end": 3623,
+   "text": "- **Per-episode statistics**: Enhanced statistics tracking at episode level",
+   "tokens": []
+  },
+  {
+   "id": 17,
+   "kind": "heading",
+   "start": 3625,
+   "end": 3659,
+   "text": "### 🚀 **Performance Enhancements**",
+   "tokens": []
+  },
+  {
+   "id": 18,
+   "kind": "list",
+   "start": 3661,
+   "end": 3738,
+   "text": "- **Memory-mapped access**: Improved RAM usage through PyArrow memory mapping",
+   "tokens": []
+  },
+  {
+   "id": 19,
+   "kind": "list",
+   "start": 3739,
+   "end": 3810,
+   "text": "- **Faster loading**: Significantly reduced dataset initialization time",
+   "tokens": []
+  },
+  {
+   "id": 20,
+   "kind": "list",
+   "start": 3811,
+   "end": 3884,
+   "text": "- **Better scalability**: Designed for datasets with millions of episodes",
+   "tokens": []
+  },
+  {
+   "id": 21,
+   "kind": "heading",
+   "start": 3886,
+   "end": 3902,
+   "text": "## Prerequisites",
+   "tokens": []
+  },
+  {
+   "id": 22,
+   "kind": "para",
+   "start": 3904,
+   "end": 3951,
+   "text": "Before porting large datasets, ensure you have:",
+   "tokens": []
+  },
+  {
+   "id": 23,
+   "kind": "list",
+   "start": 3953,
+   "end": 4044,
+   "text": "- **LeRobot installed** with v3.0 support. Follow our [Installation Guide](⟦0⟧).",
+   "tokens": [
+    "./installation"
+   ]
+  },
+  {
+   "id": 24,
+   "kind": "list",
+   "start": 4045,
+   "end": 4128,
+   "text": "- **Sufficient storage**: Raw datasets can be very large (e.g., DROID requires 2TB)",
+   "tokens": []
+  },
+  {
+   "id": 25,
+   "kind": "list",
+   "start": 4129,
+   "end": 4214,
+   "text": "- **Cluster access** (recommended for large datasets): SLURM or similar job scheduler",
+   "tokens": []
+  },
+  {
+   "id": 26,
+   "kind": "list",
+   "start": 4215,
+   "end": 4303,
+   "text": "- **Dataset-specific dependencies**: For DROID, you'll need TensorFlow Dataset utilities",
+   "tokens": []
+  },
+  {
+   "id": 27,
+   "kind": "heading",
+   "start": 4305,
+   "end": 4339,
+   "text": "## Understanding the DROID Dataset",
+   "tokens": []
+  },
+  {
+   "id": 28,
+   "kind": "para",
+   "start": 4341,
+   "end": 4469,
+   "text": "[DROID 1.0.1](⟦0⟧) is an excellent example of a large-scale robotic dataset:",
+   "tokens": [
+    "https://droid-dataset.github.io/droid/the-droid-dataset"
+   ]
+  },
+  {
+   "id": 29,
+   "kind": "list",
+   "start": 4471,
+   "end": 4520,
+   "text": "- **Size**: 1.7TB (RLDS format), 8.7TB (raw data)",
+   "tokens": []
+  },
+  {
+   "id": 30,
+   "kind": "list",
+   "start": 4521,
+   "end": 4580,
+   "text": "- **Structure**: 2048 pre-defined TensorFlow dataset shards",
+   "tokens": []
+  },
+  {
+   "id": 31,
+   "kind": "list",
+   "start": 4581,
+   "end": 4666,
+   "text": "- **Content**: 76,000+ robot manipulation trajectories from Franka Emika Panda robots",
+   "tokens": []
+  },
+  {
+   "id": 32,
+   "kind": "list",
+   "start": 4667,
+   "end": 4750,
+   "text": "- **Scope**: Real-world manipulation tasks across multiple environments and objects",
+   "tokens": []
+  },
+  {
+   "id": 33,
+   "kind": "list",
+   "start": 4751,
+   "end": 4849,
+   "text": "- **Format**: Originally in TensorFlow Records/RLDS format, requiring conversion to LeRobot format",
+   "tokens": []
+  },
+  {
+   "id": 34,
+   "kind": "list",
+   "start": 4850,
+   "end": 4917,
+   "text": "- **Hosting**: Google Cloud Storage with public access via ⟦0⟧",
+   "tokens": [
+    "`gsutil`"
+   ]
+  },
+  {
+   "id": 35,
+   "kind": "para",
+   "start": 4919,
+   "end": 4981,
+   "text": "The dataset contains diverse manipulation demonstrations with:",
+   "tokens": []
+  },
+  {
+   "id": 36,
+   "kind": "list",
+   "start": 4983,
+   "end": 5039,
+   "text": "- Multiple camera views (wrist camera, exterior cameras)",
+   "tokens": []
+  },
+  {
+   "id": 37,
+   "kind": "list",
+   "start": 5040,
+   "end": 5076,
+   "text": "- Natural language task descriptions",
+   "tokens": []
+  },
+  {
+   "id": 38,
+   "kind": "list",
+   "start": 5077,
+   "end": 5117,
+   "text": "- Robot proprioceptive state and actions",
+   "tokens": []
+  },
+  {
+   "id": 39,
+   "kind": "list",
+   "start": 5118,
+   "end": 5147,
+   "text": "- Success/failure annotations",
+   "tokens": []
+  },
+  {
+   "id": 40,
+   "kind": "heading",
+   "start": 5149,
+   "end": 5174,
+   "text": "### DROID Features Schema",
+   "tokens": []
+  },
+  {
+   "id": 41,
+   "kind": "heading",
+   "start": 6478,
+   "end": 6516,
+   "text": "## Approach 1: Single Computer Porting",
+   "tokens": []
+  },
+  {
+   "id": 42,
+   "kind": "heading",
+   "start": 6518,
+   "end": 6550,
+   "text": "### Step 1: Install Dependencies",
+   "tokens": []
+  },
+  {
+   "id": 43,
+   "kind": "para",
+   "start": 6552,
+   "end": 6575,
+   "text": "For DROID specifically:",
+   "tokens": []
+  },
+  {
+   "id": 44,
+   "kind": "para",
+   "start": 6645,
+   "end": 6720,
+   "text": "For other datasets, install the appropriate readers for your source format.",
+   "tokens": []
+  },
+  {
+   "id": 45,
+   "kind": "heading",
+   "start": 6722,
+   "end": 6751,
+   "text": "### Step 2: Download Raw Data",
+   "tokens": []
+  },
+  {
+   "id": 46,
+   "kind": "para",
+   "start": 6753,
+   "end": 6809,
+   "text": "Download DROID from Google Cloud Storage using ⟦0⟧:",
+   "tokens": [
+    "`gsutil`"
+   ]
+  },
+  {
+   "id": 47,
+   "kind": "quote",
+   "start": 7149,
+   "end": 7216,
+   "text": "> [!WARNING]\n> Large datasets require substantial time and storage:",
+   "tokens": []
+  },
+  {
+   "id": 48,
+   "kind": "quote",
+   "start": 7219,
+   "end": 7477,
+   "text": "> - **Full DROID (1.7TB)**: Several days to download depending on bandwidth\n> - **Processing time**: 7+ days for local porting of full dataset\n> - **Upload time**: 3+ days to push to Hugging Face Hub\n> - **Local storage**: ~400GB for processed LeRobot format",
+   "tokens": []
+  },
+  {
+   "id": 49,
+   "kind": "heading",
+   "start": 7479,
+   "end": 7507,
+   "text": "### Step 3: Port the Dataset",
+   "tokens": []
+  },
+  {
+   "id": 50,
+   "kind": "heading",
+   "start": 7661,
+   "end": 7688,
+   "text": "### Development and Testing",
+   "tokens": []
+  },
+  {
+   "id": 51,
+   "kind": "para",
+   "start": 7690,
+   "end": 7735,
+   "text": "For development, you can port a single shard:",
+   "tokens": []
+  },
+  {
+   "id": 52,
+   "kind": "para",
+   "start": 7920,
+   "end": 8018,
+   "text": "This approach works for smaller datasets or testing, but large datasets require cluster computing.",
+   "tokens": []
+  },
+  {
+   "id": 53,
+   "kind": "heading",
+   "start": 8020,
+   "end": 8070,
+   "text": "## Approach 2: SLURM Cluster Porting (Recommended)",
+   "tokens": []
+  },
+  {
+   "id": 54,
+   "kind": "para",
+   "start": 8072,
+   "end": 8182,
+   "text": "For large datasets like DROID, parallel processing across multiple nodes dramatically reduces processing time.",
+   "tokens": []
+  },
+  {
+   "id": 55,
+   "kind": "heading",
+   "start": 8184,
+   "end": 8224,
+   "text": "### Step 1: Install Cluster Dependencies",
+   "tokens": []
+  },
+  {
+   "id": 56,
+   "kind": "heading",
+   "start": 8310,
+   "end": 8354,
+   "text": "### Step 2: Configure Your SLURM Environment",
+   "tokens": []
+  },
+  {
+   "id": 57,
+   "kind": "para",
+   "start": 8356,
+   "end": 8388,
+   "text": "Find your partition information:",
+   "tokens": []
+  },
+  {
+   "id": 58,
+   "kind": "para",
+   "start": 8524,
+   "end": 8587,
+   "text": "Choose a **CPU partition** - no GPU needed for dataset porting.",
+   "tokens": []
+  },
+  {
+   "id": 59,
+   "kind": "heading",
+   "start": 8589,
+   "end": 8629,
+   "text": "### Step 3: Launch Parallel Porting Jobs",
+   "tokens": []
+  },
+  {
+   "id": 60,
+   "kind": "heading",
+   "start": 8930,
+   "end": 8955,
+   "text": "#### Parameter Guidelines",
+   "tokens": []
+  },
+  {
+   "id": 61,
+   "kind": "list",
+   "start": 8957,
+   "end": 9034,
+   "text": "- **⟦0⟧**: Number of parallel jobs (max 2048 for DROID's shard count)",
+   "tokens": [
+    "`--workers`"
+   ]
+  },
+  {
+   "id": 62,
+   "kind": "list",
+   "start": 9035,
+   "end": 9113,
+   "text": "- **⟦0⟧**: 8 CPUs recommended for frame encoding parallelization",
+   "tokens": [
+    "`--cpus-per-task`"
+   ]
+  },
+  {
+   "id": 63,
+   "kind": "list",
+   "start": 9114,
+   "end": 9185,
+   "text": "- **⟦0⟧**: ~16GB total RAM (8×1950M) for loading raw frames",
+   "tokens": [
+    "`--mem-per-cpu`"
+   ]
+  },
+  {
+   "id": 64,
+   "kind": "quote",
+   "start": 9187,
+   "end": 9305,
+   "text": "> [!TIP]\n> Start with fewer workers (e.g., 100) to test your cluster configuration before launching thousands of jobs.",
+   "tokens": []
+  },
+  {
+   "id": 65,
+   "kind": "heading",
+   "start": 9307,
+   "end": 9335,
+   "text": "### Step 4: Monitor Progress",
+   "tokens": []
+  },
+  {
+   "id": 66,
+   "kind": "para",
+   "start": 9337,
+   "end": 9356,
+   "text": "Check running jobs:",
+   "tokens": []
+  },
+  {
+   "id": 67,
+   "kind": "para",
+   "start": 9387,
+   "end": 9412,
+   "text": "Monitor overall progress:",
+   "tokens": []
+  },
+  {
+   "id": 68,
+   "kind": "para",
+   "start": 9450,
+   "end": 9478,
+   "text": "Inspect individual job logs:",
+   "tokens": []
+  },
+  {
+   "id": 69,
+   "kind": "para",
+   "start": 9552,
+   "end": 9570,
+   "text": "Debug failed jobs:",
+   "tokens": []
+  },
+  {
+   "id": 70,
+   "kind": "heading",
+   "start": 9619,
+   "end": 9647,
+   "text": "### Step 5: Aggregate Shards",
+   "tokens": []
+  },
+  {
+   "id": 71,
+   "kind": "para",
+   "start": 9649,
+   "end": 9680,
+   "text": "Once all porting jobs complete:",
+   "tokens": []
+  },
+  {
+   "id": 72,
+   "kind": "heading",
+   "start": 9947,
+   "end": 9972,
+   "text": "### Step 6: Upload to Hub",
+   "tokens": []
+  },
+  {
+   "id": 73,
+   "kind": "quote",
+   "start": 10229,
+   "end": 10323,
+   "text": "> [!NOTE]\n> Upload uses fewer workers (50) since it's network-bound rather than compute-bound.",
+   "tokens": []
+  },
+  {
+   "id": 74,
+   "kind": "heading",
+   "start": 10325,
+   "end": 10355,
+   "text": "## Dataset v3.0 File Structure",
+   "tokens": []
+  },
+  {
+   "id": 75,
+   "kind": "para",
+   "start": 10357,
+   "end": 10412,
+   "text": "Your completed dataset will have this modern structure:",
+   "tokens": []
+  },
+  {
+   "id": 76,
+   "kind": "para",
+   "start": 10922,
+   "end": 11010,
+   "text": "This replaces the old episode-per-file structure with efficient, optimally-sized chunks.",
+   "tokens": []
+  },
+  {
+   "id": 77,
+   "kind": "heading",
+   "start": 11012,
+   "end": 11042,
+   "text": "## Migrating from Dataset v2.1",
+   "tokens": []
+  },
+  {
+   "id": 78,
+   "kind": "para",
+   "start": 11044,
+   "end": 11113,
+   "text": "If you have existing datasets in v2.1 format, use the migration tool:",
+   "tokens": []
+  },
+  {
+   "id": 79,
+   "kind": "para",
+   "start": 11226,
+   "end": 11245,
+   "text": "This automatically:",
+   "tokens": []
+  },
+  {
+   "id": 80,
+   "kind": "list",
+   "start": 11247,
+   "end": 11287,
+   "text": "- Converts file structure to v3.0 format",
+   "tokens": []
+  },
+  {
+   "id": 81,
+   "kind": "list",
+   "start": 11288,
+   "end": 11334,
+   "text": "- Migrates metadata from JSON Lines to parquet",
+   "tokens": []
+  },
+  {
+   "id": 82,
+   "kind": "list",
+   "start": 11335,
+   "end": 11388,
+   "text": "- Aggregates statistics and creates per-episode stats",
+   "tokens": []
+  },
+  {
+   "id": 83,
+   "kind": "list",
+   "start": 11389,
+   "end": 11418,
+   "text": "- Updates version information",
+   "tokens": []
+  },
+  {
+   "id": 84,
+   "kind": "heading",
+   "start": 11420,
+   "end": 11443,
+   "text": "## Performance Benefits",
+   "tokens": []
+  },
+  {
+   "id": 85,
+   "kind": "para",
+   "start": 11445,
+   "end": 11511,
+   "text": "Dataset v3.0 provides significant improvements for large datasets:",
+   "tokens": []
+  },
+  {
+   "id": 86,
+   "kind": "list",
+   "start": 11513,
+   "end": 11572,
+   "text": "- **Faster loading**: 3-5x reduction in initialization time",
+   "tokens": []
+  },
+  {
+   "id": 87,
+   "kind": "list",
+   "start": 11573,
+   "end": 11637,
+   "text": "- **Memory efficiency**: Better RAM usage through memory mapping",
+   "tokens": []
+  },
+  {
+   "id": 88,
+   "kind": "list",
+   "start": 11638,
+   "end": 11705,
+   "text": "- **Scalable processing**: Handles millions of episodes efficiently",
+   "tokens": []
+  },
+  {
+   "id": 89,
+   "kind": "list",
+   "start": 11706,
+   "end": 11777,
+   "text": "- **Storage optimization**: Reduced file count and improved compression",
+   "tokens": []
+  }
+ ]
+}

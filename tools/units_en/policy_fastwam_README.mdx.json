@@ -1,0 +1,174 @@
+{
+ "file": "policy_fastwam_README.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1784,
+   "end": 1801,
+   "text": "## Research Paper",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1803,
+   "end": 1842,
+   "text": "Paper: ⟦0⟧",
+   "tokens": [
+    "https://arxiv.org/abs/2603.16666"
+   ]
+  },
+  {
+   "id": 2,
+   "kind": "heading",
+   "start": 1844,
+   "end": 1857,
+   "text": "## Repository",
+   "tokens": []
+  },
+  {
+   "id": 3,
+   "kind": "para",
+   "start": 1859,
+   "end": 1906,
+   "text": "Code: ⟦0⟧",
+   "tokens": [
+    "https://github.com/yuantianyuan01/FastWAM"
+   ]
+  },
+  {
+   "id": 4,
+   "kind": "para",
+   "start": 1908,
+   "end": 1963,
+   "text": "Project page: ⟦0⟧",
+   "tokens": [
+    "https://yuantianyuan01.github.io/FastWAM/"
+   ]
+  },
+  {
+   "id": 5,
+   "kind": "heading",
+   "start": 1965,
+   "end": 1976,
+   "text": "## Citation",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "heading",
+   "start": 2282,
+   "end": 2305,
+   "text": "## Additional Resources",
+   "tokens": []
+  },
+  {
+   "id": 7,
+   "kind": "para",
+   "start": 2307,
+   "end": 2369,
+   "text": "Base video model: ⟦0⟧",
+   "tokens": [
+    "https://huggingface.co/Wan-AI/Wan2.2-TI2V-5B"
+   ]
+  },
+  {
+   "id": 8,
+   "kind": "para",
+   "start": 2371,
+   "end": 2439,
+   "text": "Released upstream checkpoints: ⟦0⟧",
+   "tokens": [
+    "https://huggingface.co/yuanty/fastwam"
+   ]
+  },
+  {
+   "id": 9,
+   "kind": "heading",
+   "start": 2441,
+   "end": 2451,
+   "text": "## Results",
+   "tokens": []
+  },
+  {
+   "id": 10,
+   "kind": "para",
+   "start": 2453,
+   "end": 2586,
+   "text": "Evaluated on LIBERO with [⟦0⟧](⟦1⟧):",
+   "tokens": [
+    "`ZibinDong/fastwam_libero_uncond_2cam224`",
+    "https://huggingface.co/ZibinDong/fastwam_libero_uncond_2cam224"
+   ]
+  },
+  {
+   "id": 11,
+   "kind": "table",
+   "start": 2588,
+   "end": 2634,
+   "text": "| Suite          | Success rate | n_episodes |",
+   "tokens": []
+  },
+  {
+   "id": 12,
+   "kind": "table",
+   "start": 2682,
+   "end": 2728,
+   "text": "| libero_spatial |        97.6% |        500 |",
+   "tokens": []
+  },
+  {
+   "id": 13,
+   "kind": "table",
+   "start": 2729,
+   "end": 2775,
+   "text": "| libero_object  |        99.0% |        500 |",
+   "tokens": []
+  },
+  {
+   "id": 14,
+   "kind": "table",
+   "start": 2776,
+   "end": 2822,
+   "text": "| libero_goal    |        95.0% |        500 |",
+   "tokens": []
+  },
+  {
+   "id": 15,
+   "kind": "table",
+   "start": 2823,
+   "end": 2869,
+   "text": "| libero_10      |        94.0% |        500 |",
+   "tokens": []
+  },
+  {
+   "id": 16,
+   "kind": "table",
+   "start": 2870,
+   "end": 2916,
+   "text": "| **average**    |    **96.4%** |       2000 |",
+   "tokens": []
+  },
+  {
+   "id": 17,
+   "kind": "para",
+   "start": 2918,
+   "end": 3251,
+   "text": "Reproduce: ⟦0⟧.",
+   "tokens": [
+    "`lerobot-eval --policy.path=ZibinDong/fastwam_libero_uncond_2cam224 --policy.device=cuda --policy.torch_dtype=float32 --policy.n_action_steps=10 --env.type=libero --env.task=libero_spatial --env.observation_height=256 --env.observation_width=256 --eval.batch_size=1 --eval.n_episodes=50 --seed=0 --env.episode_length=300`"
+   ]
+  },
+  {
+   "id": 18,
+   "kind": "para",
+   "start": 3253,
+   "end": 3320,
+   "text": "For LIBERO-10, use ⟦0⟧:",
+   "tokens": [
+    "`--env.task=libero_10 --env.episode_length=600`"
+   ]
+  }
+ ]
+}

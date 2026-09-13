@@ -1,0 +1,330 @@
+<script lang="ts">
+import {onMount} from "svelte";
+import Tip from "$lib/Tip.svelte";
+import CopyLLMTxtMenu from "$lib/CopyLLMTxtMenu.svelte";
+import Youtube from "$lib/Youtube.svelte";
+import Docstring from "$lib/Docstring.svelte";
+import CodeBlock from "$lib/CodeBlock.svelte";
+import CodeBlockFw from "$lib/CodeBlockFw.svelte";
+import DocNotebookDropdown from "$lib/DocNotebookDropdown.svelte";
+import CourseFloatingBanner from "$lib/CourseFloatingBanner.svelte";
+import IconCopyLink from "$lib/IconCopyLink.svelte";
+import FrameworkContent from "$lib/FrameworkContent.svelte";
+import Markdown from "$lib/Markdown.svelte";
+import Question from "$lib/Question.svelte";
+import FrameworkSwitchCourse from "$lib/FrameworkSwitchCourse.svelte";
+import InferenceApi from "$lib/InferenceApi.svelte";
+import TokenizersLanguageContent from "$lib/TokenizersLanguageContent.svelte";
+import ExampleCodeBlock from "$lib/ExampleCodeBlock.svelte";
+import Added from "$lib/Added.svelte";
+import Changed from "$lib/Changed.svelte";
+import Deprecated from "$lib/Deprecated.svelte";
+import PipelineIcon from "$lib/PipelineIcon.svelte";
+import PipelineTag from "$lib/PipelineTag.svelte";
+import Heading from "$lib/Heading.svelte";
+import HfOptions from "$lib/HfOptions.svelte";
+import HfOption from "$lib/HfOption.svelte";
+import EditOnGithub from "$lib/EditOnGithub.svelte";
+import InferenceSnippet from "$lib/InferenceSnippet/InferenceSnippet.svelte";
+import MermaidChart from "$lib/MermaidChart.svelte";
+let fw: "pt" | "tf" = "pt";
+onMount(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    fw = urlParams.get("fw") || "pt";
+});
+</script>
+<svelte:head>
+  <meta name="hf:doc:metadata" content={metadata} >
+</svelte:head>
+
+<!--HF DOCBUILD BODY START-->
+
+HF_DOC_BODY_START
+
+<CopyLLMTxtMenu containerStyle="float: right; margin-left: 10px; display: inline-flex; position: relative; z-index: 10;"></CopyLLMTxtMenu>
+
+# OpenArm
+
+[OpenArm](https://openarm.dev) 是一款开源的 7DOF 仿人机械臂，专为具身人工智能（physical AI）研究和部署而设计。
+
+要获得你的 OpenArm（成品或 DIY），并加入全球社区，请在 [openarm.dev](https://openarm.dev) 浏览全球经过验证和认证的制造商。
+
+## 独特之处
+
+- **人体尺度设计**：OpenArm 采用类人体比例设计，针对身高约 160-165cm 的人进行缩放。这在实用伸展范围和可控惯量之间取得了最佳平衡，从而实现安全、灵敏的操作。
+
+- **安全至上架构**：OpenArm 采用 QDD 可反向驱动电机和高柔顺性设计，优先保障安全的人机交互，同时为真实世界任务保持实用的有效载荷能力（峰值 6.0kg / 标称 4.1kg）。
+
+- **为耐用而造**：关键结构部件采用铝和不锈钢制造，确保在重复数据采集和持续研究使用中的稳健性能。
+
+- **完全可获取与可搭建**：从 CNC 零件、3D 打印外壳到电气布线，每个组件都设计为可供研究人员和实验室购买和搭建，并提供完整的制造数据。
+
+- **实用且价格亲民**：整套双臂系统只需 6,500 美元，OpenArm 以传统仿人机器人成本的一小部分，提供了研究级的能力。
+
+## 平台要求
+
+<Tip warning={true}>
+  **仅限 Linux**：OpenArm 目前仅支持 Linux。CAN 总线 USB 适配器
+  没有 macOS 驱动，也未在 Windows 上测试过。
+</Tip>
+
+## 安全指南
+
+在操作 OpenArm 之前，请阅读[官方安全指南](https://docs.openarm.dev/getting-started/safety-guide)。要点如下：
+
+- **牢固安装**：用螺丝或夹具将机械臂固定在一个平整、稳固的表面上
+- **安全距离**：操作期间让身体部位和物体远离运动范围
+- **防护装备**：始终佩戴安全护目镜；根据需要使用额外的 PPE
+- **有效载荷限制**：不要超过规定的有效载荷限制（每只手臂峰值 6.0kg / 标称 4.1kg）
+- **紧急停止**：了解急停装置的位置和操作方法
+- **定期检查**：检查螺丝是否松动、机械限位是否损坏、是否有异常噪音以及接线是否破损
+
+## 硬件设置
+
+请遵循官方 [OpenArm 硬件文档](https://docs.openarm.dev) 了解：
+
+- 物料清单与采购
+- 3D 打印说明
+- 机械组装
+- 电气接线
+
+硬件仓库可在 [github.com/enactic/openarm](https://github.com/enactic/openarm) 获得。
+
+## CAN 总线设置
+
+OpenArm 通过 CAN 总线与 Damiao 电机通信。将 CAN 总线 USB 适配器插入 Linux PC 后，请按照 [Damiao 电机与 CAN 总线指南](./damiao) 配置接口。
+
+快速设置：
+
+```bash
+# Setup CAN interfaces
+lerobot-setup-can --mode=setup --interfaces=can0,can1
+
+# Test motor communication
+lerobot-setup-can --mode=test --interfaces=can0,can1
+```
+
+## 安装 LeRobot 🤗
+
+请遵循我们的[安装指南](./installation)，然后安装 Damiao 电机支持：
+
+```bash
+pip install -e ".[damiao]"
+```
+
+## 用法
+
+### follower arm（机器人）
+
+<hfoptions id="follower">
+<hfoption id="Command">
+
+```bash
+lerobot-calibrate \
+    --robot.type=openarm_follower \
+    --robot.port=can0 \
+    --robot.side=right \
+    --robot.id=my_openarm_follower
+```
+
+</hfoption>
+<hfoption id="API example">
+
+```python
+from lerobot.robots.openarm_follower import OpenArmFollower, OpenArmFollowerConfig
+
+config = OpenArmFollowerConfig(
+    port="can0",
+    side="right",  # or "left" for left arm
+    id="my_openarm_follower",
+)
+
+follower = OpenArmFollower(config)
+follower.connect()
+
+# Read current state
+obs = follower.get_observation()
+print(obs)
+
+# Send action (position in degrees)
+action = {
+    "joint_1.pos": 0.0,
+    "joint_2.pos": 0.0,
+    "joint_3.pos": 0.0,
+    "joint_4.pos": 45.0,
+    "joint_5.pos": 0.0,
+    "joint_6.pos": 0.0,
+    "joint_7.pos": 0.0,
+    "gripper.pos": 0.0,
+}
+follower.send_action(action)
+
+follower.disconnect()
+```
+
+</hfoption>
+</hfoptions>
+
+### leader arm（teleoperator）
+
+leader arm 用于 teleoperation——通过手动移动它来控制 follower arm。
+
+<hfoptions id="leader">
+<hfoption id="Command">
+
+```bash
+lerobot-calibrate \
+    --teleop.type=openarm_leader \
+    --teleop.port=can1 \
+    --teleop.id=my_openarm_leader
+```
+
+</hfoption>
+<hfoption id="API example">
+
+```python
+from lerobot.teleoperators.openarm_leader import OpenArmLeader, OpenArmLeaderConfig
+
+config = OpenArmLeaderConfig(
+    port="can1",
+    id="my_openarm_leader",
+    manual_control=True,  # Disable torque for manual movement
+)
+
+leader = OpenArmLeader(config)
+leader.connect()
+
+# Read current position (as action to send to follower)
+action = leader.get_action()
+print(action)
+
+leader.disconnect()
+```
+
+</hfoption>
+</hfoptions>
+
+### teleoperation
+
+要使用主从控制 teleoperation OpenArm：
+
+```bash
+lerobot-teleoperate \
+    --robot.type=openarm_follower \
+    --robot.port=can0 \
+    --robot.side=right \
+    --robot.id=my_follower \
+    --teleop.type=openarm_leader \
+    --teleop.port=can1 \
+    --teleop.id=my_leader
+```
+
+### 双臂 teleoperation
+
+要 teleoperation 带有两个 leader arm 和两个 follower arm 的双臂 OpenArm 设置：
+
+```bash
+lerobot-teleoperate \
+    --robot.type=bi_openarm_follower \
+    --robot.left_arm_config.port=can0 \
+    --robot.left_arm_config.side=left \
+    --robot.right_arm_config.port=can1 \
+    --robot.right_arm_config.side=right \
+    --robot.id=my_bimanual_follower \
+    --teleop.type=bi_openarm_leader \
+    --teleop.left_arm_config.port=can2 \
+    --teleop.right_arm_config.port=can3 \
+    --teleop.id=my_bimanual_leader
+```
+
+### 录制数据
+
+要在 teleoperation 期间录制 dataset：
+
+```bash
+lerobot-record \
+    --robot.type=openarm_follower \
+    --robot.port=can0 \
+    --robot.side=right \
+    --robot.id=my_follower \
+    --teleop.type=openarm_leader \
+    --teleop.port=can1 \
+    --teleop.id=my_leader \
+    --repo-id=my_hf_username/my_openarm_dataset \
+    --fps=30 \
+    --num-episodes=10
+```
+
+## 配置选项
+
+### follower arm 配置
+
+| 参数 | 默认值 | 描述 |
+| --------------------- | --------- | ---------------------------------------------------------- |
+| `port` | - | CAN 接口（例如 `can0`） |
+| `side` | `None` | 手臂侧：`"left"`、`"right"`，或 `None` 用于自定义限位 |
+| `use_can_fd` | `True` | 启用 CAN FD 以获得更高数据速率 |
+| `can_bitrate` | `1000000` | 标称比特率（1 Mbps） |
+| `can_data_bitrate` | `5000000` | CAN FD 数据比特率（5 Mbps） |
+| `max_relative_target` | `None` | 相对目标位置的安全限制 |
+| `position_kp` | 逐关节 | 位置控制比例增益 |
+| `position_kd` | 逐关节 | 位置控制微分增益 |
+
+### leader arm 配置
+
+| 参数 | 默认值 | 描述 |
+| ------------------ | --------- | ----------------------------------- |
+| `port` | - | CAN 接口（例如 `can1`） |
+| `manual_control` | `True` | 禁用扭矩以便手动移动 |
+| `use_can_fd` | `True` | 启用 CAN FD 以获得更高数据速率 |
+| `can_bitrate` | `1000000` | 标称比特率（1 Mbps） |
+| `can_data_bitrate` | `5000000` | CAN FD 数据比特率（5 Mbps） |
+
+## 电机配置
+
+OpenArm 使用 Damiao 电机，默认配置如下：
+
+| 关节 | 电机类型 | 发送 ID | 接收 ID |
+| --------------------------- | ---------- | ------- | ------- |
+| joint_1（肩部偏航） | DM8009 | 0x01 | 0x11 |
+| joint_2（肩部升降） | DM8009 | 0x02 | 0x12 |
+| joint_3（肩部旋转） | DM4340 | 0x03 | 0x13 |
+| joint_4（肘部屈曲） | DM4340 | 0x04 | 0x14 |
+| joint_5（腕部翻转） | DM4310 | 0x05 | 0x15 |
+| joint_6（腕部俯仰） | DM4310 | 0x06 | 0x16 |
+| joint_7（腕部旋转） | DM4310 | 0x07 | 0x17 |
+| gripper | DM4310 | 0x08 | 0x18 |
+
+## 故障排查
+
+### 电机无响应
+
+1. 检查电源连接
+2. 检查 CAN 接线（CAN-H、CAN-L、GND）
+3. 运行诊断：`lerobot-setup-can --mode=test --interfaces=can0`
+4. 更多细节请参见 [Damiao 故障排查指南](./damiao#troubleshooting)
+
+### 找不到 CAN 接口
+
+确保 CAN 接口已配置：
+
+```bash
+ip link show can0
+```
+
+## 资源
+
+- [OpenArm 官网](https://openarm.dev)
+- [OpenArm 文档](https://docs.openarm.dev)
+- [OpenArm GitHub](https://github.com/enactic/openarm)
+- [安全指南](https://docs.openarm.dev/getting-started/safety-guide)
+- [Damiao 电机与 CAN 总线](./damiao)
+
+
+
+<EditOnGithub source="https://github.com/huggingface/lerobot/blob/main/docs/source/openarm.mdx" />
+
+<!--HF DOCBUILD BODY END-->
+
+HF_DOC_BODY_END
+

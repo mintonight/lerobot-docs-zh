@@ -1,0 +1,747 @@
+{
+ "file": "openarm.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1933,
+   "text": "# OpenArm",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1935,
+   "end": 2051,
+   "text": "[OpenArm](⟦0⟧) is an open-source 7DOF humanoid arm designed for physical AI research and deployment.",
+   "tokens": [
+    "https://openarm.dev"
+   ]
+  },
+  {
+   "id": 2,
+   "kind": "para",
+   "start": 2053,
+   "end": 2215,
+   "text": "To get your OpenArm, assembled or DIY, and join the global community, browse verified and certified manufacturers worldwide at [openarm.dev](⟦0⟧).",
+   "tokens": [
+    "https://openarm.dev"
+   ]
+  },
+  {
+   "id": 3,
+   "kind": "heading",
+   "start": 2217,
+   "end": 2234,
+   "text": "## What's Unique?",
+   "tokens": []
+  },
+  {
+   "id": 4,
+   "kind": "list",
+   "start": 2236,
+   "end": 2465,
+   "text": "- **Human-Scale Design**: OpenArm is designed with human-like proportions, scaled for a person around 160-165cm tall. This provides an optimal balance between practical reach and manageable inertia for safe, responsive operation.",
+   "tokens": []
+  },
+  {
+   "id": 5,
+   "kind": "list",
+   "start": 2467,
+   "end": 2704,
+   "text": "- **Safety-First Architecture**: Built with QDD backdrivable motors and high compliance, OpenArm prioritizes safe human-robot interaction while maintaining practical payload capabilities (6.0kg peak / 4.1kg nominal) for real-world tasks.",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "list",
+   "start": 2706,
+   "end": 2899,
+   "text": "- **Built for Durability**: Critical structural components use aluminum and stainless steel construction, ensuring robust performance for repetitive data collection and continuous research use.",
+   "tokens": []
+  },
+  {
+   "id": 7,
+   "kind": "list",
+   "start": 2901,
+   "end": 3133,
+   "text": "- **Fully Accessible & Buildable**: Every component, from CNC parts and 3D-printed casings to electrical wiring is designed to be purchasable and buildable by individual researchers and labs, with complete fabrication data provided.",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "list",
+   "start": 3135,
+   "end": 3306,
+   "text": "- **Practical & Affordable**: At $6,500 USD for a complete bimanual system, OpenArm delivers research-grade capabilities at a fraction of traditional humanoid robot costs.",
+   "tokens": []
+  },
+  {
+   "id": 9,
+   "kind": "heading",
+   "start": 3308,
+   "end": 3332,
+   "text": "## Platform Requirements",
+   "tokens": []
+  },
+  {
+   "id": 10,
+   "kind": "para",
+   "start": 3334,
+   "end": 3501,
+   "text": "⟦0⟧\n  **Linux Only**: OpenArm currently only works on Linux. The CAN bus USB adapter\n  does not have macOS drivers and has not been tested on Windows.",
+   "tokens": [
+    "<Tip warning={true}>"
+   ]
+  },
+  {
+   "id": 11,
+   "kind": "heading",
+   "start": 3510,
+   "end": 3525,
+   "text": "## Safety Guide",
+   "tokens": []
+  },
+  {
+   "id": 12,
+   "kind": "para",
+   "start": 3527,
+   "end": 3660,
+   "text": "Before operating OpenArm, please read the [official safety guide](⟦0⟧). Key points:",
+   "tokens": [
+    "https://docs.openarm.dev/getting-started/safety-guide"
+   ]
+  },
+  {
+   "id": 13,
+   "kind": "list",
+   "start": 3662,
+   "end": 3751,
+   "text": "- **Secure installation**: Fasten the arm to a flat, stable surface with screws or clamps",
+   "tokens": []
+  },
+  {
+   "id": 14,
+   "kind": "list",
+   "start": 3752,
+   "end": 3845,
+   "text": "- **Safe distance**: Keep body parts and objects outside the range of motion during operation",
+   "tokens": []
+  },
+  {
+   "id": 15,
+   "kind": "list",
+   "start": 3846,
+   "end": 3930,
+   "text": "- **Protective equipment**: Always wear safety goggles; use additional PPE as needed",
+   "tokens": []
+  },
+  {
+   "id": 16,
+   "kind": "list",
+   "start": 3931,
+   "end": 4028,
+   "text": "- **Payload limits**: Do not exceed specified payload limits (6.0kg peak / 4.1kg nominal per arm)",
+   "tokens": []
+  },
+  {
+   "id": 17,
+   "kind": "list",
+   "start": 4029,
+   "end": 4111,
+   "text": "- **Emergency stop**: Know the location and operation of the emergency stop device",
+   "tokens": []
+  },
+  {
+   "id": 18,
+   "kind": "list",
+   "start": 4112,
+   "end": 4222,
+   "text": "- **Regular inspection**: Check for loose screws, damaged mechanical limits, unusual noises, and wiring damage",
+   "tokens": []
+  },
+  {
+   "id": 19,
+   "kind": "heading",
+   "start": 4224,
+   "end": 4241,
+   "text": "## Hardware Setup",
+   "tokens": []
+  },
+  {
+   "id": 20,
+   "kind": "para",
+   "start": 4243,
+   "end": 4326,
+   "text": "Follow the official [OpenArm hardware documentation](⟦0⟧) for:",
+   "tokens": [
+    "https://docs.openarm.dev"
+   ]
+  },
+  {
+   "id": 21,
+   "kind": "list",
+   "start": 4328,
+   "end": 4360,
+   "text": "- Bill of materials and sourcing",
+   "tokens": []
+  },
+  {
+   "id": 22,
+   "kind": "list",
+   "start": 4361,
+   "end": 4387,
+   "text": "- 3D printing instructions",
+   "tokens": []
+  },
+  {
+   "id": 23,
+   "kind": "list",
+   "start": 4388,
+   "end": 4409,
+   "text": "- Mechanical assembly",
+   "tokens": []
+  },
+  {
+   "id": 24,
+   "kind": "list",
+   "start": 4410,
+   "end": 4429,
+   "text": "- Electrical wiring",
+   "tokens": []
+  },
+  {
+   "id": 25,
+   "kind": "para",
+   "start": 4431,
+   "end": 4539,
+   "text": "The hardware repositories are available at [github.com/enactic/openarm](⟦0⟧).",
+   "tokens": [
+    "https://github.com/enactic/openarm"
+   ]
+  },
+  {
+   "id": 26,
+   "kind": "heading",
+   "start": 4541,
+   "end": 4557,
+   "text": "## CAN Bus Setup",
+   "tokens": []
+  },
+  {
+   "id": 27,
+   "kind": "para",
+   "start": 4559,
+   "end": 4762,
+   "text": "OpenArm uses CAN bus communication with Damiao motors. Once you have the CAN bus USB adapter plugged into your Linux PC, follow the [Damiao Motors and CAN Bus guide](⟦0⟧) to configure the interface.",
+   "tokens": [
+    "./damiao"
+   ]
+  },
+  {
+   "id": 28,
+   "kind": "para",
+   "start": 4764,
+   "end": 4776,
+   "text": "Quick setup:",
+   "tokens": []
+  },
+  {
+   "id": 29,
+   "kind": "heading",
+   "start": 4949,
+   "end": 4969,
+   "text": "## Install LeRobot 🤗",
+   "tokens": []
+  },
+  {
+   "id": 30,
+   "kind": "para",
+   "start": 4971,
+   "end": 5058,
+   "text": "Follow our [Installation Guide](⟦0⟧), then install the Damiao motor support:",
+   "tokens": [
+    "./installation"
+   ]
+  },
+  {
+   "id": 31,
+   "kind": "heading",
+   "start": 5100,
+   "end": 5108,
+   "text": "## Usage",
+   "tokens": []
+  },
+  {
+   "id": 32,
+   "kind": "heading",
+   "start": 5110,
+   "end": 5134,
+   "text": "### Follower Arm (Robot)",
+   "tokens": []
+  },
+  {
+   "id": 33,
+   "kind": "heading",
+   "start": 6047,
+   "end": 6076,
+   "text": "### Leader Arm (Teleoperator)",
+   "tokens": []
+  },
+  {
+   "id": 34,
+   "kind": "para",
+   "start": 6078,
+   "end": 6168,
+   "text": "The leader arm is used for teleoperation - manually moving it to control the follower arm.",
+   "tokens": []
+  },
+  {
+   "id": 35,
+   "kind": "heading",
+   "start": 6823,
+   "end": 6840,
+   "text": "### Teleoperation",
+   "tokens": []
+  },
+  {
+   "id": 36,
+   "kind": "para",
+   "start": 6842,
+   "end": 6894,
+   "text": "To teleoperate OpenArm with leader-follower control:",
+   "tokens": []
+  },
+  {
+   "id": 37,
+   "kind": "heading",
+   "start": 7131,
+   "end": 7157,
+   "text": "### Bimanual Teleoperation",
+   "tokens": []
+  },
+  {
+   "id": 38,
+   "kind": "para",
+   "start": 7159,
+   "end": 7237,
+   "text": "To teleoperate a bimanual OpenArm setup with two leader and two follower arms:",
+   "tokens": []
+  },
+  {
+   "id": 39,
+   "kind": "heading",
+   "start": 7670,
+   "end": 7688,
+   "text": "### Recording Data",
+   "tokens": []
+  },
+  {
+   "id": 40,
+   "kind": "para",
+   "start": 7690,
+   "end": 7731,
+   "text": "To record a dataset during teleoperation:",
+   "tokens": []
+  },
+  {
+   "id": 41,
+   "kind": "heading",
+   "start": 8052,
+   "end": 8076,
+   "text": "## Configuration Options",
+   "tokens": []
+  },
+  {
+   "id": 42,
+   "kind": "heading",
+   "start": 8078,
+   "end": 8104,
+   "text": "### Follower Configuration",
+   "tokens": []
+  },
+  {
+   "id": 43,
+   "kind": "table",
+   "start": 8106,
+   "end": 8204,
+   "text": "| Parameter             | Default   | Description                                                |",
+   "tokens": []
+  },
+  {
+   "id": 44,
+   "kind": "table",
+   "start": 8304,
+   "end": 8402,
+   "text": "| ⟦0⟧                | -         | CAN interface (e.g., ⟦1⟧)                               |",
+   "tokens": [
+    "`port`",
+    "`can0`"
+   ]
+  },
+  {
+   "id": 45,
+   "kind": "table",
+   "start": 8403,
+   "end": 8501,
+   "text": "| ⟦0⟧                | ⟦1⟧    | Arm side: ⟦2⟧, ⟦3⟧, or ⟦4⟧ for custom limits |",
+   "tokens": [
+    "`side`",
+    "`None`",
+    "`\"left\"`",
+    "`\"right\"`",
+    "`None`"
+   ]
+  },
+  {
+   "id": 46,
+   "kind": "table",
+   "start": 8502,
+   "end": 8600,
+   "text": "| ⟦0⟧          | ⟦1⟧    | Enable CAN FD for higher data rates                        |",
+   "tokens": [
+    "`use_can_fd`",
+    "`True`"
+   ]
+  },
+  {
+   "id": 47,
+   "kind": "table",
+   "start": 8601,
+   "end": 8699,
+   "text": "| ⟦0⟧         | ⟦1⟧ | Nominal bitrate (1 Mbps)                                   |",
+   "tokens": [
+    "`can_bitrate`",
+    "`1000000`"
+   ]
+  },
+  {
+   "id": 48,
+   "kind": "table",
+   "start": 8700,
+   "end": 8798,
+   "text": "| ⟦0⟧    | ⟦1⟧ | CAN FD data bitrate (5 Mbps)                               |",
+   "tokens": [
+    "`can_data_bitrate`",
+    "`5000000`"
+   ]
+  },
+  {
+   "id": 49,
+   "kind": "table",
+   "start": 8799,
+   "end": 8897,
+   "text": "| ⟦0⟧ | ⟦1⟧    | Safety limit for relative target positions                 |",
+   "tokens": [
+    "`max_relative_target`",
+    "`None`"
+   ]
+  },
+  {
+   "id": 50,
+   "kind": "table",
+   "start": 8898,
+   "end": 8996,
+   "text": "| ⟦0⟧         | Per-joint | Position control proportional gains                        |",
+   "tokens": [
+    "`position_kp`"
+   ]
+  },
+  {
+   "id": 51,
+   "kind": "table",
+   "start": 8997,
+   "end": 9095,
+   "text": "| ⟦0⟧         | Per-joint | Position control derivative gains                          |",
+   "tokens": [
+    "`position_kd`"
+   ]
+  },
+  {
+   "id": 52,
+   "kind": "heading",
+   "start": 9097,
+   "end": 9121,
+   "text": "### Leader Configuration",
+   "tokens": []
+  },
+  {
+   "id": 53,
+   "kind": "table",
+   "start": 9123,
+   "end": 9195,
+   "text": "| Parameter          | Default   | Description                         |",
+   "tokens": []
+  },
+  {
+   "id": 54,
+   "kind": "table",
+   "start": 9269,
+   "end": 9341,
+   "text": "| ⟦0⟧             | -         | CAN interface (e.g., ⟦1⟧)        |",
+   "tokens": [
+    "`port`",
+    "`can1`"
+   ]
+  },
+  {
+   "id": 55,
+   "kind": "table",
+   "start": 9342,
+   "end": 9414,
+   "text": "| ⟦0⟧   | ⟦1⟧    | Disable torque for manual movement  |",
+   "tokens": [
+    "`manual_control`",
+    "`True`"
+   ]
+  },
+  {
+   "id": 56,
+   "kind": "table",
+   "start": 9415,
+   "end": 9487,
+   "text": "| ⟦0⟧       | ⟦1⟧    | Enable CAN FD for higher data rates |",
+   "tokens": [
+    "`use_can_fd`",
+    "`True`"
+   ]
+  },
+  {
+   "id": 57,
+   "kind": "table",
+   "start": 9488,
+   "end": 9560,
+   "text": "| ⟦0⟧      | ⟦1⟧ | Nominal bitrate (1 Mbps)            |",
+   "tokens": [
+    "`can_bitrate`",
+    "`1000000`"
+   ]
+  },
+  {
+   "id": 58,
+   "kind": "table",
+   "start": 9561,
+   "end": 9633,
+   "text": "| ⟦0⟧ | ⟦1⟧ | CAN FD data bitrate (5 Mbps)        |",
+   "tokens": [
+    "`can_data_bitrate`",
+    "`5000000`"
+   ]
+  },
+  {
+   "id": 59,
+   "kind": "heading",
+   "start": 9635,
+   "end": 9657,
+   "text": "## Motor Configuration",
+   "tokens": []
+  },
+  {
+   "id": 60,
+   "kind": "para",
+   "start": 9659,
+   "end": 9727,
+   "text": "OpenArm uses Damiao motors with the following default configuration:",
+   "tokens": []
+  },
+  {
+   "id": 61,
+   "kind": "table",
+   "start": 9729,
+   "end": 9793,
+   "text": "| Joint                       | Motor Type | Send ID | Recv ID |",
+   "tokens": []
+  },
+  {
+   "id": 62,
+   "kind": "table",
+   "start": 9859,
+   "end": 9923,
+   "text": "| joint_1 (Shoulder pan)      | DM8009     | 0x01    | 0x11    |",
+   "tokens": []
+  },
+  {
+   "id": 63,
+   "kind": "table",
+   "start": 9924,
+   "end": 9988,
+   "text": "| joint_2 (Shoulder lift)     | DM8009     | 0x02    | 0x12    |",
+   "tokens": []
+  },
+  {
+   "id": 64,
+   "kind": "table",
+   "start": 9989,
+   "end": 10053,
+   "text": "| joint_3 (Shoulder rotation) | DM4340     | 0x03    | 0x13    |",
+   "tokens": []
+  },
+  {
+   "id": 65,
+   "kind": "table",
+   "start": 10054,
+   "end": 10118,
+   "text": "| joint_4 (Elbow flex)        | DM4340     | 0x04    | 0x14    |",
+   "tokens": []
+  },
+  {
+   "id": 66,
+   "kind": "table",
+   "start": 10119,
+   "end": 10183,
+   "text": "| joint_5 (Wrist roll)        | DM4310     | 0x05    | 0x15    |",
+   "tokens": []
+  },
+  {
+   "id": 67,
+   "kind": "table",
+   "start": 10184,
+   "end": 10248,
+   "text": "| joint_6 (Wrist pitch)       | DM4310     | 0x06    | 0x16    |",
+   "tokens": []
+  },
+  {
+   "id": 68,
+   "kind": "table",
+   "start": 10249,
+   "end": 10313,
+   "text": "| joint_7 (Wrist rotation)    | DM4310     | 0x07    | 0x17    |",
+   "tokens": []
+  },
+  {
+   "id": 69,
+   "kind": "table",
+   "start": 10314,
+   "end": 10378,
+   "text": "| gripper                     | DM4310     | 0x08    | 0x18    |",
+   "tokens": []
+  },
+  {
+   "id": 70,
+   "kind": "heading",
+   "start": 10380,
+   "end": 10398,
+   "text": "## Troubleshooting",
+   "tokens": []
+  },
+  {
+   "id": 71,
+   "kind": "heading",
+   "start": 10400,
+   "end": 10427,
+   "text": "### No Response from Motors",
+   "tokens": []
+  },
+  {
+   "id": 72,
+   "kind": "list",
+   "start": 10429,
+   "end": 10462,
+   "text": "1. Check power supply connections",
+   "tokens": []
+  },
+  {
+   "id": 73,
+   "kind": "list",
+   "start": 10463,
+   "end": 10503,
+   "text": "2. Verify CAN wiring (CAN-H, CAN-L, GND)",
+   "tokens": []
+  },
+  {
+   "id": 74,
+   "kind": "list",
+   "start": 10504,
+   "end": 10573,
+   "text": "3. Run diagnostics: ⟦0⟧",
+   "tokens": [
+    "`lerobot-setup-can --mode=test --interfaces=can0`"
+   ]
+  },
+  {
+   "id": 75,
+   "kind": "list",
+   "start": 10574,
+   "end": 10658,
+   "text": "4. See the [Damiao troubleshooting guide](⟦0⟧) for more details",
+   "tokens": [
+    "./damiao#troubleshooting"
+   ]
+  },
+  {
+   "id": 76,
+   "kind": "heading",
+   "start": 10660,
+   "end": 10687,
+   "text": "### CAN Interface Not Found",
+   "tokens": []
+  },
+  {
+   "id": 77,
+   "kind": "para",
+   "start": 10689,
+   "end": 10728,
+   "text": "Ensure the CAN interface is configured:",
+   "tokens": []
+  },
+  {
+   "id": 78,
+   "kind": "heading",
+   "start": 10761,
+   "end": 10773,
+   "text": "## Resources",
+   "tokens": []
+  },
+  {
+   "id": 79,
+   "kind": "list",
+   "start": 10775,
+   "end": 10815,
+   "text": "- [OpenArm Website](⟦0⟧)",
+   "tokens": [
+    "https://openarm.dev"
+   ]
+  },
+  {
+   "id": 80,
+   "kind": "list",
+   "start": 10816,
+   "end": 10867,
+   "text": "- [OpenArm Documentation](⟦0⟧)",
+   "tokens": [
+    "https://docs.openarm.dev"
+   ]
+  },
+  {
+   "id": 81,
+   "kind": "list",
+   "start": 10868,
+   "end": 10922,
+   "text": "- [OpenArm GitHub](⟦0⟧)",
+   "tokens": [
+    "https://github.com/enactic/openarm"
+   ]
+  },
+  {
+   "id": 82,
+   "kind": "list",
+   "start": 10923,
+   "end": 10994,
+   "text": "- [Safety Guide](⟦0⟧)",
+   "tokens": [
+    "https://docs.openarm.dev/getting-started/safety-guide"
+   ]
+  },
+  {
+   "id": 83,
+   "kind": "list",
+   "start": 10995,
+   "end": 11034,
+   "text": "- [Damiao Motors and CAN Bus](⟦0⟧)",
+   "tokens": [
+    "./damiao"
+   ]
+  }
+ ]
+}

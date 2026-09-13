@@ -1,0 +1,225 @@
+{
+ "file": "robomme.mdx",
+ "units": [
+  {
+   "id": 0,
+   "zh": "# RoboMME"
+  },
+  {
+   "id": 1,
+   "zh": "[RoboMME](⟦0⟧) 是基于 ManiSkill（SAPIEN）构建的、增强记忆的操作 benchmark。它评估机器人在整个 episode 中保留和使用信息的能力——计数、物体恒存、参照和模仿。"
+  },
+  {
+   "id": 2,
+   "zh": "- **16 个任务**，分布在 4 个记忆技能套件中"
+  },
+  {
+   "id": 3,
+   "zh": "- **1,600 个训练 demonstration**（每个任务 100 个，50 个验证、50 个测试）"
+  },
+  {
+   "id": 4,
+   "zh": "- **dataset**：[⟦0⟧](⟦1⟧) — LeRobot v3.0，10 fps 下 76.8 万帧"
+  },
+  {
+   "id": 5,
+   "zh": "- **simulation 器**：ManiSkill / SAPIEN，Panda 机械臂，仅支持 Linux"
+  },
+  {
+   "id": 6,
+   "zh": "## 任务"
+  },
+  {
+   "id": 7,
+   "zh": "| 套件                             | 任务                                                         |"
+  },
+  {
+   "id": 8,
+   "zh": "| **计数**（时间记忆）    | BinFill, PickXtimes, SwingXtimes, StopCube                    |"
+  },
+  {
+   "id": 9,
+   "zh": "| **恒存**（空间记忆）   | VideoUnmask, VideoUnmaskSwap, ButtonUnmask, ButtonUnmaskSwap  |"
+  },
+  {
+   "id": 10,
+   "zh": "| **参照**（物体记忆）     | PickHighlight, VideoRepick, VideoPlaceButton, VideoPlaceOrder |"
+  },
+  {
+   "id": 11,
+   "zh": "| **模仿**（程序性记忆） | MoveCube, InsertPeg, PatternLock, RouteStick                  |"
+  },
+  {
+   "id": 12,
+   "zh": "## 安装"
+  },
+  {
+   "id": 13,
+   "zh": "> RoboMME 需要 **Linux**（ManiSkill/SAPIEN 使用 Vulkan 渲染）。建议使用 Docker 来隔离依赖冲突。"
+  },
+  {
+   "id": 14,
+   "zh": "### 原生安装（Linux）"
+  },
+  {
+   "id": 15,
+   "zh": "> **依赖说明**：⟦0⟧（由 ⟦1⟧ 引入）固化了 ⟦2⟧ 和 ⟦3⟧，这会与 lerobot 的基础 ⟦4⟧ 冲突。这就是为什么 ⟦5⟧ 不是 pyproject 的额外依赖——请使用上面的覆盖安装方式，或使用下面的 Docker 方案来完全避免冲突。"
+  },
+  {
+   "id": 16,
+   "zh": "### Docker（推荐）"
+  },
+  {
+   "id": 17,
+   "zh": "该 benchmark 的 Dockerfile 基于已发布的 ⟦0⟧ 镜像扩展，然后覆盖 ⟦1⟧ 和 ⟦2⟧。就 lerobot 实际的 API 使用而言，这两个版本在运行时都是安全的。"
+  },
+  {
+   "id": 18,
+   "zh": "## 运行评估"
+  },
+  {
+   "id": 19,
+   "zh": "### 默认（单任务、单 episode）"
+  },
+  {
+   "id": 20,
+   "zh": "### 多任务评估"
+  },
+  {
+   "id": 21,
+   "zh": "通过用逗号分隔任务名称，可在一次运行中评估多个任务。使用 ⟦0⟧ 控制每个任务要评估哪些 episode。建议：测试划分中每个任务评估 50 个 episode。"
+  },
+  {
+   "id": 22,
+   "zh": "### ⟦0⟧ 的关键 CLI 选项"
+  },
+  {
+   "id": 23,
+   "zh": "| 选项               | 默认值       | 描述                                        |"
+  },
+  {
+   "id": 24,
+   "zh": "| ⟦0⟧           | ⟦1⟧  | 上面 16 个任务名称中的任意一个（逗号分隔）   |"
+  },
+  {
+   "id": 25,
+   "zh": "| ⟦0⟧  | ⟦1⟧        | ⟦2⟧、⟦3⟧ 或 ⟦4⟧                          |"
+  },
+  {
+   "id": 26,
+   "zh": "| ⟦0⟧   | ⟦1⟧ | ⟦2⟧（8 维）或 ⟦3⟧（7 维）             |"
+  },
+  {
+   "id": 27,
+   "zh": "| ⟦0⟧ | ⟦1⟧         | 每个 episode 的最大步数                              |"
+  },
+  {
+   "id": 28,
+   "zh": "| ⟦0⟧       | ⟦1⟧        | 要评估的 episode index 列表（null = ⟦2⟧） |"
+  },
+  {
+   "id": 29,
+   "zh": "## dataset"
+  },
+  {
+   "id": 30,
+   "zh": "dataset [⟦0⟧](⟦1⟧) 采用 **LeRobot v3.0 格式**，可以直接加载："
+  },
+  {
+   "id": 31,
+   "zh": "### dataset 特征"
+  },
+  {
+   "id": 32,
+   "zh": "| 特征            | 形状         | 描述                     |"
+  },
+  {
+   "id": 33,
+   "zh": "| ⟦0⟧            | (256, 256, 3) | 前置相机 RGB                |"
+  },
+  {
+   "id": 34,
+   "zh": "| ⟦0⟧      | (256, 256, 3) | 腕部相机 RGB                |"
+  },
+  {
+   "id": 35,
+   "zh": "| ⟦0⟧          | (8,)          | 关节角度 + gripper          |"
+  },
+  {
+   "id": 36,
+   "zh": "| ⟦0⟧            | (8,)          | 关节位置 + gripper state |"
+  },
+  {
+   "id": 37,
+   "zh": "| ⟦0⟧   | str           | 高层级语言标注  |"
+  },
+  {
+   "id": 38,
+   "zh": "| ⟦0⟧ | str           | 与场景关联的语言标注    |"
+  },
+  {
+   "id": 39,
+   "zh": "| ⟦0⟧    | int           | episode ID                      |"
+  },
+  {
+   "id": 40,
+   "zh": "| ⟦0⟧      | int           | episode 内的帧            |"
+  },
+  {
+   "id": 41,
+   "zh": "### 特征键对齐（训练）"
+  },
+  {
+   "id": 42,
+   "zh": "环境包装器将其相机暴露在 ⟦0⟧ 下，分别由 ⟦1⟧ 和 ⟦2⟧ 命名（默认分别为 ⟦3⟧ 和 ⟦4⟧）。⟦6⟧ 中的 ⟦5⟧ 将这两者映射到 policy 的 ⟦7⟧ 和 ⟦8⟧。state 以 ⟦9⟧ 形式暴露，并映射到 ⟦10⟧。"
+  },
+  {
+   "id": 43,
+   "zh": "dataset 的原始列与这些 policy 键不匹配，因此在 fine-tune 时需要传入 ⟦0⟧："
+  },
+  {
+   "id": 44,
+   "zh": "如果你使用不同的键名训练，请覆盖 ⟦0⟧ / ⟦1⟧，以便评估 observation 与 policy 训练时所用的键一致。"
+  },
+  {
+   "id": 45,
+   "zh": "## action space"
+  },
+  {
+   "id": 46,
+   "zh": "| 类型          | 维度 | 描述                                               |"
+  },
+  {
+   "id": 47,
+   "zh": "| ⟦0⟧ | 8   | 7 个关节角度 + 1 个 gripper（−1 闭合，+1 张开，绝对量） |"
+  },
+  {
+   "id": 48,
+   "zh": "| ⟦0⟧     | 7   | xyz + roll/pitch/yaw + gripper                            |"
+  },
+  {
+   "id": 49,
+   "zh": "通过 ⟦0⟧（默认）或 ⟦1⟧ 设置。"
+  },
+  {
+   "id": 50,
+   "zh": "## 平台说明"
+  },
+  {
+   "id": 51,
+   "zh": "- **仅支持 Linux**：ManiSkill 需要 SAPIEN/Vulkan。不支持 macOS 和 Windows。"
+  },
+  {
+   "id": 52,
+   "zh": "- **建议使用 GPU**：渲染可以在 CPU 上运行但速度较慢；CUDA + Vulkan 可提供全速。"
+  },
+  {
+   "id": 53,
+   "zh": "- **gymnasium / numpy 冲突**：参见上面的安装说明。Docker 镜像会自动处理此问题。"
+  },
+  {
+   "id": 54,
+   "zh": "- **ManiSkill 分支**：⟦0⟧ 依赖特定的 ManiSkill 分支（⟦1⟧），通过 ⟦2⟧ 包自动引入。"
+  }
+ ]
+}

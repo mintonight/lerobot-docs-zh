@@ -1,0 +1,118 @@
+{
+ "file": "peft_training.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1969,
+   "text": "# Parameter efficient fine-tuning with 🤗 PEFT",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1971,
+   "end": 2265,
+   "text": "[🤗 PEFT](⟦0⟧) (Parameter-Efficient Fine-Tuning) is a library for efficiently adapting\nlarge pretrained models such as pre-trained policies (e.g., SmolVLA, π₀, ...) to new tasks without training all\nof the model's parameters while yielding comparable performance.",
+   "tokens": [
+    "https://github.com/huggingface/peft"
+   ]
+  },
+  {
+   "id": 2,
+   "kind": "para",
+   "start": 2267,
+   "end": 2335,
+   "text": "Install the ⟦0⟧ optional package to enable PEFT support.",
+   "tokens": [
+    "`lerobot[peft]`"
+   ]
+  },
+  {
+   "id": 3,
+   "kind": "para",
+   "start": 2337,
+   "end": 2463,
+   "text": "To read about all the possible methods of adaption, please refer to the [🤗 PEFT docs](⟦0⟧).",
+   "tokens": [
+    "https://huggingface.co/docs/peft/index"
+   ]
+  },
+  {
+   "id": 4,
+   "kind": "heading",
+   "start": 2465,
+   "end": 2484,
+   "text": "## Training SmolVLA",
+   "tokens": []
+  },
+  {
+   "id": 5,
+   "kind": "para",
+   "start": 2486,
+   "end": 2739,
+   "text": "In this section we'll show you how to train a pre-trained SmolVLA policy with PEFT on the libero dataset.\nFor brevity we're only training on the ⟦0⟧ subset. We will use ⟦1⟧ as the model\nto parameter efficiently fine-tune:",
+   "tokens": [
+    "`libero_spatial`",
+    "`lerobot/smolvla_base`"
+   ]
+  },
+  {
+   "id": 6,
+   "kind": "para",
+   "start": 3181,
+   "end": 3757,
+   "text": "Note the ⟦0⟧ parameter that let's you select which PEFT method to use. Here we use\n[LoRA](⟦1⟧) (Low-Rank Adapter) which is probably the most\npopular fine-tuning method to date. Low-rank adaption means that we only fine-tune a matrix with comparably low rank\ninstead of the full weight matrix. This rank can be specified using the ⟦2⟧ parameter, and the LoRA scaling factor with\n⟦3⟧ (where ⟦4⟧). The higher the rank\nthe closer you get to full fine-tuning",
+   "tokens": [
+    "`--peft.method_type`",
+    "https://huggingface.co/docs/peft/main/en/package_reference/lora",
+    "`--peft.r`",
+    "`--peft.lora_alpha`",
+    "`scaling = lora_alpha / r`"
+   ]
+  },
+  {
+   "id": 7,
+   "kind": "para",
+   "start": 3759,
+   "end": 3926,
+   "text": "There are more complex methods that have more parameters. These are not yet supported, feel free to raise an issue\nif you want to see a specific PEFT method supported.",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "para",
+   "start": 3928,
+   "end": 4615,
+   "text": "By default, PEFT will target the ⟦0⟧ and ⟦1⟧ layers of the LM expert in SmolVLA. It will also target the\nstate and action projection matrices as they are most likely task-dependent. If you need to target different layers\nyou can use ⟦2⟧ to specify which layers to target. You can refer to the respective PEFT method's\ndocumentation to see what inputs are supported, (e.g., [LoRA's target_modules documentation](⟦3⟧)).\nUsually a list of suffixes or a regex are supported. For example, to target the MLPs of the ⟦4⟧ instead of\nthe ⟦5⟧ and ⟦6⟧ projections, use:",
+   "tokens": [
+    "`q_proj`",
+    "`v_proj`",
+    "`--peft.target_modules`",
+    "https://huggingface.co/docs/peft/main/en/package_reference/lora#peft.LoraConfig.target_modules",
+    "`lm_expert`",
+    "`q`",
+    "`v`"
+   ]
+  },
+  {
+   "id": 9,
+   "kind": "para",
+   "start": 4798,
+   "end": 4959,
+   "text": "In case you need to fully fine-tune a layer instead of just adapting it, you can supply a list of layer suffixes\nto the ⟦0⟧ parameter:",
+   "tokens": [
+    "`--peft.full_training_modules`"
+   ]
+  },
+  {
+   "id": 10,
+   "kind": "para",
+   "start": 5014,
+   "end": 5207,
+   "text": "The learning rate and the scheduled target learning rate can usually be scaled by a factor of 10 compared to the\nlearning rate used for full fine-tuning (e.g., 1e-4 normal, so 1e-3 using LoRA).",
+   "tokens": []
+  }
+ ]
+}

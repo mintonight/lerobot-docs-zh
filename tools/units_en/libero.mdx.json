@@ -1,0 +1,661 @@
+{
+ "file": "libero.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1932,
+   "text": "# LIBERO",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1934,
+   "end": 2398,
+   "text": "LIBERO is a benchmark designed to study **lifelong robot learning** — the idea that robots need to keep learning and adapting with their users over time, not just be pretrained once. It provides a set of standardized manipulation tasks that focus on **knowledge transfer**: how well a robot can apply what it has already learned to new situations. By evaluating on LIBERO, different algorithms can be compared fairly and researchers can build on each other's work.",
+   "tokens": []
+  },
+  {
+   "id": 2,
+   "kind": "list",
+   "start": 2400,
+   "end": 2504,
+   "text": "- Paper: [Benchmarking Knowledge Transfer for Lifelong Robot Learning](⟦0⟧)",
+   "tokens": [
+    "https://arxiv.org/abs/2306.03310"
+   ]
+  },
+  {
+   "id": 3,
+   "kind": "list",
+   "start": 2505,
+   "end": 2598,
+   "text": "- GitHub: [Lifelong-Robot-Learning/LIBERO](⟦0⟧)",
+   "tokens": [
+    "https://github.com/Lifelong-Robot-Learning/LIBERO"
+   ]
+  },
+  {
+   "id": 4,
+   "kind": "list",
+   "start": 2599,
+   "end": 2678,
+   "text": "- Project website: [libero-project.github.io](⟦0⟧)",
+   "tokens": [
+    "https://libero-project.github.io"
+   ]
+  },
+  {
+   "id": 5,
+   "kind": "heading",
+   "start": 2781,
+   "end": 2799,
+   "text": "## Available tasks",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "para",
+   "start": 2801,
+   "end": 2935,
+   "text": "LIBERO includes **five task suites** covering **130 tasks**, ranging from simple object manipulations to complex multi-step scenarios:",
+   "tokens": []
+  },
+  {
+   "id": 7,
+   "kind": "table",
+   "start": 2937,
+   "end": 3035,
+   "text": "| Suite          | CLI name         | Tasks | Description                                        |",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "table",
+   "start": 3135,
+   "end": 3233,
+   "text": "| LIBERO-Spatial | ⟦0⟧ | 10    | Tasks requiring reasoning about spatial relations  |",
+   "tokens": [
+    "`libero_spatial`"
+   ]
+  },
+  {
+   "id": 9,
+   "kind": "table",
+   "start": 3234,
+   "end": 3332,
+   "text": "| LIBERO-Object  | ⟦0⟧  | 10    | Tasks centered on manipulating different objects   |",
+   "tokens": [
+    "`libero_object`"
+   ]
+  },
+  {
+   "id": 10,
+   "kind": "table",
+   "start": 3333,
+   "end": 3431,
+   "text": "| LIBERO-Goal    | ⟦0⟧    | 10    | Goal-conditioned tasks with changing targets       |",
+   "tokens": [
+    "`libero_goal`"
+   ]
+  },
+  {
+   "id": 11,
+   "kind": "table",
+   "start": 3432,
+   "end": 3530,
+   "text": "| LIBERO-90      | ⟦0⟧      | 90    | Short-horizon tasks from the LIBERO-100 collection |",
+   "tokens": [
+    "`libero_90`"
+   ]
+  },
+  {
+   "id": 12,
+   "kind": "table",
+   "start": 3531,
+   "end": 3629,
+   "text": "| LIBERO-Long    | ⟦0⟧      | 10    | Long-horizon tasks from the LIBERO-100 collection  |",
+   "tokens": [
+    "`libero_10`"
+   ]
+  },
+  {
+   "id": 13,
+   "kind": "heading",
+   "start": 3631,
+   "end": 3646,
+   "text": "## Installation",
+   "tokens": []
+  },
+  {
+   "id": 14,
+   "kind": "para",
+   "start": 3648,
+   "end": 3702,
+   "text": "After following the LeRobot installation instructions:",
+   "tokens": []
+  },
+  {
+   "id": 15,
+   "kind": "para",
+   "start": 3744,
+   "end": 3894,
+   "text": "⟦0⟧\nLIBERO requires Linux (⟦1⟧). LeRobot uses MuJoCo for simulation — set the rendering backend before training or evaluation:",
+   "tokens": [
+    "<Tip>",
+    "`sys_platform == 'linux'`"
+   ]
+  },
+  {
+   "id": 16,
+   "kind": "heading",
+   "start": 3975,
+   "end": 3988,
+   "text": "## Evaluation",
+   "tokens": []
+  },
+  {
+   "id": 17,
+   "kind": "heading",
+   "start": 3990,
+   "end": 4026,
+   "text": "### Default evaluation (recommended)",
+   "tokens": []
+  },
+  {
+   "id": 18,
+   "kind": "para",
+   "start": 4028,
+   "end": 4092,
+   "text": "Evaluate across the four standard suites (10 episodes per task):",
+   "tokens": []
+  },
+  {
+   "id": 19,
+   "kind": "heading",
+   "start": 4323,
+   "end": 4350,
+   "text": "### Single-suite evaluation",
+   "tokens": []
+  },
+  {
+   "id": 20,
+   "kind": "para",
+   "start": 4352,
+   "end": 4381,
+   "text": "Evaluate on one LIBERO suite:",
+   "tokens": []
+  },
+  {
+   "id": 21,
+   "kind": "list",
+   "start": 4543,
+   "end": 4616,
+   "text": "- ⟦0⟧ picks the suite (⟦1⟧, ⟦2⟧, etc.).",
+   "tokens": [
+    "`--env.task`",
+    "`libero_object`",
+    "`libero_spatial`"
+   ]
+  },
+  {
+   "id": 22,
+   "kind": "list",
+   "start": 4617,
+   "end": 4732,
+   "text": "- ⟦0⟧ restricts to specific task indices (⟦1⟧, ⟦2⟧, etc.). Omit to run all tasks in the suite.",
+   "tokens": [
+    "`--env.task_ids`",
+    "`[0]`",
+    "`[1,2,3]`"
+   ]
+  },
+  {
+   "id": 23,
+   "kind": "list",
+   "start": 4733,
+   "end": 4802,
+   "text": "- ⟦0⟧ controls how many environments run in parallel.",
+   "tokens": [
+    "`--eval.batch_size`"
+   ]
+  },
+  {
+   "id": 24,
+   "kind": "list",
+   "start": 4803,
+   "end": 4864,
+   "text": "- ⟦0⟧ sets how many episodes to run per task.",
+   "tokens": [
+    "`--eval.n_episodes`"
+   ]
+  },
+  {
+   "id": 25,
+   "kind": "heading",
+   "start": 4866,
+   "end": 4892,
+   "text": "### Multi-suite evaluation",
+   "tokens": []
+  },
+  {
+   "id": 26,
+   "kind": "para",
+   "start": 4894,
+   "end": 4978,
+   "text": "Benchmark a policy across multiple suites at once by passing a comma-separated list:",
+   "tokens": []
+  },
+  {
+   "id": 27,
+   "kind": "heading",
+   "start": 5155,
+   "end": 5171,
+   "text": "### Control mode",
+   "tokens": []
+  },
+  {
+   "id": 28,
+   "kind": "para",
+   "start": 5173,
+   "end": 5367,
+   "text": "LIBERO supports two control modes — ⟦0⟧ (default) and ⟦1⟧. Different VLA checkpoints are trained with different action parameterizations, so make sure the mode matches your policy:",
+   "tokens": [
+    "`relative`",
+    "`absolute`"
+   ]
+  },
+  {
+   "id": 29,
+   "kind": "heading",
+   "start": 5428,
+   "end": 5449,
+   "text": "### Reset performance",
+   "tokens": []
+  },
+  {
+   "id": 30,
+   "kind": "para",
+   "start": 5451,
+   "end": 5644,
+   "text": "By default, LeRobot preserves LIBERO's hard-reset behavior. With fixed initial\nstates enabled, you can opt into soft resets to skip rebuilding the simulator\nmodel and renderer on every episode:",
+   "tokens": []
+  },
+  {
+   "id": 31,
+   "kind": "para",
+   "start": 5705,
+   "end": 5923,
+   "text": "Soft resets are faster but are not bit-identical to hard resets after the\nenvironment's settling steps, so camera observations and policy results may\ndiffer slightly. Use hard resets when reproducing benchmark results.",
+   "tokens": []
+  },
+  {
+   "id": 32,
+   "kind": "heading",
+   "start": 5925,
+   "end": 5954,
+   "text": "### Policy inputs and outputs",
+   "tokens": []
+  },
+  {
+   "id": 33,
+   "kind": "para",
+   "start": 5956,
+   "end": 5973,
+   "text": "**Observations:**",
+   "tokens": []
+  },
+  {
+   "id": 34,
+   "kind": "list",
+   "start": 5975,
+   "end": 6081,
+   "text": "- ⟦0⟧ — 8-dim proprioceptive features (eef position, axis-angle orientation, gripper qpos)",
+   "tokens": [
+    "`observation.state`"
+   ]
+  },
+  {
+   "id": 35,
+   "kind": "list",
+   "start": 6082,
+   "end": 6160,
+   "text": "- ⟦0⟧ — main camera view (⟦1⟧), HWC uint8",
+   "tokens": [
+    "`observation.images.image`",
+    "`agentview_image`"
+   ]
+  },
+  {
+   "id": 36,
+   "kind": "list",
+   "start": 6161,
+   "end": 6250,
+   "text": "- ⟦0⟧ — wrist camera view (⟦1⟧), HWC uint8",
+   "tokens": [
+    "`observation.images.image2`",
+    "`robot0_eye_in_hand_image`"
+   ]
+  },
+  {
+   "id": 37,
+   "kind": "para",
+   "start": 6252,
+   "end": 6650,
+   "text": "⟦0⟧\n  LeRobot enforces the ⟦1⟧ prefix for visual features. Ensure your\n  policy config ⟦2⟧ use the same naming keys, and that your dataset\n  metadata keys follow this convention. If your data contains different keys,\n  you must rename the observations to match what the policy expects, since\n  naming keys are encoded inside the normalization statistics layer.",
+   "tokens": [
+    "<Tip warning={true}>",
+    "`.images.*`",
+    "`input_features`"
+   ]
+  },
+  {
+   "id": 38,
+   "kind": "para",
+   "start": 6659,
+   "end": 6671,
+   "text": "**Actions:**",
+   "tokens": []
+  },
+  {
+   "id": 39,
+   "kind": "list",
+   "start": 6673,
+   "end": 6758,
+   "text": "- Continuous control in ⟦0⟧ — 6D end-effector delta + 1D gripper",
+   "tokens": [
+    "`Box(-1, 1, shape=(7,))`"
+   ]
+  },
+  {
+   "id": 40,
+   "kind": "heading",
+   "start": 6760,
+   "end": 6795,
+   "text": "### Recommended evaluation episodes",
+   "tokens": []
+  },
+  {
+   "id": 41,
+   "kind": "para",
+   "start": 6797,
+   "end": 7107,
+   "text": "For reproducible benchmarking, use **10 episodes per task** across all four standard suites (Spatial, Object, Goal, Long). This gives 400 total episodes and matches the protocol used for published results. Success rates may vary by a few percent across evaluation seeds, so we recommend averaging over 3 seeds.",
+   "tokens": []
+  },
+  {
+   "id": 42,
+   "kind": "para",
+   "start": 7109,
+   "end": 7306,
+   "text": "⟦0⟧\n  To compare two policies on the same episodes, use the same ⟦1⟧, keep\n  ⟦2⟧, and run each task in a single batch\n  (⟦3⟧ equal to episodes per task).",
+   "tokens": [
+    "<Tip>",
+    "`--seed`",
+    "`--env.init_states=true`",
+    "`--eval.batch_size`"
+   ]
+  },
+  {
+   "id": 43,
+   "kind": "heading",
+   "start": 7315,
+   "end": 7326,
+   "text": "## Training",
+   "tokens": []
+  },
+  {
+   "id": 44,
+   "kind": "heading",
+   "start": 7328,
+   "end": 7339,
+   "text": "### Dataset",
+   "tokens": []
+  },
+  {
+   "id": 45,
+   "kind": "para",
+   "start": 7341,
+   "end": 7510,
+   "text": "Two preprocessed LIBERO datasets are fully compatible with LeRobot. They contain the same demonstrations with the same schema and differ in how camera frames are stored:",
+   "tokens": []
+  },
+  {
+   "id": 46,
+   "kind": "table",
+   "start": 7512,
+   "end": 7689,
+   "text": "|                           | [lerobot/libero](⟦0⟧) | [HuggingFaceVLA/libero](⟦1⟧) |",
+   "tokens": [
+    "https://huggingface.co/datasets/lerobot/libero",
+    "https://huggingface.co/datasets/HuggingFaceVLA/libero"
+   ]
+  },
+  {
+   "id": 47,
+   "kind": "table",
+   "start": 7868,
+   "end": 8045,
+   "text": "| episodes / frames / tasks | 1,693 / 273,465 / 40                                             | 1,693 / 273,465 / 40                                                           |",
+   "tokens": []
+  },
+  {
+   "id": 48,
+   "kind": "table",
+   "start": 8046,
+   "end": 8223,
+   "text": "| cameras                   | 2× 256×256×3                                                     | 2× 256×256×3                                                                   |",
+   "tokens": []
+  },
+  {
+   "id": 49,
+   "kind": "table",
+   "start": 8224,
+   "end": 8401,
+   "text": "| state / action dims       | 8 / 7                                                            | 8 / 7                                                                          |",
+   "tokens": []
+  },
+  {
+   "id": 50,
+   "kind": "table",
+   "start": 8402,
+   "end": 8579,
+   "text": "| dataset format            | v3.0                                                             | v3.0                                                                           |",
+   "tokens": []
+  },
+  {
+   "id": 51,
+   "kind": "table",
+   "start": 8580,
+   "end": 8757,
+   "text": "| camera encoding           | MP4 video                                                        | PNG in parquet                                                                 |",
+   "tokens": []
+  },
+  {
+   "id": 52,
+   "kind": "table",
+   "start": 8758,
+   "end": 8935,
+   "text": "| download size             | **1.9 GB**                                                       | 69.9 GB                                                                        |",
+   "tokens": []
+  },
+  {
+   "id": 53,
+   "kind": "table",
+   "start": 8936,
+   "end": 9113,
+   "text": "| extra dependency          | video backend (⟦0⟧ or ⟦1⟧)                           | none                                                                           |",
+   "tokens": [
+    "`torchcodec`",
+    "`pyav`"
+   ]
+  },
+  {
+   "id": 54,
+   "kind": "para",
+   "start": 9115,
+   "end": 9398,
+   "text": "**We recommend [lerobot/libero](⟦0⟧)**: **37× smaller download** with **equivalent loading speed** (~330 samples/s per worker). Video re-encoding is slightly lossy; use the image-based variant if you cannot install a video decoding backend.",
+   "tokens": [
+    "https://huggingface.co/datasets/lerobot/libero"
+   ]
+  },
+  {
+   "id": 55,
+   "kind": "para",
+   "start": 9400,
+   "end": 9471,
+   "text": "For reference, the original dataset published by Physical Intelligence:",
+   "tokens": []
+  },
+  {
+   "id": 56,
+   "kind": "list",
+   "start": 9473,
+   "end": 9567,
+   "text": "- [physical-intelligence/libero](⟦0⟧)",
+   "tokens": [
+    "https://huggingface.co/datasets/physical-intelligence/libero"
+   ]
+  },
+  {
+   "id": 57,
+   "kind": "para",
+   "start": 9569,
+   "end": 9740,
+   "text": "⟦0⟧\nPin ⟦1⟧ when reporting results — Hub datasets can be re-uploaded, and success rates are only comparable against the same data revision.",
+   "tokens": [
+    "<Tip>",
+    "`--dataset.revision=<commit-sha>`"
+   ]
+  },
+  {
+   "id": 58,
+   "kind": "heading",
+   "start": 9749,
+   "end": 9777,
+   "text": "### Example training command",
+   "tokens": []
+  },
+  {
+   "id": 59,
+   "kind": "para",
+   "start": 9779,
+   "end": 9820,
+   "text": "Train SmolVLA on the recommended dataset:",
+   "tokens": []
+  },
+  {
+   "id": 60,
+   "kind": "para",
+   "start": 10098,
+   "end": 10315,
+   "text": "To share the result on the Hub, replace ⟦0⟧ with ⟦1⟧. Evaluate saved checkpoints with ⟦2⟧ as shown in the [Evaluation](⟦3⟧) section.",
+   "tokens": [
+    "`--policy.push_to_hub=false`",
+    "`--policy.repo_id=${HF_USER}/libero-smolvla`",
+    "`lerobot-eval`",
+    "#evaluation"
+   ]
+  },
+  {
+   "id": 61,
+   "kind": "heading",
+   "start": 10317,
+   "end": 10349,
+   "text": "## Reproducing published results",
+   "tokens": []
+  },
+  {
+   "id": 62,
+   "kind": "para",
+   "start": 10351,
+   "end": 10663,
+   "text": "We reproduce the results of Pi0.5 on the LIBERO benchmark. We take the Physical Intelligence LIBERO base model (⟦0⟧) and finetune for an additional 6k steps in bfloat16, with batch size of 256 on 8 H100 GPUs using the [HuggingFace LIBERO dataset](⟦1⟧).",
+   "tokens": [
+    "`pi05_libero`",
+    "https://huggingface.co/datasets/HuggingFaceVLA/libero"
+   ]
+  },
+  {
+   "id": 63,
+   "kind": "para",
+   "start": 10665,
+   "end": 10771,
+   "text": "The finetuned model: [lerobot/pi05_libero_finetuned](⟦0⟧)",
+   "tokens": [
+    "https://huggingface.co/lerobot/pi05_libero_finetuned"
+   ]
+  },
+  {
+   "id": 64,
+   "kind": "heading",
+   "start": 10773,
+   "end": 10795,
+   "text": "### Evaluation command",
+   "tokens": []
+  },
+  {
+   "id": 65,
+   "kind": "para",
+   "start": 11092,
+   "end": 11164,
+   "text": "We set ⟦0⟧, matching the original OpenPI implementation.",
+   "tokens": [
+    "`n_action_steps=10`"
+   ]
+  },
+  {
+   "id": 66,
+   "kind": "heading",
+   "start": 11166,
+   "end": 11177,
+   "text": "### Results",
+   "tokens": []
+  },
+  {
+   "id": 67,
+   "kind": "table",
+   "start": 11179,
+   "end": 11272,
+   "text": "| Model               | LIBERO Spatial | LIBERO Object | LIBERO Goal | LIBERO 10 | Average  |",
+   "tokens": []
+  },
+  {
+   "id": 68,
+   "kind": "table",
+   "start": 11367,
+   "end": 11460,
+   "text": "| **Pi0.5 (LeRobot)** | 97.0           | 99.0          | 98.0        | 96.0      | **97.5** |",
+   "tokens": []
+  },
+  {
+   "id": 69,
+   "kind": "para",
+   "start": 11462,
+   "end": 11636,
+   "text": "These results are consistent with the [original results](⟦0⟧) reported by Physical Intelligence:",
+   "tokens": [
+    "https://github.com/Physical-Intelligence/openpi/tree/main/examples/libero#results"
+   ]
+  },
+  {
+   "id": 70,
+   "kind": "table",
+   "start": 11638,
+   "end": 11731,
+   "text": "| Model              | LIBERO Spatial | LIBERO Object | LIBERO Goal | LIBERO 10 | Average   |",
+   "tokens": []
+  },
+  {
+   "id": 71,
+   "kind": "table",
+   "start": 11826,
+   "end": 11919,
+   "text": "| **Pi0.5 (OpenPI)** | 98.8           | 98.2          | 98.0        | 92.4      | **96.85** |",
+   "tokens": []
+  }
+ ]
+}

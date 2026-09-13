@@ -1,0 +1,431 @@
+{
+ "file": "koch.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1935,
+   "text": "# Koch v1.1",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1937,
+   "end": 2004,
+   "text": "In the steps below, we explain how to assemble the Koch v1.1 robot.",
+   "tokens": []
+  },
+  {
+   "id": 2,
+   "kind": "heading",
+   "start": 2006,
+   "end": 2037,
+   "text": "## Order and assemble the parts",
+   "tokens": []
+  },
+  {
+   "id": 3,
+   "kind": "para",
+   "start": 2039,
+   "end": 2256,
+   "text": "Follow the sourcing and assembling instructions provided in this [README](⟦0⟧). This will guide you through setting up both the follower and leader arms, as shown in the image below.",
+   "tokens": [
+    "https://github.com/jess-moss/koch-v1-1"
+   ]
+  },
+  {
+   "id": 4,
+   "kind": "para",
+   "start": 2258,
+   "end": 2377,
+   "text": "For a visual walkthrough of the assembly process, you can refer to [this video tutorial](⟦0⟧).",
+   "tokens": [
+    "https://youtu.be/8nQIg9BwwTk"
+   ]
+  },
+  {
+   "id": 5,
+   "kind": "quote",
+   "start": 2379,
+   "end": 2540,
+   "text": "> [!WARNING]\n> Since the production of this video, we simplified the configuration phase. Because of this, two things differ from the instructions in that video:",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "quote",
+   "start": 2543,
+   "end": 2835,
+   "text": "> - Don't plug in all the motor cables right away and wait to be instructed to do so in [Configure the motors](⟦0⟧).\n> - Don't screw in the controller board (PCB) to the base right away and wait for being instructed to do so in [Configure the motors](⟦1⟧).",
+   "tokens": [
+    "#configure-the-motors",
+    "#configure-the-motors"
+   ]
+  },
+  {
+   "id": 7,
+   "kind": "heading",
+   "start": 2837,
+   "end": 2857,
+   "text": "## Install LeRobot 🤗",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "para",
+   "start": 2859,
+   "end": 2926,
+   "text": "To install LeRobot follow, our [Installation Guide](⟦0⟧)",
+   "tokens": [
+    "./installation"
+   ]
+  },
+  {
+   "id": 9,
+   "kind": "para",
+   "start": 2928,
+   "end": 3001,
+   "text": "In addition to these instructions, you need to install the Dynamixel SDK:",
+   "tokens": []
+  },
+  {
+   "id": 10,
+   "kind": "heading",
+   "start": 3046,
+   "end": 3069,
+   "text": "## Configure the motors",
+   "tokens": []
+  },
+  {
+   "id": 11,
+   "kind": "heading",
+   "start": 3071,
+   "end": 3121,
+   "text": "### 1. Find the USB ports associated with each arm",
+   "tokens": []
+  },
+  {
+   "id": 12,
+   "kind": "para",
+   "start": 3123,
+   "end": 3184,
+   "text": "To find the port for each bus servo adapter, run this script:",
+   "tokens": []
+  },
+  {
+   "id": 13,
+   "kind": "para",
+   "start": 3263,
+   "end": 3278,
+   "text": "Example output:",
+   "tokens": []
+  },
+  {
+   "id": 14,
+   "kind": "para",
+   "start": 3626,
+   "end": 3727,
+   "text": "Where the found port is: ⟦0⟧ corresponding to your leader or follower arm.",
+   "tokens": [
+    "`/dev/tty.usbmodem575E0032081`"
+   ]
+  },
+  {
+   "id": 15,
+   "kind": "para",
+   "start": 3764,
+   "end": 3832,
+   "text": "On Linux, you might need to give access to the USB ports by running:",
+   "tokens": []
+  },
+  {
+   "id": 16,
+   "kind": "para",
+   "start": 3903,
+   "end": 3918,
+   "text": "Example output:",
+   "tokens": []
+  },
+  {
+   "id": 17,
+   "kind": "para",
+   "start": 4218,
+   "end": 4303,
+   "text": "Where the found port is: ⟦0⟧ corresponding to your leader or follower arm.",
+   "tokens": [
+    "`/dev/ttyACM1`"
+   ]
+  },
+  {
+   "id": 18,
+   "kind": "heading",
+   "start": 4331,
+   "end": 4370,
+   "text": "### 2. Set the motors ids and baudrates",
+   "tokens": []
+  },
+  {
+   "id": 19,
+   "kind": "para",
+   "start": 4372,
+   "end": 4829,
+   "text": "Each motor is identified by a unique id on the bus. When brand new, motors usually come with a default id of ⟦0⟧. For the communication to work properly between the motors and the controller, we first need to set a unique, different id to each motor. Additionally, the speed at which data is transmitted on the bus is determined by the baudrate. In order to talk to each other, the controller and all the motors need to be configured with the same baudrate.",
+   "tokens": [
+    "`1`"
+   ]
+  },
+  {
+   "id": 20,
+   "kind": "para",
+   "start": 4831,
+   "end": 5077,
+   "text": "To that end, we first need to connect to each motor individually with the controller in order to set these. Since we will write these parameters in the non-volatile section of the motors' internal memory (EEPROM), we'll only need to do this once.",
+   "tokens": []
+  },
+  {
+   "id": 21,
+   "kind": "para",
+   "start": 5079,
+   "end": 5222,
+   "text": "If you are repurposing motors from another robot, you will probably also need to perform this step, as the ids and baudrate likely won't match.",
+   "tokens": []
+  },
+  {
+   "id": 22,
+   "kind": "heading",
+   "start": 5224,
+   "end": 5237,
+   "text": "#### Follower",
+   "tokens": []
+  },
+  {
+   "id": 23,
+   "kind": "para",
+   "start": 5239,
+   "end": 5517,
+   "text": "Connect the usb cable from your computer and the 5V power supply to the follower arm's controller board. Then, run the following command or run the API example with the port you got from the previous step. You'll also need to give your leader arm a name with the ⟦0⟧ parameter.",
+   "tokens": [
+    "`id`"
+   ]
+  },
+  {
+   "id": 24,
+   "kind": "para",
+   "start": 5519,
+   "end": 5710,
+   "text": "For a visual reference on how to set the motor ids please refer to [this video](⟦0⟧) where we follow the process for the SO101 arm.",
+   "tokens": [
+    "https://huggingface.co/docs/lerobot/en/so101#setup-motors-video"
+   ]
+  },
+  {
+   "id": 25,
+   "kind": "para",
+   "start": 6309,
+   "end": 6350,
+   "text": "You should see the following instruction.",
+   "tokens": []
+  },
+  {
+   "id": 26,
+   "kind": "para",
+   "start": 6435,
+   "end": 6694,
+   "text": "As instructed, plug the gripper's motor. Make sure it's the only motor connected to the board, and that the motor itself is not yet daisy-chained to any other motor. As you press ⟦0⟧, the script will automatically set the id and baudrate for that motor.",
+   "tokens": [
+    "`[Enter]`"
+   ]
+  },
+  {
+   "id": 27,
+   "kind": "para",
+   "start": 6696,
+   "end": 6740,
+   "text": "⟦0⟧\n⟦1⟧Troubleshooting⟦2⟧",
+   "tokens": [
+    "<details>",
+    "<summary>",
+    "</summary>"
+   ]
+  },
+  {
+   "id": 28,
+   "kind": "para",
+   "start": 6742,
+   "end": 6838,
+   "text": "If you get an error at that point, check your cables and make sure they are plugged in properly:",
+   "tokens": []
+  },
+  {
+   "id": 29,
+   "kind": "para",
+   "start": 6840,
+   "end": 7002,
+   "text": "⟦0⟧\n  ⟦1⟧Power supply⟦2⟧\n  ⟦3⟧USB cable between your computer and the controller board⟦4⟧\n  ⟦5⟧The 3-pin cable from the controller board to the motor⟦6⟧",
+   "tokens": [
+    "<ul>",
+    "<li>",
+    "</li>",
+    "<li>",
+    "</li>",
+    "<li>",
+    "</li>"
+   ]
+  },
+  {
+   "id": 30,
+   "kind": "para",
+   "start": 7010,
+   "end": 7121,
+   "text": "If you are using a Waveshare controller board, make sure that the two jumpers are set on the ⟦0⟧ channel (USB).",
+   "tokens": [
+    "`B`"
+   ]
+  },
+  {
+   "id": 31,
+   "kind": "para",
+   "start": 7135,
+   "end": 7177,
+   "text": "You should then see the following message:",
+   "tokens": []
+  },
+  {
+   "id": 32,
+   "kind": "para",
+   "start": 7216,
+   "end": 7249,
+   "text": "Followed by the next instruction:",
+   "tokens": []
+  },
+  {
+   "id": 33,
+   "kind": "para",
+   "start": 7337,
+   "end": 7747,
+   "text": "You can disconnect the 3-pin cable from the controller board but you can leave it connected to the gripper motor on the other end as it will already be in the right place. Now, plug in another 3-pin cable to the wrist roll motor and connect it to the controller board. As with the previous motor, make sure it is the only motor connected to the board and that the motor itself isn't connected to any other one.",
+   "tokens": []
+  },
+  {
+   "id": 34,
+   "kind": "para",
+   "start": 7749,
+   "end": 7799,
+   "text": "Repeat the operation for each motor as instructed.",
+   "tokens": []
+  },
+  {
+   "id": 35,
+   "kind": "quote",
+   "start": 7801,
+   "end": 7949,
+   "text": "> [!TIP]\n> Check your cabling at each step before pressing Enter. For instance, the power supply cable might disconnect as you manipulate the board.",
+   "tokens": []
+  },
+  {
+   "id": 36,
+   "kind": "para",
+   "start": 7951,
+   "end": 8255,
+   "text": "When you are done, the script will simply finish, at which point the motors are ready to be used. You can now plug the 3-pin cable from each motor to the next one, and the cable from the first motor (the 'shoulder pan' with id=1) to the controller board, which can now be attached to the base of the arm.",
+   "tokens": []
+  },
+  {
+   "id": 37,
+   "kind": "heading",
+   "start": 8257,
+   "end": 8268,
+   "text": "#### Leader",
+   "tokens": []
+  },
+  {
+   "id": 38,
+   "kind": "para",
+   "start": 8270,
+   "end": 8352,
+   "text": "Do the same steps for the leader arm but modify the command or script accordingly.",
+   "tokens": []
+  },
+  {
+   "id": 39,
+   "kind": "heading",
+   "start": 8945,
+   "end": 8957,
+   "text": "## Calibrate",
+   "tokens": []
+  },
+  {
+   "id": 40,
+   "kind": "para",
+   "start": 8959,
+   "end": 9237,
+   "text": "Next, you'll need to calibrate your robot to ensure that the leader and follower arms have the same position values when they are in the same physical position.\nThe calibration process is very important because it allows a neural network trained on one robot to work on another.",
+   "tokens": []
+  },
+  {
+   "id": 41,
+   "kind": "heading",
+   "start": 9239,
+   "end": 9252,
+   "text": "#### Follower",
+   "tokens": []
+  },
+  {
+   "id": 42,
+   "kind": "para",
+   "start": 9254,
+   "end": 9325,
+   "text": "Run the following command or API example to calibrate the follower arm:",
+   "tokens": []
+  },
+  {
+   "id": 43,
+   "kind": "para",
+   "start": 10037,
+   "end": 10510,
+   "text": "We unified the calibration method for most robots. Thus, the calibration steps for this Koch arm are the same as the steps for the SO100 and SO101. First, we have to move the robot to the position where each joint is in the middle of its range, then we press ⟦0⟧. Secondly, we move all joints through their full range of motion. A video of this same process for the SO101 as reference can be found [here](⟦1⟧).",
+   "tokens": [
+    "`Enter`",
+    "https://huggingface.co/docs/lerobot/en/so101#calibration-video"
+   ]
+  },
+  {
+   "id": 44,
+   "kind": "heading",
+   "start": 10512,
+   "end": 10523,
+   "text": "#### Leader",
+   "tokens": []
+  },
+  {
+   "id": 45,
+   "kind": "para",
+   "start": 10525,
+   "end": 10613,
+   "text": "Do the same steps to calibrate the leader arm, run the following command or API example:",
+   "tokens": []
+  },
+  {
+   "id": 46,
+   "kind": "para",
+   "start": 11309,
+   "end": 11470,
+   "text": "Congrats 🎉, your robot is all set to learn a task on its own. Start training it by following this tutorial: [Getting started with real-world robots](⟦0⟧)",
+   "tokens": [
+    "./il_robots"
+   ]
+  },
+  {
+   "id": 47,
+   "kind": "quote",
+   "start": 11472,
+   "end": 11592,
+   "text": "> [!TIP]\n> If you have any questions or need help, please reach out on [Discord](⟦0⟧).",
+   "tokens": [
+    "https://discord.com/invite/s3KuuzsPFb"
+   ]
+  }
+ ]
+}

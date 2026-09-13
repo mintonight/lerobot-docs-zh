@@ -1,0 +1,380 @@
+{
+ "file": "api/policies.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1934,
+   "text": "# Policies",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1936,
+   "end": 2125,
+   "text": "Every policy inherits ⟦0⟧, which combines a ⟦1⟧ with the Hub mixin, so any\npolicy can be pushed to and loaded from the Hugging Face Hub with the same two calls.",
+   "tokens": [
+    "`PreTrainedPolicy`",
+    "`torch.nn.Module`"
+   ]
+  },
+  {
+   "id": 2,
+   "kind": "para",
+   "start": 2127,
+   "end": 2363,
+   "text": "Each policy has its own guide with training recipes and results — [ACT](⟦0⟧), [SmolVLA](⟦1⟧),\n[π₀](⟦2⟧), [π₀.₅](⟦3⟧) and the rest are listed under Policies. To add one, see\n[Adding a Policy](⟦4⟧).",
+   "tokens": [
+    "../act",
+    "../smolvla",
+    "../pi0",
+    "../pi05",
+    "../bring_your_own_policies"
+   ]
+  },
+  {
+   "id": 3,
+   "kind": "heading",
+   "start": 2365,
+   "end": 2421,
+   "text": "## PreTrainedPolicy⟦0⟧",
+   "tokens": [
+    "[[lerobot.policies.PreTrainedPolicy]]"
+   ]
+  },
+  {
+   "id": 4,
+   "kind": "para",
+   "start": 2870,
+   "end": 2899,
+   "text": "Base class for policy models.",
+   "tokens": []
+  },
+  {
+   "id": 5,
+   "kind": "para",
+   "start": 3225,
+   "end": 3299,
+   "text": "⟦0⟧\nDiscard actions precomputed by earlier ⟦1⟧ calls.",
+   "tokens": [
+    "</Docstring>",
+    "`select_action`"
+   ]
+  },
+  {
+   "id": 6,
+   "kind": "para",
+   "start": 3301,
+   "end": 3693,
+   "text": "Forces a fresh forward pass on the next ⟦0⟧ so a mid-episode conditioning\nchange (e.g. a new instruction) takes effect at once instead of after the queue drains.\nUnlike ⟦1⟧, the rest of the episode state is kept.  Call it from the thread\nthat calls ⟦2⟧.  Clears the queues named in :attr:*_action_queue_attrs*;\na policy that keeps no action queue inherits a no-op.",
+   "tokens": [
+    "`select_action`",
+    "`reset`",
+    "`select_action`"
+   ]
+  },
+  {
+   "id": 7,
+   "kind": "docfield",
+   "start": 4048,
+   "end": 4244,
+   "text": "⟦0⟧- **batch** (dict[str, Tensor]) -- _description_⟦1⟧⟦2⟧⟦3⟧The loss and potentially other information. Apart from the loss which",
+   "tokens": [
+    "<paramsdesc>",
+    "</paramsdesc>",
+    "<rettype>tuple[Tensor, dict | None]</rettype>",
+    "<retdesc>"
+   ]
+  },
+  {
+   "id": 8,
+   "kind": "para",
+   "start": 4245,
+   "end": 4354,
+   "text": "is a Tensor, all other items should be logging-friendly, native Python types.⟦0⟧⟦1⟧\n_summary_",
+   "tokens": [
+    "</retdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 9,
+   "kind": "para",
+   "start": 5285,
+   "end": 5471,
+   "text": "The policy is set in evaluation mode by default using ⟦0⟧ (dropout modules are\ndeactivated). To train it, you should first set it back in training mode with ⟦1⟧.",
+   "tokens": [
+    "`policy.eval()`",
+    "`policy.train()`"
+   ]
+  },
+  {
+   "id": 10,
+   "kind": "para",
+   "start": 5835,
+   "end": 5911,
+   "text": "⟦0⟧\nRun the policy's text head on a preprocessed observation batch.",
+   "tokens": [
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 11,
+   "kind": "para",
+   "start": 5913,
+   "end": 6250,
+   "text": "The request rides on ⟦0⟧ as complementary data (:data:*~lerobot.utils.constants.QUERY_KIND*\n/ ⟦1⟧); a ⟦2⟧ reply is fed straight into ⟦3⟧, so it must be\nexactly one subtask, not a plan or a numbered list.  Returns the generated text, and must not\nmutate action-producing state (queues, observation history).",
+   "tokens": [
+    "`batch`",
+    "`QUERY_TEXT`",
+    "`next_subtask`",
+    "`set_task`"
+   ]
+  },
+  {
+   "id": 12,
+   "kind": "para",
+   "start": 6590,
+   "end": 6667,
+   "text": "Returns the policy-specific parameters dict to be passed on to the optimizer.",
+   "tokens": []
+  },
+  {
+   "id": 13,
+   "kind": "para",
+   "start": 7109,
+   "end": 7229,
+   "text": "⟦0⟧\nReturns the action chunk (for action chunking policies) for a given observation, potentially in batch mode.",
+   "tokens": [
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 14,
+   "kind": "para",
+   "start": 7231,
+   "end": 7359,
+   "text": "Child classes using action chunking should use this method within ⟦0⟧ to form the action chunk\ncached for selection.",
+   "tokens": [
+    "`select_action`"
+   ]
+  },
+  {
+   "id": 15,
+   "kind": "docfield",
+   "start": 7919,
+   "end": 8491,
+   "text": "⟦0⟧- **cfg** (TrainPipelineConfig) -- The training config; saved as *train_config.json* and\n  used to render the model card.\n- **peft_model** -- The PEFT wrapper when training adapters, whose weights replace the full\n  model weights in the published repo. Defaults to None.\n- **state_dict** (dict[str, Tensor] | None) -- Ignored; weights are now gathered internally\n  when the policy is sharded. Defaults to None.\n- **dataset_meta** (LeRobotDatasetMetadata | None) -- Dataset metadata for the model card,\n  if available. Defaults to None.⟦1⟧⟦2⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "</paramsdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 16,
+   "kind": "para",
+   "start": 8492,
+   "end": 8523,
+   "text": "Publish this policy to the Hub.",
+   "tokens": []
+  },
+  {
+   "id": 17,
+   "kind": "para",
+   "start": 8525,
+   "end": 8668,
+   "text": "Deprecated: use ⟦0⟧ instead, which\nalso publishes the pre/post-processors alongside the model.",
+   "tokens": [
+    "`lerobot.common.train_utils.publish_trained_model()`"
+   ]
+  },
+  {
+   "id": 18,
+   "kind": "para",
+   "start": 8974,
+   "end": 9034,
+   "text": "⟦0⟧\nTo be called whenever the environment is reset.",
+   "tokens": [
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 19,
+   "kind": "para",
+   "start": 9036,
+   "end": 9069,
+   "text": "Does things like clearing caches.",
+   "tokens": []
+  },
+  {
+   "id": 20,
+   "kind": "para",
+   "start": 9497,
+   "end": 9582,
+   "text": "⟦0⟧\nReturn one action to run in the environment (potentially in batch mode).",
+   "tokens": [
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 21,
+   "kind": "para",
+   "start": 9584,
+   "end": 9696,
+   "text": "When the model uses a history of observations, or outputs a sequence of actions, this method deals\nwith caching.",
+   "tokens": []
+  },
+  {
+   "id": 22,
+   "kind": "para",
+   "start": 10014,
+   "end": 10097,
+   "text": "⟦0⟧\nWhether this policy implements Real-Time Chunking inference semantics.",
+   "tokens": [
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 23,
+   "kind": "para",
+   "start": 10438,
+   "end": 10523,
+   "text": "⟦0⟧\nWhether this policy implements ⟦1⟧ (override both together).",
+   "tokens": [
+    "</Docstring>",
+    "`generate_text`"
+   ]
+  },
+  {
+   "id": 24,
+   "kind": "docfield",
+   "start": 10948,
+   "end": 11285,
+   "text": "⟦0⟧- **peft_config** -- Optional PEFT adapter configuration (e.g., LoraConfig).\n  If provided, used directly (with CLI overrides applied).\n- **peft_cli_overrides** -- Optional dict of CLI overrides (method_type, target_modules, r, etc.)\n  These are merged with policy defaults to build the final config.⟦1⟧⟦2⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "</paramsdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 25,
+   "kind": "para",
+   "start": 11287,
+   "end": 11359,
+   "text": "Wrap this policy with PEFT adapters for parameter-efficient fine-tuning.",
+   "tokens": []
+  },
+  {
+   "id": 26,
+   "kind": "para",
+   "start": 11361,
+   "end": 11574,
+   "text": "This method is the single entry point for PEFT integration. Subclasses should\noverride ⟦0⟧ to provide default target modules, and\n⟦1⟧ for policy-specific validation.",
+   "tokens": [
+    "`_get_default_peft_targets()`",
+    "`_validate_peft_config()`"
+   ]
+  },
+  {
+   "id": 27,
+   "kind": "heading",
+   "start": 11593,
+   "end": 11648,
+   "text": "## PreTrainedConfig⟦0⟧",
+   "tokens": [
+    "[[lerobot.configs.PreTrainedConfig]]"
+   ]
+  },
+  {
+   "id": 28,
+   "kind": "docfield",
+   "start": 12753,
+   "end": 13578,
+   "text": "⟦0⟧- **n_obs_steps** -- Number of environment steps worth of observations to pass to the policy (takes the\n  current step and additional steps going back).\n- **input_features** -- A dictionary defining the PolicyFeature of the input data for the policy. The key represents\n  the input data name, and the value is PolicyFeature, which consists of FeatureType and shape attributes.\n- **output_features** -- A dictionary defining the PolicyFeature of the output data for the policy. The key represents\n  the output data name, and the value is PolicyFeature, which consists of FeatureType and shape attributes.\n- **normalization_mapping** -- A dictionary that maps from a str value of FeatureType (e.g., \"STATE\", \"VISUAL\") to\n  a corresponding NormalizationMode (e.g., NormalizationMode.MIN_MAX)⟦1⟧⟦2⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "</paramsdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 29,
+   "kind": "para",
+   "start": 13580,
+   "end": 13623,
+   "text": "Base configuration class for policy models.",
+   "tokens": []
+  },
+  {
+   "id": 30,
+   "kind": "heading",
+   "start": 13636,
+   "end": 13682,
+   "text": "## make_policy⟦0⟧",
+   "tokens": [
+    "[[lerobot.policies.make_policy]]"
+   ]
+  },
+  {
+   "id": 31,
+   "kind": "docfield",
+   "start": 14279,
+   "end": 15538,
+   "text": "⟦0⟧- **cfg** (PreTrainedConfig) -- The configuration for the policy to be created. If\n  ⟦1⟧ is set, the policy will be loaded with weights from that path.\n- **ds_meta** (LeRobotDatasetMetadata | None) -- Dataset metadata used to infer feature shapes and\n  types. Also provides statistics for normalization layers.\n- **env_cfg** (EnvConfig | None) -- Environment configuration used to infer feature shapes and\n  types. One of ⟦2⟧ or ⟦3⟧ must be provided.\n- **rename_map** (dict[str, str] | None) -- Optional mapping of dataset or environment feature\n  keys to match expected policy feature names (e.g., ⟦4⟧ → ⟦5⟧).\n- **defer_weight_load** (bool) -- Build the exact policy ⟦6⟧ would build — same\n  config resolution, same stats-derived buffers, same device placement and eval mode —\n  but skip the safetensors weight load. Used when resuming from a DCP checkpoint, whose\n  sharded weights stream in after ⟦7⟧ (the distributed checkpoint\n  engine overwrites the random init).⟦8⟧⟦9⟧⟦10⟧An instantiated and device-placed policy model.⟦11⟧⟦12⟧- ⟦13⟧ -- If both or neither of ⟦14⟧ and ⟦15⟧ are provided.",
+   "tokens": [
+    "<paramsdesc>",
+    "`cfg.pretrained_path`",
+    "`ds_meta`",
+    "`env_cfg`",
+    "`\"left\"`",
+    "`\"camera1\"`",
+    "`from_pretrained`",
+    "`accelerator.prepare()`",
+    "</paramsdesc>",
+    "<rettype>PreTrainedPolicy</rettype>",
+    "<retdesc>",
+    "</retdesc>",
+    "<raises>",
+    "``ValueError``",
+    "`ds_meta`",
+    "`env_cfg`"
+   ]
+  },
+  {
+   "id": 32,
+   "kind": "list",
+   "start": 15539,
+   "end": 15749,
+   "text": "- ⟦0⟧ -- If attempting to use an unsupported policy-backend combination\n  (e.g., VQBeT with 'mps').⟦1⟧⟦2⟧⟦3⟧",
+   "tokens": [
+    "``NotImplementedError``",
+    "</raises>",
+    "<raisederrors>``ValueError`` or ``NotImplementedError``</raisederrors>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 33,
+   "kind": "para",
+   "start": 15751,
+   "end": 15778,
+   "text": "Instantiate a policy model.",
+   "tokens": []
+  },
+  {
+   "id": 34,
+   "kind": "para",
+   "start": 15780,
+   "end": 16092,
+   "text": "This factory function handles the logic of creating a policy, which requires\ndetermining the input and output feature shapes. These shapes can be derived\neither from a ⟦0⟧ object or an ⟦1⟧ object. The function\ncan either initialize a new policy from scratch or load a pretrained one.",
+   "tokens": [
+    "`LeRobotDatasetMetadata`",
+    "`EnvConfig`"
+   ]
+  }
+ ]
+}

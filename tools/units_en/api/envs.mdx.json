@@ -1,0 +1,145 @@
+{
+ "file": "api/envs.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1938,
+   "text": "# Environments",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1940,
+   "end": 2113,
+   "text": "Simulation environments are configured through ⟦0⟧ and built by ⟦1⟧. Each subclass\ndeclares its ⟦2⟧ and how to construct the vectorised environments.",
+   "tokens": [
+    "`EnvConfig`",
+    "`make_env`",
+    "`gym_kwargs`"
+   ]
+  },
+  {
+   "id": 2,
+   "kind": "para",
+   "start": 2115,
+   "end": 2263,
+   "text": "See [Environments from the Hub](⟦0⟧) for using published environments and\n[Adding a New Benchmark](⟦1⟧) for contributing one.",
+   "tokens": [
+    "../envhub",
+    "../adding_benchmarks"
+   ]
+  },
+  {
+   "id": 3,
+   "kind": "heading",
+   "start": 2265,
+   "end": 2303,
+   "text": "## EnvConfig⟦0⟧",
+   "tokens": [
+    "[[lerobot.envs.EnvConfig]]"
+   ]
+  },
+  {
+   "id": 4,
+   "kind": "para",
+   "start": 3316,
+   "end": 3366,
+   "text": "⟦0⟧\nCreate {suite: ⟦1⟧}.",
+   "tokens": [
+    "</Docstring>",
+    "{task_id: VectorEnv}"
+   ]
+  },
+  {
+   "id": 5,
+   "kind": "para",
+   "start": 3368,
+   "end": 3524,
+   "text": "Default: single-task env via gym.make(). Multi-task benchmarks override.\nAsyncVectorEnv is the default for n_envs > 1; auto-downgraded to Sync for n_envs=1.",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "para",
+   "start": 3836,
+   "end": 3918,
+   "text": "⟦0⟧\nReturn (preprocessor, postprocessor) for this env. Default: identity.",
+   "tokens": [
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 7,
+   "kind": "heading",
+   "start": 3934,
+   "end": 3970,
+   "text": "## make_env⟦0⟧",
+   "tokens": [
+    "[[lerobot.envs.make_env]]"
+   ]
+  },
+  {
+   "id": 8,
+   "kind": "docfield",
+   "start": 4505,
+   "end": 5363,
+   "text": "⟦0⟧- **cfg** (EnvConfig | str) -- Either an ⟦1⟧ object describing the environment to build locally,\n  or a Hugging Face Hub repository identifier (e.g. ⟦2⟧). In the latter case,\n  the repo must include a Python file (usually ⟦3⟧).\n- **n_envs** (int, optional) -- The number of parallelized env to return. Defaults to 1.\n- **use_async_envs** (bool, optional) -- Whether to return an AsyncVectorEnv or a SyncVectorEnv. Defaults to\n  False.\n- **hub_cache_dir** (str | None) -- Optional cache path for downloaded hub files.\n- **trust_remote_code** (bool) -- **Explicit consent** to execute remote code from the Hub.\n  Default False — must be set to True to import/exec hub ⟦4⟧.⟦5⟧⟦6⟧⟦7⟧A mapping from suite name to indexed vectorized environments.",
+   "tokens": [
+    "<paramsdesc>",
+    "`EnvConfig`",
+    "`\"username/repo\"`",
+    "`env.py`",
+    "`env.py`",
+    "</paramsdesc>",
+    "<rettype>dict[str, dict[int, gym.vector.VectorEnv]]</rettype>",
+    "<retdesc>"
+   ]
+  },
+  {
+   "id": 9,
+   "kind": "list",
+   "start": 5364,
+   "end": 5457,
+   "text": "- For multi-task benchmarks (e.g., LIBERO): one entry per suite, and one vec env per task_id.",
+   "tokens": []
+  },
+  {
+   "id": 10,
+   "kind": "list",
+   "start": 5458,
+   "end": 5588,
+   "text": "- For single-task environments: a single suite entry (cfg.type) with task_id=0.⟦0⟧⟦1⟧- ⟦2⟧ -- if n_envs < 1",
+   "tokens": [
+    "</retdesc>",
+    "<raises>",
+    "``ValueError``"
+   ]
+  },
+  {
+   "id": 11,
+   "kind": "list",
+   "start": 5589,
+   "end": 5827,
+   "text": "- ⟦0⟧ -- If the requested env package is not installed⟦1⟧⟦2⟧⟦3⟧\nMakes a gym vector environment according to the config or Hub reference.",
+   "tokens": [
+    "``ModuleNotFoundError``",
+    "</raises>",
+    "<raisederrors>``ValueError`` or ``ModuleNotFoundError``</raisederrors>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 12,
+   "kind": "heading",
+   "start": 5848,
+   "end": 5898,
+   "text": "## make_env_config⟦0⟧",
+   "tokens": [
+    "[[lerobot.envs.make_env_config]]"
+   ]
+  }
+ ]
+}

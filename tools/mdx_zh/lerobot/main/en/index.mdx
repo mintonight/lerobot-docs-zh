@@ -1,0 +1,227 @@
+<script lang="ts">
+import {onMount} from "svelte";
+import Tip from "$lib/Tip.svelte";
+import CopyLLMTxtMenu from "$lib/CopyLLMTxtMenu.svelte";
+import Youtube from "$lib/Youtube.svelte";
+import Docstring from "$lib/Docstring.svelte";
+import CodeBlock from "$lib/CodeBlock.svelte";
+import CodeBlockFw from "$lib/CodeBlockFw.svelte";
+import DocNotebookDropdown from "$lib/DocNotebookDropdown.svelte";
+import CourseFloatingBanner from "$lib/CourseFloatingBanner.svelte";
+import IconCopyLink from "$lib/IconCopyLink.svelte";
+import FrameworkContent from "$lib/FrameworkContent.svelte";
+import Markdown from "$lib/Markdown.svelte";
+import Question from "$lib/Question.svelte";
+import FrameworkSwitchCourse from "$lib/FrameworkSwitchCourse.svelte";
+import InferenceApi from "$lib/InferenceApi.svelte";
+import TokenizersLanguageContent from "$lib/TokenizersLanguageContent.svelte";
+import ExampleCodeBlock from "$lib/ExampleCodeBlock.svelte";
+import Added from "$lib/Added.svelte";
+import Changed from "$lib/Changed.svelte";
+import Deprecated from "$lib/Deprecated.svelte";
+import PipelineIcon from "$lib/PipelineIcon.svelte";
+import PipelineTag from "$lib/PipelineTag.svelte";
+import Heading from "$lib/Heading.svelte";
+import HfOptions from "$lib/HfOptions.svelte";
+import HfOption from "$lib/HfOption.svelte";
+import EditOnGithub from "$lib/EditOnGithub.svelte";
+import InferenceSnippet from "$lib/InferenceSnippet/InferenceSnippet.svelte";
+import MermaidChart from "$lib/MermaidChart.svelte";
+let fw: "pt" | "tf" = "pt";
+onMount(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    fw = urlParams.get("fw") || "pt";
+});
+</script>
+<svelte:head>
+  <meta name="hf:doc:metadata" content={metadata} >
+</svelte:head>
+
+<!--HF DOCBUILD BODY START-->
+
+HF_DOC_BODY_START
+
+<CopyLLMTxtMenu containerStyle="float: right; margin-left: 10px; display: inline-flex; position: relative; z-index: 10;"></CopyLLMTxtMenu>
+
+# LeRobot
+
+<div class="flex justify-center">
+  <a target="_blank" href="https://huggingface.co/lerobot">
+    <img
+      alt="LeRobot, Hugging Face Robotics Library"
+      src="https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/lerobot/lerobot-logo-thumbnail.png"
+    ></img>
+  </a>
+</div>
+
+**面向真实世界机器人技术的最先进机器学习**
+
+🤗 LeRobot 提供硬件无关、原生 Python 的接口来控制真实机器人——从 SO-ARM101 这类平价机械臂到完整的人形机器人。此外还提供用于录制、存储和分享其生成 dataset 的工具。每个 dataset 都采用标准化的 **LeRobotDataset** 格式（同步的视频 + action/state 数据），可直接从 [Hugging Face Hub](https://huggingface.co/lerobot) 流式加载。
+
+🤗 在这些数据之上，LeRobot 实现了最先进的 policy——从 ACT 这类轻量级模仿学习模型到 π₀ 和 SmolVLA 这类大型视觉-语言-action 模型——它们都能用相同的几条 CLI 命令进行训练、分享和部署。
+
+目标：降低机器人技术的入门门槛，让每个人都能为共享 dataset 和预训练模型做出贡献并从中受益。
+
+<div align="center" style="display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin: 20px 0;">
+  <a href="https://discord.gg/s3KuuzsPFb" target="_blank">
+    <img alt="Discord" src="https://img.shields.io/badge/Discord-Join_the_Community-5865F2?style=flat&logo=discord&logoColor=white">
+  </a>
+  <a href="https://x.com/LeRobotHF" target="_blank">
+    <img alt="X (Twitter)" src="https://img.shields.io/badge/X-Follow_%40LeRobotHF-black?style=flat&logo=x&logoColor=white">
+  </a>
+  <a href="https://huggingface.co/lerobot" target="_blank">
+    <img alt="Hugging Face Hub" src="https://img.shields.io/badge/HF_Hub-Models_%26_Datasets-FFD21E?style=flat">
+  </a>
+</div>
+
+<div align="center">
+  <img src="https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/lerobot/robots_control_video.webp" width="640px" alt="Reachy 2 Demo">
+</div>
+
+## 工作原理
+
+**teleoperation → 录制 → 训练 → 部署**
+
+1. **teleoperation** - 自己控制机器人（使用 leader arm、键盘或手机），以便它从你的 action 中学习。
+2. **录制** - 每个 demonstration 都会保存为 dataset：同步的相机视频加上你执行的 action。
+3. **训练** - policy（将控制机器人的神经网络）学习模仿你的 demonstration。
+4. **部署** - 在机器人上运行训练好的 policy，看它自行完成任务。
+
+## 快速开始
+
+初次接触？先[安装 LeRobot](./installation)，然后选择你的路径：
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 my-6">
+  <div class="border dark:border-gray-700 rounded-lg p-4 shadow">
+    <div class="text-lg font-semibold mb-2">🔧 我有机器人 </div>
+    <p class="text-gray-700 dark:text-gray-300 text-sm">
+      LeRobot 支持多种机械臂和移动机器人。热门选择：
+    </p>
+    <ul class="text-gray-700 dark:text-gray-300 text-sm list-disc pl-5 mb-2">
+      <li>
+        <a href="./so101"> SO-101 </a> - 我们的旗舰低成本机械臂
+      </li>
+      <li>
+        <a href="./lekiwi"> LeKiwi </a> - 上方带机械臂的移动底座
+      </li>
+      <li>
+        <a href="./koch"> Koch v1.1 </a> - 社区长期青睐之选
+      </li>
+      <li>
+        或在侧边栏的 <strong> 机器人 </strong> 下找到你的机器人
+      </li>
+    </ul>
+    <p class="text-gray-700 dark:text-gray-300 text-sm">
+      组装并 calibrate 后，录制 dataset 并用 <a href="./il_robots"> 模仿学习教程 </a> 训练你的第一个
+      policy——或者用 <a href="./lelab"> LeLab </a> 完全跳过 CLI，它是同一工作流的浏览器 GUI。
+    </p>
+  </div>
+  <div class="border dark:border-gray-700 rounded-lg p-4 shadow">
+    <div class="text-lg font-semibold mb-2">💻 还没有硬件 </div>
+    <p class="text-gray-700 dark:text-gray-300 text-sm">
+      即使没有机器人，你仍然可以训练和评估 policy：
+    </p>
+    <ul class="text-gray-700 dark:text-gray-300 text-sm list-disc pl-5 mb-2">
+      <li>
+        在 Hub 上现有的
+        <a href="https://huggingface.co/datasets?other=LeRobot">
+          LeRobot dataset
+        </a>
+        上训练
+      </li>
+      <li>
+        在 <a href="./envhub"> simulation </a> 中评估，对比 LIBERO 或 Meta-World 等 benchmark
+      </li>
+      <li>
+        试试免费的 <a href="./notebooks"> Colab 笔记本 </a> - 无需
+        安装
+      </li>
+    </ul>
+  </div>
+  <div class="border dark:border-gray-700 rounded-lg p-4 shadow">
+    <div class="text-lg font-semibold mb-2">🤝 我想做贡献 </div>
+    <p class="text-gray-700 dark:text-gray-300 text-sm">
+      从 <a href="./contributing"> 贡献指南 </a> 开始，然后
+      <a href="./bring_your_own_policies"> 添加新 policy </a> 或
+      <a href="./integrate_hardware"> 自带硬件 </a>。
+    </p>
+  </div>
+</div>
+
+## 浏览文档
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 my-6">
+  <a
+    class="!no-underline border dark:border-gray-700 rounded-lg p-4 shadow hover:shadow-lg"
+    href="./cheat-sheet"
+  >
+    <div class="font-semibold mb-1">📋 速查表 </div>
+    <p class="text-gray-700 dark:text-gray-300 text-sm">
+      每条 LeRobot CLI 命令，可直接复制粘贴。
+    </p>
+  </a>
+  <a
+    class="!no-underline border dark:border-gray-700 rounded-lg p-4 shadow hover:shadow-lg"
+    href="./hardware_guide"
+  >
+    <div class="font-semibold mb-1">🖥️ 计算与硬件指南 </div>
+    <p class="text-gray-700 dark:text-gray-300 text-sm">
+      哪种 policy 适合你的 GPU，以及训练需要多长时间。
+    </p>
+  </a>
+  <a
+    class="!no-underline border dark:border-gray-700 rounded-lg p-4 shadow hover:shadow-lg"
+    href="./lerobot-dataset-v3"
+  >
+    <div class="font-semibold mb-1">🗂️ LeRobotDataset </div>
+    <p class="text-gray-700 dark:text-gray-300 text-sm">
+      从 Hub 加载、流式传输和可视化机器人 dataset。
+    </p>
+  </a>
+  <a
+    class="!no-underline border dark:border-gray-700 rounded-lg p-4 shadow hover:shadow-lg"
+    href="./lelab"
+  >
+    <div class="font-semibold mb-1">🖼 LeLab </div>
+    <p class="text-gray-700 dark:text-gray-300 text-sm">
+      用于 calibration、录制和训练的浏览器 GUI - 无需 CLI。
+    </p>
+  </a>
+  <a
+    class="!no-underline border dark:border-gray-700 rounded-lg p-4 shadow hover:shadow-lg"
+    href="./act"
+  >
+    <div class="font-semibold mb-1">🧠 policy </div>
+    <p class="text-gray-700 dark:text-gray-300 text-sm">
+      从 ACT 开始，这是我们推荐的首选 policy——或在侧边栏浏览 SmolVLA、π₀ 及
+      更多内容。
+    </p>
+  </a>
+  <a
+    class="!no-underline border dark:border-gray-700 rounded-lg p-4 shadow hover:shadow-lg"
+    href="./envhub"
+  >
+    <div class="font-semibold mb-1">🎮 simulation 与 benchmark </div>
+    <p class="text-gray-700 dark:text-gray-300 text-sm">
+      在接触真实硬件之前，先在 simulation environment 中训练和评估。
+    </p>
+  </a>
+</div>
+
+## 常见问题
+
+遇到问题？以下是一些最常见的情况：
+
+- **相机画面模糊或不可用** - 光照比分辨率更重要。请参阅[相机](./cameras)指南。
+- **构建或安装错误**（`cmake`、`ffmpeg`、CUDA）- 请参阅[安装指南](./installation#troubleshooting)的故障排查部分。
+- **不确定哪种 policy 适合你的 GPU** - 查看[计算与硬件指南](./hardware_guide)。
+- **仍然卡住？** 在 [Discord](https://discord.gg/s3KuuzsPFb) 上提问 - 社区（以及 LeRobot 团队）随时提供帮助。
+
+
+
+<EditOnGithub source="https://github.com/huggingface/lerobot/blob/main/docs/source/index.mdx" />
+
+<!--HF DOCBUILD BODY END-->
+
+HF_DOC_BODY_END
+

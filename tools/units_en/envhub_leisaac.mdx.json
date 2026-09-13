@@ -1,0 +1,406 @@
+{
+ "file": "envhub_leisaac.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1950,
+   "text": "# LeIsaac × LeRobot EnvHub",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1952,
+   "end": 2176,
+   "text": "LeRobot EnvHub now supports **imitation learning in simulation** with LeIsaac.\nSpin up everyday manipulation tasks, teleoperate the robot, collect demos, push them to the Hub, and train policies in LeRobot — all in one loop.",
+   "tokens": []
+  },
+  {
+   "id": 2,
+   "kind": "para",
+   "start": 2178,
+   "end": 2301,
+   "text": "[LeIsaac](⟦0⟧) integrates with IsaacLab and the SO101 Leader/Follower setup to provide:",
+   "tokens": [
+    "https://github.com/LightwheelAI/leisaac"
+   ]
+  },
+  {
+   "id": 3,
+   "kind": "list",
+   "start": 2303,
+   "end": 2361,
+   "text": "- 🕹️ **Teleoperation-first workflows** for data collection",
+   "tokens": []
+  },
+  {
+   "id": 4,
+   "kind": "list",
+   "start": 2362,
+   "end": 2421,
+   "text": "- 📦 **Built-in data conversion** ready for LeRobot training",
+   "tokens": []
+  },
+  {
+   "id": 5,
+   "kind": "list",
+   "start": 2422,
+   "end": 2517,
+   "text": "- 🤖 **Everyday skills** like picking oranges, lifting cubes, cleaning tables, and folding cloth",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "list",
+   "start": 2518,
+   "end": 2647,
+   "text": "- ☁️ **Ongoing upgrades** from [LightWheel](⟦0⟧): cloud simulation, EnvHub support, Sim2Real tooling, and more",
+   "tokens": [
+    "https://lightwheel.ai/"
+   ]
+  },
+  {
+   "id": 7,
+   "kind": "para",
+   "start": 2649,
+   "end": 2736,
+   "text": "Below you’ll find the currently supported LeIsaac tasks exposed through LeRobot EnvHub.",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "heading",
+   "start": 2738,
+   "end": 2762,
+   "text": "# Available Environments",
+   "tokens": []
+  },
+  {
+   "id": 9,
+   "kind": "para",
+   "start": 2764,
+   "end": 2938,
+   "text": "The following table lists all available tasks and environments in LeIsaac x LeRobot Envhub. You can also get the latest list of environments by running the following command:",
+   "tokens": []
+  },
+  {
+   "id": 10,
+   "kind": "table",
+   "start": 2994,
+   "end": 3871,
+   "text": "| Task                                                                                                                                                            | Environment ID                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | Task Description                                                                                                           | Related Robot                                              |",
+   "tokens": []
+  },
+  {
+   "id": 11,
+   "kind": "table",
+   "start": 4750,
+   "end": 5627,
+   "text": "| ⟦0⟧⟦1⟧ | [LeIsaac-SO101-PickOrange-v0](⟦2⟧)⟦3⟧⟦4⟧[LeIsaac-SO101-PickOrange-Direct-v0](⟦5⟧)                                                                                                                                                                                                                        | Pick three oranges and put them into the plate, then reset the arm to rest state.                                          | Single-Arm SO101 Follower                                  |",
+   "tokens": [
+    "<video src=\"https://github.com/user-attachments/assets/466eddff-f720-4f99-94d5-5e123e4c302c\" autoplay loop muted playsinline style=\"max-width: 300px;\">",
+    "</video>",
+    "https://github.com/LightwheelAI/leisaac/blob/main/source/leisaac/leisaac/tasks/pick_orange/pick_orange_env_cfg.py",
+    "<br />",
+    "<br />",
+    "https://github.com/LightwheelAI/leisaac/blob/main/source/leisaac/leisaac/tasks/pick_orange/direct/pick_orange_env.py"
+   ]
+  },
+  {
+   "id": 12,
+   "kind": "table",
+   "start": 5628,
+   "end": 6505,
+   "text": "| ⟦0⟧⟦1⟧ | [LeIsaac-SO101-LiftCube-v0](⟦2⟧)⟦3⟧⟦4⟧[LeIsaac-SO101-LiftCube-Direct-v0](⟦5⟧)                                                                                                                                                                                                                                    | Lift the red cube up.                                                                                                      | Single-Arm SO101 Follower                                  |",
+   "tokens": [
+    "<video src=\"https://github.com/user-attachments/assets/1e4eb83a-0b38-40fb-a0b2-ddb0fe201e6d\" autoplay loop muted playsinline style=\"max-width: 300px;\">",
+    "</video>",
+    "https://github.com/LightwheelAI/leisaac/blob/main/source/leisaac/leisaac/tasks/lift_cube/lift_cube_env_cfg.py",
+    "<br />",
+    "<br />",
+    "https://github.com/LightwheelAI/leisaac/blob/main/source/leisaac/leisaac/tasks/lift_cube/direct/lift_cube_env.py"
+   ]
+  },
+  {
+   "id": 13,
+   "kind": "table",
+   "start": 6506,
+   "end": 7383,
+   "text": "| ⟦0⟧⟦1⟧ | [LeIsaac-SO101-CleanToyTable-v0](⟦2⟧)⟦3⟧⟦4⟧[LeIsaac-SO101-CleanToyTable-BiArm-v0](⟦5⟧)⟦6⟧⟦7⟧[LeIsaac-SO101-CleanToyTable-BiArm-Direct-v0](⟦8⟧) | Pick two letter e objects into the box, and reset the arm to rest state.                                                   | Single-Arm SO101 Follower⟦9⟧⟦10⟧Bi-Arm SO101 Follower |",
+   "tokens": [
+    "<video src=\"https://github.com/user-attachments/assets/e49d8f1c-dcc9-412b-a88f-100680d8a45b\" autoplay loop muted playsinline style=\"max-width: 300px;\">",
+    "</video>",
+    "https://github.com/LightwheelAI/leisaac/blob/main/source/leisaac/leisaac/tasks/clean_toy_table/clean_toy_table_env_cfg.py",
+    "<br />",
+    "<br />",
+    "https://github.com/LightwheelAI/leisaac/blob/main/source/leisaac/leisaac/tasks/clean_toy_table/clean_toy_table_bi_arm_env_cfg.py",
+    "<br />",
+    "<br />",
+    "https://github.com/LightwheelAI/leisaac/blob/main/source/leisaac/leisaac/tasks/clean_toy_table/direct/clean_toy_table_bi_arm_env.py",
+    "<br />",
+    "<br />"
+   ]
+  },
+  {
+   "id": 14,
+   "kind": "table",
+   "start": 7384,
+   "end": 8261,
+   "text": "| ⟦0⟧⟦1⟧ | [LeIsaac-SO101-FoldCloth-BiArm-v0](⟦2⟧)⟦3⟧⟦4⟧[LeIsaac-SO101-FoldCloth-BiArm-Direct-v0](⟦5⟧)                                                                                                                                                                                                    | Fold the cloth, and reset the arm to rest state.⟦6⟧⟦7⟧_Note: Only the DirectEnv support check_success in this task._ | Bi-Arm SO101 Follower                                      |",
+   "tokens": [
+    "<video src=\"https://github.com/user-attachments/assets/e29a0f8a-9286-4ce6-b45d-342c3d3ba754\" autoplay loop muted playsinline style=\"max-width: 300px;\">",
+    "</video>",
+    "https://github.com/LightwheelAI/leisaac/blob/main/source/leisaac/leisaac/tasks/fold_cloth/fold_cloth_bi_arm_env_cfg.py",
+    "<br />",
+    "<br />",
+    "https://github.com/LightwheelAI/leisaac/blob/main/source/leisaac/leisaac/tasks/fold_cloth/direct/fold_cloth_bi_arm_env.py",
+    "<br />",
+    "<br />"
+   ]
+  },
+  {
+   "id": 15,
+   "kind": "heading",
+   "start": 8263,
+   "end": 8319,
+   "text": "# Load LeIsaac directly in LeRobot with one line of code",
+   "tokens": []
+  },
+  {
+   "id": 16,
+   "kind": "quote",
+   "start": 8321,
+   "end": 8377,
+   "text": "> EnvHub: Share LeIsaac environments through HuggingFace",
+   "tokens": []
+  },
+  {
+   "id": 17,
+   "kind": "para",
+   "start": 8379,
+   "end": 8583,
+   "text": "[EnvHub](⟦0⟧) is our reproducible environment hub, spin up a packaged simulation with one line, experiment immediately, and publish your own tasks for the community.",
+   "tokens": [
+    "https://huggingface.co/docs/lerobot/envhub"
+   ]
+  },
+  {
+   "id": 18,
+   "kind": "para",
+   "start": 8585,
+   "end": 8674,
+   "text": "LeIsaac offers EnvHub support so you can consume or share tasks with only a few commands.",
+   "tokens": []
+  },
+  {
+   "id": 19,
+   "kind": "heading",
+   "start": 8854,
+   "end": 8894,
+   "text": "## How to get started, environment Setup",
+   "tokens": []
+  },
+  {
+   "id": 20,
+   "kind": "para",
+   "start": 8896,
+   "end": 8955,
+   "text": "Run the following commands to setup your code environments:",
+   "tokens": []
+  },
+  {
+   "id": 21,
+   "kind": "heading",
+   "start": 9512,
+   "end": 9528,
+   "text": "## Usage Example",
+   "tokens": []
+  },
+  {
+   "id": 22,
+   "kind": "para",
+   "start": 9530,
+   "end": 9715,
+   "text": "EnvHub exposes every LeIsaac-supported task in a uniform interface. The examples below load ⟦0⟧ and demonstrate a random-action rollout and an interactive teleoperation.",
+   "tokens": [
+    "`so101_pick_orange`"
+   ]
+  },
+  {
+   "id": 23,
+   "kind": "heading",
+   "start": 9717,
+   "end": 9734,
+   "text": "### Random Action",
+   "tokens": []
+  },
+  {
+   "id": 24,
+   "kind": "para",
+   "start": 9736,
+   "end": 9793,
+   "text": "⟦0⟧\n⟦1⟧Click to expand code example⟦2⟧",
+   "tokens": [
+    "<details>",
+    "<summary>",
+    "</summary>"
+   ]
+  },
+  {
+   "id": 25,
+   "kind": "para",
+   "start": 10538,
+   "end": 10605,
+   "text": "You should see the SO101 arm swinging under purely random commands.",
+   "tokens": []
+  },
+  {
+   "id": 26,
+   "kind": "heading",
+   "start": 10607,
+   "end": 10624,
+   "text": "### Teleoperation",
+   "tokens": []
+  },
+  {
+   "id": 27,
+   "kind": "para",
+   "start": 10626,
+   "end": 10684,
+   "text": "LeRobot’s teleoperation stack can drive the simulated arm.",
+   "tokens": []
+  },
+  {
+   "id": 28,
+   "kind": "para",
+   "start": 10686,
+   "end": 10757,
+   "text": "Connect the SO101 Leader controller, run the calibration command below.",
+   "tokens": []
+  },
+  {
+   "id": 29,
+   "kind": "para",
+   "start": 10881,
+   "end": 10915,
+   "text": "And then launch the teleop script.",
+   "tokens": []
+  },
+  {
+   "id": 30,
+   "kind": "para",
+   "start": 10917,
+   "end": 10974,
+   "text": "⟦0⟧\n⟦1⟧Click to expand code example⟦2⟧",
+   "tokens": [
+    "<details>",
+    "<summary>",
+    "</summary>"
+   ]
+  },
+  {
+   "id": 31,
+   "kind": "para",
+   "start": 14010,
+   "end": 14097,
+   "text": "Running the script lets you operate the simulated arm using the physical Leader device.",
+   "tokens": []
+  },
+  {
+   "id": 32,
+   "kind": "heading",
+   "start": 14099,
+   "end": 14139,
+   "text": "## ☁️ Cloud Simulation (No GPU Required)",
+   "tokens": []
+  },
+  {
+   "id": 33,
+   "kind": "para",
+   "start": 14141,
+   "end": 14373,
+   "text": "Don’t have a local GPU or the right drivers? No problem! You can run LeIsaac entirely in the cloud with zero setup.\nLeIsaac works out-of-the-box on **NVIDIA Brev**, giving you a fully configured environment directly in your browser.",
+   "tokens": []
+  },
+  {
+   "id": 34,
+   "kind": "para",
+   "start": 14375,
+   "end": 14541,
+   "text": "👉 **Start here:** [⟦0⟧](⟦1⟧)",
+   "tokens": [
+    "https://lightwheelai.github.io/leisaac/docs/cloud_simulation/nvidia_brev",
+    "https://lightwheelai.github.io/leisaac/docs/cloud_simulation/nvidia_brev"
+   ]
+  },
+  {
+   "id": 35,
+   "kind": "para",
+   "start": 14543,
+   "end": 14803,
+   "text": "Once your instance is deployed, simply open the link for **port 80 (HTTP)** to launch **Visual Studio Code Server** (default password: ⟦0⟧). From there, you can run simulations, edit code, and visualize IsaacLab environments — all from your web browser.",
+   "tokens": [
+    "`password`"
+   ]
+  },
+  {
+   "id": 36,
+   "kind": "para",
+   "start": 14805,
+   "end": 14871,
+   "text": "**No GPU, no drivers, no local installation. Just click and run.**",
+   "tokens": []
+  },
+  {
+   "id": 37,
+   "kind": "heading",
+   "start": 14873,
+   "end": 14892,
+   "text": "## Additional Notes",
+   "tokens": []
+  },
+  {
+   "id": 38,
+   "kind": "para",
+   "start": 14894,
+   "end": 14969,
+   "text": "We keep EnvHub coverage aligned with the LeIsaac task. Currently supported:",
+   "tokens": []
+  },
+  {
+   "id": 39,
+   "kind": "para",
+   "start": 15063,
+   "end": 15145,
+   "text": "Switch tasks by targeting a different script when calling ⟦0⟧, for example:",
+   "tokens": [
+    "`make_env`"
+   ]
+  },
+  {
+   "id": 40,
+   "kind": "para",
+   "start": 15649,
+   "end": 15792,
+   "text": "Note: when working with ⟦0⟧, call ⟦1⟧ immediately after retrieving the env before performing any other operations:",
+   "tokens": [
+    "`bi_so101_fold_cloth`",
+    "`initialize()`"
+   ]
+  },
+  {
+   "id": 41,
+   "kind": "para",
+   "start": 15794,
+   "end": 15851,
+   "text": "⟦0⟧\n⟦1⟧Click to expand code example⟦2⟧",
+   "tokens": [
+    "<details>",
+    "<summary>",
+    "</summary>"
+   ]
+  }
+ ]
+}

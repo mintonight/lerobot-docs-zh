@@ -1,0 +1,385 @@
+{
+ "file": "groot.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1938,
+   "text": "# GR00T Policy",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1940,
+   "end": 2201,
+   "text": "GR00T is an NVIDIA foundation model family for generalized humanoid robot reasoning and skills. It is a cross-embodiment policy that accepts multimodal input, including language, images, and proprioception, to perform manipulation tasks in diverse environments.",
+   "tokens": []
+  },
+  {
+   "id": 2,
+   "kind": "para",
+   "start": 2203,
+   "end": 2265,
+   "text": "LeRobot integrates GR00T N1.7 through the ⟦0⟧ policy type.",
+   "tokens": [
+    "`groot`"
+   ]
+  },
+  {
+   "id": 3,
+   "kind": "quote",
+   "start": 2267,
+   "end": 2697,
+   "text": "> [!WARNING]\n> **Breaking change:** GR00T N1.5 support was removed from LeRobot, and current releases support GR00T N1.7 only. N1.5 checkpoints and configs are rejected with a migration note. To keep using an N1.5 checkpoint, pin the last release that supports it: ⟦0⟧. To use the current release, migrate to GR00T N1.7 (base model [⟦1⟧](⟦2⟧)).",
+   "tokens": [
+    "`pip install 'lerobot==0.5.1'`",
+    "`nvidia/GR00T-N1.7-3B`",
+    "https://huggingface.co/nvidia/GR00T-N1.7-3B"
+   ]
+  },
+  {
+   "id": 4,
+   "kind": "heading",
+   "start": 2699,
+   "end": 2716,
+   "text": "## Model Overview",
+   "tokens": []
+  },
+  {
+   "id": 5,
+   "kind": "para",
+   "start": 2718,
+   "end": 2828,
+   "text": "GR00T N1.7 uses a Cosmos-Reason2/Qwen3-VL backbone and provides checkpoints for SimplerEnv, DROID, and LIBERO.",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "para",
+   "start": 2830,
+   "end": 2966,
+   "text": "Developers and researchers can post-train GR00T with their own real or synthetic data to adapt it for specific humanoid robots or tasks.",
+   "tokens": []
+  },
+  {
+   "id": 7,
+   "kind": "para",
+   "start": 2968,
+   "end": 3140,
+   "text": "GR00T uses pre-trained vision and language encoders with a flow matching action transformer to model a chunk of actions conditioned on vision, language, and proprioception.",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "para",
+   "start": 3319,
+   "end": 3428,
+   "text": "Its strong performance comes from being trained on an expansive and diverse humanoid dataset, which includes:",
+   "tokens": []
+  },
+  {
+   "id": 9,
+   "kind": "list",
+   "start": 3430,
+   "end": 3463,
+   "text": "- Real captured data from robots.",
+   "tokens": []
+  },
+  {
+   "id": 10,
+   "kind": "list",
+   "start": 3464,
+   "end": 3526,
+   "text": "- Synthetic data generated using NVIDIA Isaac GR00T Blueprint.",
+   "tokens": []
+  },
+  {
+   "id": 11,
+   "kind": "list",
+   "start": 3527,
+   "end": 3555,
+   "text": "- Internet-scale video data.",
+   "tokens": []
+  },
+  {
+   "id": 12,
+   "kind": "para",
+   "start": 3557,
+   "end": 3683,
+   "text": "This approach allows the model to be highly adaptable through post-training for specific embodiments, tasks, and environments.",
+   "tokens": []
+  },
+  {
+   "id": 13,
+   "kind": "heading",
+   "start": 3685,
+   "end": 3713,
+   "text": "## Installation Requirements",
+   "tokens": []
+  },
+  {
+   "id": 14,
+   "kind": "para",
+   "start": 3715,
+   "end": 3806,
+   "text": "GR00T is intended for NVIDIA GPU-accelerated systems. Install LeRobot with the GR00T extra:",
+   "tokens": []
+  },
+  {
+   "id": 15,
+   "kind": "para",
+   "start": 3850,
+   "end": 3872,
+   "text": "For a source checkout:",
+   "tokens": []
+  },
+  {
+   "id": 16,
+   "kind": "heading",
+   "start": 3913,
+   "end": 3921,
+   "text": "## Usage",
+   "tokens": []
+  },
+  {
+   "id": 17,
+   "kind": "para",
+   "start": 3923,
+   "end": 3941,
+   "text": "To use GR00T N1.7:",
+   "tokens": []
+  },
+  {
+   "id": 18,
+   "kind": "heading",
+   "start": 3976,
+   "end": 3987,
+   "text": "## Training",
+   "tokens": []
+  },
+  {
+   "id": 19,
+   "kind": "heading",
+   "start": 3989,
+   "end": 4017,
+   "text": "### Training Command Example",
+   "tokens": []
+  },
+  {
+   "id": 20,
+   "kind": "para",
+   "start": 4019,
+   "end": 4110,
+   "text": "Here's a complete training command for finetuning the base GR00T model on your own dataset:",
+   "tokens": []
+  },
+  {
+   "id": 21,
+   "kind": "para",
+   "start": 4112,
+   "end": 4348,
+   "text": "This command is using the ⟦0⟧ flag, which is used for the SO-101 robot, [read more about how GR00T handles different embodiments.](⟦1⟧).",
+   "tokens": [
+    "`new_embodiment`",
+    "https://github.com/NVIDIA/Isaac-GR00T/blob/main/getting_started/policy.md#--embodiment-tag"
+   ]
+  },
+  {
+   "id": 22,
+   "kind": "heading",
+   "start": 5469,
+   "end": 5491,
+   "text": "## Performance Results",
+   "tokens": []
+  },
+  {
+   "id": 23,
+   "kind": "heading",
+   "start": 5493,
+   "end": 5521,
+   "text": "### LIBERO Benchmark Results",
+   "tokens": []
+  },
+  {
+   "id": 24,
+   "kind": "quote",
+   "start": 5523,
+   "end": 5614,
+   "text": "> [!NOTE]\n> Follow the [LIBERO](⟦0⟧) setup instructions before running ⟦1⟧.",
+   "tokens": [
+    "./libero",
+    "`lerobot-eval`"
+   ]
+  },
+  {
+   "id": 25,
+   "kind": "para",
+   "start": 5616,
+   "end": 5782,
+   "text": "GR00T N1.7 has demonstrated strong performance on the LIBERO benchmark suite. To reproduce LeRobot results, follow the instructions in the [LIBERO](⟦0⟧) section.",
+   "tokens": [
+    "./libero"
+   ]
+  },
+  {
+   "id": 26,
+   "kind": "heading",
+   "start": 5784,
+   "end": 5803,
+   "text": "### Train on LIBERO",
+   "tokens": []
+  },
+  {
+   "id": 27,
+   "kind": "para",
+   "start": 5805,
+   "end": 5873,
+   "text": "Example training command for a LIBERO suite (here ⟦0⟧):",
+   "tokens": [
+    "`libero_spatial`"
+   ]
+  },
+  {
+   "id": 28,
+   "kind": "para",
+   "start": 7204,
+   "end": 7320,
+   "text": "This will follow the recipe found [here](⟦0⟧).",
+   "tokens": [
+    "https://github.com/NVIDIA/Isaac-GR00T/blob/main/examples/LIBERO/README.md"
+   ]
+  },
+  {
+   "id": 29,
+   "kind": "heading",
+   "start": 7322,
+   "end": 7351,
+   "text": "### GR00T N1.7 LIBERO Results",
+   "tokens": []
+  },
+  {
+   "id": 30,
+   "kind": "para",
+   "start": 7353,
+   "end": 7444,
+   "text": "Preliminary LeRobot integration results (GR00T-LeRobot, ⟦0⟧ per suite):",
+   "tokens": [
+    "`eval.n_episodes >= 50`"
+   ]
+  },
+  {
+   "id": 31,
+   "kind": "table",
+   "start": 7446,
+   "end": 7593,
+   "text": "| Suite            | Success rate | Checkpoint                                                                                                    |",
+   "tokens": []
+  },
+  {
+   "id": 32,
+   "kind": "table",
+   "start": 7742,
+   "end": 7889,
+   "text": "| LIBERO Spatial   |          95% | [nvidia/gr00t17-lerobot-libero_spatial-640](⟦0⟧) |",
+   "tokens": [
+    "https://huggingface.co/nvidia/gr00t17-lerobot-libero_spatial-640"
+   ]
+  },
+  {
+   "id": 33,
+   "kind": "table",
+   "start": 7890,
+   "end": 8037,
+   "text": "| LIBERO Object    |         100% | [nvidia/gr00t17-lerobot-libero_object-640](⟦0⟧)   |",
+   "tokens": [
+    "https://huggingface.co/nvidia/gr00t17-lerobot-libero_object-640"
+   ]
+  },
+  {
+   "id": 34,
+   "kind": "table",
+   "start": 8038,
+   "end": 8185,
+   "text": "| LIBERO Goal      |          98% | [nvidia/gr00t17-lerobot-libero_goal-640](⟦0⟧)       |",
+   "tokens": [
+    "https://huggingface.co/nvidia/gr00t17-lerobot-libero_goal-640"
+   ]
+  },
+  {
+   "id": 35,
+   "kind": "table",
+   "start": 8186,
+   "end": 8333,
+   "text": "| LIBERO 10 (Long) |          93% | [nvidia/gr00t17-lerobot-libero_10-640](⟦0⟧)           |",
+   "tokens": [
+    "https://huggingface.co/nvidia/gr00t17-lerobot-libero_10-640"
+   ]
+  },
+  {
+   "id": 36,
+   "kind": "table",
+   "start": 8334,
+   "end": 8481,
+   "text": "| **Average**      |    **96.5%** |                                                                                                               |",
+   "tokens": []
+  },
+  {
+   "id": 37,
+   "kind": "para",
+   "start": 8739,
+   "end": 8806,
+   "text": "Use ⟦0⟧ per suite when reporting success rates.",
+   "tokens": [
+    "`eval.n_episodes >= 50`"
+   ]
+  },
+  {
+   "id": 38,
+   "kind": "heading",
+   "start": 8808,
+   "end": 8843,
+   "text": "### Evaluate in your hardware setup",
+   "tokens": []
+  },
+  {
+   "id": 39,
+   "kind": "para",
+   "start": 8845,
+   "end": 9038,
+   "text": "Once you have trained your model using your parameters you can run inference in your downstream task. Follow the instructions in [Policy Deployment (lerobot-rollout)](⟦0⟧). For example:",
+   "tokens": [
+    "./inference"
+   ]
+  },
+  {
+   "id": 40,
+   "kind": "quote",
+   "start": 10176,
+   "end": 10272,
+   "text": "> [!NOTE]\n> Value of ⟦0⟧ should not exceed 5 to ensure stable inference.",
+   "tokens": [
+    "`inference.queue_threshold`"
+   ]
+  },
+  {
+   "id": 41,
+   "kind": "heading",
+   "start": 10274,
+   "end": 10284,
+   "text": "## License",
+   "tokens": []
+  },
+  {
+   "id": 42,
+   "kind": "para",
+   "start": 10286,
+   "end": 10445,
+   "text": "GR00T N1.7 is released under the [NVIDIA Open Model License Agreement](⟦0⟧).",
+   "tokens": [
+    "https://www.nvidia.com/en-us/agreements/enterprise-software/nvidia-open-model-license/"
+   ]
+  }
+ ]
+}

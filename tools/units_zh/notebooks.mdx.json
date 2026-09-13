@@ -1,0 +1,61 @@
+{
+ "file": "notebooks.mdx",
+ "units": [
+  {
+   "id": 0,
+   "zh": "# 🤗 LeRobot 笔记本"
+  },
+  {
+   "id": 1,
+   "zh": "该仓库包含使用 LeRobot 的示例 notebook。这些 notebook 演示了如何使用标准化 policy 在真实或 simulation dataset 上训练 policy。"
+  },
+  {
+   "id": 2,
+   "zh": "### 训练 ACT"
+  },
+  {
+   "id": 3,
+   "zh": "[ACT](⟦0⟧)（action chunking Transformer）是一种基于 transformer 的模仿学习 policy 架构，它处理机器人 state 和相机输入，以生成平滑的分块 action sequence。"
+  },
+  {
+   "id": 4,
+   "zh": "我们提供了一个可直接运行的 Google Colab notebook，帮助你使用 Hugging Face Hub 中的 dataset 训练 ACT policy，并可选地将日志记录到 Weights & Biases。"
+  },
+  {
+   "id": 5,
+   "zh": "| Notebook                                                                                                | Colab                                                                                                                                                                             |"
+  },
+  {
+   "id": 6,
+   "zh": "| [使用 LeRobot 训练 ACT](⟦0⟧) | [⟦1⟧](⟦2⟧) |"
+  },
+  {
+   "id": 7,
+   "zh": "100k 步的预期训练时间：在 NVIDIA A100 GPU 上、批次大小为 ⟦0⟧ 时约 1.5 小时。"
+  },
+  {
+   "id": 8,
+   "zh": "### 训练 SmolVLA"
+  },
+  {
+   "id": 9,
+   "zh": "[SmolVLA](⟦0⟧) 是一个小巧而高效的视觉-语言-action 模型。它尺寸紧凑，拥有 450M 参数，由 Hugging Face 开发。"
+  },
+  {
+   "id": 10,
+   "zh": "我们提供了一个可直接运行的 Google Colab notebook，帮助你使用 Hugging Face Hub 中的 dataset 训练 SmolVLA policy，并可选地将日志记录到 Weights & Biases。"
+  },
+  {
+   "id": 11,
+   "zh": "| Notebook                                                                                                        | Colab                                                                                                                                                                                 |"
+  },
+  {
+   "id": 12,
+   "zh": "| [使用 LeRobot 训练 SmolVLA](⟦0⟧) | [⟦1⟧](⟦2⟧) |"
+  },
+  {
+   "id": 13,
+   "zh": "20k 步的预期训练时间：在 NVIDIA A100 GPU 上、批次大小为 ⟦0⟧ 时约 5 小时。"
+  }
+ ]
+}

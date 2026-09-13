@@ -1,0 +1,400 @@
+{
+ "file": "pi0.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1934,
+   "text": "# π₀ (Pi0)",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1936,
+   "end": 2162,
+   "text": "π₀ is a **Vision-Language-Action model for general robot control**, from Physical Intelligence. The LeRobot implementation is adapted from their open source [OpenPI](⟦0⟧) repository.",
+   "tokens": [
+    "https://github.com/Physical-Intelligence/openpi"
+   ]
+  },
+  {
+   "id": 2,
+   "kind": "heading",
+   "start": 2164,
+   "end": 2181,
+   "text": "## Model Overview",
+   "tokens": []
+  },
+  {
+   "id": 3,
+   "kind": "para",
+   "start": 2183,
+   "end": 2642,
+   "text": "π₀ represents a breakthrough in robotics as the first general-purpose robot foundation model developed by [Physical Intelligence](⟦0⟧). Unlike traditional robot programs that are narrow specialists programmed for repetitive motions, π₀ is designed to be a generalist policy that can understand visual inputs, interpret natural language instructions, and control a variety of different robots across diverse tasks.",
+   "tokens": [
+    "https://www.physicalintelligence.company/blog/pi0"
+   ]
+  },
+  {
+   "id": 4,
+   "kind": "heading",
+   "start": 2810,
+   "end": 2850,
+   "text": "### The Vision for Physical Intelligence",
+   "tokens": []
+  },
+  {
+   "id": 5,
+   "kind": "para",
+   "start": 2852,
+   "end": 3476,
+   "text": "As described by Physical Intelligence, while AI has achieved remarkable success in digital domains, from chess-playing to drug discovery, human intelligence still dramatically outpaces AI in the physical world. To paraphrase Moravec's paradox, winning a game of chess represents an \"easy\" problem for AI, but folding a shirt or cleaning up a table requires solving some of the most difficult engineering problems ever conceived. π₀ represents a first step toward developing artificial physical intelligence that enables users to simply ask robots to perform any task they want, just like they can with large language models.",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "heading",
+   "start": 3478,
+   "end": 3507,
+   "text": "### Architecture and Approach",
+   "tokens": []
+  },
+  {
+   "id": 7,
+   "kind": "para",
+   "start": 3509,
+   "end": 3545,
+   "text": "π₀ combines several key innovations:",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "list",
+   "start": 3547,
+   "end": 3696,
+   "text": "- **Flow Matching**: Uses a novel method to augment pre-trained VLMs with continuous action outputs via flow matching (a variant of diffusion models)",
+   "tokens": []
+  },
+  {
+   "id": 9,
+   "kind": "list",
+   "start": 3697,
+   "end": 3883,
+   "text": "- **Cross-Embodiment Training**: Trained on data from 8 distinct robot platforms including UR5e, Bimanual UR5e, Franka, Bimanual Trossen, Bimanual ARX, Mobile Trossen, and Mobile Fibocom",
+   "tokens": []
+  },
+  {
+   "id": 10,
+   "kind": "list",
+   "start": 3884,
+   "end": 4000,
+   "text": "- **Internet-Scale Pre-training**: Inherits semantic knowledge from a pre-trained 3B parameter Vision-Language Model",
+   "tokens": []
+  },
+  {
+   "id": 11,
+   "kind": "list",
+   "start": 4001,
+   "end": 4105,
+   "text": "- **High-Frequency Control**: Outputs motor commands at up to 50 Hz for real-time dexterous manipulation",
+   "tokens": []
+  },
+  {
+   "id": 12,
+   "kind": "heading",
+   "start": 4107,
+   "end": 4135,
+   "text": "## Installation Requirements",
+   "tokens": []
+  },
+  {
+   "id": 13,
+   "kind": "list",
+   "start": 4137,
+   "end": 4210,
+   "text": "1. Install LeRobot by following our [Installation Guide](⟦0⟧).",
+   "tokens": [
+    "./installation"
+   ]
+  },
+  {
+   "id": 14,
+   "kind": "list",
+   "start": 4211,
+   "end": 4250,
+   "text": "2. Install Pi0 dependencies by running:",
+   "tokens": []
+  },
+  {
+   "id": 15,
+   "kind": "heading",
+   "start": 4297,
+   "end": 4330,
+   "text": "## Training Data and Capabilities",
+   "tokens": []
+  },
+  {
+   "id": 16,
+   "kind": "para",
+   "start": 4332,
+   "end": 4429,
+   "text": "π₀ is trained on the largest robot interaction dataset to date, combining three key data sources:",
+   "tokens": []
+  },
+  {
+   "id": 17,
+   "kind": "list",
+   "start": 4431,
+   "end": 4527,
+   "text": "1. **Internet-Scale Pre-training**: Vision-language data from the web for semantic understanding",
+   "tokens": []
+  },
+  {
+   "id": 18,
+   "kind": "list",
+   "start": 4528,
+   "end": 4601,
+   "text": "2. **Open X-Embodiment Dataset**: Open-source robot manipulation datasets",
+   "tokens": []
+  },
+  {
+   "id": 19,
+   "kind": "list",
+   "start": 4602,
+   "end": 4709,
+   "text": "3. **Physical Intelligence Dataset**: Large and diverse dataset of dexterous tasks across 8 distinct robots",
+   "tokens": []
+  },
+  {
+   "id": 20,
+   "kind": "heading",
+   "start": 4711,
+   "end": 4719,
+   "text": "## Usage",
+   "tokens": []
+  },
+  {
+   "id": 21,
+   "kind": "para",
+   "start": 4721,
+   "end": 4770,
+   "text": "To use π₀ in LeRobot, specify the policy type as:",
+   "tokens": []
+  },
+  {
+   "id": 22,
+   "kind": "heading",
+   "start": 4803,
+   "end": 4814,
+   "text": "## Training",
+   "tokens": []
+  },
+  {
+   "id": 23,
+   "kind": "para",
+   "start": 4816,
+   "end": 4917,
+   "text": "For training π₀, you can use the standard LeRobot training script with the appropriate configuration:",
+   "tokens": []
+  },
+  {
+   "id": 24,
+   "kind": "heading",
+   "start": 5420,
+   "end": 5447,
+   "text": "### Key Training Parameters",
+   "tokens": []
+  },
+  {
+   "id": 25,
+   "kind": "list",
+   "start": 5449,
+   "end": 5531,
+   "text": "- **⟦0⟧**: Enables model compilation for faster training",
+   "tokens": [
+    "`--policy.compile_model=true`"
+   ]
+  },
+  {
+   "id": 26,
+   "kind": "list",
+   "start": 5532,
+   "end": 5628,
+   "text": "- **⟦0⟧**: Reduces memory usage significantly during training",
+   "tokens": [
+    "`--policy.gradient_checkpointing=true`"
+   ]
+  },
+  {
+   "id": 27,
+   "kind": "list",
+   "start": 5629,
+   "end": 5705,
+   "text": "- **⟦0⟧**: Use mixed precision training for efficiency",
+   "tokens": [
+    "`--policy.dtype=bfloat16`"
+   ]
+  },
+  {
+   "id": 28,
+   "kind": "list",
+   "start": 5706,
+   "end": 5791,
+   "text": "- **⟦0⟧**: Batch size for training, adapt this based on your GPU memory",
+   "tokens": [
+    "`--batch_size=32`"
+   ]
+  },
+  {
+   "id": 29,
+   "kind": "list",
+   "start": 5792,
+   "end": 5895,
+   "text": "- **⟦0⟧**: The base π₀ model you want to finetune, options are:",
+   "tokens": [
+    "`--policy.pretrained_path=lerobot/pi0_base`"
+   ]
+  },
+  {
+   "id": 30,
+   "kind": "list",
+   "start": 5896,
+   "end": 5959,
+   "text": "  - [lerobot/pi0_base](⟦0⟧)",
+   "tokens": [
+    "https://huggingface.co/lerobot/pi0_base"
+   ]
+  },
+  {
+   "id": 31,
+   "kind": "list",
+   "start": 5960,
+   "end": 6072,
+   "text": "  - [lerobot/pi0_libero](⟦0⟧) (specifically trained on the Libero dataset)",
+   "tokens": [
+    "https://huggingface.co/lerobot/pi0_libero"
+   ]
+  },
+  {
+   "id": 32,
+   "kind": "heading",
+   "start": 6074,
+   "end": 6107,
+   "text": "### Training Parameters Explained",
+   "tokens": []
+  },
+  {
+   "id": 33,
+   "kind": "table",
+   "start": 6109,
+   "end": 6192,
+   "text": "| Parameter               | Default | Description                                 |",
+   "tokens": []
+  },
+  {
+   "id": 34,
+   "kind": "table",
+   "start": 6277,
+   "end": 6360,
+   "text": "| ⟦0⟧ | ⟦1⟧ | Do not freeze the vision encoder            |",
+   "tokens": [
+    "`freeze_vision_encoder`",
+    "`false`"
+   ]
+  },
+  {
+   "id": 35,
+   "kind": "table",
+   "start": 6361,
+   "end": 6444,
+   "text": "| ⟦0⟧     | ⟦1⟧ | Do not freeze the VLM, train all parameters |",
+   "tokens": [
+    "`train_expert_only`",
+    "`false`"
+   ]
+  },
+  {
+   "id": 36,
+   "kind": "para",
+   "start": 6446,
+   "end": 6603,
+   "text": "**💡 Tip**: Setting ⟦0⟧ freezes the VLM and trains only the action expert and projections, allowing finetuning with reduced memory usage.",
+   "tokens": [
+    "`train_expert_only=true`"
+   ]
+  },
+  {
+   "id": 37,
+   "kind": "heading",
+   "start": 6605,
+   "end": 6624,
+   "text": "## Relative Actions",
+   "tokens": []
+  },
+  {
+   "id": 38,
+   "kind": "para",
+   "start": 6626,
+   "end": 6826,
+   "text": "By default, π₀ predicts absolute actions. You can enable **relative actions** so the model predicts offsets relative to the current robot state. This can improve training stability for certain setups.",
+   "tokens": []
+  },
+  {
+   "id": 39,
+   "kind": "para",
+   "start": 6828,
+   "end": 6918,
+   "text": "To use relative actions, first recompute your dataset stats in relative space via the CLI:",
+   "tokens": []
+  },
+  {
+   "id": 40,
+   "kind": "para",
+   "start": 7174,
+   "end": 7200,
+   "text": "Or equivalently in Python:",
+   "tokens": []
+  },
+  {
+   "id": 41,
+   "kind": "para",
+   "start": 7441,
+   "end": 7689,
+   "text": "The ⟦0⟧ should match your policy's ⟦1⟧ (default 50 for π₀). ⟦2⟧ lists joint names that should remain in absolute space (e.g. gripper commands). Use ⟦3⟧ to upload the updated stats to the Hub.",
+   "tokens": [
+    "`chunk_size`",
+    "`chunk_size`",
+    "`relative_exclude_joints`",
+    "`--push_to_hub true`"
+   ]
+  },
+  {
+   "id": 42,
+   "kind": "para",
+   "start": 7691,
+   "end": 7732,
+   "text": "Then train with relative actions enabled:",
+   "tokens": []
+  },
+  {
+   "id": 43,
+   "kind": "heading",
+   "start": 7926,
+   "end": 7936,
+   "text": "## License",
+   "tokens": []
+  },
+  {
+   "id": 44,
+   "kind": "para",
+   "start": 7938,
+   "end": 8083,
+   "text": "This model follows the **Apache 2.0 License**, consistent with the original [OpenPI repository](⟦0⟧).",
+   "tokens": [
+    "https://github.com/Physical-Intelligence/openpi"
+   ]
+  }
+ ]
+}

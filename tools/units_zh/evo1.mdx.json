@@ -1,0 +1,325 @@
+{
+ "file": "evo1.mdx",
+ "units": [
+  {
+   "id": 0,
+   "zh": "# EVO1"
+  },
+  {
+   "id": 1,
+   "zh": "EVO1 是一种用于机器人控制的视觉-语言-action policy，围绕 InternVL3 骨干和连续流匹配 action 头构建。此 LeRobot 集成将 EVO1 作为标准 policy 类型公开，因此可以用常见的 LeRobot dataset、checkpoint 和处理器 API 对其进行训练和评估。"
+  },
+  {
+   "id": 2,
+   "zh": "## 模型概览"
+  },
+  {
+   "id": 3,
+   "zh": "该 policy 使用 InternVL3 嵌入一个或多个相机图像以及语言任务提示，将机器人 state/action 向量填充到固定的最大维度，并使用流匹配 action 头预测未来的 action chunk。inference 时，policy 采样一个 action chunk，并在再次采样之前从该 action chunk 返回 ⟦0⟧ 个 action。"
+  },
+  {
+   "id": 4,
+   "zh": "### LeRobot 集成涵盖的内容"
+  },
+  {
+   "id": 5,
+   "zh": "- 通过 LeRobot 的标准 ⟦0⟧ 配置"
+  },
+  {
+   "id": 6,
+   "zh": "- InternVL3 图像/文本嵌入，并带有可选的 FlashAttention 回退"
+  },
+  {
+   "id": 7,
+   "zh": "- 面向仅 action 头 fine-tune 和 VLM fine-tune 运行的基于阶段的 fine-tune 控制"
+  },
+  {
+   "id": 8,
+   "zh": "- 连续流匹配 action prediction"
+  },
+  {
+   "id": 9,
+   "zh": "- 通过 LeRobot policy API 保存/加载 checkpoint"
+  },
+  {
+   "id": 10,
+   "zh": "- 使用 ⟦0⟧ 进行训练，并使用标准 policy inference API 进行评估"
+  },
+  {
+   "id": 11,
+   "zh": "更广泛的 EVO1 项目可能包含额外的训练脚本和 dataset 工具。本页重点介绍 LeRobot 机器人控制 policy 路径。"
+  },
+  {
+   "id": 12,
+   "zh": "## 安装要求"
+  },
+  {
+   "id": 13,
+   "zh": "1. 按照[安装指南](⟦0⟧)安装 LeRobot。"
+  },
+  {
+   "id": 14,
+   "zh": "2. 安装 EVO1 依赖项："
+  },
+  {
+   "id": 15,
+   "zh": "   对于 LIBERO 训练和评估，还需安装 LIBERO extra："
+  },
+  {
+   "id": 16,
+   "zh": "3. 仅当 ⟦0⟧ wheel 与你的 Python、PyTorch、CUDA 和 GPU 技术栈兼容时才安装它。当 ⟦1⟧ 不可用时，EVO1 会回退到标准注意力。"
+  },
+  {
+   "id": 17,
+   "zh": "EVO1 使用原生 Hugging Face ⟦0⟧ InternVL 实现，因此 ⟦1⟧ 必须指向原生转换的 checkpoint，例如 ⟦2⟧（注意 ⟦3⟧ 后缀）。首次运行会下载配置的 VLM checkpoint，后续运行会从 Hugging Face 缓存中复用它。"
+  },
+  {
+   "id": 18,
+   "zh": "## 数据要求"
+  },
+  {
+   "id": 19,
+   "zh": "EVO1 期望 LeRobot dataset 具有："
+  },
+  {
+   "id": 20,
+   "zh": "- 一到 ⟦0⟧ 个视觉 observation，例如 ⟦1⟧"
+  },
+  {
+   "id": 21,
+   "zh": "- dataset ⟦0⟧ 字段中的语言任务指令，或使用 ⟦1⟧ 配置的另一个字段"
+  },
+  {
+   "id": 22,
+   "zh": "state 和 action 向量会填充到 ⟦0⟧ 和 ⟦1⟧。预测结果在返回之前会被裁剪回 dataset 的 action 维度。"
+  },
+  {
+   "id": 23,
+   "zh": "## 用法"
+  },
+  {
+   "id": 24,
+   "zh": "要在 LeRobot 配置中使用 EVO1，请指定："
+  },
+  {
+   "id": 25,
+   "zh": "默认情况下，新的 EVO1 policy 从以下位置初始化其 VLM："
+  },
+  {
+   "id": 26,
+   "zh": "一旦获得 LeRobot 格式的 EVO1 checkpoint，请使用以下方式加载："
+  },
+  {
+   "id": 27,
+   "zh": "## 训练"
+  },
+  {
+   "id": 28,
+   "zh": "### 阶段 1"
+  },
+  {
+   "id": 29,
+   "zh": "阶段 1 冻结 VLM 并训练 action 头："
+  },
+  {
+   "id": 30,
+   "zh": "### 阶段 2"
+  },
+  {
+   "id": 31,
+   "zh": "阶段 2 加载阶段 1 的 policy，但启动全新的优化器和调度器："
+  },
+  {
+   "id": 32,
+   "zh": "默认情况下，⟦0⟧ 会重新应用该阶段的 fine-tune 默认值。当从阶段 1 checkpoint 启动阶段 2 时，这一点很重要，因为阶段 1 checkpoint 配置将 VLM fine-tune\n标志存储为禁用 state。这些阶段默认值优先于已保存或手动提供的 ⟦1⟧\n标志，除非 ⟦2⟧，因此仅当你手动控制\n每个 fine-tune 标志时才设置该标志。"
+  },
+  {
+   "id": 33,
+   "zh": "### 关键训练参数"
+  },
+  {
+   "id": 34,
+   "zh": "| 参数                                          | 默认值                       | 描述                                                              |"
+  },
+  {
+   "id": 35,
+   "zh": "| ⟦0⟧                       | ⟦1⟧ | 原生转换的 InternVL3 checkpoint 或本地模型目录                         |"
+  },
+  {
+   "id": 36,
+   "zh": "| ⟦0⟧                       | ⟦1⟧                    | ⟦2⟧ 训练 action 头；⟦3⟧ fine-tune VLM 分支                                   |"
+  },
+  {
+   "id": 37,
+   "zh": "| ⟦0⟧        | ⟦1⟧                      | 加载 checkpoint 后重新应用阶段 fine-tune 默认值                                 |"
+  },
+  {
+   "id": 38,
+   "zh": "| ⟦0⟧                       | ⟦1⟧                        | 为 policy 保留的 InternVL3 语言层数                                    |"
+  },
+  {
+   "id": 39,
+   "zh": "| ⟦0⟧                            | ⟦1⟧                  | 请求的 VLM 数据类型                                                |"
+  },
+  {
+   "id": 40,
+   "zh": "| ⟦0⟧                       | ⟦1⟧                      | 安装时请求 FlashAttention；否则回退                                |"
+  },
+  {
+   "id": 41,
+   "zh": "| ⟦0⟧        | ⟦1⟧                      | 在支持的 InternVL3 模块上启用 checkpoint                                |"
+  },
+  {
+   "id": 42,
+   "zh": "| ⟦0⟧ | ⟦1⟧                     | 在支持时传递给梯度 checkpoint 的 reentrant 设置                          |"
+  },
+  {
+   "id": 43,
+   "zh": "| ⟦0⟧                           | ⟦1⟧                        | 每个 action chunk 预测的未来 action 数                                        |"
+  },
+  {
+   "id": 44,
+   "zh": "| ⟦0⟧                       | ⟦1⟧                        | 从采样的 action chunk 中消耗的 action 数                                       |"
+  },
+  {
+   "id": 45,
+   "zh": "| ⟦0⟧                        | ⟦1⟧                        | state 填充维度                                                       |"
+  },
+  {
+   "id": 46,
+   "zh": "| ⟦0⟧                       | ⟦1⟧                        | action 填充维度                                                       |"
+  },
+  {
+   "id": 47,
+   "zh": "| ⟦0⟧               | ⟦1⟧                      | EVO1 后处理之后返回的可选 action 维度                                  |"
+  },
+  {
+   "id": 48,
+   "zh": "| ⟦0⟧                     | ⟦1⟧                     | 为 LIBERO 风格评估对后处理的 gripper 通道进行二值化                    |"
+  },
+  {
+   "id": 49,
+   "zh": "| ⟦0⟧                           | ⟦1⟧                      | 用作语言提示的批次字段                                             |"
+  },
+  {
+   "id": 50,
+   "zh": "## inference"
+  },
+  {
+   "id": 51,
+   "zh": "使用训练好的 EVO1 checkpoint 试用："
+  },
+  {
+   "id": 52,
+   "zh": "## 结果"
+  },
+  {
+   "id": 53,
+   "zh": "### LIBERO 评估"
+  },
+  {
+   "id": 54,
+   "zh": "#### 参考结果"
+  },
+  {
+   "id": 55,
+   "zh": "> [!NOTE]\n> 发布的 Stage-2 checkpoint 通过了干净下载和 rollout 验证：\n> [⟦0⟧](⟦1⟧)，revision\n> [⟦2⟧](⟦3⟧)。\n> 干净下载评估使用了 LeRobot revision\n> [⟦4⟧](⟦5⟧)。"
+  },
+  {
+   "id": 56,
+   "zh": "第 70,000 步的单次运行 Stage-2 checkpoint 产生了："
+  },
+  {
+   "id": 57,
+   "zh": "| 套件           | 成功 episode             |  episode     | 成功率       |"
+  },
+  {
+   "id": 58,
+   "zh": "| LIBERO Spatial |                 485 |       500 |        97.0% |"
+  },
+  {
+   "id": 59,
+   "zh": "| LIBERO Object  |                 496 |       500 |        99.2% |"
+  },
+  {
+   "id": 60,
+   "zh": "| LIBERO Goal    |                 483 |       500 |        96.6% |"
+  },
+  {
+   "id": 61,
+   "zh": "| LIBERO-10      |                 469 |       500 |        93.8% |"
+  },
+  {
+   "id": 62,
+   "zh": "| **总体**       |           **1,933** | **2,000** |   **96.65%** |"
+  },
+  {
+   "id": 63,
+   "zh": "这些结果使用一个训练好的 checkpoint 和评估种子 ⟦0⟧；它们不是多种子平均值或置信度估计。"
+  },
+  {
+   "id": 64,
+   "zh": "#### 参考训练配方"
+  },
+  {
+   "id": 65,
+   "zh": "发布的 checkpoint 在\n[⟦0⟧](⟦1⟧) 中记录了完整解析后的 Stage-2 配置。\n实测运行使用两块 H100 GPU 和两个 DDP 进程，每个进程批次为 64，因此全局批次为 128。两个阶段使用相同的拓扑。基础 VLM 来自\n⟦3⟧ 的 revision ⟦2⟧。\n发布的产物没有记录确切的 LeRobot 训练提交或其原始依赖锁定，\n因此下面的命令从当前检出重现记录的配置和拓扑，\n而不是逐位重建软件环境。"
+  },
+  {
+   "id": 66,
+   "zh": "在 LeRobot 源码检出中，安装锁定的依赖并下载该确切的 VLM revision："
+  },
+  {
+   "id": 67,
+   "zh": "阶段 1 冻结 VLM 并训练 action 头 5,000 步："
+  },
+  {
+   "id": 68,
+   "zh": "阶段 2 加载 Stage-1 policy，但启动全新的优化器和调度器。它训练 80,000 步；\n报告的 checkpoint 是第 70,000 步保存的版本："
+  },
+  {
+   "id": 69,
+   "zh": "#### 作者格式评估配置"
+  },
+  {
+   "id": 70,
+   "zh": "作者格式的 EVO1 LIBERO 配置使用原始 LIBERO 相机特征名\n（⟦0⟧ 和 ⟦1⟧），每\n14 个 action 重新规划，并在推进 simulation 器之前对 gripper 命令进行二值化。EVO1 policy 后处理器\n可以将填充的 24 维 action 裁剪回 7 维 LIBERO action space，并应用该 gripper 二值化。要在\n相同的每任务一个 episode 设置下评估作者格式 checkpoint，请保留原始相机名，\n而不是默认的 ⟦2⟧/⟦3⟧ 映射，并设置 LIBERO action 后处理标志："
+  },
+  {
+   "id": 71,
+   "zh": "#### 原生 ⟦0⟧ v3 配置"
+  },
+  {
+   "id": 72,
+   "zh": "Revision ⟦0⟧ 将相机特征存储为 ⟦1⟧ 和\n⟦2⟧。此示例评估全部十个 LIBERO Object 任务，每个任务在全新进程中启动："
+  },
+  {
+   "id": 73,
+   "zh": "使用以下视界运行每个套件的全部十个任务 ID："
+  },
+  {
+   "id": 74,
+   "zh": "为每一行设置 ⟦0⟧ 和 ⟦1⟧。这样每个套件有 500 个 episode，总共 2,000 个 episode，而\n循环中每个任务使用全新进程与实测的 RNG 重置拓扑相匹配。"
+  },
+  {
+   "id": 75,
+   "zh": "## 参考"
+  },
+  {
+   "id": 76,
+   "zh": "- [EVO1 仓库](⟦0⟧)"
+  },
+  {
+   "id": 77,
+   "zh": "- [InternVL3-1B-hf](⟦0⟧)"
+  },
+  {
+   "id": 78,
+   "zh": "## 许可证"
+  },
+  {
+   "id": 79,
+   "zh": "此 LeRobot 集成遵循 LeRobot 使用的 Apache 2.0 License。请查看上游 EVO1 和 InternVL3 模型页面，了解已发布 checkpoint 和数据的许可证。"
+  }
+ ]
+}

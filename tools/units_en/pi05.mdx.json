@@ -1,0 +1,987 @@
+{
+ "file": "pi05.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1944,
+   "text": "# π₀.₅ (Pi05) Policy",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1946,
+   "end": 2179,
+   "text": "π₀.₅ is a **Vision-Language-Action model with open-world generalization**, from Physical Intelligence. The LeRobot implementation is adapted from their open source [OpenPI](⟦0⟧) repository.",
+   "tokens": [
+    "https://github.com/Physical-Intelligence/openpi"
+   ]
+  },
+  {
+   "id": 2,
+   "kind": "heading",
+   "start": 2181,
+   "end": 2198,
+   "text": "## Model Overview",
+   "tokens": []
+  },
+  {
+   "id": 3,
+   "kind": "para",
+   "start": 2200,
+   "end": 2591,
+   "text": "π₀.₅ represents a significant evolution from π₀, developed by [Physical Intelligence](⟦0⟧) to address a big challenge in robotics: **open-world generalization**. While robots can perform impressive tasks in controlled environments, π₀.₅ is designed to generalize to entirely new environments and situations that were never seen during training.",
+   "tokens": [
+    "https://www.physicalintelligence.company/blog/pi05"
+   ]
+  },
+  {
+   "id": 4,
+   "kind": "heading",
+   "start": 2593,
+   "end": 2625,
+   "text": "### The Generalization Challenge",
+   "tokens": []
+  },
+  {
+   "id": 5,
+   "kind": "para",
+   "start": 2627,
+   "end": 2970,
+   "text": "As Physical Intelligence explains, the fundamental challenge isn't performing tasks of agility or dexterity, but generalization, the ability to correctly perform tasks in new settings with new objects. Consider a robot cleaning different homes: each home has different objects in different places. Generalization must occur at multiple levels:",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "list",
+   "start": 2972,
+   "end": 3121,
+   "text": "- **Physical Level**: Understanding how to pick up a spoon (by the handle) or plate (by the edge), even with unseen objects in cluttered environments",
+   "tokens": []
+  },
+  {
+   "id": 7,
+   "kind": "list",
+   "start": 3122,
+   "end": 3289,
+   "text": "- **Semantic Level**: Understanding task semantics, where to put clothes and shoes (laundry hamper, not on the bed), and what tools are appropriate for cleaning spills",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "list",
+   "start": 3290,
+   "end": 3411,
+   "text": "- **Environmental Level**: Adapting to \"messy\" real-world environments like homes, grocery stores, offices, and hospitals",
+   "tokens": []
+  },
+  {
+   "id": 9,
+   "kind": "heading",
+   "start": 3413,
+   "end": 3450,
+   "text": "### Co-Training on Heterogeneous Data",
+   "tokens": []
+  },
+  {
+   "id": 10,
+   "kind": "para",
+   "start": 3452,
+   "end": 3560,
+   "text": "The breakthrough innovation in π₀.₅ is **co-training on heterogeneous data sources**. The model learns from:",
+   "tokens": []
+  },
+  {
+   "id": 11,
+   "kind": "list",
+   "start": 3562,
+   "end": 3651,
+   "text": "1. **Multimodal Web Data**: Image captioning, visual question answering, object detection",
+   "tokens": []
+  },
+  {
+   "id": 12,
+   "kind": "list",
+   "start": 3652,
+   "end": 3737,
+   "text": "2. **Verbal Instructions**: Humans coaching robots through complex tasks step-by-step",
+   "tokens": []
+  },
+  {
+   "id": 13,
+   "kind": "list",
+   "start": 3738,
+   "end": 3845,
+   "text": "3. **Subtask Commands**: High-level semantic behavior labels (e.g., \"pick up the pillow\" for an unmade bed)",
+   "tokens": []
+  },
+  {
+   "id": 14,
+   "kind": "list",
+   "start": 3846,
+   "end": 3943,
+   "text": "4. **Cross-Embodiment Robot Data**: Data from various robot platforms with different capabilities",
+   "tokens": []
+  },
+  {
+   "id": 15,
+   "kind": "list",
+   "start": 3944,
+   "end": 4025,
+   "text": "5. **Multi-Environment Data**: Static robots deployed across many different homes",
+   "tokens": []
+  },
+  {
+   "id": 16,
+   "kind": "list",
+   "start": 4026,
+   "end": 4100,
+   "text": "6. **Mobile Manipulation Data**: ~400 hours of mobile robot demonstrations",
+   "tokens": []
+  },
+  {
+   "id": 17,
+   "kind": "para",
+   "start": 4102,
+   "end": 4243,
+   "text": "This diverse training mixture creates a \"curriculum\" that enables generalization across physical, visual, and semantic levels simultaneously.",
+   "tokens": []
+  },
+  {
+   "id": 18,
+   "kind": "heading",
+   "start": 4245,
+   "end": 4273,
+   "text": "## Installation Requirements",
+   "tokens": []
+  },
+  {
+   "id": 19,
+   "kind": "list",
+   "start": 4275,
+   "end": 4348,
+   "text": "1. Install LeRobot by following our [Installation Guide](⟦0⟧).",
+   "tokens": [
+    "./installation"
+   ]
+  },
+  {
+   "id": 20,
+   "kind": "list",
+   "start": 4349,
+   "end": 4390,
+   "text": "2. Install Pi0.5 dependencies by running:",
+   "tokens": []
+  },
+  {
+   "id": 21,
+   "kind": "para",
+   "start": 4437,
+   "end": 4475,
+   "text": "   If you installed LeRobot from PyPI:",
+   "tokens": []
+  },
+  {
+   "id": 22,
+   "kind": "heading",
+   "start": 4525,
+   "end": 4533,
+   "text": "## Usage",
+   "tokens": []
+  },
+  {
+   "id": 23,
+   "kind": "para",
+   "start": 4535,
+   "end": 4605,
+   "text": "To use π₀.₅ in your LeRobot configuration, specify the policy type as:",
+   "tokens": []
+  },
+  {
+   "id": 24,
+   "kind": "heading",
+   "start": 4639,
+   "end": 4650,
+   "text": "## Training",
+   "tokens": []
+  },
+  {
+   "id": 25,
+   "kind": "heading",
+   "start": 4652,
+   "end": 4676,
+   "text": "### Quickstart on LIBERO",
+   "tokens": []
+  },
+  {
+   "id": 26,
+   "kind": "para",
+   "start": 4678,
+   "end": 4883,
+   "text": "Finetune the LIBERO base model on [lerobot/libero](⟦0⟧), a ~1.9 GB video-encoded copy of the demonstrations behind the [results below](⟦1⟧).",
+   "tokens": [
+    "https://huggingface.co/datasets/lerobot/libero",
+    "#libero-benchmark-results"
+   ]
+  },
+  {
+   "id": 27,
+   "kind": "para",
+   "start": 4885,
+   "end": 4992,
+   "text": "It carries the keys π₀.₅ reads, which are also the ones the LIBERO environment produces at evaluation time:",
+   "tokens": []
+  },
+  {
+   "id": 28,
+   "kind": "table",
+   "start": 4994,
+   "end": 5106,
+   "text": "| Feature                     | Shape in the dataset | How π₀.₅ consumes it                                    |",
+   "tokens": []
+  },
+  {
+   "id": 29,
+   "kind": "table",
+   "start": 5220,
+   "end": 5332,
+   "text": "| ⟦0⟧  | 256×256×3, agentview | resized to 224×224                                      |",
+   "tokens": [
+    "`observation.images.image`"
+   ]
+  },
+  {
+   "id": 30,
+   "kind": "table",
+   "start": 5333,
+   "end": 5445,
+   "text": "| ⟦0⟧ | 256×256×3, wrist     | resized to 224×224                                      |",
+   "tokens": [
+    "`observation.images.image2`"
+   ]
+  },
+  {
+   "id": 31,
+   "kind": "table",
+   "start": 5446,
+   "end": 5558,
+   "text": "| ⟦0⟧         | 8                    | discretized into 256 bins and written into the prompt   |",
+   "tokens": [
+    "`observation.state`"
+   ]
+  },
+  {
+   "id": 32,
+   "kind": "table",
+   "start": 5559,
+   "end": 5671,
+   "text": "| ⟦0⟧                    | 7                    | padded to 32 internally; the loss uses the first 7 dims |",
+   "tokens": [
+    "`action`"
+   ]
+  },
+  {
+   "id": 33,
+   "kind": "para",
+   "start": 5673,
+   "end": 5801,
+   "text": "**No ⟦0⟧ is needed here** — the keys already match; see [Rename Map and Empty Cameras](⟦1⟧) if yours differ.",
+   "tokens": [
+    "`--rename_map`",
+    "./rename_map"
+   ]
+  },
+  {
+   "id": 34,
+   "kind": "para",
+   "start": 5803,
+   "end": 6007,
+   "text": "⟦0⟧\n  π₀.₅ uses the gated\n  [google/paligemma-3b-pt-224](⟦1⟧)\n  tokenizer — accept its license on the Hub and log in with ⟦2⟧\n  before training.",
+   "tokens": [
+    "<Tip>",
+    "https://huggingface.co/google/paligemma-3b-pt-224",
+    "`hf auth login`"
+   ]
+  },
+  {
+   "id": 35,
+   "kind": "para",
+   "start": 6016,
+   "end": 6045,
+   "text": "Sized for a single 80 GB GPU:",
+   "tokens": []
+  },
+  {
+   "id": 36,
+   "kind": "para",
+   "start": 6753,
+   "end": 6983,
+   "text": "**Mean/std normalization, not π₀.₅'s [quantile default](⟦0⟧)** — matching [pi05_libero_finetuned_v044](⟦1⟧), the checkpoint the results below were measured on.",
+   "tokens": [
+    "#quantile-statistics",
+    "https://huggingface.co/lerobot/pi05_libero_finetuned_v044"
+   ]
+  },
+  {
+   "id": 37,
+   "kind": "para",
+   "start": 6985,
+   "end": 7261,
+   "text": "**⟦0⟧ and ⟦1⟧ are explicit** because ⟦2⟧ loads weights only — ⟦3⟧ stores both, and they would otherwise fall back to ⟦4⟧ and ⟦5⟧ (see [Loading a checkpoint](⟦6⟧)).",
+   "tokens": [
+    "`--policy.n_action_steps=10`",
+    "`--policy.empty_cameras=1`",
+    "`--policy.pretrained_path`",
+    "`lerobot/pi05_libero_base`",
+    "`50`",
+    "`0`",
+    "#loading-a-checkpoint"
+   ]
+  },
+  {
+   "id": 38,
+   "kind": "para",
+   "start": 7263,
+   "end": 7383,
+   "text": "Then evaluate a checkpoint with ⟦0⟧ and compare against the reference success rates — see [LIBERO](⟦1⟧).",
+   "tokens": [
+    "`lerobot-eval`",
+    "./libero"
+   ]
+  },
+  {
+   "id": 39,
+   "kind": "heading",
+   "start": 7385,
+   "end": 7408,
+   "text": "### Quantile statistics",
+   "tokens": []
+  },
+  {
+   "id": 40,
+   "kind": "para",
+   "start": 7410,
+   "end": 7601,
+   "text": "π₀.₅ normalizes ⟦0⟧ and ⟦1⟧ with quantiles, so your dataset's ⟦2⟧ needs ⟦3⟧ and ⟦4⟧. Older datasets carry only ⟦5⟧/⟦6⟧/⟦7⟧/⟦8⟧ and fail on the first batch:",
+   "tokens": [
+    "`STATE`",
+    "`ACTION`",
+    "`meta/stats.json`",
+    "`q01`",
+    "`q99`",
+    "`min`",
+    "`max`",
+    "`mean`",
+    "`std`"
+   ]
+  },
+  {
+   "id": 41,
+   "kind": "para",
+   "start": 7680,
+   "end": 7695,
+   "text": "Recompute them:",
+   "tokens": []
+  },
+  {
+   "id": 42,
+   "kind": "para",
+   "start": 7865,
+   "end": 8060,
+   "text": "**The result lands in ⟦0⟧**, not the cache ⟦1⟧ reads — so train with ⟦2⟧, or add ⟦3⟧ above.",
+   "tokens": [
+    "`$HF_LEROBOT_HOME/your_dataset`",
+    "`--dataset.repo_id`",
+    "`--dataset.root=$HF_LEROBOT_HOME/your_dataset`",
+    "`--push_to_hub true`"
+   ]
+  },
+  {
+   "id": 43,
+   "kind": "para",
+   "start": 8062,
+   "end": 8198,
+   "text": "Or keep the dataset as-is and pass ⟦0⟧.",
+   "tokens": [
+    "`--policy.normalization_mapping='{\"ACTION\": \"MEAN_STD\", \"STATE\": \"MEAN_STD\", \"VISUAL\": \"IDENTITY\"}'`"
+   ]
+  },
+  {
+   "id": 44,
+   "kind": "para",
+   "start": 8200,
+   "end": 8489,
+   "text": "Recording, resuming, and merging aggregate quantiles from per-episode summaries, so ⟦0⟧ ends up holding a conservative envelope (⟦1⟧ for ⟦2⟧, ⟦3⟧ for ⟦4⟧) rather than whole-dataset quantiles. To estimate the latter, scan every episode with a running histogram:",
+   "tokens": [
+    "`meta/stats.json`",
+    "`min`",
+    "`q <= 50`",
+    "`max`",
+    "`q > 50`"
+   ]
+  },
+  {
+   "id": 45,
+   "kind": "para",
+   "start": 8632,
+   "end": 9105,
+   "text": "⟦0⟧ keeps the existing image statistics and avoids downloading or decoding video data when only ⟦1⟧/⟦2⟧ need recomputing, and ⟦3⟧ reads a local dataset instead of the Hub. These values are histogram estimates, subject to discretization and rebinning error, so they can differ from the conservative ones — which changes π₀.₅'s normalized targets and therefore its loss scale. Statistics already saved inside an existing checkpoint are not affected.",
+   "tokens": [
+    "`--skip-images`",
+    "`STATE`",
+    "`ACTION`",
+    "`--root`"
+   ]
+  },
+  {
+   "id": 46,
+   "kind": "heading",
+   "start": 9107,
+   "end": 9135,
+   "text": "### Training Command Example",
+   "tokens": []
+  },
+  {
+   "id": 47,
+   "kind": "para",
+   "start": 9137,
+   "end": 9265,
+   "text": "The same finetune with the VLM frozen: less memory, at some cost in success rate. Swap ⟦0⟧ for your own dataset.",
+   "tokens": [
+    "`--dataset.repo_id`"
+   ]
+  },
+  {
+   "id": 48,
+   "kind": "heading",
+   "start": 9985,
+   "end": 10012,
+   "text": "### Key Training Parameters",
+   "tokens": []
+  },
+  {
+   "id": 49,
+   "kind": "list",
+   "start": 10014,
+   "end": 10096,
+   "text": "- **⟦0⟧**: Enables model compilation for faster training",
+   "tokens": [
+    "`--policy.compile_model=true`"
+   ]
+  },
+  {
+   "id": 50,
+   "kind": "list",
+   "start": 10097,
+   "end": 10193,
+   "text": "- **⟦0⟧**: Reduces memory usage significantly during training",
+   "tokens": [
+    "`--policy.gradient_checkpointing=true`"
+   ]
+  },
+  {
+   "id": 51,
+   "kind": "list",
+   "start": 10194,
+   "end": 10270,
+   "text": "- **⟦0⟧**: Use mixed precision training for efficiency",
+   "tokens": [
+    "`--policy.dtype=bfloat16`"
+   ]
+  },
+  {
+   "id": 52,
+   "kind": "list",
+   "start": 10271,
+   "end": 10356,
+   "text": "- **⟦0⟧**: Batch size for training, adapt this based on your GPU memory",
+   "tokens": [
+    "`--batch_size=64`"
+   ]
+  },
+  {
+   "id": 53,
+   "kind": "list",
+   "start": 10357,
+   "end": 10463,
+   "text": "- **⟦0⟧**: The base π₀.₅ model you want to finetune, options are:",
+   "tokens": [
+    "`--policy.pretrained_path=lerobot/pi05_base`"
+   ]
+  },
+  {
+   "id": 54,
+   "kind": "list",
+   "start": 10464,
+   "end": 10529,
+   "text": "  - [lerobot/pi05_base](⟦0⟧)",
+   "tokens": [
+    "https://huggingface.co/lerobot/pi05_base"
+   ]
+  },
+  {
+   "id": 55,
+   "kind": "list",
+   "start": 10530,
+   "end": 10654,
+   "text": "  - [lerobot/pi05_libero_base](⟦0⟧) (specifically trained on the Libero dataset)",
+   "tokens": [
+    "https://huggingface.co/lerobot/pi05_libero_base"
+   ]
+  },
+  {
+   "id": 56,
+   "kind": "heading",
+   "start": 10656,
+   "end": 10686,
+   "text": "### Optional training-time RTC",
+   "tokens": []
+  },
+  {
+   "id": 57,
+   "kind": "para",
+   "start": 10688,
+   "end": 10994,
+   "text": "Pi05 can optionally learn action-prefix conditioning for efficient\n[Real-Time Chunking](⟦0⟧), following\n[Training-Time Action Conditioning for Efficient Real-Time Chunking](⟦1⟧).\nSet ⟦2⟧ to the largest expected inference delay in\ncontroller steps:",
+   "tokens": [
+    "./rtc",
+    "https://arxiv.org/abs/2512.05964",
+    "`policy.rtc_training_max_delay`"
+   ]
+  },
+  {
+   "id": 58,
+   "kind": "para",
+   "start": 11344,
+   "end": 11639,
+   "text": "The default is ⟦0⟧, which disables training-time RTC and leaves the standard\nPi05 objective unchanged. The configured delay must be smaller than\n⟦1⟧. During training, Pi05 samples a clean prefix length independently\nfor each example and computes flow loss only on the remaining postfix.",
+   "tokens": [
+    "`0`",
+    "`chunk_size`"
+   ]
+  },
+  {
+   "id": 59,
+   "kind": "para",
+   "start": 11641,
+   "end": 11698,
+   "text": "Use the resulting checkpoint with trained RTC explicitly:",
+   "tokens": []
+  },
+  {
+   "id": 60,
+   "kind": "para",
+   "start": 12065,
+   "end": 12506,
+   "text": "Set ⟦0⟧ between the checkpoint's\n⟦1⟧ and ⟦2⟧, and\n⟦3⟧ to at least ⟦4⟧. A one-off\nlatency spike past the trained range discards that chunk and retries; rollout\nstops with an explicit error only if the delay stays out of range. The default\n⟦5⟧ remains available for ordinary checkpoints.",
+   "tokens": [
+    "`inference.rtc.execution_horizon`",
+    "`rtc_training_max_delay`",
+    "`chunk_size - rtc_training_max_delay`",
+    "`inference.queue_threshold`",
+    "`rtc_training_max_delay`",
+    "`--inference.rtc.mode=guided`"
+   ]
+  },
+  {
+   "id": 61,
+   "kind": "heading",
+   "start": 12508,
+   "end": 12532,
+   "text": "### Loading a checkpoint",
+   "tokens": []
+  },
+  {
+   "id": 62,
+   "kind": "para",
+   "start": 12534,
+   "end": 12572,
+   "text": "The two forms are not interchangeable:",
+   "tokens": []
+  },
+  {
+   "id": 63,
+   "kind": "table",
+   "start": 12846,
+   "end": 12981,
+   "text": "| Loads                                  | weights **and** the checkpoint's ⟦0⟧ | weights only                              |",
+   "tokens": [
+    "`config.json`"
+   ]
+  },
+  {
+   "id": 64,
+   "kind": "table",
+   "start": 12982,
+   "end": 13117,
+   "text": "| Feature names                          | from the checkpoint                            | from your dataset, after ⟦0⟧   |",
+   "tokens": [
+    "`--rename_map`"
+   ]
+  },
+  {
+   "id": 65,
+   "kind": "table",
+   "start": 13118,
+   "end": 13253,
+   "text": "| Stored settings, e.g. ⟦0⟧ | inherited                                      | reset to the defaults                     |",
+   "tokens": [
+    "`n_action_steps`"
+   ]
+  },
+  {
+   "id": 66,
+   "kind": "table",
+   "start": 13254,
+   "end": 13389,
+   "text": "| ⟦0⟧                        | must be omitted                                | required                                  |",
+   "tokens": [
+    "`--policy.type`"
+   ]
+  },
+  {
+   "id": 67,
+   "kind": "table",
+   "start": 13390,
+   "end": 13525,
+   "text": "| ⟦0⟧                         | needed when your camera keys differ            | supported for canonicalizing dataset keys |",
+   "tokens": [
+    "`--rename_map`"
+   ]
+  },
+  {
+   "id": 68,
+   "kind": "para",
+   "start": 13527,
+   "end": 13812,
+   "text": "Use ⟦0⟧ with either loading form when raw dataset feature names differ from the policy\nfeature names. For example, the RoboMME fine-tuning command maps its raw ⟦1⟧, ⟦2⟧,\n⟦3⟧, and ⟦4⟧ columns while initializing weights with ⟦5⟧.",
+   "tokens": [
+    "`--rename_map`",
+    "`image`",
+    "`wrist_image`",
+    "`state`",
+    "`actions`",
+    "`--policy.pretrained_path`"
+   ]
+  },
+  {
+   "id": 69,
+   "kind": "heading",
+   "start": 13814,
+   "end": 13847,
+   "text": "### Training Parameters Explained",
+   "tokens": []
+  },
+  {
+   "id": 70,
+   "kind": "table",
+   "start": 13849,
+   "end": 13932,
+   "text": "| Parameter               | Default | Description                                 |",
+   "tokens": []
+  },
+  {
+   "id": 71,
+   "kind": "table",
+   "start": 14017,
+   "end": 14100,
+   "text": "| ⟦0⟧ | ⟦1⟧ | Do not freeze the vision encoder            |",
+   "tokens": [
+    "`freeze_vision_encoder`",
+    "`false`"
+   ]
+  },
+  {
+   "id": 72,
+   "kind": "table",
+   "start": 14101,
+   "end": 14184,
+   "text": "| ⟦0⟧     | ⟦1⟧ | Do not freeze the VLM, train all parameters |",
+   "tokens": [
+    "`train_expert_only`",
+    "`false`"
+   ]
+  },
+  {
+   "id": 73,
+   "kind": "para",
+   "start": 14186,
+   "end": 14343,
+   "text": "**💡 Tip**: Setting ⟦0⟧ freezes the VLM and trains only the action expert and projections, allowing finetuning with reduced memory usage.",
+   "tokens": [
+    "`train_expert_only=true`"
+   ]
+  },
+  {
+   "id": 74,
+   "kind": "heading",
+   "start": 14345,
+   "end": 14386,
+   "text": "## Short-Horizon Observation Memory (MEM)",
+   "tokens": []
+  },
+  {
+   "id": 75,
+   "kind": "para",
+   "start": 14388,
+   "end": 14630,
+   "text": "Pi05 can optionally use short-horizon visual and proprioceptive context based on\n[MEM](⟦0⟧). Both paths are disabled by default, so\nexisting checkpoints and training commands retain the single-frame Pi05 behavior.",
+   "tokens": [
+    "https://arxiv.org/abs/2603.03596"
+   ]
+  },
+  {
+   "id": 76,
+   "kind": "para",
+   "start": 14654,
+   "end": 15105,
+   "text": "This implements MEM's short-horizon memory only — the video encoder of section\nIII-C and the proprioceptive projection of section III-D. MEM's long-horizon\n_language_ memory (section III-B), in which a high-level policy predicts the next\nsubtask and a compressed natural-language summary of what has happened so far, is\nnot implemented. In the paper's ablations, video memory alone recovers only part\nof full MEM's task progress on long-horizon tasks.",
+   "tokens": []
+  },
+  {
+   "id": 77,
+   "kind": "para",
+   "start": 15107,
+   "end": 15426,
+   "text": "Introducing memory when finetuning from a checkpoint that was pretrained without\nit also corresponds to the paper's weaker ⟦0⟧ ablation. MEM's\nheadline results come from pretraining the video encoder on a diverse mixture of\nrobot and non-robot video, which no public Pi05 checkpoint currently provides.",
+   "tokens": [
+    "`MEM-Posttrain-Only`"
+   ]
+  },
+  {
+   "id": 78,
+   "kind": "para",
+   "start": 15436,
+   "end": 15468,
+   "text": "Enable it while finetuning with:",
+   "tokens": []
+  },
+  {
+   "id": 79,
+   "kind": "para",
+   "start": 15768,
+   "end": 16106,
+   "text": "⟦0⟧ includes the current observation. ⟦1⟧ is measured in\n**dataset frames**, not seconds, so scale it with your dataset's ⟦2⟧: MEM\npretrains on six observations one second apart, which is ⟦3⟧ for a\n30 fps dataset (the default) but ⟦4⟧ for a 10 fps dataset such as\n⟦5⟧.",
+   "tokens": [
+    "`memory_frames`",
+    "`memory_stride`",
+    "`fps`",
+    "`memory_stride=30`",
+    "`memory_stride=10`",
+    "`lerobot/robomme`"
+   ]
+  },
+  {
+   "id": 80,
+   "kind": "para",
+   "start": 16108,
+   "end": 16526,
+   "text": "Every fourth SigLIP layer replaces its attention with MEM's composed space-time\nattention: causal temporal attention between matching patch tokens, composed with\nthe standard spatial attention and reusing the pretrained projections, so no\nlearnable parameters are added to the vision tower. Past-frame tokens are dropped\nonce the last such layer has run, keeping the downstream language/action prefix\nlength unchanged.",
+   "tokens": []
+  },
+  {
+   "id": 81,
+   "kind": "para",
+   "start": 16528,
+   "end": 16715,
+   "text": "Unavailable history at the beginning of an episode is padded and masked. At\ninference, Pi05 maintains the same strided image history internally and clears\nit whenever the policy is reset.",
+   "tokens": []
+  },
+  {
+   "id": 82,
+   "kind": "para",
+   "start": 16717,
+   "end": 16768,
+   "text": "Historical proprioception is an independent option:",
+   "tokens": []
+  },
+  {
+   "id": 83,
+   "kind": "para",
+   "start": 16823,
+   "end": 17415,
+   "text": "When enabled, one projected continuous state token is added for each retained\nframe, and the discretized state is removed from the text prompt so the state is\nrepresented exactly once (MEM section III-D). This changes the prompt format, so\nenable it from the start of training rather than partway through. Visual and\nproprioceptive memory use the same ⟦0⟧ and ⟦1⟧ settings,\nbut either path can be enabled independently. Train or finetune with the selected\nmemory options; enabling them only at inference does not give a single-frame\ncheckpoint learned memory behavior.",
+   "tokens": [
+    "`memory_frames`",
+    "`memory_stride`"
+   ]
+  },
+  {
+   "id": 84,
+   "kind": "para",
+   "start": 17417,
+   "end": 17548,
+   "text": "Under PEFT, ⟦0⟧ is trained and saved in full via\n⟦1⟧, since it has no pretrained weights to adapt.",
+   "tokens": [
+    "`proprio_history_proj`",
+    "`modules_to_save`"
+   ]
+  },
+  {
+   "id": 85,
+   "kind": "para",
+   "start": 17550,
+   "end": 17949,
+   "text": "At inference, MEM keeps one batched history queue and assumes every batch row\nshares episode boundaries. ⟦0⟧ satisfies this by calling\n⟦1⟧ before each batched rollout and before resetting the vector\nenvironment. Independently autoresetting rows in an asynchronous vector batch\nis not supported; start a new rollout so the complete policy and action queues\nare reset together.",
+   "tokens": [
+    "`lerobot-eval`",
+    "`policy.reset()`"
+   ]
+  },
+  {
+   "id": 86,
+   "kind": "heading",
+   "start": 17951,
+   "end": 17970,
+   "text": "## Relative Actions",
+   "tokens": []
+  },
+  {
+   "id": 87,
+   "kind": "para",
+   "start": 17972,
+   "end": 18174,
+   "text": "By default, π₀.₅ predicts absolute actions. You can enable **relative actions** so the model predicts offsets relative to the current robot state. This can improve training stability for certain setups.",
+   "tokens": []
+  },
+  {
+   "id": 88,
+   "kind": "para",
+   "start": 18176,
+   "end": 18266,
+   "text": "To use relative actions, first recompute your dataset stats in relative space via the CLI:",
+   "tokens": []
+  },
+  {
+   "id": 89,
+   "kind": "para",
+   "start": 18522,
+   "end": 18548,
+   "text": "Or equivalently in Python:",
+   "tokens": []
+  },
+  {
+   "id": 90,
+   "kind": "para",
+   "start": 18789,
+   "end": 19039,
+   "text": "The ⟦0⟧ should match your policy's ⟦1⟧ (default 50 for π₀.₅). ⟦2⟧ lists joint names that should remain in absolute space (e.g. gripper commands). Use ⟦3⟧ to upload the updated stats to the Hub.",
+   "tokens": [
+    "`chunk_size`",
+    "`chunk_size`",
+    "`relative_exclude_joints`",
+    "`--push_to_hub true`"
+   ]
+  },
+  {
+   "id": 91,
+   "kind": "para",
+   "start": 19041,
+   "end": 19082,
+   "text": "Then train with relative actions enabled:",
+   "tokens": []
+  },
+  {
+   "id": 92,
+   "kind": "heading",
+   "start": 19277,
+   "end": 19299,
+   "text": "## Performance Results",
+   "tokens": []
+  },
+  {
+   "id": 93,
+   "kind": "heading",
+   "start": 19301,
+   "end": 19329,
+   "text": "### Libero Benchmark Results",
+   "tokens": []
+  },
+  {
+   "id": 94,
+   "kind": "para",
+   "start": 19331,
+   "end": 19592,
+   "text": "π₀.₅ has demonstrated strong performance on the Libero benchmark suite. To compare and test its LeRobot implementation, we finetuned the libero base model for an additional 6k steps on the Libero dataset and compared the results to the OpenPI reference results.",
+   "tokens": []
+  },
+  {
+   "id": 95,
+   "kind": "table",
+   "start": 19594,
+   "end": 19660,
+   "text": "| Benchmark          | LeRobot Implementation | OpenPI Reference |",
+   "tokens": []
+  },
+  {
+   "id": 96,
+   "kind": "table",
+   "start": 19728,
+   "end": 19794,
+   "text": "| **Libero Spatial** | 97.0%                  | 98.8%            |",
+   "tokens": []
+  },
+  {
+   "id": 97,
+   "kind": "table",
+   "start": 19795,
+   "end": 19861,
+   "text": "| **Libero Object**  | 99.0%                  | 98.2%            |",
+   "tokens": []
+  },
+  {
+   "id": 98,
+   "kind": "table",
+   "start": 19862,
+   "end": 19928,
+   "text": "| **Libero Goal**    | 98.0%                  | 98.0%            |",
+   "tokens": []
+  },
+  {
+   "id": 99,
+   "kind": "table",
+   "start": 19929,
+   "end": 19995,
+   "text": "| **Libero 10**      | 96.0%                  | 92.4%            |",
+   "tokens": []
+  },
+  {
+   "id": 100,
+   "kind": "table",
+   "start": 19996,
+   "end": 20062,
+   "text": "| **Average**        | 97.5%                  | 96.85%           |",
+   "tokens": []
+  },
+  {
+   "id": 101,
+   "kind": "para",
+   "start": 20064,
+   "end": 20303,
+   "text": "These results demonstrate π₀.₅'s strong generalization capabilities across diverse robotic manipulation tasks. To reproduce these results, you can follow the instructions in the [Libero](⟦0⟧) section.",
+   "tokens": [
+    "https://huggingface.co/docs/lerobot/libero"
+   ]
+  },
+  {
+   "id": 102,
+   "kind": "heading",
+   "start": 20305,
+   "end": 20315,
+   "text": "## License",
+   "tokens": []
+  },
+  {
+   "id": 103,
+   "kind": "para",
+   "start": 20317,
+   "end": 20462,
+   "text": "This model follows the **Apache 2.0 License**, consistent with the original [OpenPI repository](⟦0⟧).",
+   "tokens": [
+    "https://github.com/Physical-Intelligence/openpi"
+   ]
+  }
+ ]
+}

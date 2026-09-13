@@ -1,0 +1,525 @@
+{
+ "file": "debug_processor_pipeline.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1955,
+   "text": "# Debug Your Processor Pipeline",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1957,
+   "end": 2353,
+   "text": "Processor pipelines can be complex, especially when chaining multiple transformation steps.\nUnlike simple function calls, pipelines lack natural observability, you can't easily see what happens\nbetween each step or where things go wrong.\nThis guide provides debugging tools and techniques specifically designed to address these challenges\nand help you understand data flow through your pipelines.",
+   "tokens": []
+  },
+  {
+   "id": 2,
+   "kind": "para",
+   "start": 2355,
+   "end": 2668,
+   "text": "We'll explore three complementary debugging approaches: **hooks** for runtime monitoring, **step-through debugging** for detailed inspection, and **feature validation** for catching structural mismatches. Each serves a different purpose and together they provide complete visibility into your pipeline's behavior.",
+   "tokens": []
+  },
+  {
+   "id": 3,
+   "kind": "heading",
+   "start": 2670,
+   "end": 2692,
+   "text": "## Understanding Hooks",
+   "tokens": []
+  },
+  {
+   "id": 4,
+   "kind": "para",
+   "start": 2694,
+   "end": 2921,
+   "text": "Hooks are functions that get called at specific points during pipeline execution.\nThey provide a way to inspect, monitor, or modify data without changing your pipeline code.\nThink of them as \"event listeners\" for your pipeline.",
+   "tokens": []
+  },
+  {
+   "id": 5,
+   "kind": "heading",
+   "start": 2923,
+   "end": 2942,
+   "text": "### What is a Hook?",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "para",
+   "start": 2944,
+   "end": 3202,
+   "text": "A hook is a callback function that gets automatically invoked at specific moments during pipeline execution.\nThe concept comes from event-driven programming, imagine you could \"hook into\" the pipeline's execution flow to observe or react to what's happening.",
+   "tokens": []
+  },
+  {
+   "id": 7,
+   "kind": "para",
+   "start": 3204,
+   "end": 3455,
+   "text": "Think of hooks like inserting checkpoints into your pipeline. Every time the pipeline reaches one of these checkpoints, it pauses briefly to call your hook function, giving you a chance to inspect the current state, log information, and validate data.",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "para",
+   "start": 3457,
+   "end": 3513,
+   "text": "A hook is simply a function that accepts two parameters:",
+   "tokens": []
+  },
+  {
+   "id": 9,
+   "kind": "list",
+   "start": 3515,
+   "end": 3591,
+   "text": "- ⟦0⟧ - The index of the current processing step (0, 1, 2, etc.)",
+   "tokens": [
+    "`step_idx: int`"
+   ]
+  },
+  {
+   "id": 10,
+   "kind": "list",
+   "start": 3592,
+   "end": 3673,
+   "text": "- ⟦0⟧ - The data transition at that point in the pipeline",
+   "tokens": [
+    "`transition: EnvTransition`"
+   ]
+  },
+  {
+   "id": 11,
+   "kind": "para",
+   "start": 3675,
+   "end": 3978,
+   "text": "The beauty of hooks is their non-invasive nature: you can add monitoring, validation, or debugging logic without changing a single line of your pipeline code. The pipeline remains clean and focused on its core logic, while hooks handle the cross-cutting concerns like logging, monitoring, and debugging.",
+   "tokens": []
+  },
+  {
+   "id": 12,
+   "kind": "heading",
+   "start": 3980,
+   "end": 4005,
+   "text": "### Before vs After Hooks",
+   "tokens": []
+  },
+  {
+   "id": 13,
+   "kind": "para",
+   "start": 4007,
+   "end": 4048,
+   "text": "The pipeline supports two types of hooks:",
+   "tokens": []
+  },
+  {
+   "id": 14,
+   "kind": "list",
+   "start": 4050,
+   "end": 4133,
+   "text": "- **Before hooks** (⟦0⟧) - Called before each step executes",
+   "tokens": [
+    "`register_before_step_hook`"
+   ]
+  },
+  {
+   "id": 15,
+   "kind": "list",
+   "start": 4134,
+   "end": 4215,
+   "text": "- **After hooks** (⟦0⟧) - Called after each step completes",
+   "tokens": [
+    "`register_after_step_hook`"
+   ]
+  },
+  {
+   "id": 16,
+   "kind": "heading",
+   "start": 4749,
+   "end": 4786,
+   "text": "### Implementing a NaN Detection Hook",
+   "tokens": []
+  },
+  {
+   "id": 17,
+   "kind": "para",
+   "start": 4788,
+   "end": 4849,
+   "text": "Here's a practical example of a hook that detects NaN values:",
+   "tokens": []
+  },
+  {
+   "id": 18,
+   "kind": "heading",
+   "start": 5490,
+   "end": 5519,
+   "text": "### How Hooks Work Internally",
+   "tokens": []
+  },
+  {
+   "id": 19,
+   "kind": "para",
+   "start": 5521,
+   "end": 5770,
+   "text": "Understanding the internal mechanism helps you use hooks more effectively. The pipeline maintains two separate lists: one for before-step hooks and another for after-step hooks. When you register a hook, it's simply appended to the appropriate list.",
+   "tokens": []
+  },
+  {
+   "id": 20,
+   "kind": "para",
+   "start": 5772,
+   "end": 6083,
+   "text": "During execution, the pipeline follows a strict sequence: for each processing step, it first calls all before-hooks in registration order, then executes the actual step transformation, and finally calls all after-hooks in registration order. This creates a predictable, sandwich-like structure around each step.",
+   "tokens": []
+  },
+  {
+   "id": 21,
+   "kind": "para",
+   "start": 6085,
+   "end": 6396,
+   "text": "The key insight is that hooks don't change the core pipeline logic—they're purely additive. The pipeline's ⟦0⟧ method orchestrates this dance between hooks and processing steps, ensuring that your debugging or monitoring code runs at exactly the right moments without interfering with the main data flow.",
+   "tokens": [
+    "`_forward`"
+   ]
+  },
+  {
+   "id": 22,
+   "kind": "para",
+   "start": 6398,
+   "end": 6458,
+   "text": "Here's a simplified view of how the pipeline executes hooks:",
+   "tokens": []
+  },
+  {
+   "id": 23,
+   "kind": "heading",
+   "start": 7438,
+   "end": 7456,
+   "text": "### Execution Flow",
+   "tokens": []
+  },
+  {
+   "id": 24,
+   "kind": "para",
+   "start": 7458,
+   "end": 7493,
+   "text": "The execution flow looks like this:",
+   "tokens": []
+  },
+  {
+   "id": 25,
+   "kind": "para",
+   "start": 7597,
+   "end": 7643,
+   "text": "For example, with 3 steps and both hook types:",
+   "tokens": []
+  },
+  {
+   "id": 26,
+   "kind": "heading",
+   "start": 8086,
+   "end": 8104,
+   "text": "### Multiple Hooks",
+   "tokens": []
+  },
+  {
+   "id": 27,
+   "kind": "para",
+   "start": 8106,
+   "end": 8194,
+   "text": "You can register multiple hooks of the same type - they execute in the order registered:",
+   "tokens": []
+  },
+  {
+   "id": 28,
+   "kind": "para",
+   "start": 8760,
+   "end": 9094,
+   "text": "While hooks are excellent for monitoring specific issues (like NaN detection) or gathering metrics during normal pipeline execution, sometimes you need to dive deeper. When you want to understand exactly what happens at each step or debug complex transformation logic, step-through debugging provides the detailed inspection you need.",
+   "tokens": []
+  },
+  {
+   "id": 29,
+   "kind": "heading",
+   "start": 9096,
+   "end": 9121,
+   "text": "## Step-Through Debugging",
+   "tokens": []
+  },
+  {
+   "id": 30,
+   "kind": "para",
+   "start": 9123,
+   "end": 9353,
+   "text": "Step-through debugging is like having a slow-motion replay for your pipeline. Instead of watching your data get transformed in one quick blur from input to output, you can pause and examine what happens after each individual step.",
+   "tokens": []
+  },
+  {
+   "id": 31,
+   "kind": "para",
+   "start": 9355,
+   "end": 9678,
+   "text": "This approach is particularly valuable when you're trying to understand a complex pipeline, debug unexpected behavior, or verify that each transformation is working as expected. Unlike hooks, which are great for automated monitoring, step-through debugging gives you manual, interactive control over the inspection process.",
+   "tokens": []
+  },
+  {
+   "id": 32,
+   "kind": "para",
+   "start": 9680,
+   "end": 10027,
+   "text": "The ⟦0⟧ method is a generator that yields the transition state after each processing step, allowing you to inspect intermediate results. Think of it as creating a series of snapshots of your data as it flows through the pipeline—each snapshot shows you exactly what your data looks like after one more transformation has been applied.",
+   "tokens": [
+    "`step_through()`"
+   ]
+  },
+  {
+   "id": 33,
+   "kind": "heading",
+   "start": 10029,
+   "end": 10055,
+   "text": "### How Step-Through Works",
+   "tokens": []
+  },
+  {
+   "id": 34,
+   "kind": "para",
+   "start": 10057,
+   "end": 10289,
+   "text": "The ⟦0⟧ method fundamentally changes how the pipeline executes. Instead of running all steps in sequence and only returning the final result, it transforms the pipeline into an iterator that yields intermediate results.",
+   "tokens": [
+    "`step_through()`"
+   ]
+  },
+  {
+   "id": 35,
+   "kind": "para",
+   "start": 10291,
+   "end": 10668,
+   "text": "Here's what happens internally: the method starts by converting your input data into the pipeline's internal transition format, then yields this initial state. Next, it applies the first processing step and yields the result. Then it applies the second step to that result and yields again, and so on. Each ⟦0⟧ gives you a complete snapshot of the transition at that point.",
+   "tokens": [
+    "`yield`"
+   ]
+  },
+  {
+   "id": 36,
+   "kind": "para",
+   "start": 10670,
+   "end": 10973,
+   "text": "This generator pattern is powerful because it's lazy—the pipeline only computes the next step when you ask for it. This means you can stop at any point, inspect the current state thoroughly, and decide whether to continue. You're not forced to run the entire pipeline just to debug one problematic step.",
+   "tokens": []
+  },
+  {
+   "id": 37,
+   "kind": "para",
+   "start": 10975,
+   "end": 11130,
+   "text": "Instead of running the entire pipeline and only seeing the final result, ⟦0⟧ pauses after each step and gives you the intermediate transition:",
+   "tokens": [
+    "`step_through()`"
+   ]
+  },
+  {
+   "id": 38,
+   "kind": "heading",
+   "start": 11599,
+   "end": 11641,
+   "text": "### Interactive Debugging with Breakpoints",
+   "tokens": []
+  },
+  {
+   "id": 39,
+   "kind": "para",
+   "start": 11643,
+   "end": 11715,
+   "text": "You can add breakpoints in the step-through loop to interactively debug:",
+   "tokens": []
+  },
+  {
+   "id": 40,
+   "kind": "para",
+   "start": 12175,
+   "end": 12212,
+   "text": "During the debugger session, you can:",
+   "tokens": []
+  },
+  {
+   "id": 41,
+   "kind": "list",
+   "start": 12214,
+   "end": 12289,
+   "text": "- Examine ⟦0⟧ to see observation data",
+   "tokens": [
+    "`intermediate[TransitionKey.OBSERVATION]`"
+   ]
+  },
+  {
+   "id": 42,
+   "kind": "list",
+   "start": 12290,
+   "end": 12361,
+   "text": "- Check ⟦0⟧ for action transformations",
+   "tokens": [
+    "`intermediate[TransitionKey.ACTION]`"
+   ]
+  },
+  {
+   "id": 43,
+   "kind": "list",
+   "start": 12362,
+   "end": 12432,
+   "text": "- Inspect any part of the transition to understand what each step does",
+   "tokens": []
+  },
+  {
+   "id": 44,
+   "kind": "para",
+   "start": 12434,
+   "end": 12773,
+   "text": "Step-through debugging is perfect for understanding the _data_ transformations, but what about the _structure_ of that data? While hooks and step-through help you debug runtime behavior, you also need to ensure your pipeline produces data in the format expected by downstream components. This is where feature contract validation comes in.",
+   "tokens": []
+  },
+  {
+   "id": 45,
+   "kind": "heading",
+   "start": 12775,
+   "end": 12806,
+   "text": "## Validating Feature Contracts",
+   "tokens": []
+  },
+  {
+   "id": 46,
+   "kind": "para",
+   "start": 12808,
+   "end": 12964,
+   "text": "Feature contracts define what data structure your pipeline expects as input and produces as output.\nValidating these contracts helps catch mismatches early.",
+   "tokens": []
+  },
+  {
+   "id": 47,
+   "kind": "heading",
+   "start": 12966,
+   "end": 13001,
+   "text": "### Understanding Feature Contracts",
+   "tokens": []
+  },
+  {
+   "id": 48,
+   "kind": "para",
+   "start": 13003,
+   "end": 13108,
+   "text": "Each processor step has a ⟦0⟧ method that describes how it changes the data structure:",
+   "tokens": [
+    "`transform_features()`"
+   ]
+  },
+  {
+   "id": 49,
+   "kind": "heading",
+   "start": 14090,
+   "end": 14121,
+   "text": "### Verifying Expected Features",
+   "tokens": []
+  },
+  {
+   "id": 50,
+   "kind": "para",
+   "start": 14123,
+   "end": 14181,
+   "text": "Check that your pipeline produces the features you expect:",
+   "tokens": []
+  },
+  {
+   "id": 51,
+   "kind": "para",
+   "start": 14767,
+   "end": 14894,
+   "text": "This validation helps ensure your pipeline will work correctly with downstream components that expect specific data structures.",
+   "tokens": []
+  },
+  {
+   "id": 52,
+   "kind": "heading",
+   "start": 14896,
+   "end": 14906,
+   "text": "## Summary",
+   "tokens": []
+  },
+  {
+   "id": 53,
+   "kind": "para",
+   "start": 14908,
+   "end": 15013,
+   "text": "Now that you understand the three debugging approaches, you can tackle any pipeline issue systematically:",
+   "tokens": []
+  },
+  {
+   "id": 54,
+   "kind": "list",
+   "start": 15015,
+   "end": 15099,
+   "text": "1. **Hooks** - For runtime monitoring and validation without modifying pipeline code",
+   "tokens": []
+  },
+  {
+   "id": 55,
+   "kind": "list",
+   "start": 15100,
+   "end": 15190,
+   "text": "2. **Step-through** - For inspecting intermediate states and understanding transformations",
+   "tokens": []
+  },
+  {
+   "id": 56,
+   "kind": "list",
+   "start": 15191,
+   "end": 15264,
+   "text": "3. **Feature validation** - For ensuring data structure contracts are met",
+   "tokens": []
+  },
+  {
+   "id": 57,
+   "kind": "para",
+   "start": 15266,
+   "end": 15296,
+   "text": "**When to use each approach:**",
+   "tokens": []
+  },
+  {
+   "id": 58,
+   "kind": "list",
+   "start": 15298,
+   "end": 15426,
+   "text": "- Start with **step-through debugging** when you need to understand what your pipeline does or when something unexpected happens",
+   "tokens": []
+  },
+  {
+   "id": 59,
+   "kind": "list",
+   "start": 15427,
+   "end": 15532,
+   "text": "- Add **hooks** for continuous monitoring during development and production to catch issues automatically",
+   "tokens": []
+  },
+  {
+   "id": 60,
+   "kind": "list",
+   "start": 15533,
+   "end": 15636,
+   "text": "- Use **feature validation** before deployment to ensure your pipeline works with downstream components",
+   "tokens": []
+  },
+  {
+   "id": 61,
+   "kind": "para",
+   "start": 15638,
+   "end": 15938,
+   "text": "These three tools work together to give you the complete observability that complex pipelines naturally lack. With hooks watching for issues, step-through helping you understand behavior, and feature validation ensuring compatibility, you'll be able to debug any pipeline confidently and efficiently.",
+   "tokens": []
+  }
+ ]
+}

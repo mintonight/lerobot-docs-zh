@@ -1,0 +1,2103 @@
+{
+ "file": "hilserl.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1969,
+   "text": "# HIL-SERL Real Robot Training Workflow Guide",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1971,
+   "end": 2188,
+   "text": "In this tutorial you will go through the full Human-in-the-Loop Sample-Efficient Reinforcement Learning (HIL-SERL) workflow using LeRobot. You will master training a policy with RL on a real robot in just a few hours.",
+   "tokens": []
+  },
+  {
+   "id": 2,
+   "kind": "para",
+   "start": 2190,
+   "end": 2700,
+   "text": "HIL-SERL is a sample-efficient reinforcement learning algorithm that combines human demonstrations with online learning and human interventions. The approach starts from a small set of human demonstrations, uses them to train a reward classifier, and then employs an actor-learner architecture where humans can intervene during policy execution to guide exploration and correct unsafe behaviors. In this tutorial, you'll use a gamepad to provide interventions and control the robot during the learning process.",
+   "tokens": []
+  },
+  {
+   "id": 3,
+   "kind": "para",
+   "start": 2702,
+   "end": 2736,
+   "text": "It combines three key ingredients:",
+   "tokens": []
+  },
+  {
+   "id": 4,
+   "kind": "list",
+   "start": 2738,
+   "end": 2901,
+   "text": "1. **Offline demonstrations & reward classifier:** a handful of human-teleop episodes plus a vision-based success detector give the policy a shaped starting point.",
+   "tokens": []
+  },
+  {
+   "id": 5,
+   "kind": "list",
+   "start": 2903,
+   "end": 3159,
+   "text": "2. **On-robot actor / learner loop with human interventions:** a distributed Soft Actor Critic (SAC) learner updates the policy while an actor explores on the physical robot; the human can jump in at any time to correct dangerous or unproductive behaviour.",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "list",
+   "start": 3161,
+   "end": 3335,
+   "text": "3. **Safety & efficiency tools:** joint/end-effector (EE) bounds, crop region of interest (ROI) preprocessing and WandB monitoring keep the data useful and the hardware safe.",
+   "tokens": []
+  },
+  {
+   "id": 7,
+   "kind": "para",
+   "start": 3337,
+   "end": 3459,
+   "text": "Together these elements let HIL-SERL reach near-perfect task success and faster cycle times than imitation-only baselines.",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "para",
+   "start": 3698,
+   "end": 3760,
+   "text": "⟦0⟧\n  ⟦1⟧HIL-SERL workflow, Luo et al. 2024⟦2⟧",
+   "tokens": [
+    "<p align=\"center\">",
+    "<i>",
+    "</i>"
+   ]
+  },
+  {
+   "id": 9,
+   "kind": "para",
+   "start": 3767,
+   "end": 3905,
+   "text": "This guide provides step-by-step instructions for training a robot policy using LeRobot's HilSerl implementation to train on a real robot.",
+   "tokens": []
+  },
+  {
+   "id": 10,
+   "kind": "heading",
+   "start": 3907,
+   "end": 3925,
+   "text": "## What do I need?",
+   "tokens": []
+  },
+  {
+   "id": 11,
+   "kind": "list",
+   "start": 3927,
+   "end": 3985,
+   "text": "- A gamepad (recommended) or keyboard to control the robot",
+   "tokens": []
+  },
+  {
+   "id": 12,
+   "kind": "list",
+   "start": 3986,
+   "end": 4000,
+   "text": "- A Nvidia GPU",
+   "tokens": []
+  },
+  {
+   "id": 13,
+   "kind": "list",
+   "start": 4001,
+   "end": 4096,
+   "text": "- A real robot with a follower and leader arm (optional if you use the keyboard or the gamepad)",
+   "tokens": []
+  },
+  {
+   "id": 14,
+   "kind": "list",
+   "start": 4097,
+   "end": 4189,
+   "text": "- A URDF file for the robot for the kinematics package (check ⟦0⟧)",
+   "tokens": [
+    "`lerobot/model/kinematics.py`"
+   ]
+  },
+  {
+   "id": 15,
+   "kind": "heading",
+   "start": 4191,
+   "end": 4225,
+   "text": "## What kind of tasks can I train?",
+   "tokens": []
+  },
+  {
+   "id": 16,
+   "kind": "para",
+   "start": 4227,
+   "end": 4314,
+   "text": "One can use HIL-SERL to train on a variety of manipulation tasks. Some recommendations:",
+   "tokens": []
+  },
+  {
+   "id": 17,
+   "kind": "list",
+   "start": 4316,
+   "end": 4378,
+   "text": "- Start with a simple task to understand how the system works.",
+   "tokens": []
+  },
+  {
+   "id": 18,
+   "kind": "list",
+   "start": 4379,
+   "end": 4409,
+   "text": "  - Push cube to a goal region",
+   "tokens": []
+  },
+  {
+   "id": 19,
+   "kind": "list",
+   "start": 4410,
+   "end": 4449,
+   "text": "  - Pick and lift cube with the gripper",
+   "tokens": []
+  },
+  {
+   "id": 20,
+   "kind": "list",
+   "start": 4450,
+   "end": 4541,
+   "text": "- Avoid extremely long horizon tasks. Focus on tasks that can be completed in 5-10 seconds.",
+   "tokens": []
+  },
+  {
+   "id": 21,
+   "kind": "list",
+   "start": 4542,
+   "end": 4646,
+   "text": "- Once you have a good idea of how the system works, you can try more complex tasks and longer horizons.",
+   "tokens": []
+  },
+  {
+   "id": 22,
+   "kind": "list",
+   "start": 4647,
+   "end": 4670,
+   "text": "  - Pick and place cube",
+   "tokens": []
+  },
+  {
+   "id": 23,
+   "kind": "list",
+   "start": 4671,
+   "end": 4719,
+   "text": "  - Bimanual tasks to pick objects with two arms",
+   "tokens": []
+  },
+  {
+   "id": 24,
+   "kind": "list",
+   "start": 4720,
+   "end": 4783,
+   "text": "  - Hand-over tasks to transfer objects from one arm to another",
+   "tokens": []
+  },
+  {
+   "id": 25,
+   "kind": "list",
+   "start": 4784,
+   "end": 4797,
+   "text": "  - Go crazy!",
+   "tokens": []
+  },
+  {
+   "id": 26,
+   "kind": "heading",
+   "start": 4799,
+   "end": 4831,
+   "text": "## Install LeRobot with HIL-SERL",
+   "tokens": []
+  },
+  {
+   "id": 27,
+   "kind": "para",
+   "start": 4833,
+   "end": 4907,
+   "text": "To install LeRobot with HIL-SERL, you need to install the ⟦0⟧ extra.",
+   "tokens": [
+    "`hilserl`"
+   ]
+  },
+  {
+   "id": 28,
+   "kind": "heading",
+   "start": 4950,
+   "end": 4981,
+   "text": "## Real Robot Training Workflow",
+   "tokens": []
+  },
+  {
+   "id": 29,
+   "kind": "heading",
+   "start": 4983,
+   "end": 5014,
+   "text": "### Understanding Configuration",
+   "tokens": []
+  },
+  {
+   "id": 30,
+   "kind": "para",
+   "start": 5016,
+   "end": 5360,
+   "text": "The training process begins with proper configuration for the HILSERl environment. The main configuration class is ⟦0⟧ in ⟦1⟧, which contains nested ⟦2⟧ (defined in ⟦3⟧) and ⟦4⟧. The configuration is organized into focused, nested sub-configs:",
+   "tokens": [
+    "`GymManipulatorConfig`",
+    "`lerobot/rl/gym_manipulator.py`",
+    "`HILSerlRobotEnvConfig`",
+    "`lerobot/envs/configs.py`",
+    "`DatasetConfig`"
+   ]
+  },
+  {
+   "id": 31,
+   "kind": "heading",
+   "start": 8972,
+   "end": 9007,
+   "text": "### Processor Pipeline Architecture",
+   "tokens": []
+  },
+  {
+   "id": 32,
+   "kind": "para",
+   "start": 9009,
+   "end": 9198,
+   "text": "HIL-SERL uses a modular processor pipeline architecture that processes robot observations and actions through a series of composable steps. The pipeline is divided into two main components:",
+   "tokens": []
+  },
+  {
+   "id": 33,
+   "kind": "heading",
+   "start": 9200,
+   "end": 9235,
+   "text": "#### Environment Processor Pipeline",
+   "tokens": []
+  },
+  {
+   "id": 34,
+   "kind": "para",
+   "start": 9237,
+   "end": 9333,
+   "text": "The environment processor (⟦0⟧) handles incoming observations and environment state:",
+   "tokens": [
+    "`env_processor`"
+   ]
+  },
+  {
+   "id": 35,
+   "kind": "list",
+   "start": 9335,
+   "end": 9431,
+   "text": "1. **VanillaObservationProcessorStep**: Converts raw robot observations into standardized format",
+   "tokens": []
+  },
+  {
+   "id": 36,
+   "kind": "list",
+   "start": 9432,
+   "end": 9525,
+   "text": "2. **JointVelocityProcessorStep** (optional): Adds joint velocity information to observations",
+   "tokens": []
+  },
+  {
+   "id": 37,
+   "kind": "list",
+   "start": 9526,
+   "end": 9614,
+   "text": "3. **MotorCurrentProcessorStep** (optional): Adds motor current readings to observations",
+   "tokens": []
+  },
+  {
+   "id": 38,
+   "kind": "list",
+   "start": 9615,
+   "end": 9709,
+   "text": "4. **ForwardKinematicsJointsToEE** (optional): Computes end-effector pose from joint positions",
+   "tokens": []
+  },
+  {
+   "id": 39,
+   "kind": "list",
+   "start": 9710,
+   "end": 9789,
+   "text": "5. **ImageCropResizeProcessorStep** (optional): Crops and resizes camera images",
+   "tokens": []
+  },
+  {
+   "id": 40,
+   "kind": "list",
+   "start": 9790,
+   "end": 9860,
+   "text": "6. **TimeLimitProcessorStep** (optional): Enforces episode time limits",
+   "tokens": []
+  },
+  {
+   "id": 41,
+   "kind": "list",
+   "start": 9861,
+   "end": 9957,
+   "text": "7. **GripperPenaltyProcessorStep** (optional): Applies penalties for inappropriate gripper usage",
+   "tokens": []
+  },
+  {
+   "id": 42,
+   "kind": "list",
+   "start": 9958,
+   "end": 10053,
+   "text": "8. **RewardClassifierProcessorStep** (optional): Automated reward detection using vision models",
+   "tokens": []
+  },
+  {
+   "id": 43,
+   "kind": "list",
+   "start": 10054,
+   "end": 10152,
+   "text": "9. **AddBatchDimensionProcessorStep**: Converts data to batch format for neural network processing",
+   "tokens": []
+  },
+  {
+   "id": 44,
+   "kind": "list",
+   "start": 10153,
+   "end": 10234,
+   "text": "10. **DeviceProcessorStep**: Moves data to the specified compute device (CPU/GPU)",
+   "tokens": []
+  },
+  {
+   "id": 45,
+   "kind": "heading",
+   "start": 10236,
+   "end": 10266,
+   "text": "#### Action Processor Pipeline",
+   "tokens": []
+  },
+  {
+   "id": 46,
+   "kind": "para",
+   "start": 10268,
+   "end": 10359,
+   "text": "The action processor (⟦0⟧) handles outgoing actions and human interventions:",
+   "tokens": [
+    "`action_processor`"
+   ]
+  },
+  {
+   "id": 47,
+   "kind": "list",
+   "start": 10361,
+   "end": 10449,
+   "text": "1. **AddTeleopActionAsComplimentaryDataStep**: Captures teleoperator actions for logging",
+   "tokens": []
+  },
+  {
+   "id": 48,
+   "kind": "list",
+   "start": 10450,
+   "end": 10539,
+   "text": "2. **AddTeleopEventsAsInfoStep**: Records intervention events and episode control signals",
+   "tokens": []
+  },
+  {
+   "id": 49,
+   "kind": "list",
+   "start": 10540,
+   "end": 10631,
+   "text": "3. **InterventionActionProcessorStep**: Handles human interventions and episode termination",
+   "tokens": []
+  },
+  {
+   "id": 50,
+   "kind": "list",
+   "start": 10632,
+   "end": 10682,
+   "text": "4. **Inverse Kinematics Pipeline** (when enabled):",
+   "tokens": []
+  },
+  {
+   "id": 51,
+   "kind": "list",
+   "start": 10683,
+   "end": 10770,
+   "text": "   - **MapDeltaActionToRobotActionStep**: Converts delta actions to robot action format",
+   "tokens": []
+  },
+  {
+   "id": 52,
+   "kind": "list",
+   "start": 10771,
+   "end": 10852,
+   "text": "   - **EEReferenceAndDelta**: Computes end-effector reference and delta movements",
+   "tokens": []
+  },
+  {
+   "id": 53,
+   "kind": "list",
+   "start": 10853,
+   "end": 10913,
+   "text": "   - **EEBoundsAndSafety**: Enforces workspace safety bounds",
+   "tokens": []
+  },
+  {
+   "id": 54,
+   "kind": "list",
+   "start": 10914,
+   "end": 10998,
+   "text": "   - **InverseKinematicsEEToJoints**: Converts end-effector actions to joint targets",
+   "tokens": []
+  },
+  {
+   "id": 55,
+   "kind": "list",
+   "start": 10999,
+   "end": 11064,
+   "text": "   - **GripperVelocityToJoint**: Handles gripper control commands",
+   "tokens": []
+  },
+  {
+   "id": 56,
+   "kind": "heading",
+   "start": 11066,
+   "end": 11093,
+   "text": "#### Configuration Examples",
+   "tokens": []
+  },
+  {
+   "id": 57,
+   "kind": "para",
+   "start": 11095,
+   "end": 11128,
+   "text": "**Basic Observation Processing**:",
+   "tokens": []
+  },
+  {
+   "id": 58,
+   "kind": "para",
+   "start": 11347,
+   "end": 11368,
+   "text": "**Image Processing**:",
+   "tokens": []
+  },
+  {
+   "id": 59,
+   "kind": "para",
+   "start": 11659,
+   "end": 11688,
+   "text": "**Inverse Kinematics Setup**:",
+   "tokens": []
+  },
+  {
+   "id": 60,
+   "kind": "heading",
+   "start": 12098,
+   "end": 12133,
+   "text": "### Advanced Observation Processing",
+   "tokens": []
+  },
+  {
+   "id": 61,
+   "kind": "para",
+   "start": 12135,
+   "end": 12243,
+   "text": "The HIL-SERL framework supports additional observation processing features that can improve policy learning:",
+   "tokens": []
+  },
+  {
+   "id": 62,
+   "kind": "heading",
+   "start": 12245,
+   "end": 12275,
+   "text": "#### Joint Velocity Processing",
+   "tokens": []
+  },
+  {
+   "id": 63,
+   "kind": "para",
+   "start": 12277,
+   "end": 12356,
+   "text": "Enable joint velocity estimation to provide the policy with motion information:",
+   "tokens": []
+  },
+  {
+   "id": 64,
+   "kind": "para",
+   "start": 12496,
+   "end": 12511,
+   "text": "This processor:",
+   "tokens": []
+  },
+  {
+   "id": 65,
+   "kind": "list",
+   "start": 12513,
+   "end": 12610,
+   "text": "- Estimates joint velocities using finite differences between consecutive joint position readings",
+   "tokens": []
+  },
+  {
+   "id": 66,
+   "kind": "list",
+   "start": 12611,
+   "end": 12670,
+   "text": "- Adds velocity information to the observation state vector",
+   "tokens": []
+  },
+  {
+   "id": 67,
+   "kind": "list",
+   "start": 12671,
+   "end": 12737,
+   "text": "- Useful for policies that need motion awareness for dynamic tasks",
+   "tokens": []
+  },
+  {
+   "id": 68,
+   "kind": "heading",
+   "start": 12739,
+   "end": 12768,
+   "text": "#### Motor Current Processing",
+   "tokens": []
+  },
+  {
+   "id": 69,
+   "kind": "para",
+   "start": 12770,
+   "end": 12838,
+   "text": "Monitor motor currents to detect contact forces and load conditions:",
+   "tokens": []
+  },
+  {
+   "id": 70,
+   "kind": "para",
+   "start": 12971,
+   "end": 12986,
+   "text": "This processor:",
+   "tokens": []
+  },
+  {
+   "id": 71,
+   "kind": "list",
+   "start": 12988,
+   "end": 13048,
+   "text": "- Reads motor current values from the robot's control system",
+   "tokens": []
+  },
+  {
+   "id": 72,
+   "kind": "list",
+   "start": 13049,
+   "end": 13108,
+   "text": "- Adds current measurements to the observation state vector",
+   "tokens": []
+  },
+  {
+   "id": 73,
+   "kind": "list",
+   "start": 13109,
+   "end": 13181,
+   "text": "- Helps detect contact events, object weights, and mechanical resistance",
+   "tokens": []
+  },
+  {
+   "id": 74,
+   "kind": "list",
+   "start": 13182,
+   "end": 13226,
+   "text": "- Useful for contact-rich manipulation tasks",
+   "tokens": []
+  },
+  {
+   "id": 75,
+   "kind": "heading",
+   "start": 13228,
+   "end": 13264,
+   "text": "#### Combined Observation Processing",
+   "tokens": []
+  },
+  {
+   "id": 76,
+   "kind": "para",
+   "start": 13266,
+   "end": 13337,
+   "text": "You can enable multiple observation processing features simultaneously:",
+   "tokens": []
+  },
+  {
+   "id": 77,
+   "kind": "para",
+   "start": 13555,
+   "end": 13755,
+   "text": "**Note**: Enabling additional observation features increases the state space dimensionality, which may require adjusting your policy network architecture and potentially collecting more training data.",
+   "tokens": []
+  },
+  {
+   "id": 78,
+   "kind": "heading",
+   "start": 13757,
+   "end": 13791,
+   "text": "### Finding Robot Workspace Bounds",
+   "tokens": []
+  },
+  {
+   "id": 79,
+   "kind": "para",
+   "start": 13793,
+   "end": 13899,
+   "text": "Before collecting demonstrations, you need to determine the appropriate operational bounds for your robot.",
+   "tokens": []
+  },
+  {
+   "id": 80,
+   "kind": "para",
+   "start": 13901,
+   "end": 14435,
+   "text": "This helps simplify the problem of learning on the real robot in two ways: 1) by limiting the robot's operational space to a specific region that solves the task and avoids unnecessary or unsafe exploration, and 2) by allowing training in end-effector space rather than joint space. Empirically, learning in joint space for reinforcement learning in manipulation is often a harder problem - some tasks are nearly impossible to learn in joint space but become learnable when the action space is transformed to end-effector coordinates.",
+   "tokens": []
+  },
+  {
+   "id": 81,
+   "kind": "para",
+   "start": 14437,
+   "end": 14472,
+   "text": "**Using lerobot-find-joint-limits**",
+   "tokens": []
+  },
+  {
+   "id": 82,
+   "kind": "para",
+   "start": 14474,
+   "end": 14807,
+   "text": "This script helps you find the safe operational bounds for your robot's end-effector. Given that you have a follower and leader arm, you can use the script to find the bounds for the follower arm that will be applied during training.\nBounding the action space will reduce the redundant exploration of the agent and guarantees safety.",
+   "tokens": []
+  },
+  {
+   "id": 83,
+   "kind": "para",
+   "start": 15046,
+   "end": 15058,
+   "text": "**Workflow**",
+   "tokens": []
+  },
+  {
+   "id": 84,
+   "kind": "list",
+   "start": 15060,
+   "end": 15135,
+   "text": "1. Run the script and move the robot through the space that solves the task",
+   "tokens": []
+  },
+  {
+   "id": 85,
+   "kind": "list",
+   "start": 15136,
+   "end": 15274,
+   "text": "2. The script will record the minimum and maximum end-effector positions and the joint angles and prints them to the console, for example:",
+   "tokens": []
+  },
+  {
+   "id": 86,
+   "kind": "list",
+   "start": 15500,
+   "end": 15675,
+   "text": "3. Use these values in your environment configuration under ⟦0⟧ (see ⟦1⟧ in ⟦2⟧)",
+   "tokens": [
+    "`env.processor.inverse_kinematics.end_effector_bounds`",
+    "`InverseKinematicsConfig`",
+    "`lerobot/envs/configs.py`"
+   ]
+  },
+  {
+   "id": 87,
+   "kind": "para",
+   "start": 15677,
+   "end": 15702,
+   "text": "**Example Configuration**",
+   "tokens": []
+  },
+  {
+   "id": 88,
+   "kind": "heading",
+   "start": 15914,
+   "end": 15943,
+   "text": "### Collecting Demonstrations",
+   "tokens": []
+  },
+  {
+   "id": 89,
+   "kind": "para",
+   "start": 15945,
+   "end": 16163,
+   "text": "With the bounds defined, you can safely collect demonstrations for training. Training RL with off-policy algorithm allows us to use offline datasets collected in order to improve the efficiency of the learning process.",
+   "tokens": []
+  },
+  {
+   "id": 90,
+   "kind": "para",
+   "start": 16165,
+   "end": 16191,
+   "text": "**Setting Up Record Mode**",
+   "tokens": []
+  },
+  {
+   "id": 91,
+   "kind": "para",
+   "start": 16193,
+   "end": 16388,
+   "text": "Create a configuration file for recording demonstrations (or edit an existing one like [env_config.json](⟦0⟧)):",
+   "tokens": [
+    "https://huggingface.co/datasets/lerobot/config_examples/resolve/main/rl/env_config.json"
+   ]
+  },
+  {
+   "id": 92,
+   "kind": "list",
+   "start": 16390,
+   "end": 16435,
+   "text": "1. Set ⟦0⟧ to ⟦1⟧ at the root level",
+   "tokens": [
+    "`mode`",
+    "`\"record\"`"
+   ]
+  },
+  {
+   "id": 93,
+   "kind": "list",
+   "start": 16436,
+   "end": 16536,
+   "text": "2. Specify a unique ⟦0⟧ for your dataset in the ⟦1⟧ section (e.g., \"username/task_name\")",
+   "tokens": [
+    "`repo_id`",
+    "`dataset`"
+   ]
+  },
+  {
+   "id": 94,
+   "kind": "list",
+   "start": 16537,
+   "end": 16645,
+   "text": "3. Set ⟦0⟧ in the ⟦1⟧ section to the number of demonstrations you want to collect",
+   "tokens": [
+    "`num_episodes_to_record`",
+    "`dataset`"
+   ]
+  },
+  {
+   "id": 95,
+   "kind": "list",
+   "start": 16646,
+   "end": 16753,
+   "text": "4. Set ⟦0⟧ to ⟦1⟧ initially (we'll determine crops later)",
+   "tokens": [
+    "`env.processor.image_preprocessing.crop_params_dict`",
+    "`{}`"
+   ]
+  },
+  {
+   "id": 96,
+   "kind": "list",
+   "start": 16754,
+   "end": 16842,
+   "text": "5. Configure ⟦0⟧, ⟦1⟧, and other hardware settings in the ⟦2⟧ section",
+   "tokens": [
+    "`env.robot`",
+    "`env.teleop`",
+    "`env`"
+   ]
+  },
+  {
+   "id": 97,
+   "kind": "para",
+   "start": 16844,
+   "end": 16874,
+   "text": "Example configuration section:",
+   "tokens": []
+  },
+  {
+   "id": 98,
+   "kind": "heading",
+   "start": 17739,
+   "end": 17771,
+   "text": "### Using a Teleoperation Device",
+   "tokens": []
+  },
+  {
+   "id": 99,
+   "kind": "para",
+   "start": 17773,
+   "end": 18015,
+   "text": "Along with your robot, you will need a teleoperation device to control it in order to collect datasets of your task and perform interventions during the online training.\nWe support using a gamepad or a keyboard or the leader arm of the robot.",
+   "tokens": []
+  },
+  {
+   "id": 100,
+   "kind": "para",
+   "start": 18017,
+   "end": 18162,
+   "text": "HIL-Serl learns actions in the end-effector space of the robot. Therefore, the teleoperation will control the end-effector's x,y,z displacements.",
+   "tokens": []
+  },
+  {
+   "id": 101,
+   "kind": "para",
+   "start": 18164,
+   "end": 18525,
+   "text": "The end-effector transformation is applied by the processor pipeline (⟦0⟧, ⟦1⟧, ⟦2⟧, ⟦3⟧) configured under ⟦4⟧ (⟦5⟧) and ⟦6⟧ / ⟦7⟧. The defaults related to the end-effector space are:",
+   "tokens": [
+    "`InverseKinematicsRLStep`",
+    "`EEBoundsAndSafety`",
+    "`EEReferenceAndDelta`",
+    "`GripperVelocityToJoint`",
+    "`env.processor.inverse_kinematics`",
+    "`InverseKinematicsConfig`",
+    "`env.processor.gripper`",
+    "`env.processor.max_gripper_pos`"
+   ]
+  },
+  {
+   "id": 102,
+   "kind": "para",
+   "start": 19151,
+   "end": 19281,
+   "text": "The ⟦0⟧ defines the teleoperation device. You can check the list of available teleoperators in ⟦1⟧.",
+   "tokens": [
+    "`Teleoperator`",
+    "`lerobot/teleoperators`"
+   ]
+  },
+  {
+   "id": 103,
+   "kind": "para",
+   "start": 19283,
+   "end": 19309,
+   "text": "**Setting up the Gamepad**",
+   "tokens": []
+  },
+  {
+   "id": 104,
+   "kind": "para",
+   "start": 19311,
+   "end": 19397,
+   "text": "The gamepad provides a very convenient way to control the robot and the episode state.",
+   "tokens": []
+  },
+  {
+   "id": 105,
+   "kind": "para",
+   "start": 19399,
+   "end": 19529,
+   "text": "To setup the gamepad, you need to set the ⟦0⟧ to ⟦1⟧ and define the ⟦2⟧ section in the configuration file.",
+   "tokens": [
+    "`control_mode`",
+    "`\"gamepad\"`",
+    "`teleop`"
+   ]
+  },
+  {
+   "id": 106,
+   "kind": "para",
+   "start": 20034,
+   "end": 20125,
+   "text": "⟦0⟧\n  ⟦1⟧Gamepad button mapping for robot control and episode management⟦2⟧",
+   "tokens": [
+    "<p align=\"center\">",
+    "<i>",
+    "</i>"
+   ]
+  },
+  {
+   "id": 107,
+   "kind": "para",
+   "start": 20132,
+   "end": 20163,
+   "text": "**Setting up the SO101 leader**",
+   "tokens": []
+  },
+  {
+   "id": 108,
+   "kind": "para",
+   "start": 20165,
+   "end": 20338,
+   "text": "The SO101 leader arm has reduced gears that allows it to move and track the follower arm during exploration. Therefore, taking over is much smoother than the gearless SO100.",
+   "tokens": []
+  },
+  {
+   "id": 109,
+   "kind": "para",
+   "start": 20340,
+   "end": 20474,
+   "text": "To setup the SO101 leader, you need to set the ⟦0⟧ to ⟦1⟧ and define the ⟦2⟧ section in the configuration file.",
+   "tokens": [
+    "`control_mode`",
+    "`\"leader\"`",
+    "`teleop`"
+   ]
+  },
+  {
+   "id": 110,
+   "kind": "para",
+   "start": 20745,
+   "end": 21006,
+   "text": "In order to annotate the success/failure of the episode, **you will need** to use a keyboard to press ⟦0⟧ for success, ⟦1⟧ for failure.\nDuring the online training, press ⟦2⟧ to take over the policy and ⟦3⟧ again to give the control back to the policy.",
+   "tokens": [
+    "`s`",
+    "`esc`",
+    "`space`",
+    "`space`"
+   ]
+  },
+  {
+   "id": 111,
+   "kind": "para",
+   "start": 21008,
+   "end": 21087,
+   "text": "⟦0⟧\n⟦1⟧⟦2⟧Video: SO101 leader teleoperation⟦3⟧⟦4⟧",
+   "tokens": [
+    "<details>",
+    "<summary>",
+    "<strong>",
+    "</strong>",
+    "</summary>"
+   ]
+  },
+  {
+   "id": 112,
+   "kind": "para",
+   "start": 21335,
+   "end": 21458,
+   "text": "⟦0⟧⟦1⟧SO101 leader teleoperation example, the leader tracks the follower, press ⟦2⟧ to intervene⟦3⟧⟦4⟧",
+   "tokens": [
+    "<p align=\"center\">",
+    "<i>",
+    "`space`",
+    "</i>",
+    "</p>"
+   ]
+  },
+  {
+   "id": 113,
+   "kind": "para",
+   "start": 21471,
+   "end": 21499,
+   "text": "**Recording Demonstrations**",
+   "tokens": []
+  },
+  {
+   "id": 114,
+   "kind": "para",
+   "start": 21501,
+   "end": 21684,
+   "text": "Start the recording process, an example of the config file can be found [here](⟦0⟧):",
+   "tokens": [
+    "https://huggingface.co/datasets/aractingi/lerobot-example-config-files/blob/main/env_config_so100.json"
+   ]
+  },
+  {
+   "id": 115,
+   "kind": "para",
+   "start": 21792,
+   "end": 21809,
+   "text": "During recording:",
+   "tokens": []
+  },
+  {
+   "id": 116,
+   "kind": "list",
+   "start": 21811,
+   "end": 21942,
+   "text": "1. The robot will reset to the initial position defined in the configuration file ⟦0⟧",
+   "tokens": [
+    "`env.processor.reset.fixed_reset_joint_positions`"
+   ]
+  },
+  {
+   "id": 117,
+   "kind": "list",
+   "start": 21943,
+   "end": 21976,
+   "text": "2. Complete the task successfully",
+   "tokens": []
+  },
+  {
+   "id": 118,
+   "kind": "list",
+   "start": 21977,
+   "end": 22051,
+   "text": "3. The episode ends with a reward of 1 when you press the \"success\" button",
+   "tokens": []
+  },
+  {
+   "id": 119,
+   "kind": "list",
+   "start": 22052,
+   "end": 22151,
+   "text": "4. If the time limit is reached, or the fail button is pressed, the episode ends with a reward of 0",
+   "tokens": []
+  },
+  {
+   "id": 120,
+   "kind": "list",
+   "start": 22152,
+   "end": 22216,
+   "text": "5. You can rerecord an episode by pressing the \"rerecord\" button",
+   "tokens": []
+  },
+  {
+   "id": 121,
+   "kind": "list",
+   "start": 22217,
+   "end": 22275,
+   "text": "6. The process automatically continues to the next episode",
+   "tokens": []
+  },
+  {
+   "id": 122,
+   "kind": "list",
+   "start": 22276,
+   "end": 22383,
+   "text": "7. After recording all episodes, the dataset is pushed to the Hugging Face Hub (optional) and saved locally",
+   "tokens": []
+  },
+  {
+   "id": 123,
+   "kind": "heading",
+   "start": 22385,
+   "end": 22411,
+   "text": "### Processing the Dataset",
+   "tokens": []
+  },
+  {
+   "id": 124,
+   "kind": "para",
+   "start": 22413,
+   "end": 22627,
+   "text": "After collecting demonstrations, process them to determine optimal camera crops.\nReinforcement learning is sensitive to background distractions, so it is important to crop the images to the relevant workspace area.",
+   "tokens": []
+  },
+  {
+   "id": 125,
+   "kind": "para",
+   "start": 22629,
+   "end": 22902,
+   "text": "Visual RL algorithms learn directly from pixel inputs, making them vulnerable to irrelevant visual information. Background elements like changing lighting, shadows, people moving, or objects outside the workspace can confuse the learning process. Good ROI selection should:",
+   "tokens": []
+  },
+  {
+   "id": 126,
+   "kind": "list",
+   "start": 22904,
+   "end": 22965,
+   "text": "- Include only the essential workspace where the task happens",
+   "tokens": []
+  },
+  {
+   "id": 127,
+   "kind": "list",
+   "start": 22966,
+   "end": 23037,
+   "text": "- Capture the robot's end-effector and all objects involved in the task",
+   "tokens": []
+  },
+  {
+   "id": 128,
+   "kind": "list",
+   "start": 23038,
+   "end": 23096,
+   "text": "- Exclude unnecessary background elements and distractions",
+   "tokens": []
+  },
+  {
+   "id": 129,
+   "kind": "para",
+   "start": 23098,
+   "end": 23247,
+   "text": "Note: If you already know the crop parameters, you can skip this step and just set the ⟦0⟧ in the configuration file during recording.",
+   "tokens": [
+    "`crop_params_dict`"
+   ]
+  },
+  {
+   "id": 130,
+   "kind": "para",
+   "start": 23249,
+   "end": 23280,
+   "text": "**Determining Crop Parameters**",
+   "tokens": []
+  },
+  {
+   "id": 131,
+   "kind": "para",
+   "start": 23282,
+   "end": 23385,
+   "text": "Use the ⟦0⟧ script to interactively select regions of interest in your camera images:",
+   "tokens": [
+    "`crop_dataset_roi.py`"
+   ]
+  },
+  {
+   "id": 132,
+   "kind": "list",
+   "start": 23472,
+   "end": 23536,
+   "text": "1. For each camera view, the script will display the first frame",
+   "tokens": []
+  },
+  {
+   "id": 133,
+   "kind": "list",
+   "start": 23537,
+   "end": 23591,
+   "text": "2. Draw a rectangle around the relevant workspace area",
+   "tokens": []
+  },
+  {
+   "id": 134,
+   "kind": "list",
+   "start": 23592,
+   "end": 23629,
+   "text": "3. Press 'c' to confirm the selection",
+   "tokens": []
+  },
+  {
+   "id": 135,
+   "kind": "list",
+   "start": 23630,
+   "end": 23660,
+   "text": "4. Repeat for all camera views",
+   "tokens": []
+  },
+  {
+   "id": 136,
+   "kind": "list",
+   "start": 23661,
+   "end": 23736,
+   "text": "5. The script outputs cropping parameters and creates a new cropped dataset",
+   "tokens": []
+  },
+  {
+   "id": 137,
+   "kind": "para",
+   "start": 23738,
+   "end": 23753,
+   "text": "Example output:",
+   "tokens": []
+  },
+  {
+   "id": 138,
+   "kind": "para",
+   "start": 24092,
+   "end": 24179,
+   "text": "⟦0⟧\n  ⟦1⟧Interactive cropping tool for selecting regions of interest⟦2⟧",
+   "tokens": [
+    "<p align=\"center\">",
+    "<i>",
+    "</i>"
+   ]
+  },
+  {
+   "id": 139,
+   "kind": "para",
+   "start": 24186,
+   "end": 24212,
+   "text": "**Updating Configuration**",
+   "tokens": []
+  },
+  {
+   "id": 140,
+   "kind": "para",
+   "start": 24214,
+   "end": 24271,
+   "text": "Add these crop parameters to your training configuration:",
+   "tokens": []
+  },
+  {
+   "id": 141,
+   "kind": "para",
+   "start": 24562,
+   "end": 24594,
+   "text": "**Recommended image resolution**",
+   "tokens": []
+  },
+  {
+   "id": 142,
+   "kind": "para",
+   "start": 24596,
+   "end": 24909,
+   "text": "Most vision-based policies have been validated on square inputs of either **128×128** (default) or **64×64** pixels. We therefore advise setting the resize_size parameter to [128, 128] – or [64, 64] if you need to save GPU memory and bandwidth. Other resolutions are possible but have not been extensively tested.",
+   "tokens": []
+  },
+  {
+   "id": 143,
+   "kind": "heading",
+   "start": 24911,
+   "end": 24943,
+   "text": "### Training a Reward Classifier",
+   "tokens": []
+  },
+  {
+   "id": 144,
+   "kind": "para",
+   "start": 24945,
+   "end": 25409,
+   "text": "The reward classifier plays an important role in the HIL-SERL workflow by automating reward assignment and automatically detecting episode success. Instead of manually defining reward functions or relying on human feedback for every timestep, the reward classifier learns to predict success/failure from visual observations. This enables the RL algorithm to learn efficiently by providing consistent and automated reward signals based on the robot's camera inputs.",
+   "tokens": []
+  },
+  {
+   "id": 145,
+   "kind": "para",
+   "start": 25411,
+   "end": 25654,
+   "text": "This guide explains how to train a reward classifier for human-in-the-loop reinforcement learning implementation of LeRobot. Reward classifiers learn to predict the reward value given a state which can be used in an RL setup to train a policy.",
+   "tokens": []
+  },
+  {
+   "id": 146,
+   "kind": "para",
+   "start": 25656,
+   "end": 25828,
+   "text": "**Note**: Training a reward classifier is optional. You can start the first round of RL experiments by annotating the success manually with your gamepad or keyboard device.",
+   "tokens": []
+  },
+  {
+   "id": 147,
+   "kind": "para",
+   "start": 25830,
+   "end": 26105,
+   "text": "The reward classifier implementation in ⟦0⟧ uses a pretrained vision model to process the images. It can output either a single value for binary rewards to predict success/fail cases or multiple values for multi-class settings.",
+   "tokens": [
+    "`lerobot/rewards/classifier/modeling_classifier.py`"
+   ]
+  },
+  {
+   "id": 148,
+   "kind": "para",
+   "start": 26107,
+   "end": 26157,
+   "text": "**Collecting a Dataset for the reward classifier**",
+   "tokens": []
+  },
+  {
+   "id": 149,
+   "kind": "para",
+   "start": 26159,
+   "end": 26384,
+   "text": "Before training, you need to collect a dataset with labeled examples. Setting ⟦0⟧ in your config and running ⟦1⟧ enables the process of collecting a dataset of observations, actions, and rewards.",
+   "tokens": [
+    "`mode: \"record\"`",
+    "`gym_manipulator.py`"
+   ]
+  },
+  {
+   "id": 150,
+   "kind": "para",
+   "start": 26386,
+   "end": 26507,
+   "text": "To collect a dataset, you need to modify some parameters in the environment configuration based on HILSerlRobotEnvConfig.",
+   "tokens": []
+  },
+  {
+   "id": 151,
+   "kind": "para",
+   "start": 26629,
+   "end": 26667,
+   "text": "**Key Parameters for Data Collection**",
+   "tokens": []
+  },
+  {
+   "id": 152,
+   "kind": "list",
+   "start": 26669,
+   "end": 26738,
+   "text": "- **mode**: set it to ⟦0⟧ to collect a dataset (at root level)",
+   "tokens": [
+    "`\"record\"`"
+   ]
+  },
+  {
+   "id": 153,
+   "kind": "list",
+   "start": 26739,
+   "end": 26831,
+   "text": "- **dataset.repo_id**: ⟦0⟧, name of the dataset and repo on the hub",
+   "tokens": [
+    "`\"hf_username/dataset_name\"`"
+   ]
+  },
+  {
+   "id": 154,
+   "kind": "list",
+   "start": 26832,
+   "end": 26898,
+   "text": "- **dataset.num_episodes_to_record**: Number of episodes to record",
+   "tokens": []
+  },
+  {
+   "id": 155,
+   "kind": "list",
+   "start": 26899,
+   "end": 27033,
+   "text": "- **env.processor.reset.terminate_on_success**: Whether to automatically terminate episodes when success is detected (default: ⟦0⟧)",
+   "tokens": [
+    "`true`"
+   ]
+  },
+  {
+   "id": 156,
+   "kind": "list",
+   "start": 27034,
+   "end": 27086,
+   "text": "- **env.fps**: Number of frames per second to record",
+   "tokens": []
+  },
+  {
+   "id": 157,
+   "kind": "list",
+   "start": 27087,
+   "end": 27152,
+   "text": "- **dataset.push_to_hub**: Whether to push the dataset to the hub",
+   "tokens": []
+  },
+  {
+   "id": 158,
+   "kind": "para",
+   "start": 27154,
+   "end": 27603,
+   "text": "The ⟦0⟧ parameter allows you to control episode termination behavior. When set to ⟦1⟧, episodes will continue even after success is detected, allowing you to collect more positive examples with the reward=1 label. This is crucial for training reward classifiers as it provides more success state examples in your dataset. When set to ⟦2⟧ (default), episodes terminate immediately upon success detection.",
+   "tokens": [
+    "`env.processor.reset.terminate_on_success`",
+    "`false`",
+    "`true`"
+   ]
+  },
+  {
+   "id": 159,
+   "kind": "para",
+   "start": 27605,
+   "end": 27856,
+   "text": "**Important**: For reward classifier training, set ⟦0⟧ to collect sufficient positive examples. For regular HIL-SERL training, keep it as ⟦1⟧ to enable automatic episode termination when the task is completed successfully.",
+   "tokens": [
+    "`terminate_on_success: false`",
+    "`true`"
+   ]
+  },
+  {
+   "id": 160,
+   "kind": "para",
+   "start": 27858,
+   "end": 27908,
+   "text": "Example configuration section for data collection:",
+   "tokens": []
+  },
+  {
+   "id": 161,
+   "kind": "para",
+   "start": 28604,
+   "end": 28639,
+   "text": "**Reward Classifier Configuration**",
+   "tokens": []
+  },
+  {
+   "id": 162,
+   "kind": "para",
+   "start": 28641,
+   "end": 28769,
+   "text": "The reward classifier is configured using ⟦0⟧. Here are the key parameters:",
+   "tokens": [
+    "`lerobot/rewards/classifier/configuration_classifier.py`"
+   ]
+  },
+  {
+   "id": 163,
+   "kind": "list",
+   "start": 28771,
+   "end": 28858,
+   "text": "- **model_name**: Base model architecture (e.g., we mainly use ⟦0⟧)",
+   "tokens": [
+    "`\"helper2424/resnet10\"`"
+   ]
+  },
+  {
+   "id": 164,
+   "kind": "list",
+   "start": 28859,
+   "end": 28903,
+   "text": "- **model_type**: ⟦0⟧ or ⟦1⟧",
+   "tokens": [
+    "`\"cnn\"`",
+    "`\"transformer\"`"
+   ]
+  },
+  {
+   "id": 165,
+   "kind": "list",
+   "start": 28904,
+   "end": 28946,
+   "text": "- **num_cameras**: Number of camera inputs",
+   "tokens": []
+  },
+  {
+   "id": 166,
+   "kind": "list",
+   "start": 28947,
+   "end": 29031,
+   "text": "- **num_classes**: Number of output classes (typically 2 for binary success/failure)",
+   "tokens": []
+  },
+  {
+   "id": 167,
+   "kind": "list",
+   "start": 29032,
+   "end": 29079,
+   "text": "- **hidden_dim**: Size of hidden representation",
+   "tokens": []
+  },
+  {
+   "id": 168,
+   "kind": "list",
+   "start": 29080,
+   "end": 29124,
+   "text": "- **dropout_rate**: Regularization parameter",
+   "tokens": []
+  },
+  {
+   "id": 169,
+   "kind": "list",
+   "start": 29125,
+   "end": 29173,
+   "text": "- **learning_rate**: Learning rate for optimizer",
+   "tokens": []
+  },
+  {
+   "id": 170,
+   "kind": "para",
+   "start": 29175,
+   "end": 29352,
+   "text": "Example configuration for training the [reward classifier](⟦0⟧):",
+   "tokens": [
+    "https://huggingface.co/datasets/aractingi/lerobot-example-config-files/blob/main/reward_classifier_train_config.json"
+   ]
+  },
+  {
+   "id": 171,
+   "kind": "para",
+   "start": 30381,
+   "end": 30408,
+   "text": "**Training the Classifier**",
+   "tokens": []
+  },
+  {
+   "id": 172,
+   "kind": "para",
+   "start": 30410,
+   "end": 30485,
+   "text": "To train the classifier, use the ⟦0⟧ script with your configuration:",
+   "tokens": [
+    "`train.py`"
+   ]
+  },
+  {
+   "id": 173,
+   "kind": "para",
+   "start": 30572,
+   "end": 30607,
+   "text": "**Deploying and Testing the Model**",
+   "tokens": []
+  },
+  {
+   "id": 174,
+   "kind": "para",
+   "start": 30609,
+   "end": 30704,
+   "text": "To use your trained reward classifier, configure the ⟦0⟧ to use your model:",
+   "tokens": [
+    "`HILSerlRobotEnvConfig`"
+   ]
+  },
+  {
+   "id": 175,
+   "kind": "para",
+   "start": 31146,
+   "end": 31190,
+   "text": "or set the argument in the json config file.",
+   "tokens": []
+  },
+  {
+   "id": 176,
+   "kind": "para",
+   "start": 31473,
+   "end": 31516,
+   "text": "Run ⟦0⟧ to test the model.",
+   "tokens": [
+    "`gym_manipulator.py`"
+   ]
+  },
+  {
+   "id": 177,
+   "kind": "para",
+   "start": 31606,
+   "end": 31714,
+   "text": "The reward classifier will automatically provide rewards based on the visual input from the robot's cameras.",
+   "tokens": []
+  },
+  {
+   "id": 178,
+   "kind": "para",
+   "start": 31716,
+   "end": 31771,
+   "text": "**Example Workflow for training the reward classifier**",
+   "tokens": []
+  },
+  {
+   "id": 179,
+   "kind": "list",
+   "start": 31773,
+   "end": 32034,
+   "text": "1. **Create the configuration files**:\n   Create the necessary json configuration files for the reward classifier and the environment. Check the examples [here](⟦0⟧).",
+   "tokens": [
+    "https://huggingface.co/datasets/lerobot/config_examples/resolve/main/reward_classifier/config.json"
+   ]
+  },
+  {
+   "id": 180,
+   "kind": "list",
+   "start": 32036,
+   "end": 32061,
+   "text": "2. **Collect a dataset**:",
+   "tokens": []
+  },
+  {
+   "id": 181,
+   "kind": "list",
+   "start": 32172,
+   "end": 32200,
+   "text": "3. **Train the classifier**:",
+   "tokens": []
+  },
+  {
+   "id": 182,
+   "kind": "list",
+   "start": 32308,
+   "end": 32335,
+   "text": "4. **Test the classifier**:",
+   "tokens": []
+  },
+  {
+   "id": 183,
+   "kind": "heading",
+   "start": 32445,
+   "end": 32476,
+   "text": "### Training with Actor-Learner",
+   "tokens": []
+  },
+  {
+   "id": 184,
+   "kind": "para",
+   "start": 32478,
+   "end": 32958,
+   "text": "The LeRobot system uses a distributed actor-learner architecture for training. This architecture decouples robot interactions from the learning process, allowing them to run concurrently without blocking each other. The actor server handles robot observations and actions, sending interaction data to the learner server. The learner server performs gradient descent and periodically updates the actor's policy weights. You will need to start two processes: a learner and an actor.",
+   "tokens": []
+  },
+  {
+   "id": 185,
+   "kind": "para",
+   "start": 32960,
+   "end": 32983,
+   "text": "**Configuration Setup**",
+   "tokens": []
+  },
+  {
+   "id": 186,
+   "kind": "para",
+   "start": 32985,
+   "end": 33246,
+   "text": "Create a training configuration file (example available [here](⟦0⟧)). The training config is based on the main ⟦1⟧ class in ⟦2⟧.",
+   "tokens": [
+    "https://huggingface.co/datasets/lerobot/config_examples/resolve/main/rl/train_config.json",
+    "`TrainRLServerPipelineConfig`",
+    "`lerobot/rl/train_rl.py`"
+   ]
+  },
+  {
+   "id": 187,
+   "kind": "list",
+   "start": 33248,
+   "end": 33322,
+   "text": "1. Configure the policy settings (⟦0⟧, ⟦1⟧, etc.)",
+   "tokens": [
+    "`type=\"gaussian_actor\"`",
+    "`device`"
+   ]
+  },
+  {
+   "id": 188,
+   "kind": "list",
+   "start": 33323,
+   "end": 33505,
+   "text": "2. Configure the algorithm settings under the top-level ⟦0⟧ block (⟦1⟧, learning rates, discount, etc., defined in ⟦2⟧).",
+   "tokens": [
+    "`algorithm`",
+    "`type=\"sac\"`",
+    "`lerobot/rl/algorithms/sac/configuration_sac.py`"
+   ]
+  },
+  {
+   "id": 189,
+   "kind": "list",
+   "start": 33506,
+   "end": 33546,
+   "text": "3. Set ⟦0⟧ to your cropped dataset",
+   "tokens": [
+    "`dataset`"
+   ]
+  },
+  {
+   "id": 190,
+   "kind": "list",
+   "start": 33547,
+   "end": 33601,
+   "text": "4. Configure environment settings with crop parameters",
+   "tokens": []
+  },
+  {
+   "id": 191,
+   "kind": "list",
+   "start": 33602,
+   "end": 33821,
+   "text": "5. Check the other parameters related to the Gaussian Actor in [configuration_gaussian_actor.py](⟦0⟧).",
+   "tokens": [
+    "https://github.com/huggingface/lerobot/blob/main/src/lerobot/policies/gaussian_actor/configuration_gaussian_actor.py#L79"
+   ]
+  },
+  {
+   "id": 192,
+   "kind": "list",
+   "start": 33822,
+   "end": 33936,
+   "text": "6. Verify that the ⟦0⟧ config is correct with the right ⟦1⟧ and ⟦2⟧ for your task.",
+   "tokens": [
+    "`policy`",
+    "`input_features`",
+    "`output_features`"
+   ]
+  },
+  {
+   "id": 193,
+   "kind": "para",
+   "start": 33938,
+   "end": 33962,
+   "text": "**Starting the Learner**",
+   "tokens": []
+  },
+  {
+   "id": 194,
+   "kind": "para",
+   "start": 33964,
+   "end": 34004,
+   "text": "First, start the learner server process:",
+   "tokens": []
+  },
+  {
+   "id": 195,
+   "kind": "para",
+   "start": 34114,
+   "end": 34126,
+   "text": "The learner:",
+   "tokens": []
+  },
+  {
+   "id": 196,
+   "kind": "list",
+   "start": 34128,
+   "end": 34160,
+   "text": "- Initializes the policy network",
+   "tokens": []
+  },
+  {
+   "id": 197,
+   "kind": "list",
+   "start": 34161,
+   "end": 34186,
+   "text": "- Prepares replay buffers",
+   "tokens": []
+  },
+  {
+   "id": 198,
+   "kind": "list",
+   "start": 34187,
+   "end": 34237,
+   "text": "- Opens a ⟦0⟧ server to communicate with actors",
+   "tokens": [
+    "`gRPC`"
+   ]
+  },
+  {
+   "id": 199,
+   "kind": "list",
+   "start": 34238,
+   "end": 34284,
+   "text": "- Processes transitions and updates the policy",
+   "tokens": []
+  },
+  {
+   "id": 200,
+   "kind": "para",
+   "start": 34286,
+   "end": 34308,
+   "text": "**Starting the Actor**",
+   "tokens": []
+  },
+  {
+   "id": 201,
+   "kind": "para",
+   "start": 34310,
+   "end": 34386,
+   "text": "In a separate terminal, start the actor process with the same configuration:",
+   "tokens": []
+  },
+  {
+   "id": 202,
+   "kind": "para",
+   "start": 34494,
+   "end": 34504,
+   "text": "The actor:",
+   "tokens": []
+  },
+  {
+   "id": 203,
+   "kind": "list",
+   "start": 34506,
+   "end": 34542,
+   "text": "- Connects to the learner via ⟦0⟧",
+   "tokens": [
+    "`gRPC`"
+   ]
+  },
+  {
+   "id": 204,
+   "kind": "list",
+   "start": 34543,
+   "end": 34572,
+   "text": "- Initializes the environment",
+   "tokens": []
+  },
+  {
+   "id": 205,
+   "kind": "list",
+   "start": 34573,
+   "end": 34627,
+   "text": "- Execute rollouts of the policy to collect experience",
+   "tokens": []
+  },
+  {
+   "id": 206,
+   "kind": "list",
+   "start": 34628,
+   "end": 34662,
+   "text": "- Sends transitions to the learner",
+   "tokens": []
+  },
+  {
+   "id": 207,
+   "kind": "list",
+   "start": 34663,
+   "end": 34699,
+   "text": "- Receives updated policy parameters",
+   "tokens": []
+  },
+  {
+   "id": 208,
+   "kind": "para",
+   "start": 34701,
+   "end": 34718,
+   "text": "**Training Flow**",
+   "tokens": []
+  },
+  {
+   "id": 209,
+   "kind": "para",
+   "start": 34720,
+   "end": 34756,
+   "text": "The training proceeds automatically:",
+   "tokens": []
+  },
+  {
+   "id": 210,
+   "kind": "list",
+   "start": 34758,
+   "end": 34809,
+   "text": "1. The actor executes the policy in the environment",
+   "tokens": []
+  },
+  {
+   "id": 211,
+   "kind": "list",
+   "start": 34810,
+   "end": 34862,
+   "text": "2. Transitions are collected and sent to the learner",
+   "tokens": []
+  },
+  {
+   "id": 212,
+   "kind": "list",
+   "start": 34863,
+   "end": 34923,
+   "text": "3. The learner updates the policy based on these transitions",
+   "tokens": []
+  },
+  {
+   "id": 213,
+   "kind": "list",
+   "start": 34924,
+   "end": 34979,
+   "text": "4. Updated policy parameters are sent back to the actor",
+   "tokens": []
+  },
+  {
+   "id": 214,
+   "kind": "list",
+   "start": 34980,
+   "end": 35046,
+   "text": "5. The process continues until the specified step limit is reached",
+   "tokens": []
+  },
+  {
+   "id": 215,
+   "kind": "para",
+   "start": 35048,
+   "end": 35069,
+   "text": "**Human in the Loop**",
+   "tokens": []
+  },
+  {
+   "id": 216,
+   "kind": "list",
+   "start": 35071,
+   "end": 35235,
+   "text": "- The key to learning efficiently is to have human interventions to provide corrective feedback and completing the task to aide the policy learning and exploration.",
+   "tokens": []
+  },
+  {
+   "id": 217,
+   "kind": "list",
+   "start": 35236,
+   "end": 35430,
+   "text": "- To perform human interventions, you can press the upper right trigger button on the gamepad (or the ⟦0⟧ key on the keyboard). This will pause the policy actions and allow you to take over.",
+   "tokens": [
+    "`space`"
+   ]
+  },
+  {
+   "id": 218,
+   "kind": "list",
+   "start": 35431,
+   "end": 35642,
+   "text": "- A successful experiment is one where the human has to intervene at the start but then reduces the amount of interventions as the policy improves. You can monitor the intervention rate in the ⟦0⟧ dashboard.",
+   "tokens": [
+    "`wandb`"
+   ]
+  },
+  {
+   "id": 219,
+   "kind": "para",
+   "start": 35945,
+   "end": 36031,
+   "text": "  ⟦0⟧\n    Example showing how human interventions help guide policy learning over time",
+   "tokens": [
+    "<i>"
+   ]
+  },
+  {
+   "id": 220,
+   "kind": "list",
+   "start": 36045,
+   "end": 36193,
+   "text": "- The figure shows the plot of the episodic reward over interaction step. The figure shows the effect of human interventions on the policy learning.",
+   "tokens": []
+  },
+  {
+   "id": 221,
+   "kind": "list",
+   "start": 36194,
+   "end": 36335,
+   "text": "- The orange curve is an experiment without any human interventions. While the pink and blue curves are experiments with human interventions.",
+   "tokens": []
+  },
+  {
+   "id": 222,
+   "kind": "list",
+   "start": 36336,
+   "end": 36488,
+   "text": "- We can observe that the number of steps where the policy starts achieving the maximum reward is cut by a quarter when human interventions are present.",
+   "tokens": []
+  },
+  {
+   "id": 223,
+   "kind": "para",
+   "start": 36490,
+   "end": 36518,
+   "text": "**Monitoring and Debugging**",
+   "tokens": []
+  },
+  {
+   "id": 224,
+   "kind": "para",
+   "start": 36520,
+   "end": 36696,
+   "text": "If you have ⟦0⟧ set to ⟦1⟧ in your configuration, you can monitor training progress in real-time through the [Weights & Biases](⟦2⟧) dashboard.",
+   "tokens": [
+    "`wandb.enable`",
+    "`true`",
+    "https://wandb.ai/site/"
+   ]
+  },
+  {
+   "id": 225,
+   "kind": "heading",
+   "start": 36698,
+   "end": 36730,
+   "text": "### Guide to Human Interventions",
+   "tokens": []
+  },
+  {
+   "id": 226,
+   "kind": "para",
+   "start": 36732,
+   "end": 36890,
+   "text": "The learning process is very sensitive to the intervention strategy. It will takes a few runs to understand how to intervene effectively. Some tips and hints:",
+   "tokens": []
+  },
+  {
+   "id": 227,
+   "kind": "list",
+   "start": 36892,
+   "end": 36966,
+   "text": "- Allow the policy to explore for a few episodes at the start of training.",
+   "tokens": []
+  },
+  {
+   "id": 228,
+   "kind": "list",
+   "start": 36967,
+   "end": 37099,
+   "text": "- Avoid intervening for long periods of time. Try to intervene in situation to correct the robot's behaviour when it goes off track.",
+   "tokens": []
+  },
+  {
+   "id": 229,
+   "kind": "list",
+   "start": 37100,
+   "end": 37259,
+   "text": "- Once the policy starts achieving the task, even if its not perfect, you can limit your interventions to simple quick actions like a simple grasping commands.",
+   "tokens": []
+  },
+  {
+   "id": 230,
+   "kind": "para",
+   "start": 37261,
+   "end": 37379,
+   "text": "The ideal behaviour is that your intervention rate should drop gradually during training as shown in the figure below.",
+   "tokens": []
+  },
+  {
+   "id": 231,
+   "kind": "para",
+   "start": 37672,
+   "end": 37766,
+   "text": "  ⟦0⟧\n    Plot of the intervention rate during a training run on a pick and lift cube\n    task",
+   "tokens": [
+    "<i>"
+   ]
+  },
+  {
+   "id": 232,
+   "kind": "heading",
+   "start": 37780,
+   "end": 37811,
+   "text": "### Key hyperparameters to tune",
+   "tokens": []
+  },
+  {
+   "id": 233,
+   "kind": "para",
+   "start": 37813,
+   "end": 37902,
+   "text": "Some configuration values have a disproportionate impact on training stability and speed:",
+   "tokens": []
+  },
+  {
+   "id": 234,
+   "kind": "list",
+   "start": 37904,
+   "end": 38232,
+   "text": "- **⟦0⟧** (⟦1⟧) – initial entropy temperature in SAC. Higher values encourage more exploration; lower values make the policy more deterministic early on. A good starting point is ⟦2⟧. We observed that setting it too high can make human interventions ineffective and slow down learning.",
+   "tokens": [
+    "`temperature_init`",
+    "`algorithm.temperature_init`",
+    "`1e-2`"
+   ]
+  },
+  {
+   "id": 235,
+   "kind": "list",
+   "start": 38233,
+   "end": 38610,
+   "text": "- **⟦0⟧** (⟦1⟧) – interval in _seconds_ between two weight pushes from the learner to the actor. The default is ⟦2⟧. Decrease to **1-2 s** to provide fresher weights (at the cost of more network traffic); increase only if your connection is slow, as this will reduce sample efficiency.",
+   "tokens": [
+    "`policy_parameters_push_frequency`",
+    "`policy.actor_learner_config.policy_parameters_push_frequency`",
+    "`4 s`"
+   ]
+  },
+  {
+   "id": 236,
+   "kind": "list",
+   "start": 38611,
+   "end": 38937,
+   "text": "- **⟦0⟧** (⟦1⟧) – device on which the learner keeps the policy parameters. If you have spare GPU memory, set this to ⟦2⟧ (instead of the default ⟦3⟧). Keeping the weights on-GPU removes CPU→GPU transfer overhead and can significantly increase the number of learner updates per second.",
+   "tokens": [
+    "`storage_device`",
+    "`policy.storage_device`",
+    "`\"cuda\"`",
+    "`\"cpu\"`"
+   ]
+  },
+  {
+   "id": 237,
+   "kind": "para",
+   "start": 38939,
+   "end": 38983,
+   "text": "Congrats 🎉, you have finished this tutorial!",
+   "tokens": []
+  },
+  {
+   "id": 238,
+   "kind": "quote",
+   "start": 38985,
+   "end": 39105,
+   "text": "> [!TIP]\n> If you have any questions or need help, please reach out on [Discord](⟦0⟧).",
+   "tokens": [
+    "https://discord.com/invite/s3KuuzsPFb"
+   ]
+  },
+  {
+   "id": 239,
+   "kind": "para",
+   "start": 39107,
+   "end": 39122,
+   "text": "Paper citation:",
+   "tokens": []
+  }
+ ]
+}

@@ -1,0 +1,228 @@
+{
+ "file": "third_party_sensors.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1955,
+   "text": "# Third-Party Cameras & Sensors",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1957,
+   "end": 2371,
+   "text": "The LeRobot ecosystem extends far beyond its natively supported cameras (OpenCV, Intel RealSense, ZMQ, Reachy 2). Thanks to LeRobot's plugin architecture, the community has built drop-in camera and sensor integrations — from depth cameras to vision-based tactile sensors. This page showcases community-maintained camera and sensor integrations you can use for teleoperation, data collection, and policy deployment.",
+   "tokens": []
+  },
+  {
+   "id": 2,
+   "kind": "quote",
+   "start": 2373,
+   "end": 2550,
+   "text": "> [!IMPORTANT]\n> These projects are developed and maintained by third parties. Please refer to each repository for installation instructions, hardware requirements, and support.",
+   "tokens": []
+  },
+  {
+   "id": 3,
+   "kind": "para",
+   "start": 2552,
+   "end": 2830,
+   "text": "Drop-in plugins are auto-discovered by package name: LeRobot imports any installed package prefixed with ⟦0⟧. Once installed, reference the camera ⟦1⟧ the plugin registers (see its README — it may differ from the package name) directly from any LeRobot command:",
+   "tokens": [
+    "`lerobot_camera_`",
+    "`type`"
+   ]
+  },
+  {
+   "id": 4,
+   "kind": "heading",
+   "start": 3122,
+   "end": 3140,
+   "text": "## Tactile Sensors",
+   "tokens": []
+  },
+  {
+   "id": 5,
+   "kind": "para",
+   "start": 3318,
+   "end": 3411,
+   "text": "  ⟦0⟧\n    ⟦1⟧⟦2⟧Project⟦3⟧⟦4⟧Description⟦5⟧⟦6⟧",
+   "tokens": [
+    "<thead style=\"border:0\">",
+    "<tr style=\"border:0\">",
+    "<th>",
+    "</th>",
+    "<th>",
+    "</th>",
+    "</tr>"
+   ]
+  },
+  {
+   "id": 6,
+   "kind": "para",
+   "start": 3433,
+   "end": 3725,
+   "text": "    ⟦0⟧\n      ⟦1⟧⟦2⟧lerobot-camera-xense⟦3⟧⟦4⟧\n      ⟦5⟧Plugin for ⟦6⟧Xense⟦7⟧ vision-based tactile sensors, exposing rectified/difference images, depth, and 2D markers.⟦8⟧",
+   "tokens": [
+    "<tr style=\"border:0\">",
+    "<td>",
+    "<a href=\"https://github.com/xensedyl/lerobot-camera-xense\">",
+    "</a>",
+    "</td>",
+    "<td>",
+    "<a href=\"https://www.xenserobotics.com/\">",
+    "</a>",
+    "</td>"
+   ]
+  },
+  {
+   "id": 7,
+   "kind": "heading",
+   "start": 3757,
+   "end": 3773,
+   "text": "## Depth Cameras",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "para",
+   "start": 3951,
+   "end": 4044,
+   "text": "  ⟦0⟧\n    ⟦1⟧⟦2⟧Project⟦3⟧⟦4⟧Description⟦5⟧⟦6⟧",
+   "tokens": [
+    "<thead style=\"border:0\">",
+    "<tr style=\"border:0\">",
+    "<th>",
+    "</th>",
+    "<th>",
+    "</th>",
+    "</tr>"
+   ]
+  },
+  {
+   "id": 9,
+   "kind": "para",
+   "start": 4066,
+   "end": 4393,
+   "text": "    ⟦0⟧\n      ⟦1⟧⟦2⟧lerobot_camera_berxel⟦3⟧⟦4⟧\n      ⟦5⟧Plugin for the ⟦6⟧Berxel⟦7⟧ depth camera, part of the broader ⟦8⟧HEXFELLOW⟦9⟧ driver suite.⟦10⟧",
+   "tokens": [
+    "<tr style=\"border:0\">",
+    "<td>",
+    "<a href=\"https://github.com/hexfellow/hex_lerobot_drivers/tree/main/lerobot_camera_berxel\">",
+    "</a>",
+    "</td>",
+    "<td>",
+    "<a href=\"https://www.berxel.com/\">",
+    "</a>",
+    "<a href=\"https://hexfellow.com/\">",
+    "</a>",
+    "</td>"
+   ]
+  },
+  {
+   "id": 10,
+   "kind": "heading",
+   "start": 4425,
+   "end": 4445,
+   "text": "## Networked Cameras",
+   "tokens": []
+  },
+  {
+   "id": 11,
+   "kind": "para",
+   "start": 4623,
+   "end": 4716,
+   "text": "  ⟦0⟧\n    ⟦1⟧⟦2⟧Project⟦3⟧⟦4⟧Description⟦5⟧⟦6⟧",
+   "tokens": [
+    "<thead style=\"border:0\">",
+    "<tr style=\"border:0\">",
+    "<th>",
+    "</th>",
+    "<th>",
+    "</th>",
+    "</tr>"
+   ]
+  },
+  {
+   "id": 12,
+   "kind": "para",
+   "start": 4738,
+   "end": 5004,
+   "text": "    ⟦0⟧\n      ⟦1⟧⟦2⟧lerobot_camera_zmq⟦3⟧⟦4⟧\n      ⟦5⟧Plugin streaming ⟦6⟧Stereolabs ZED⟦7⟧ and USB camera frames from a Raspberry Pi over the network.⟦8⟧",
+   "tokens": [
+    "<tr style=\"border:0\">",
+    "<td>",
+    "<a href=\"https://github.com/F-Fer/lerobot_ur5e_gello\">",
+    "</a>",
+    "</td>",
+    "<td>",
+    "<a href=\"https://www.stereolabs.com/\">",
+    "</a>",
+    "</td>"
+   ]
+  },
+  {
+   "id": 13,
+   "kind": "heading",
+   "start": 5036,
+   "end": 5054,
+   "text": "## Virtual Cameras",
+   "tokens": []
+  },
+  {
+   "id": 14,
+   "kind": "para",
+   "start": 5232,
+   "end": 5325,
+   "text": "  ⟦0⟧\n    ⟦1⟧⟦2⟧Project⟦3⟧⟦4⟧Description⟦5⟧⟦6⟧",
+   "tokens": [
+    "<thead style=\"border:0\">",
+    "<tr style=\"border:0\">",
+    "<th>",
+    "</th>",
+    "<th>",
+    "</th>",
+    "</tr>"
+   ]
+  },
+  {
+   "id": 15,
+   "kind": "para",
+   "start": 5347,
+   "end": 5599,
+   "text": "    ⟦0⟧\n      ⟦1⟧⟦2⟧lerobot_camera_dummy⟦3⟧⟦4⟧\n      ⟦5⟧Plugin simulating a camera for recording without hardware. Useful for debugging !⟦6⟧",
+   "tokens": [
+    "<tr style=\"border:0\">",
+    "<td>",
+    "<a href=\"https://github.com/hexfellow/hex_lerobot_drivers/tree/main/lerobot_camera_dummy\">",
+    "</a>",
+    "</td>",
+    "<td>",
+    "</td>"
+   ]
+  },
+  {
+   "id": 16,
+   "kind": "heading",
+   "start": 5631,
+   "end": 5646,
+   "text": "## Contributing",
+   "tokens": []
+  },
+  {
+   "id": 17,
+   "kind": "para",
+   "start": 5648,
+   "end": 5973,
+   "text": "Built your own LeRobot camera or sensor integration? Package it as an installable ⟦0⟧ plugin and it will be auto-discovered by the LeRobot CLI — see the [Bring Your Own Hardware](⟦1⟧) guide and the [Cameras](⟦2⟧) reference to get started, then share your project with the community!",
+   "tokens": [
+    "`lerobot_camera_<name>`",
+    "./integrate_hardware",
+    "./cameras"
+   ]
+  }
+ ]
+}

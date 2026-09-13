@@ -1,0 +1,229 @@
+<script lang="ts">
+import {onMount} from "svelte";
+import Tip from "$lib/Tip.svelte";
+import CopyLLMTxtMenu from "$lib/CopyLLMTxtMenu.svelte";
+import Youtube from "$lib/Youtube.svelte";
+import Docstring from "$lib/Docstring.svelte";
+import CodeBlock from "$lib/CodeBlock.svelte";
+import CodeBlockFw from "$lib/CodeBlockFw.svelte";
+import DocNotebookDropdown from "$lib/DocNotebookDropdown.svelte";
+import CourseFloatingBanner from "$lib/CourseFloatingBanner.svelte";
+import IconCopyLink from "$lib/IconCopyLink.svelte";
+import FrameworkContent from "$lib/FrameworkContent.svelte";
+import Markdown from "$lib/Markdown.svelte";
+import Question from "$lib/Question.svelte";
+import FrameworkSwitchCourse from "$lib/FrameworkSwitchCourse.svelte";
+import InferenceApi from "$lib/InferenceApi.svelte";
+import TokenizersLanguageContent from "$lib/TokenizersLanguageContent.svelte";
+import ExampleCodeBlock from "$lib/ExampleCodeBlock.svelte";
+import Added from "$lib/Added.svelte";
+import Changed from "$lib/Changed.svelte";
+import Deprecated from "$lib/Deprecated.svelte";
+import PipelineIcon from "$lib/PipelineIcon.svelte";
+import PipelineTag from "$lib/PipelineTag.svelte";
+import Heading from "$lib/Heading.svelte";
+import HfOptions from "$lib/HfOptions.svelte";
+import HfOption from "$lib/HfOption.svelte";
+import EditOnGithub from "$lib/EditOnGithub.svelte";
+import InferenceSnippet from "$lib/InferenceSnippet/InferenceSnippet.svelte";
+import MermaidChart from "$lib/MermaidChart.svelte";
+let fw: "pt" | "tf" = "pt";
+onMount(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    fw = urlParams.get("fw") || "pt";
+});
+</script>
+<svelte:head>
+  <meta name="hf:doc:metadata" content={metadata} >
+</svelte:head>
+
+<!--HF DOCBUILD BODY START-->
+
+HF_DOC_BODY_START
+
+<CopyLLMTxtMenu containerStyle="float: right; margin-left: 10px; display: inline-flex; position: relative; z-index: 10;"></CopyLLMTxtMenu>
+
+# teleoperator
+
+teleoperator 为机器人产生要跟随的 action——leader arm、游戏手柄、键盘、手机。它们都
+实现了 `Teleoperator` 接口，因此针对该接口编写的录制脚本可与任何输入
+设备配合工作。
+
+有关设置指南，请参见[手机 teleoperation](../phone_teleop)和 [Isaac Teleop](../isaac_teleop)；有关录制工作流程，
+请参见[机器人模仿学习](../il_robots)。
+
+## Teleoperator [[lerobot.teleoperators.Teleoperator]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.teleoperators.Teleoperator"} anchor={"lerobot.teleoperators.Teleoperator"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/teleoperators/teleoperator.py#L29"} parameters={[{"name": "config", "val": ": TeleoperatorConfig"}]}>
+<paramsdesc>- **config_class** (RobotConfig) -- 此 teleoperator 预期的配置类。
+- **name** (str) -- 用于标识此 teleoperator 类型的唯一名称。</paramsdesc></Docstring>
+
+所有与 LeRobot 兼容的 teleoperator 的基础抽象类。
+
+此类提供了用于与物理 teleoperator 交互的标准化接口。
+子类必须实现所有抽象方法和属性才能使用。
+
+
+
+
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"connect"} anchor={"lerobot.teleoperators.Teleoperator.connect"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/teleoperators/teleoperator.py#L122"} parameters={[{"name": "calibrate", "val": ": bool = True"}]}>
+<paramsdesc>- **calibrate** (bool) -- 如果为 True，则在连接后，如果 teleoperator 未
+  calibration 或需要 calibrate，则自动对其进行 calibration（这取决于硬件）。</paramsdesc></Docstring>
+
+与 teleoperator 建立通信。
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"disconnect"} anchor={"lerobot.teleoperators.Teleoperator.disconnect"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/teleoperators/teleoperator.py#L205"} parameters={[]}>
+</Docstring>
+与 teleoperator 断开连接并执行任何必要的清理。
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"configure"} anchor={"lerobot.teleoperators.Teleoperator.configure"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/teleoperators/teleoperator.py#L171"} parameters={[]}>
+</Docstring>
+
+对 teleoperator 应用任何一次性或运行时配置。
+这可能包括设置电机参数、控制模式或初始 state。
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"calibrate"} anchor={"lerobot.teleoperators.Teleoperator.calibrate"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/teleoperators/teleoperator.py#L139"} parameters={[]}>
+</Docstring>
+
+如适用则 calibration teleoperator。否则，这应为空操作。
+
+此方法应收集任何必要的数据（例如电机偏移量），并相应更新
+:pyattr:`calibration` 字典。
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"get_action"} anchor={"lerobot.teleoperators.Teleoperator.get_action"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/teleoperators/teleoperator.py#L179"} parameters={[]}>
+<rettype>RobotAction</rettype><retdesc> 表示 teleoperator 当前 action 的扁平字典。其
+结构应与 :pymeth:`observation_features` 匹配。</retdesc></Docstring>
+
+从 teleoperator 检索当前 action。
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"send_feedback"} anchor={"lerobot.teleoperators.Teleoperator.send_feedback"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/teleoperators/teleoperator.py#L190"} parameters={[{"name": "feedback", "val": ": dict"}]}>
+<paramsdesc>- **feedback** (dict[str, Any]) -- 表示期望反馈的字典。其结构应与
+  :pymeth:`feedback_features` 匹配。</paramsdesc><rettype>dict[str, Any]</rettype><retdesc> 实际发送给电机、可能被裁剪或修改的 action，例如受
+速度安全限制。</retdesc></Docstring>
+
+向 teleoperator 发送反馈 action 命令。
+
+
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"action_features"} anchor={"lerobot.teleoperators.Teleoperator.action_features"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/teleoperators/teleoperator.py#L87"} parameters={[]}>
+</Docstring>
+
+描述 teleoperator 所产生 action 的结构和类型的字典。其
+结构（键）应与 :pymeth:`get_action` 返回的结构匹配。该字典的值
+应为：如果值是简单值，则为该值的类型，例如单一
+本体感受值（关节的目标位置/速度）用 `float`
+
+注意：无论机器人是否已连接，都应能调用此属性。
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"feedback_features"} anchor={"lerobot.teleoperators.Teleoperator.feedback_features"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/teleoperators/teleoperator.py#L100"} parameters={[]}>
+</Docstring>
+
+描述机器人所期望反馈 action 的结构和类型的字典。其
+结构（键）应与传递给 :pymeth:`send_feedback` 的结构匹配。该字典的值
+应为：如果值是简单值，则为该值的类型，例如单一
+本体感受值（关节的目标位置/速度）用 `float`
+
+注意：无论机器人是否已连接，都应能调用此属性。
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"is_connected"} anchor={"lerobot.teleoperators.Teleoperator.is_connected"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/teleoperators/teleoperator.py#L113"} parameters={[]}>
+</Docstring>
+
+teleoperator 当前是否已连接。如果为 `False`，调用 :pymeth:`get_action`
+或 :pymeth:`send_feedback` 应抛出错误。
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"is_calibrated"} anchor={"lerobot.teleoperators.Teleoperator.is_calibrated"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/teleoperators/teleoperator.py#L133"} parameters={[]}>
+</Docstring>
+teleoperator 当前是否已 calibration。如不适用，应始终为 `True`
+
+</div></div>
+
+## TeleoperatorConfig [[lerobot.teleoperators.TeleoperatorConfig]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.teleoperators.TeleoperatorConfig"} anchor={"lerobot.teleoperators.TeleoperatorConfig"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/teleoperators/config.py#L23"} parameters={[{"name": "id", "val": ": str | None = None"}, {"name": "calibration_dir", "val": ": pathlib.Path | None = None"}]}>
+</Docstring>
+
+
+</div>
+
+## make_teleoperator_from_config [[lerobot.teleoperators.make_teleoperator_from_config]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"lerobot.teleoperators.make_teleoperator_from_config"} anchor={"lerobot.teleoperators.make_teleoperator_from_config"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/teleoperators/utils.py#L36"} parameters={[{"name": "config", "val": ": TeleoperatorConfig"}]}>
+</Docstring>
+
+
+</div>
+
+
+<EditOnGithub source="https://github.com/huggingface/lerobot/blob/main/docs/source/api/teleoperators.mdx" />
+
+<!--HF DOCBUILD BODY END-->
+
+HF_DOC_BODY_END
+

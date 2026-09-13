@@ -1,0 +1,1328 @@
+{
+ "file": "xvla.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 2003,
+   "text": "# X-VLA: The First Soft-Prompted Robot Foundation Model for Any Robot, Any Task",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "heading",
+   "start": 2005,
+   "end": 2016,
+   "text": "## Overview",
+   "tokens": []
+  },
+  {
+   "id": 2,
+   "kind": "para",
+   "start": 2018,
+   "end": 2517,
+   "text": "For years, robotics has aspired to build agents that can follow natural human instructions and operate dexterously across many environments and robot bodies. Recent breakthroughs in LLMs and VLMs suggest a path forward: extend these foundation-model architectures to embodied control by grounding them in actions. This has led to the rise of Vision-Language-Action (VLA) models, with the hope that a single generalist model could combine broad semantic understanding with robust manipulation skills.",
+   "tokens": []
+  },
+  {
+   "id": 3,
+   "kind": "para",
+   "start": 2519,
+   "end": 2935,
+   "text": "But training such models is difficult. Robot data is fragmented across platforms, sensors, embodiments, and collection protocols. Heterogeneity appears everywhere: different arm configurations, different action spaces, different camera setups, different visual domains, and different task distributions. These inconsistencies create major distribution shifts that make pretraining unstable and adaptation unreliable.",
+   "tokens": []
+  },
+  {
+   "id": 4,
+   "kind": "para",
+   "start": 2937,
+   "end": 3117,
+   "text": "Inspired by meta-learning and prompt learning, we ask: **\"What if a VLA model could learn the structure of each robot and dataset the same way LLMs learn tasks, through prompts?\"**",
+   "tokens": []
+  },
+  {
+   "id": 5,
+   "kind": "para",
+   "start": 3119,
+   "end": 3560,
+   "text": "**X-VLA** is a soft-prompted, flow-matching VLA framework that treats each hardware setup as a \"task\" and encodes it using a small set of learnable embeddings. These **Soft Prompts** capture embodiment and domain-specific variations, guiding the Transformer from the earliest stages of multimodal fusion. With this mechanism, X-VLA can reconcile diverse robot morphologies, data types, and sensor setups within a single unified architecture.",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "para",
+   "start": 3802,
+   "end": 4306,
+   "text": "Built from pure Transformer encoders, X-VLA scales naturally with model size and dataset diversity. Across 6 simulation benchmarks and 3 real robots, Soft Prompts consistently outperform existing methods in handling hardware and domain differences. X-VLA-0.9B, trained on 290K episodes spanning seven robotic platforms, learns an embodiment-agnostic generalist policy in Phase I, and adapts efficiently to new robots in Phase II simply by learning a new set of prompts, while keeping the backbone frozen.",
+   "tokens": []
+  },
+  {
+   "id": 7,
+   "kind": "para",
+   "start": 4532,
+   "end": 4816,
+   "text": "With only 1% of parameters tuned (9M), X-VLA-0.9B achieves near-π₀ performance on LIBERO and Simpler-WidowX, despite using **300× fewer trainable parameters**. It also demonstrates strong real-world dexterity with minimal demonstrations, including folding cloths in under two minutes.",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "para",
+   "start": 5056,
+   "end": 5357,
+   "text": "X-VLA shows that generalist robot intelligence does not require increasingly complex architectures, only the right way to absorb heterogeneity. Soft Prompts offer a simple, scalable mechanism for unifying diverse robotic data, paving the way toward adaptable, cross-embodiment robot foundation models.",
+   "tokens": []
+  },
+  {
+   "id": 9,
+   "kind": "heading",
+   "start": 5359,
+   "end": 5374,
+   "text": "## Installation",
+   "tokens": []
+  },
+  {
+   "id": 10,
+   "kind": "para",
+   "start": 5376,
+   "end": 5433,
+   "text": "After installing LeRobot, install the X-VLA dependencies:",
+   "tokens": []
+  },
+  {
+   "id": 11,
+   "kind": "para",
+   "start": 5471,
+   "end": 5515,
+   "text": "After the new release, you'll be able to do:",
+   "tokens": []
+  },
+  {
+   "id": 12,
+   "kind": "heading",
+   "start": 5556,
+   "end": 5570,
+   "text": "## Quick Start",
+   "tokens": []
+  },
+  {
+   "id": 13,
+   "kind": "heading",
+   "start": 5572,
+   "end": 5587,
+   "text": "### Basic Usage",
+   "tokens": []
+  },
+  {
+   "id": 14,
+   "kind": "para",
+   "start": 5589,
+   "end": 5660,
+   "text": "To use X-VLA in your LeRobot configuration, specify the policy type as:",
+   "tokens": []
+  },
+  {
+   "id": 15,
+   "kind": "heading",
+   "start": 5692,
+   "end": 5730,
+   "text": "### Evaluating Pre-trained Checkpoints",
+   "tokens": []
+  },
+  {
+   "id": 16,
+   "kind": "para",
+   "start": 5732,
+   "end": 5763,
+   "text": "Example evaluation with LIBERO:",
+   "tokens": []
+  },
+  {
+   "id": 17,
+   "kind": "heading",
+   "start": 6029,
+   "end": 6053,
+   "text": "## Available Checkpoints",
+   "tokens": []
+  },
+  {
+   "id": 18,
+   "kind": "heading",
+   "start": 6055,
+   "end": 6071,
+   "text": "### 🎯 Base Model",
+   "tokens": []
+  },
+  {
+   "id": 19,
+   "kind": "para",
+   "start": 6073,
+   "end": 6138,
+   "text": "**[lerobot/xvla-base](⟦0⟧)**",
+   "tokens": [
+    "https://huggingface.co/lerobot/xvla-base"
+   ]
+  },
+  {
+   "id": 20,
+   "kind": "para",
+   "start": 6140,
+   "end": 6297,
+   "text": "A 0.9B parameter instantiation of X-VLA, trained with a carefully designed data processing and learning recipe. The training pipeline consists of two phases:",
+   "tokens": []
+  },
+  {
+   "id": 21,
+   "kind": "list",
+   "start": 6299,
+   "end": 6610,
+   "text": "- **Phase I: Pretraining** - Pretrained on 290K episodes from Droid, Robomind, and Agibot, spanning seven platforms across five types of robotic arms (single-arm to bi-manual setups). By leveraging soft prompts to absorb embodiment-specific variations, the model learns an embodiment-agnostic generalist policy.",
+   "tokens": []
+  },
+  {
+   "id": 22,
+   "kind": "list",
+   "start": 6612,
+   "end": 6856,
+   "text": "- **Phase II: Domain Adaptation** - Adapted to deployable policies for target domains. A new set of soft prompts is introduced and optimized to encode the hardware configuration of the novel domain, while the pretrained backbone remains frozen.",
+   "tokens": []
+  },
+  {
+   "id": 23,
+   "kind": "heading",
+   "start": 6858,
+   "end": 6884,
+   "text": "### Simulation Checkpoints",
+   "tokens": []
+  },
+  {
+   "id": 24,
+   "kind": "para",
+   "start": 6886,
+   "end": 6955,
+   "text": "**[lerobot/xvla-libero](⟦0⟧)**",
+   "tokens": [
+    "https://huggingface.co/lerobot/xvla-libero"
+   ]
+  },
+  {
+   "id": 25,
+   "kind": "para",
+   "start": 6957,
+   "end": 7057,
+   "text": "Achieves 93% success rate on LIBERO benchmarks. Fine-tuned from the base model for simulation tasks.",
+   "tokens": []
+  },
+  {
+   "id": 26,
+   "kind": "para",
+   "start": 7059,
+   "end": 7128,
+   "text": "**[lerobot/xvla-widowx](⟦0⟧)**",
+   "tokens": [
+    "https://huggingface.co/lerobot/xvla-widowx"
+   ]
+  },
+  {
+   "id": 27,
+   "kind": "para",
+   "start": 7130,
+   "end": 7261,
+   "text": "Fine-tuned on BridgeData for pick-and-place experiments on compact WidowX platforms. Demonstrates robust manipulation capabilities.",
+   "tokens": []
+  },
+  {
+   "id": 28,
+   "kind": "heading",
+   "start": 7263,
+   "end": 7291,
+   "text": "### 🤖 Real-World Checkpoints",
+   "tokens": []
+  },
+  {
+   "id": 29,
+   "kind": "para",
+   "start": 7293,
+   "end": 7364,
+   "text": "**[lerobot/xvla-folding](⟦0⟧)**",
+   "tokens": [
+    "https://huggingface.co/lerobot/xvla-folding"
+   ]
+  },
+  {
+   "id": 30,
+   "kind": "para",
+   "start": 7366,
+   "end": 7537,
+   "text": "A fine-tuned dexterous manipulation model trained on the high-quality Soft-FOLD cloth folding dataset. Achieves 100% success rate over 2 hours of continuous cloth folding.",
+   "tokens": []
+  },
+  {
+   "id": 31,
+   "kind": "para",
+   "start": 7539,
+   "end": 7620,
+   "text": "**[lerobot/xvla-agibot-world](⟦0⟧)**",
+   "tokens": [
+    "https://huggingface.co/lerobot/xvla-agibot-world"
+   ]
+  },
+  {
+   "id": 32,
+   "kind": "para",
+   "start": 7622,
+   "end": 7678,
+   "text": "Optimized for AgileX robot dexterous manipulation tasks.",
+   "tokens": []
+  },
+  {
+   "id": 33,
+   "kind": "para",
+   "start": 7680,
+   "end": 7761,
+   "text": "**[lerobot/xvla-google-robot](⟦0⟧)**",
+   "tokens": [
+    "https://huggingface.co/lerobot/xvla-google-robot"
+   ]
+  },
+  {
+   "id": 34,
+   "kind": "para",
+   "start": 7763,
+   "end": 7798,
+   "text": "Adapted for Google Robot platforms.",
+   "tokens": []
+  },
+  {
+   "id": 35,
+   "kind": "heading",
+   "start": 7800,
+   "end": 7817,
+   "text": "## Training X-VLA",
+   "tokens": []
+  },
+  {
+   "id": 36,
+   "kind": "heading",
+   "start": 7819,
+   "end": 7857,
+   "text": "### Recommended Training Configuration",
+   "tokens": []
+  },
+  {
+   "id": 37,
+   "kind": "para",
+   "start": 7859,
+   "end": 8014,
+   "text": "When fine-tuning X-VLA for a new embodiment or task, we recommend not freezing the VLM, and also setting the ⟦0⟧ to not hit OOM errors.",
+   "tokens": [
+    "`policy.dtype=bfloat16`"
+   ]
+  },
+  {
+   "id": 38,
+   "kind": "heading",
+   "start": 8500,
+   "end": 8533,
+   "text": "### Training Parameters Explained",
+   "tokens": []
+  },
+  {
+   "id": 39,
+   "kind": "table",
+   "start": 8535,
+   "end": 8624,
+   "text": "| Parameter                  | Default | Description                                    |",
+   "tokens": []
+  },
+  {
+   "id": 40,
+   "kind": "table",
+   "start": 8715,
+   "end": 8804,
+   "text": "| ⟦0⟧    | ⟦1⟧ | Do not freeze the VLM vision encoder weights   |",
+   "tokens": [
+    "`freeze_vision_encoder`",
+    "`false`"
+   ]
+  },
+  {
+   "id": 41,
+   "kind": "table",
+   "start": 8805,
+   "end": 8894,
+   "text": "| ⟦0⟧  | ⟦1⟧ | Do not freeze the VLM language encoder weights |",
+   "tokens": [
+    "`freeze_language_encoder`",
+    "`false`"
+   ]
+  },
+  {
+   "id": 42,
+   "kind": "table",
+   "start": 8895,
+   "end": 8984,
+   "text": "| ⟦0⟧ | ⟦1⟧  | Allow policy transformer layers to train       |",
+   "tokens": [
+    "`train_policy_transformer`",
+    "`true`"
+   ]
+  },
+  {
+   "id": 43,
+   "kind": "table",
+   "start": 8985,
+   "end": 9074,
+   "text": "| ⟦0⟧       | ⟦1⟧  | Allow soft prompts to train                    |",
+   "tokens": [
+    "`train_soft_prompts`",
+    "`true`"
+   ]
+  },
+  {
+   "id": 44,
+   "kind": "para",
+   "start": 9076,
+   "end": 9227,
+   "text": "**💡 Best Practice**: For Phase II adaptation to new embodiments, do not freeze the VLM encoders and also train the policy transformer and soft prompts.",
+   "tokens": []
+  },
+  {
+   "id": 45,
+   "kind": "heading",
+   "start": 9229,
+   "end": 9268,
+   "text": "### Example: Training on Bimanual Robot",
+   "tokens": []
+  },
+  {
+   "id": 46,
+   "kind": "para",
+   "start": 9793,
+   "end": 9970,
+   "text": "💡 **Best Performance:** If you have sufficient computational resources and want to achieve best X-VLA finetuning performance, you should follow the official finetuning strategy:",
+   "tokens": []
+  },
+  {
+   "id": 47,
+   "kind": "para",
+   "start": 9972,
+   "end": 10041,
+   "text": "**🔥 Full-finetune all components with a custom learning-rate scheme**",
+   "tokens": []
+  },
+  {
+   "id": 48,
+   "kind": "para",
+   "start": 10043,
+   "end": 10335,
+   "text": "To ensure stable optimization, the Vision-Language Model (VLM) must be trained with only 1/10 of the base learning rate, while all other components use the full LR.\nThis LR ratio is crucial for achieving strong and stable finetuning performance. This is already done for you by default.\n❕Note",
+   "tokens": []
+  },
+  {
+   "id": 49,
+   "kind": "para",
+   "start": 10337,
+   "end": 10579,
+   "text": "Completely matching the official reported performance may require an additional warm-up LR schedule for soft-prompts, which can bring minor improvements.\nWe encourage implementing this in your customized training pipeline for optimal results.",
+   "tokens": []
+  },
+  {
+   "id": 50,
+   "kind": "heading",
+   "start": 10581,
+   "end": 10597,
+   "text": "## Core Concepts",
+   "tokens": []
+  },
+  {
+   "id": 51,
+   "kind": "heading",
+   "start": 10599,
+   "end": 10618,
+   "text": "### 1. Action Modes",
+   "tokens": []
+  },
+  {
+   "id": 52,
+   "kind": "para",
+   "start": 10620,
+   "end": 10844,
+   "text": "X-VLA uses an **Action Registry** system to handle different action spaces and embodiments. The ⟦0⟧ parameter defines how actions are processed, what loss functions are used, and how predictions are post-processed.",
+   "tokens": [
+    "`action_mode`"
+   ]
+  },
+  {
+   "id": 53,
+   "kind": "heading",
+   "start": 10846,
+   "end": 10873,
+   "text": "#### Available Action Modes",
+   "tokens": []
+  },
+  {
+   "id": 54,
+   "kind": "table",
+   "start": 10875,
+   "end": 11006,
+   "text": "| Action Mode      | Action Dim              | Description                                 | Use Case                             |",
+   "tokens": []
+  },
+  {
+   "id": 55,
+   "kind": "table",
+   "start": 11139,
+   "end": 11270,
+   "text": "| ⟦0⟧           | 20                      | End-effector with xyz, 6D rotation, gripper | Dual-arm setups with spatial control |",
+   "tokens": [
+    "`ee6d`"
+   ]
+  },
+  {
+   "id": 56,
+   "kind": "table",
+   "start": 11271,
+   "end": 11402,
+   "text": "| ⟦0⟧          | 14                      | Joint-space with gripper                    | Direct joint control robots          |",
+   "tokens": [
+    "`joint`"
+   ]
+  },
+  {
+   "id": 57,
+   "kind": "table",
+   "start": 11403,
+   "end": 11534,
+   "text": "| ⟦0⟧    | 20                      | AGI-bot variant with MSE loss               | AGI-bot platforms                    |",
+   "tokens": [
+    "`agibot_ee6d`"
+   ]
+  },
+  {
+   "id": 58,
+   "kind": "table",
+   "start": 11535,
+   "end": 11666,
+   "text": "| ⟦0⟧ | 20 (model), 12 (real)   | SO101 bimanual robot                        | Bimanual manipulation tasks          |",
+   "tokens": [
+    "`so101_bimanual`"
+   ]
+  },
+  {
+   "id": 59,
+   "kind": "table",
+   "start": 11667,
+   "end": 11798,
+   "text": "| ⟦0⟧           | 20 (model), auto (real) | Auto-detects action dim from dataset        | **Recommended** for new robots       |",
+   "tokens": [
+    "`auto`"
+   ]
+  },
+  {
+   "id": 60,
+   "kind": "heading",
+   "start": 11800,
+   "end": 11828,
+   "text": "#### Why Action Modes Matter",
+   "tokens": []
+  },
+  {
+   "id": 61,
+   "kind": "para",
+   "start": 11830,
+   "end": 12095,
+   "text": "When you have a pretrained checkpoint like ⟦0⟧ trained with ⟦1⟧, and you want to train on a dataset with a different action dimension (e.g., 14 for bimanual arms), you can't simply trim the action dimension. The action mode orchestrates:",
+   "tokens": [
+    "`lerobot/xvla-base`",
+    "`action_dim=20`"
+   ]
+  },
+  {
+   "id": 62,
+   "kind": "list",
+   "start": 12097,
+   "end": 12219,
+   "text": "1. **Loss Computation**: Different loss functions for different action components (MSE for joints, BCE for grippers, etc.)",
+   "tokens": []
+  },
+  {
+   "id": 63,
+   "kind": "list",
+   "start": 12220,
+   "end": 12290,
+   "text": "2. **Preprocessing**: Zeroing out gripper channels, padding dimensions",
+   "tokens": []
+  },
+  {
+   "id": 64,
+   "kind": "list",
+   "start": 12291,
+   "end": 12366,
+   "text": "3. **Postprocessing**: Applying sigmoid to gripper logits, trimming padding",
+   "tokens": []
+  },
+  {
+   "id": 65,
+   "kind": "heading",
+   "start": 12368,
+   "end": 12408,
+   "text": "#### Example: BimanualSO101 Action Space",
+   "tokens": []
+  },
+  {
+   "id": 66,
+   "kind": "para",
+   "start": 12410,
+   "end": 12520,
+   "text": "The ⟦0⟧ action mode handles the mismatch between model output (20D) and real robot control (12D):",
+   "tokens": [
+    "`so101_bimanual`"
+   ]
+  },
+  {
+   "id": 67,
+   "kind": "para",
+   "start": 12834,
+   "end": 12975,
+   "text": "See the [action_hub.py](⟦0⟧) implementation for details.",
+   "tokens": [
+    "https://github.com/huggingface/lerobot/blob/main/src/lerobot/policies/xvla/action_hub.py"
+   ]
+  },
+  {
+   "id": 68,
+   "kind": "heading",
+   "start": 12977,
+   "end": 13012,
+   "text": "#### Auto Action Mode (Recommended)",
+   "tokens": []
+  },
+  {
+   "id": 69,
+   "kind": "para",
+   "start": 13014,
+   "end": 13171,
+   "text": "The ⟦0⟧ action mode is the easiest way to use X-VLA with any robot. It automatically detects your dataset's action dimension and handles padding/trimming:",
+   "tokens": [
+    "`auto`"
+   ]
+  },
+  {
+   "id": 70,
+   "kind": "para",
+   "start": 13307,
+   "end": 13324,
+   "text": "**How it works:**",
+   "tokens": []
+  },
+  {
+   "id": 71,
+   "kind": "list",
+   "start": 13326,
+   "end": 13399,
+   "text": "- Reads ⟦0⟧ from your dataset (e.g., 7 for Franka)",
+   "tokens": [
+    "`action_feature.shape[-1]`"
+   ]
+  },
+  {
+   "id": 72,
+   "kind": "list",
+   "start": 13400,
+   "end": 13474,
+   "text": "- Model outputs ⟦0⟧ (default 20) for pretrained compatibility",
+   "tokens": [
+    "`max_action_dim`"
+   ]
+  },
+  {
+   "id": 73,
+   "kind": "list",
+   "start": 13475,
+   "end": 13576,
+   "text": "- Loss is computed **only on the real dimensions**: ⟦0⟧",
+   "tokens": [
+    "`MSE(pred[:,:,:real_dim], target[:,:,:real_dim])`"
+   ]
+  },
+  {
+   "id": 74,
+   "kind": "list",
+   "start": 13577,
+   "end": 13640,
+   "text": "- Postprocess trims output back to ⟦0⟧ for robot control",
+   "tokens": [
+    "`real_dim`"
+   ]
+  },
+  {
+   "id": 75,
+   "kind": "para",
+   "start": 13642,
+   "end": 13713,
+   "text": "This eliminates the need to create custom action modes for most robots.",
+   "tokens": []
+  },
+  {
+   "id": 76,
+   "kind": "heading",
+   "start": 13715,
+   "end": 13732,
+   "text": "### 2. Domain IDs",
+   "tokens": []
+  },
+  {
+   "id": 77,
+   "kind": "para",
+   "start": 13734,
+   "end": 13865,
+   "text": "Domain IDs are learnable identifiers for different robot configurations and camera setups. They allow X-VLA to distinguish between:",
+   "tokens": []
+  },
+  {
+   "id": 78,
+   "kind": "list",
+   "start": 13867,
+   "end": 13906,
+   "text": "- Different robots (Robot 1 vs Robot 2)",
+   "tokens": []
+  },
+  {
+   "id": 79,
+   "kind": "list",
+   "start": 13907,
+   "end": 13955,
+   "text": "- Different camera configurations (cam1 vs cam2)",
+   "tokens": []
+  },
+  {
+   "id": 80,
+   "kind": "list",
+   "start": 13956,
+   "end": 14029,
+   "text": "- Different combinations (Robot1-cam1-cam2 vs Robot1-cam1 vs Robot2-cam1)",
+   "tokens": []
+  },
+  {
+   "id": 81,
+   "kind": "heading",
+   "start": 14031,
+   "end": 14054,
+   "text": "#### Setting Domain IDs",
+   "tokens": []
+  },
+  {
+   "id": 82,
+   "kind": "para",
+   "start": 14056,
+   "end": 14132,
+   "text": "**During Training**: By default, domain_id is set to 0 for general training.",
+   "tokens": []
+  },
+  {
+   "id": 83,
+   "kind": "para",
+   "start": 14134,
+   "end": 14233,
+   "text": "**During Evaluation**: Specify the domain_id that matches your checkpoint's training configuration.",
+   "tokens": []
+  },
+  {
+   "id": 84,
+   "kind": "para",
+   "start": 14310,
+   "end": 14431,
+   "text": "The domain_id is automatically added to observations by the ⟦0⟧ in the preprocessing pipeline.",
+   "tokens": [
+    "`XVLAAddDomainIdProcessorStep`"
+   ]
+  },
+  {
+   "id": 85,
+   "kind": "para",
+   "start": 14433,
+   "end": 14586,
+   "text": "The ⟦0⟧ model has been trained on the following domain IDs. It is recommended to choose one that most resembles your robot/configuration:",
+   "tokens": [
+    "`lerobot/xvla-base`"
+   ]
+  },
+  {
+   "id": 86,
+   "kind": "heading",
+   "start": 14588,
+   "end": 14613,
+   "text": "#### Fine-tuning Datasets",
+   "tokens": []
+  },
+  {
+   "id": 87,
+   "kind": "table",
+   "start": 14615,
+   "end": 14647,
+   "text": "| Dataset Name     | Domain ID |",
+   "tokens": []
+  },
+  {
+   "id": 88,
+   "kind": "table",
+   "start": 14681,
+   "end": 14713,
+   "text": "| Bridge           | 0         |",
+   "tokens": []
+  },
+  {
+   "id": 89,
+   "kind": "table",
+   "start": 14714,
+   "end": 14746,
+   "text": "| RT1              | 1         |",
+   "tokens": []
+  },
+  {
+   "id": 90,
+   "kind": "table",
+   "start": 14747,
+   "end": 14779,
+   "text": "| Calvin           | 2         |",
+   "tokens": []
+  },
+  {
+   "id": 91,
+   "kind": "table",
+   "start": 14780,
+   "end": 14812,
+   "text": "| libero           | 3         |",
+   "tokens": []
+  },
+  {
+   "id": 92,
+   "kind": "table",
+   "start": 14813,
+   "end": 14845,
+   "text": "| widowx-air       | 4         |",
+   "tokens": []
+  },
+  {
+   "id": 93,
+   "kind": "table",
+   "start": 14846,
+   "end": 14878,
+   "text": "| AIR-AGILEX-HQ    | 5         |",
+   "tokens": []
+  },
+  {
+   "id": 94,
+   "kind": "table",
+   "start": 14879,
+   "end": 14911,
+   "text": "| robotwin2_abs_ee | 6         |",
+   "tokens": []
+  },
+  {
+   "id": 95,
+   "kind": "table",
+   "start": 14912,
+   "end": 14944,
+   "text": "| robotwin2_clean  | 6         |",
+   "tokens": []
+  },
+  {
+   "id": 96,
+   "kind": "table",
+   "start": 14945,
+   "end": 14977,
+   "text": "| robocasa-human   | 7         |",
+   "tokens": []
+  },
+  {
+   "id": 97,
+   "kind": "table",
+   "start": 14978,
+   "end": 15010,
+   "text": "| VLABench         | 8         |",
+   "tokens": []
+  },
+  {
+   "id": 98,
+   "kind": "table",
+   "start": 15011,
+   "end": 15043,
+   "text": "| AGIBOT-challenge | 9         |",
+   "tokens": []
+  },
+  {
+   "id": 99,
+   "kind": "table",
+   "start": 15044,
+   "end": 15076,
+   "text": "| AIR-AGILEX       | 10        |",
+   "tokens": []
+  },
+  {
+   "id": 100,
+   "kind": "table",
+   "start": 15077,
+   "end": 15109,
+   "text": "| AIRBOT           | 18        |",
+   "tokens": []
+  },
+  {
+   "id": 101,
+   "kind": "heading",
+   "start": 15111,
+   "end": 15133,
+   "text": "### 3. Processor Steps",
+   "tokens": []
+  },
+  {
+   "id": 102,
+   "kind": "para",
+   "start": 15135,
+   "end": 15219,
+   "text": "X-VLA requires specific preprocessing and postprocessing steps for proper operation.",
+   "tokens": []
+  },
+  {
+   "id": 103,
+   "kind": "heading",
+   "start": 15221,
+   "end": 15254,
+   "text": "#### Required Preprocessing Steps",
+   "tokens": []
+  },
+  {
+   "id": 104,
+   "kind": "list",
+   "start": 15256,
+   "end": 15339,
+   "text": "1. **XVLAImageToFloatProcessorStep**: Converts images from [0, 255] to [0, 1] range",
+   "tokens": []
+  },
+  {
+   "id": 105,
+   "kind": "list",
+   "start": 15340,
+   "end": 15441,
+   "text": "2. **XVLAImageNetNormalizeProcessorStep**: Applies ImageNet normalization (required for VLM backbone)",
+   "tokens": []
+  },
+  {
+   "id": 106,
+   "kind": "list",
+   "start": 15442,
+   "end": 15509,
+   "text": "3. **XVLAAddDomainIdProcessorStep**: Adds domain_id to observations",
+   "tokens": []
+  },
+  {
+   "id": 107,
+   "kind": "heading",
+   "start": 15511,
+   "end": 15540,
+   "text": "#### Example Custom Processor",
+   "tokens": []
+  },
+  {
+   "id": 108,
+   "kind": "para",
+   "start": 15542,
+   "end": 15626,
+   "text": "For LIBERO environments, a custom processor handles the specific observation format:",
+   "tokens": []
+  },
+  {
+   "id": 109,
+   "kind": "heading",
+   "start": 15881,
+   "end": 15912,
+   "text": "### 4. Configuration Parameters",
+   "tokens": []
+  },
+  {
+   "id": 110,
+   "kind": "para",
+   "start": 15914,
+   "end": 15953,
+   "text": "Key configuration parameters for X-VLA:",
+   "tokens": []
+  },
+  {
+   "id": 111,
+   "kind": "heading",
+   "start": 17035,
+   "end": 17066,
+   "text": "## Creating Custom Action Modes",
+   "tokens": []
+  },
+  {
+   "id": 112,
+   "kind": "para",
+   "start": 17068,
+   "end": 17145,
+   "text": "If your robot has a unique action space, you can create a custom action mode:",
+   "tokens": []
+  },
+  {
+   "id": 113,
+   "kind": "heading",
+   "start": 17147,
+   "end": 17183,
+   "text": "### Step 1: Define Your Action Space",
+   "tokens": []
+  },
+  {
+   "id": 114,
+   "kind": "heading",
+   "start": 18777,
+   "end": 18816,
+   "text": "### Step 2: Use Your Custom Action Mode",
+   "tokens": []
+  },
+  {
+   "id": 115,
+   "kind": "heading",
+   "start": 18967,
+   "end": 18985,
+   "text": "## Advanced Topics",
+   "tokens": []
+  },
+  {
+   "id": 116,
+   "kind": "heading",
+   "start": 18987,
+   "end": 19011,
+   "text": "### Multi-Camera Support",
+   "tokens": []
+  },
+  {
+   "id": 117,
+   "kind": "para",
+   "start": 19013,
+   "end": 19090,
+   "text": "X-VLA supports multiple camera views through the ⟦0⟧ parameter:",
+   "tokens": [
+    "`num_image_views`"
+   ]
+  },
+  {
+   "id": 118,
+   "kind": "heading",
+   "start": 19276,
+   "end": 19309,
+   "text": "### Custom Preprocessing Pipeline",
+   "tokens": []
+  },
+  {
+   "id": 119,
+   "kind": "para",
+   "start": 19311,
+   "end": 19371,
+   "text": "Create a custom preprocessing pipeline for your environment:",
+   "tokens": []
+  },
+  {
+   "id": 120,
+   "kind": "heading",
+   "start": 19948,
+   "end": 19988,
+   "text": "### Handling Different Action Dimensions",
+   "tokens": []
+  },
+  {
+   "id": 121,
+   "kind": "para",
+   "start": 19990,
+   "end": 20062,
+   "text": "When your dataset has fewer action dimensions than the pretrained model:",
+   "tokens": []
+  },
+  {
+   "id": 122,
+   "kind": "para",
+   "start": 20064,
+   "end": 20114,
+   "text": "**Option 1 (Recommended)**: Use ⟦0⟧ action mode",
+   "tokens": [
+    "`auto`"
+   ]
+  },
+  {
+   "id": 123,
+   "kind": "para",
+   "start": 20303,
+   "end": 20367,
+   "text": "**Option 2**: Use a predefined action mode with built-in padding",
+   "tokens": []
+  },
+  {
+   "id": 124,
+   "kind": "para",
+   "start": 20509,
+   "end": 20582,
+   "text": "**Option 2**: Create a custom action mode that maps dimensions explicitly",
+   "tokens": []
+  },
+  {
+   "id": 125,
+   "kind": "heading",
+   "start": 20796,
+   "end": 20814,
+   "text": "## Troubleshooting",
+   "tokens": []
+  },
+  {
+   "id": 126,
+   "kind": "heading",
+   "start": 20816,
+   "end": 20833,
+   "text": "### Common Issues",
+   "tokens": []
+  },
+  {
+   "id": 127,
+   "kind": "para",
+   "start": 20835,
+   "end": 20873,
+   "text": "**Issue**: \"Action dimension mismatch\"",
+   "tokens": []
+  },
+  {
+   "id": 128,
+   "kind": "list",
+   "start": 20875,
+   "end": 20994,
+   "text": "- **Solution**: Check that your ⟦0⟧ matches your robot's action space. Create a custom action mode if needed.",
+   "tokens": [
+    "`action_mode`"
+   ]
+  },
+  {
+   "id": 129,
+   "kind": "para",
+   "start": 20996,
+   "end": 21042,
+   "text": "**Issue**: \"Image values outside [0, 1] range\"",
+   "tokens": []
+  },
+  {
+   "id": 130,
+   "kind": "list",
+   "start": 21044,
+   "end": 21149,
+   "text": "- **Solution**: Ensure images are preprocessed with ⟦0⟧ before normalization.",
+   "tokens": [
+    "`XVLAImageToFloatProcessorStep`"
+   ]
+  },
+  {
+   "id": 131,
+   "kind": "para",
+   "start": 21151,
+   "end": 21183,
+   "text": "**Issue**: \"Domain ID not found\"",
+   "tokens": []
+  },
+  {
+   "id": 132,
+   "kind": "list",
+   "start": 21185,
+   "end": 21303,
+   "text": "- **Solution**: Make sure ⟦0⟧ is in your preprocessing pipeline with the correct domain_id.",
+   "tokens": [
+    "`XVLAAddDomainIdProcessorStep`"
+   ]
+  },
+  {
+   "id": 133,
+   "kind": "para",
+   "start": 21305,
+   "end": 21352,
+   "text": "**Issue**: \"Low success rate on new embodiment\"",
+   "tokens": []
+  },
+  {
+   "id": 134,
+   "kind": "list",
+   "start": 21354,
+   "end": 21369,
+   "text": "- **Solution**:",
+   "tokens": []
+  },
+  {
+   "id": 135,
+   "kind": "list",
+   "start": 21370,
+   "end": 21409,
+   "text": "  1. Verify your action_mode is correct",
+   "tokens": []
+  },
+  {
+   "id": 136,
+   "kind": "list",
+   "start": 21410,
+   "end": 21484,
+   "text": "  2. Check that soft prompts are being trained (⟦0⟧)",
+   "tokens": [
+    "`train_soft_prompts=True`"
+   ]
+  },
+  {
+   "id": 137,
+   "kind": "list",
+   "start": 21485,
+   "end": 21553,
+   "text": "  3. Ensure proper preprocessing (ImageNet normalization, domain_id)",
+   "tokens": []
+  },
+  {
+   "id": 138,
+   "kind": "list",
+   "start": 21554,
+   "end": 21593,
+   "text": "  4. Consider increasing training steps",
+   "tokens": []
+  },
+  {
+   "id": 139,
+   "kind": "para",
+   "start": 21595,
+   "end": 21637,
+   "text": "**Issue**: \"Out of memory during training\"",
+   "tokens": []
+  },
+  {
+   "id": 140,
+   "kind": "list",
+   "start": 21639,
+   "end": 21654,
+   "text": "- **Solution**:",
+   "tokens": []
+  },
+  {
+   "id": 141,
+   "kind": "list",
+   "start": 21655,
+   "end": 21701,
+   "text": "  1. Reduce ⟦0⟧ (e.g., from 32 to 16)",
+   "tokens": [
+    "`chunk_size`"
+   ]
+  },
+  {
+   "id": 142,
+   "kind": "list",
+   "start": 21702,
+   "end": 21736,
+   "text": "  2. Enable gradient checkpointing",
+   "tokens": []
+  },
+  {
+   "id": 143,
+   "kind": "list",
+   "start": 21737,
+   "end": 21759,
+   "text": "  3. Reduce batch size",
+   "tokens": []
+  },
+  {
+   "id": 144,
+   "kind": "list",
+   "start": 21760,
+   "end": 21787,
+   "text": "  4. Freeze more components",
+   "tokens": []
+  },
+  {
+   "id": 145,
+   "kind": "heading",
+   "start": 21789,
+   "end": 21800,
+   "text": "## Citation",
+   "tokens": []
+  },
+  {
+   "id": 146,
+   "kind": "para",
+   "start": 21802,
+   "end": 21849,
+   "text": "If you use X-VLA in your research, please cite:",
+   "tokens": []
+  },
+  {
+   "id": 147,
+   "kind": "heading",
+   "start": 22264,
+   "end": 22287,
+   "text": "## Additional Resources",
+   "tokens": []
+  },
+  {
+   "id": 148,
+   "kind": "list",
+   "start": 22289,
+   "end": 22338,
+   "text": "- [X-VLA Paper](⟦0⟧)",
+   "tokens": [
+    "https://arxiv.org/pdf/2510.10274"
+   ]
+  },
+  {
+   "id": 149,
+   "kind": "list",
+   "start": 22339,
+   "end": 22404,
+   "text": "- [LeRobot Documentation](⟦0⟧)",
+   "tokens": [
+    "https://github.com/huggingface/lerobot"
+   ]
+  },
+  {
+   "id": 150,
+   "kind": "list",
+   "start": 22405,
+   "end": 22529,
+   "text": "- [Action Registry Implementation](⟦0⟧)",
+   "tokens": [
+    "https://github.com/huggingface/lerobot/blob/main/src/lerobot/policies/xvla/action_hub.py"
+   ]
+  },
+  {
+   "id": 151,
+   "kind": "list",
+   "start": 22530,
+   "end": 22652,
+   "text": "- [Processor Implementation](⟦0⟧)",
+   "tokens": [
+    "https://github.com/huggingface/lerobot/blob/main/src/lerobot/policies/xvla/processor_xvla.py"
+   ]
+  },
+  {
+   "id": 152,
+   "kind": "list",
+   "start": 22653,
+   "end": 22774,
+   "text": "- [Model Configuration](⟦0⟧)",
+   "tokens": [
+    "https://github.com/huggingface/lerobot/blob/main/src/lerobot/policies/xvla/configuration_xvla.py"
+   ]
+  },
+  {
+   "id": 153,
+   "kind": "heading",
+   "start": 22776,
+   "end": 22791,
+   "text": "## Contributing",
+   "tokens": []
+  },
+  {
+   "id": 154,
+   "kind": "para",
+   "start": 22793,
+   "end": 22942,
+   "text": "We welcome contributions! If you've implemented a new action mode or processor for your robot, please consider submitting a PR to help the community.",
+   "tokens": []
+  }
+ ]
+}

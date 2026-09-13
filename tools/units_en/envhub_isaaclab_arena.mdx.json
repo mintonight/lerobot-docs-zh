@@ -1,0 +1,850 @@
+{
+ "file": "envhub_isaaclab_arena.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1957,
+   "text": "# NVIDIA IsaacLab Arena & LeRobot",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1959,
+   "end": 2191,
+   "text": "LeRobot EnvHub now supports **GPU-accelerated simulation** with IsaacLab Arena for policy evaluation at scale.\nTrain and evaluate imitation learning policies with high-fidelity simulation — all integrated into the LeRobot ecosystem.",
+   "tokens": []
+  },
+  {
+   "id": 2,
+   "kind": "para",
+   "start": 2437,
+   "end": 2542,
+   "text": "[IsaacLab Arena](⟦0⟧) integrates with NVIDIA IsaacLab to provide:",
+   "tokens": [
+    "https://github.com/isaac-sim/IsaacLab-Arena"
+   ]
+  },
+  {
+   "id": 3,
+   "kind": "list",
+   "start": 2544,
+   "end": 2618,
+   "text": "- 🤖 **Humanoid embodiments**: GR1, G1, Galileo with various configurations",
+   "tokens": []
+  },
+  {
+   "id": 4,
+   "kind": "list",
+   "start": 2619,
+   "end": 2722,
+   "text": "- 🎯 **Manipulation & loco-manipulation tasks**: Door opening, pick-and-place, button pressing, and more",
+   "tokens": []
+  },
+  {
+   "id": 5,
+   "kind": "list",
+   "start": 2723,
+   "end": 2802,
+   "text": "- ⚡ **GPU-accelerated rollouts**: Parallel environment execution on NVIDIA GPUs",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "list",
+   "start": 2803,
+   "end": 2911,
+   "text": "- 🖼️ **RTX Rendering**: Evaluate vision-based policies with realistic rendering, reflections and refractions",
+   "tokens": []
+  },
+  {
+   "id": 7,
+   "kind": "list",
+   "start": 2912,
+   "end": 3025,
+   "text": "- 📦 **LeRobot-compatible datasets**: Ready for training with GR00T N1x, PI0, SmolVLA, ACT, and Diffusion policies",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "list",
+   "start": 3026,
+   "end": 3109,
+   "text": "- 🔄 **EnvHub integration**: Load environments from HuggingFace EnvHub with one line",
+   "tokens": []
+  },
+  {
+   "id": 9,
+   "kind": "heading",
+   "start": 3111,
+   "end": 3126,
+   "text": "## Installation",
+   "tokens": []
+  },
+  {
+   "id": 10,
+   "kind": "heading",
+   "start": 3128,
+   "end": 3145,
+   "text": "### Prerequisites",
+   "tokens": []
+  },
+  {
+   "id": 11,
+   "kind": "para",
+   "start": 3147,
+   "end": 3322,
+   "text": "Hardware requirements are shared with Isaac Sim, and are detailed in [Isaac Sim Requirements](⟦0⟧).",
+   "tokens": [
+    "https://docs.isaacsim.omniverse.nvidia.com/5.1.0/installation/requirements.html"
+   ]
+  },
+  {
+   "id": 12,
+   "kind": "list",
+   "start": 3324,
+   "end": 3354,
+   "text": "- NVIDIA GPU with CUDA support",
+   "tokens": []
+  },
+  {
+   "id": 13,
+   "kind": "list",
+   "start": 3355,
+   "end": 3401,
+   "text": "- NVIDIA driver compatible with IsaacSim 5.1.0",
+   "tokens": []
+  },
+  {
+   "id": 14,
+   "kind": "list",
+   "start": 3402,
+   "end": 3432,
+   "text": "- Linux (Ubuntu 22.04 / 24.04)",
+   "tokens": []
+  },
+  {
+   "id": 15,
+   "kind": "heading",
+   "start": 3434,
+   "end": 3443,
+   "text": "### Setup",
+   "tokens": []
+  },
+  {
+   "id": 16,
+   "kind": "heading",
+   "start": 4494,
+   "end": 4516,
+   "text": "## Evaluating Policies",
+   "tokens": []
+  },
+  {
+   "id": 17,
+   "kind": "heading",
+   "start": 4518,
+   "end": 4542,
+   "text": "### Pre-trained Policies",
+   "tokens": []
+  },
+  {
+   "id": 18,
+   "kind": "para",
+   "start": 4544,
+   "end": 4589,
+   "text": "The following trained policies are available:",
+   "tokens": []
+  },
+  {
+   "id": 19,
+   "kind": "table",
+   "start": 4591,
+   "end": 4728,
+   "text": "| Policy                      | Architecture | Task          | Link                                                                     |",
+   "tokens": []
+  },
+  {
+   "id": 20,
+   "kind": "table",
+   "start": 4867,
+   "end": 5004,
+   "text": "| pi05-arena-gr1-microwave    | PI0.5        | GR1 Microwave | [HuggingFace](⟦0⟧)    |",
+   "tokens": [
+    "https://huggingface.co/nvidia/pi05-arena-gr1-microwave"
+   ]
+  },
+  {
+   "id": 21,
+   "kind": "table",
+   "start": 5005,
+   "end": 5142,
+   "text": "| smolvla-arena-gr1-microwave | SmolVLA      | GR1 Microwave | [HuggingFace](⟦0⟧) |",
+   "tokens": [
+    "https://huggingface.co/nvidia/smolvla-arena-gr1-microwave"
+   ]
+  },
+  {
+   "id": 22,
+   "kind": "heading",
+   "start": 5144,
+   "end": 5164,
+   "text": "### Evaluate SmolVLA",
+   "tokens": []
+  },
+  {
+   "id": 23,
+   "kind": "heading",
+   "start": 5932,
+   "end": 5950,
+   "text": "### Evaluate PI0.5",
+   "tokens": []
+  },
+  {
+   "id": 24,
+   "kind": "para",
+   "start": 6045,
+   "end": 6110,
+   "text": "⟦0⟧PI0.5 requires disabling torch compile for evaluation:⟦1⟧",
+   "tokens": [
+    "<Tip>",
+    "</Tip>"
+   ]
+  },
+  {
+   "id": 25,
+   "kind": "para",
+   "start": 6825,
+   "end": 6919,
+   "text": "⟦0⟧\n  To change the number of parallel environments, use the ⟦1⟧`\n  flag.",
+   "tokens": [
+    "<Tip>",
+    "```--eval.batch_size``"
+   ]
+  },
+  {
+   "id": 26,
+   "kind": "heading",
+   "start": 6928,
+   "end": 6946,
+   "text": "### What to Expect",
+   "tokens": []
+  },
+  {
+   "id": 27,
+   "kind": "para",
+   "start": 6948,
+   "end": 7028,
+   "text": "During evaluation, you will see a progress bar showing the running success rate:",
+   "tokens": []
+  },
+  {
+   "id": 28,
+   "kind": "heading",
+   "start": 7146,
+   "end": 7165,
+   "text": "### Video Recording",
+   "tokens": []
+  },
+  {
+   "id": 29,
+   "kind": "para",
+   "start": 7167,
+   "end": 7252,
+   "text": "To enable video recording during evaluation, add the following flags to your command:",
+   "tokens": []
+  },
+  {
+   "id": 30,
+   "kind": "para",
+   "start": 7334,
+   "end": 7489,
+   "text": "For more details on video recording, see the [IsaacLab Recording Documentation](⟦0⟧).",
+   "tokens": [
+    "https://isaac-sim.github.io/IsaacLab/main/source/how-to/record_video.html"
+   ]
+  },
+  {
+   "id": 31,
+   "kind": "para",
+   "start": 7491,
+   "end": 7619,
+   "text": "⟦0⟧\nWhen running headless with ⟦1⟧, you must also enable cameras explicitly for camera enabled environments:",
+   "tokens": [
+    "<Tip>",
+    "`--env.headless=true`"
+   ]
+  },
+  {
+   "id": 32,
+   "kind": "heading",
+   "start": 7688,
+   "end": 7708,
+   "text": "### Output Directory",
+   "tokens": []
+  },
+  {
+   "id": 33,
+   "kind": "para",
+   "start": 7710,
+   "end": 7791,
+   "text": "Evaluation videos are saved to the output directory with the following structure:",
+   "tokens": []
+  },
+  {
+   "id": 34,
+   "kind": "para",
+   "start": 7893,
+   "end": 7905,
+   "text": "For example:",
+   "tokens": []
+  },
+  {
+   "id": 35,
+   "kind": "heading",
+   "start": 8014,
+   "end": 8034,
+   "text": "## Training Policies",
+   "tokens": []
+  },
+  {
+   "id": 36,
+   "kind": "para",
+   "start": 8036,
+   "end": 8131,
+   "text": "To learn more about training policies with LeRobot, please refer to the training documentation:",
+   "tokens": []
+  },
+  {
+   "id": 37,
+   "kind": "list",
+   "start": 8133,
+   "end": 8155,
+   "text": "- [SmolVLA](⟦0⟧)",
+   "tokens": [
+    "./smolvla"
+   ]
+  },
+  {
+   "id": 38,
+   "kind": "list",
+   "start": 8156,
+   "end": 8173,
+   "text": "- [Pi0.5](⟦0⟧)",
+   "tokens": [
+    "./pi05"
+   ]
+  },
+  {
+   "id": 39,
+   "kind": "list",
+   "start": 8174,
+   "end": 8197,
+   "text": "- [GR00T N1.7](⟦0⟧)",
+   "tokens": [
+    "./groot"
+   ]
+  },
+  {
+   "id": 40,
+   "kind": "para",
+   "start": 8199,
+   "end": 8283,
+   "text": "Sample IsaacLab Arena datasets are available on HuggingFace Hub for experimentation:",
+   "tokens": []
+  },
+  {
+   "id": 41,
+   "kind": "table",
+   "start": 8285,
+   "end": 8432,
+   "text": "| Dataset                                                                                                   | Description                | Frames |",
+   "tokens": []
+  },
+  {
+   "id": 42,
+   "kind": "table",
+   "start": 8581,
+   "end": 8728,
+   "text": "| [Arena-GR1-Manipulation-Task](⟦0⟧)      | GR1 microwave manipulation | ~4K    |",
+   "tokens": [
+    "https://huggingface.co/datasets/nvidia/Arena-GR1-Manipulation-Task-v3"
+   ]
+  },
+  {
+   "id": 43,
+   "kind": "table",
+   "start": 8729,
+   "end": 8876,
+   "text": "| [Arena-G1-Loco-Manipulation-Task](⟦0⟧) | G1 loco-manipulation       | ~4K    |",
+   "tokens": [
+    "https://huggingface.co/datasets/nvidia/Arena-G1-Loco-Manipulation-Task"
+   ]
+  },
+  {
+   "id": 44,
+   "kind": "heading",
+   "start": 8878,
+   "end": 8906,
+   "text": "## Environment Configuration",
+   "tokens": []
+  },
+  {
+   "id": 45,
+   "kind": "heading",
+   "start": 8908,
+   "end": 8938,
+   "text": "### Full Configuration Options",
+   "tokens": []
+  },
+  {
+   "id": 46,
+   "kind": "heading",
+   "start": 10474,
+   "end": 10527,
+   "text": "### Using Environment Hub directly for advanced usage",
+   "tokens": []
+  },
+  {
+   "id": 47,
+   "kind": "para",
+   "start": 10529,
+   "end": 10695,
+   "text": "Create a file called ⟦0⟧ or [download from the EnvHub](⟦1⟧):",
+   "tokens": [
+    "`test_env_load_arena.py`",
+    "https://huggingface.co/nvidia/isaaclab-arena-envs/blob/main/tests/test_env_load_arena.py"
+   ]
+  },
+  {
+   "id": 48,
+   "kind": "para",
+   "start": 11630,
+   "end": 11639,
+   "text": "Run with:",
+   "tokens": []
+  },
+  {
+   "id": 49,
+   "kind": "heading",
+   "start": 12053,
+   "end": 12081,
+   "text": "## Creating New Environments",
+   "tokens": []
+  },
+  {
+   "id": 50,
+   "kind": "para",
+   "start": 12083,
+   "end": 12246,
+   "text": "First create a new IsaacLab Arena environment by following the [IsaacLab Arena Documentation](⟦0⟧).",
+   "tokens": [
+    "https://isaac-sim.github.io/IsaacLab-Arena/release/0.1.1/index.html"
+   ]
+  },
+  {
+   "id": 51,
+   "kind": "para",
+   "start": 12248,
+   "end": 12270,
+   "text": "Clone our EnvHub repo:",
+   "tokens": []
+  },
+  {
+   "id": 52,
+   "kind": "para",
+   "start": 12345,
+   "end": 12497,
+   "text": "Modify the ⟦0⟧ file based on your new environment.\n[Upload](⟦1⟧) your modified repo to HuggingFace EnvHub.",
+   "tokens": [
+    "`example_envs.yaml`",
+    "./envhub#step-3-upload-to-the-hub"
+   ]
+  },
+  {
+   "id": 53,
+   "kind": "para",
+   "start": 12499,
+   "end": 12728,
+   "text": "⟦0⟧\n  Your IsaacLab Arena environment code must be locally available during\n  evaluation. Users can clone your environment repository separately, or you can\n  bundle the environment code and assets directly in your EnvHub repo.",
+   "tokens": [
+    "<Tip>"
+   ]
+  },
+  {
+   "id": 54,
+   "kind": "para",
+   "start": 12737,
+   "end": 12785,
+   "text": "Then, when evaluating, use your new environment:",
+   "tokens": []
+  },
+  {
+   "id": 55,
+   "kind": "para",
+   "start": 12945,
+   "end": 12983,
+   "text": "We look forward to your contributions!",
+   "tokens": []
+  },
+  {
+   "id": 56,
+   "kind": "heading",
+   "start": 12985,
+   "end": 13003,
+   "text": "## Troubleshooting",
+   "tokens": []
+  },
+  {
+   "id": 57,
+   "kind": "heading",
+   "start": 13005,
+   "end": 13027,
+   "text": "### CUDA out of memory",
+   "tokens": []
+  },
+  {
+   "id": 58,
+   "kind": "para",
+   "start": 13029,
+   "end": 13077,
+   "text": "Reduce ⟦0⟧ or use a GPU with more VRAM:",
+   "tokens": [
+    "`batch_size`"
+   ]
+  },
+  {
+   "id": 59,
+   "kind": "heading",
+   "start": 13112,
+   "end": 13133,
+   "text": "### EULA not accepted",
+   "tokens": []
+  },
+  {
+   "id": 60,
+   "kind": "para",
+   "start": 13135,
+   "end": 13176,
+   "text": "Set environment variables before running:",
+   "tokens": []
+  },
+  {
+   "id": 61,
+   "kind": "heading",
+   "start": 13237,
+   "end": 13268,
+   "text": "### Video recording not working",
+   "tokens": []
+  },
+  {
+   "id": 62,
+   "kind": "para",
+   "start": 13270,
+   "end": 13307,
+   "text": "Enable cameras when running headless:",
+   "tokens": []
+  },
+  {
+   "id": 63,
+   "kind": "heading",
+   "start": 13385,
+   "end": 13421,
+   "text": "### Policy output dimension mismatch",
+   "tokens": []
+  },
+  {
+   "id": 64,
+   "kind": "para",
+   "start": 13423,
+   "end": 13463,
+   "text": "Ensure ⟦0⟧ matches your policy:",
+   "tokens": [
+    "`action_dim`"
+   ]
+  },
+  {
+   "id": 65,
+   "kind": "heading",
+   "start": 13498,
+   "end": 13552,
+   "text": "### libGLU.so.1 Errors during Isaac Sim initialization",
+   "tokens": []
+  },
+  {
+   "id": 66,
+   "kind": "para",
+   "start": 13554,
+   "end": 13654,
+   "text": "Ensure you have the following dependencies installed, this is likely to happen on headless machines.",
+   "tokens": []
+  },
+  {
+   "id": 67,
+   "kind": "heading",
+   "start": 13728,
+   "end": 13739,
+   "text": "## See Also",
+   "tokens": []
+  },
+  {
+   "id": 68,
+   "kind": "list",
+   "start": 13741,
+   "end": 13802,
+   "text": "- [EnvHub Documentation](⟦0⟧) - General EnvHub usage",
+   "tokens": [
+    "./envhub.mdx"
+   ]
+  },
+  {
+   "id": 69,
+   "kind": "list",
+   "start": 13803,
+   "end": 13873,
+   "text": "- [IsaacLab Arena GitHub](⟦0⟧)",
+   "tokens": [
+    "https://github.com/isaac-sim/IsaacLab-Arena"
+   ]
+  },
+  {
+   "id": 70,
+   "kind": "list",
+   "start": 13874,
+   "end": 13939,
+   "text": "- [IsaacLab Documentation](⟦0⟧)",
+   "tokens": [
+    "https://isaac-sim.github.io/IsaacLab/"
+   ]
+  },
+  {
+   "id": 71,
+   "kind": "heading",
+   "start": 13941,
+   "end": 13966,
+   "text": "## Lightwheel LW-BenchHub",
+   "tokens": []
+  },
+  {
+   "id": 72,
+   "kind": "para",
+   "start": 13968,
+   "end": 14406,
+   "text": "[Lightwheel](⟦0⟧) is bringing ⟦1⟧ and ⟦2⟧ with 268 tasks to the LeRobot ecosystem.\nLW-BenchHub collects and generates large-scale datasets via teleoperation that comply with the LeRobot specification, enabling out-of-the-box training and evaluation workflows.\nWith the unified interface provided by EnvHub, developers can quickly build end-to-end experimental pipelines.",
+   "tokens": [
+    "https://www.lightwheel.ai",
+    "`Lightwheel-Libero-Tasks`",
+    "`Lightwheel-RoboCasa-Tasks`"
+   ]
+  },
+  {
+   "id": 73,
+   "kind": "heading",
+   "start": 14408,
+   "end": 14419,
+   "text": "### Install",
+   "tokens": []
+  },
+  {
+   "id": 74,
+   "kind": "para",
+   "start": 14421,
+   "end": 14517,
+   "text": "Assuming you followed the [Installation](⟦0⟧) steps, you can install LW-BenchHub with:",
+   "tokens": [
+    "#installation"
+   ]
+  },
+  {
+   "id": 75,
+   "kind": "para",
+   "start": 14835,
+   "end": 14975,
+   "text": "For more detailed instructions, please refer to the [LW-BenchHub Documentation](⟦0⟧).",
+   "tokens": [
+    "https://docs.lightwheel.net/lw_benchhub/usage/Installation"
+   ]
+  },
+  {
+   "id": 76,
+   "kind": "heading",
+   "start": 14977,
+   "end": 15005,
+   "text": "### Lightwheel Tasks Dataset",
+   "tokens": []
+  },
+  {
+   "id": 77,
+   "kind": "para",
+   "start": 15007,
+   "end": 15061,
+   "text": "LW-BenchHub datasets are available on HuggingFace Hub:",
+   "tokens": []
+  },
+  {
+   "id": 78,
+   "kind": "table",
+   "start": 15063,
+   "end": 15219,
+   "text": "| Dataset                                                                                                       | Description             | Tasks | Frames |",
+   "tokens": []
+  },
+  {
+   "id": 79,
+   "kind": "table",
+   "start": 15377,
+   "end": 15533,
+   "text": "| [Lightwheel-Tasks-X7S](⟦0⟧)                     | X7S LIBERO and RoboCasa | 117   | ~10.3M |",
+   "tokens": [
+    "https://huggingface.co/datasets/LightwheelAI/Lightwheel-Tasks-X7S"
+   ]
+  },
+  {
+   "id": 80,
+   "kind": "table",
+   "start": 15534,
+   "end": 15690,
+   "text": "| [Lightwheel-Tasks-Double-Piper](⟦0⟧)   | Double-Piper LIBERO     | 130   | ~6.0M  |",
+   "tokens": [
+    "https://huggingface.co/datasets/LightwheelAI/Lightwheel-Tasks-Double-Piper"
+   ]
+  },
+  {
+   "id": 81,
+   "kind": "table",
+   "start": 15691,
+   "end": 15847,
+   "text": "| [Lightwheel-Tasks-G1-Controller](⟦0⟧) | G1-Controller LIBERO    | 62    | ~2.7M  |",
+   "tokens": [
+    "https://huggingface.co/datasets/LightwheelAI/Lightwheel-Tasks-G1-Controller"
+   ]
+  },
+  {
+   "id": 82,
+   "kind": "table",
+   "start": 15848,
+   "end": 16004,
+   "text": "| [Lightwheel-Tasks-G1-WBC](⟦0⟧)               | G1-WBC RoboCasa         | 32    | ~1.5M  |",
+   "tokens": [
+    "https://huggingface.co/datasets/LightwheelAI/Lightwheel-Tasks-G1-WBC"
+   ]
+  },
+  {
+   "id": 83,
+   "kind": "para",
+   "start": 16006,
+   "end": 16090,
+   "text": "For training policies, refer to the [Training Policies](⟦0⟧) section.",
+   "tokens": [
+    "#training-policies"
+   ]
+  },
+  {
+   "id": 84,
+   "kind": "heading",
+   "start": 16092,
+   "end": 16115,
+   "text": "### Evaluating Policies",
+   "tokens": []
+  },
+  {
+   "id": 85,
+   "kind": "heading",
+   "start": 16117,
+   "end": 16142,
+   "text": "#### Pre-trained Policies",
+   "tokens": []
+  },
+  {
+   "id": 86,
+   "kind": "para",
+   "start": 16144,
+   "end": 16189,
+   "text": "The following trained policies are available:",
+   "tokens": []
+  },
+  {
+   "id": 87,
+   "kind": "table",
+   "start": 16191,
+   "end": 16386,
+   "text": "| Policy                   | Architecture | Task                           | Layout     | Robot           | Link                                                                                  |",
+   "tokens": []
+  },
+  {
+   "id": 88,
+   "kind": "table",
+   "start": 16583,
+   "end": 16778,
+   "text": "| smolvla-double-piper-pnp | SmolVLA      | L90K1PutTheBlackBowlOnThePlate | libero-1-1 | DoublePiper-Abs | [HuggingFace](⟦0⟧) |",
+   "tokens": [
+    "https://huggingface.co/LightwheelAI/smolvla-double-piper-pnp/tree/main"
+   ]
+  },
+  {
+   "id": 89,
+   "kind": "heading",
+   "start": 16780,
+   "end": 16801,
+   "text": "#### Evaluate SmolVLA",
+   "tokens": []
+  },
+  {
+   "id": 90,
+   "kind": "heading",
+   "start": 17530,
+   "end": 17559,
+   "text": "### Environment Configuration",
+   "tokens": []
+  },
+  {
+   "id": 91,
+   "kind": "para",
+   "start": 17561,
+   "end": 17678,
+   "text": "Evaluation can be quickly launched by modifying the ⟦0⟧, ⟦1⟧, and ⟦2⟧ settings in the configuration file.",
+   "tokens": [
+    "`robot`",
+    "`task`",
+    "`layout`"
+   ]
+  },
+  {
+   "id": 92,
+   "kind": "heading",
+   "start": 17680,
+   "end": 17711,
+   "text": "#### Full Configuration Options",
+   "tokens": []
+  },
+  {
+   "id": 93,
+   "kind": "heading",
+   "start": 18925,
+   "end": 18937,
+   "text": "### See Also",
+   "tokens": []
+  },
+  {
+   "id": 94,
+   "kind": "list",
+   "start": 18939,
+   "end": 19006,
+   "text": "- [LW-BenchHub GitHub](⟦0⟧)",
+   "tokens": [
+    "https://github.com/LightwheelAI/LW-BenchHub"
+   ]
+  },
+  {
+   "id": 95,
+   "kind": "list",
+   "start": 19007,
+   "end": 19078,
+   "text": "- [LW-BenchHub Documentation](⟦0⟧)",
+   "tokens": [
+    "https://docs.lightwheel.net/lw_benchhub/"
+   ]
+  }
+ ]
+}

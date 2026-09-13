@@ -1,0 +1,789 @@
+{
+ "file": "so101.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1932,
+   "text": "# SO-101",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 2323,
+   "end": 2401,
+   "text": "In the steps below, we explain how to assemble our flagship robot, the SO-101.",
+   "tokens": []
+  },
+  {
+   "id": 2,
+   "kind": "heading",
+   "start": 2403,
+   "end": 2422,
+   "text": "## Source the parts",
+   "tokens": []
+  },
+  {
+   "id": 3,
+   "kind": "para",
+   "start": 2424,
+   "end": 2687,
+   "text": "Follow this [README](⟦0⟧). It contains the bill of materials, with a link to source the parts, as well as the instructions to 3D print the parts.\nAnd advise if it's your first time printing or if you don't own a 3D printer.",
+   "tokens": [
+    "https://github.com/TheRobotStudio/SO-ARM100"
+   ]
+  },
+  {
+   "id": 4,
+   "kind": "heading",
+   "start": 2689,
+   "end": 2709,
+   "text": "## Install LeRobot 🤗",
+   "tokens": []
+  },
+  {
+   "id": 5,
+   "kind": "para",
+   "start": 2711,
+   "end": 2778,
+   "text": "To install LeRobot, follow our [Installation Guide](⟦0⟧)",
+   "tokens": [
+    "./installation"
+   ]
+  },
+  {
+   "id": 6,
+   "kind": "para",
+   "start": 2780,
+   "end": 2851,
+   "text": "In addition to these instructions, you need to install the Feetech SDK:",
+   "tokens": []
+  },
+  {
+   "id": 7,
+   "kind": "heading",
+   "start": 2894,
+   "end": 2931,
+   "text": "## Step-by-Step Assembly Instructions",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "para",
+   "start": 2933,
+   "end": 3215,
+   "text": "The follower arm uses 6x STS3215 motors with 1/345 gearing. The leader, however, uses three differently geared motors to make sure it can both sustain its own weight and it can be moved without requiring much force. Which motor is needed for which joint is shown in the table below.",
+   "tokens": []
+  },
+  {
+   "id": 9,
+   "kind": "table",
+   "start": 3217,
+   "end": 3261,
+   "text": "| Leader-Arm Axis     | Motor | Gear Ratio |",
+   "tokens": []
+  },
+  {
+   "id": 10,
+   "kind": "table",
+   "start": 3307,
+   "end": 3351,
+   "text": "| Base / Shoulder Pan |   1   |  1 / 191   |",
+   "tokens": []
+  },
+  {
+   "id": 11,
+   "kind": "table",
+   "start": 3352,
+   "end": 3396,
+   "text": "| Shoulder Lift       |   2   |  1 / 345   |",
+   "tokens": []
+  },
+  {
+   "id": 12,
+   "kind": "table",
+   "start": 3397,
+   "end": 3441,
+   "text": "| Elbow Flex          |   3   |  1 / 191   |",
+   "tokens": []
+  },
+  {
+   "id": 13,
+   "kind": "table",
+   "start": 3442,
+   "end": 3486,
+   "text": "| Wrist Flex          |   4   |  1 / 147   |",
+   "tokens": []
+  },
+  {
+   "id": 14,
+   "kind": "table",
+   "start": 3487,
+   "end": 3531,
+   "text": "| Wrist Roll          |   5   |  1 / 147   |",
+   "tokens": []
+  },
+  {
+   "id": 15,
+   "kind": "table",
+   "start": 3532,
+   "end": 3576,
+   "text": "| Gripper             |   6   |  1 / 147   |",
+   "tokens": []
+  },
+  {
+   "id": 16,
+   "kind": "heading",
+   "start": 3578,
+   "end": 3601,
+   "text": "## Configure the motors",
+   "tokens": []
+  },
+  {
+   "id": 17,
+   "kind": "heading",
+   "start": 3603,
+   "end": 3653,
+   "text": "### 1. Find the USB ports associated with each arm",
+   "tokens": []
+  },
+  {
+   "id": 18,
+   "kind": "para",
+   "start": 3655,
+   "end": 3820,
+   "text": "To find the port for each bus servo adapter, connect MotorBus to your computer via USB and power. Run the following script and disconnect the MotorBus when prompted:",
+   "tokens": []
+  },
+  {
+   "id": 19,
+   "kind": "para",
+   "start": 3899,
+   "end": 3914,
+   "text": "Example output:",
+   "tokens": []
+  },
+  {
+   "id": 20,
+   "kind": "para",
+   "start": 4262,
+   "end": 4363,
+   "text": "Where the found port is: ⟦0⟧ corresponding to your leader or follower arm.",
+   "tokens": [
+    "`/dev/tty.usbmodem575E0032081`"
+   ]
+  },
+  {
+   "id": 21,
+   "kind": "para",
+   "start": 4400,
+   "end": 4468,
+   "text": "On Linux, you might need to give access to the USB ports by running:",
+   "tokens": []
+  },
+  {
+   "id": 22,
+   "kind": "para",
+   "start": 4539,
+   "end": 4554,
+   "text": "Example output:",
+   "tokens": []
+  },
+  {
+   "id": 23,
+   "kind": "para",
+   "start": 4854,
+   "end": 4939,
+   "text": "Where the found port is: ⟦0⟧ corresponding to your leader or follower arm.",
+   "tokens": [
+    "`/dev/ttyACM1`"
+   ]
+  },
+  {
+   "id": 24,
+   "kind": "heading",
+   "start": 4967,
+   "end": 5006,
+   "text": "### 2. Set the motors ids and baudrates",
+   "tokens": []
+  },
+  {
+   "id": 25,
+   "kind": "para",
+   "start": 5008,
+   "end": 5465,
+   "text": "Each motor is identified by a unique id on the bus. When brand new, motors usually come with a default id of ⟦0⟧. For the communication to work properly between the motors and the controller, we first need to set a unique, different id to each motor. Additionally, the speed at which data is transmitted on the bus is determined by the baudrate. In order to talk to each other, the controller and all the motors need to be configured with the same baudrate.",
+   "tokens": [
+    "`1`"
+   ]
+  },
+  {
+   "id": 26,
+   "kind": "para",
+   "start": 5467,
+   "end": 5713,
+   "text": "To that end, we first need to connect to each motor individually with the controller in order to set these. Since we will write these parameters in the non-volatile section of the motors' internal memory (EEPROM), we'll only need to do this once.",
+   "tokens": []
+  },
+  {
+   "id": 27,
+   "kind": "para",
+   "start": 5715,
+   "end": 5857,
+   "text": "If you are repurposing motors from another robot, you will probably also need to perform this step as the ids and baudrate likely won't match.",
+   "tokens": []
+  },
+  {
+   "id": 28,
+   "kind": "para",
+   "start": 5859,
+   "end": 5929,
+   "text": "The video below shows the sequence of steps for setting the motor ids.",
+   "tokens": []
+  },
+  {
+   "id": 29,
+   "kind": "heading",
+   "start": 5931,
+   "end": 5955,
+   "text": "##### Setup motors video",
+   "tokens": []
+  },
+  {
+   "id": 30,
+   "kind": "heading",
+   "start": 6202,
+   "end": 6215,
+   "text": "#### Follower",
+   "tokens": []
+  },
+  {
+   "id": 31,
+   "kind": "para",
+   "start": 6217,
+   "end": 6494,
+   "text": "Connect the usb cable from your computer and the power supply to the follower arm's controller board. Then, run the following command or run the API example with the port you got from the previous step. You'll also need to give your follower arm a name with the ⟦0⟧ parameter.",
+   "tokens": [
+    "`id`"
+   ]
+  },
+  {
+   "id": 32,
+   "kind": "para",
+   "start": 7097,
+   "end": 7137,
+   "text": "You should see the following instruction",
+   "tokens": []
+  },
+  {
+   "id": 33,
+   "kind": "para",
+   "start": 7226,
+   "end": 7485,
+   "text": "As instructed, plug the gripper's motor. Make sure it's the only motor connected to the board, and that the motor itself is not yet daisy-chained to any other motor. As you press ⟦0⟧, the script will automatically set the id and baudrate for that motor.",
+   "tokens": [
+    "`[Enter]`"
+   ]
+  },
+  {
+   "id": 34,
+   "kind": "para",
+   "start": 7487,
+   "end": 7531,
+   "text": "⟦0⟧\n⟦1⟧Troubleshooting⟦2⟧",
+   "tokens": [
+    "<details>",
+    "<summary>",
+    "</summary>"
+   ]
+  },
+  {
+   "id": 35,
+   "kind": "para",
+   "start": 7533,
+   "end": 7629,
+   "text": "If you get an error at that point, check your cables and make sure they are plugged in properly:",
+   "tokens": []
+  },
+  {
+   "id": 36,
+   "kind": "para",
+   "start": 7631,
+   "end": 7793,
+   "text": "⟦0⟧\n  ⟦1⟧Power supply⟦2⟧\n  ⟦3⟧USB cable between your computer and the controller board⟦4⟧\n  ⟦5⟧The 3-pin cable from the controller board to the motor⟦6⟧",
+   "tokens": [
+    "<ul>",
+    "<li>",
+    "</li>",
+    "<li>",
+    "</li>",
+    "<li>",
+    "</li>"
+   ]
+  },
+  {
+   "id": 37,
+   "kind": "para",
+   "start": 7801,
+   "end": 7912,
+   "text": "If you are using a Waveshare controller board, make sure that the two jumpers are set on the ⟦0⟧ channel (USB).",
+   "tokens": [
+    "`B`"
+   ]
+  },
+  {
+   "id": 38,
+   "kind": "para",
+   "start": 7926,
+   "end": 7968,
+   "text": "You should then see the following message:",
+   "tokens": []
+  },
+  {
+   "id": 39,
+   "kind": "para",
+   "start": 8011,
+   "end": 8044,
+   "text": "Followed by the next instruction:",
+   "tokens": []
+  },
+  {
+   "id": 40,
+   "kind": "para",
+   "start": 8136,
+   "end": 8548,
+   "text": "You can disconnect the 3-pin cable from the controller board, but you can leave it connected to the gripper motor on the other end, as it will already be in the right place. Now, plug in another 3-pin cable to the wrist roll motor and connect it to the controller board. As with the previous motor, make sure it is the only motor connected to the board and that the motor itself isn't connected to any other one.",
+   "tokens": []
+  },
+  {
+   "id": 41,
+   "kind": "para",
+   "start": 8550,
+   "end": 8600,
+   "text": "Repeat the operation for each motor as instructed.",
+   "tokens": []
+  },
+  {
+   "id": 42,
+   "kind": "quote",
+   "start": 8602,
+   "end": 8750,
+   "text": "> [!TIP]\n> Check your cabling at each step before pressing Enter. For instance, the power supply cable might disconnect as you manipulate the board.",
+   "tokens": []
+  },
+  {
+   "id": 43,
+   "kind": "para",
+   "start": 8752,
+   "end": 9056,
+   "text": "When you are done, the script will simply finish, at which point the motors are ready to be used. You can now plug the 3-pin cable from each motor to the next one, and the cable from the first motor (the 'shoulder pan' with id=1) to the controller board, which can now be attached to the base of the arm.",
+   "tokens": []
+  },
+  {
+   "id": 44,
+   "kind": "heading",
+   "start": 9058,
+   "end": 9069,
+   "text": "#### Leader",
+   "tokens": []
+  },
+  {
+   "id": 45,
+   "kind": "para",
+   "start": 9071,
+   "end": 9108,
+   "text": "Do the same steps for the leader arm.",
+   "tokens": []
+  },
+  {
+   "id": 46,
+   "kind": "heading",
+   "start": 9702,
+   "end": 9717,
+   "text": "### Clean Parts",
+   "tokens": []
+  },
+  {
+   "id": 47,
+   "kind": "para",
+   "start": 9719,
+   "end": 9869,
+   "text": "Remove all support material from the 3D-printed parts. The easiest way to do this is using a small screwdriver to get underneath the support material.",
+   "tokens": []
+  },
+  {
+   "id": 48,
+   "kind": "para",
+   "start": 9871,
+   "end": 9973,
+   "text": "It is advisable to install one 3-pin cable in the motor after placing them before continuing assembly.",
+   "tokens": []
+  },
+  {
+   "id": 49,
+   "kind": "heading",
+   "start": 9975,
+   "end": 9986,
+   "text": "### Joint 1",
+   "tokens": []
+  },
+  {
+   "id": 50,
+   "kind": "list",
+   "start": 9988,
+   "end": 10100,
+   "text": "- Install both motor horns. Secure the top horn with a M3x6mm screw. No screws are required for the bottom horn.",
+   "tokens": []
+  },
+  {
+   "id": 51,
+   "kind": "list",
+   "start": 10101,
+   "end": 10139,
+   "text": "- Place the first motor into the base.",
+   "tokens": []
+  },
+  {
+   "id": 52,
+   "kind": "list",
+   "start": 10140,
+   "end": 10240,
+   "text": "- Fasten the motor with 4 M2x6mm screws (smallest screws). Two from the top and two from the bottom.",
+   "tokens": []
+  },
+  {
+   "id": 53,
+   "kind": "list",
+   "start": 10241,
+   "end": 10334,
+   "text": "- Slide over the first motor holder and fasten it using two M2x6mm screws (one on each side).",
+   "tokens": []
+  },
+  {
+   "id": 54,
+   "kind": "list",
+   "start": 10335,
+   "end": 10362,
+   "text": "- Attach the shoulder part.",
+   "tokens": []
+  },
+  {
+   "id": 55,
+   "kind": "list",
+   "start": 10363,
+   "end": 10452,
+   "text": "- Tighten the shoulder part with 4 M3x6mm screws on top and 4 M3x6mm screws on the bottom",
+   "tokens": []
+  },
+  {
+   "id": 56,
+   "kind": "list",
+   "start": 10453,
+   "end": 10485,
+   "text": "- Add the shoulder motor holder.",
+   "tokens": []
+  },
+  {
+   "id": 57,
+   "kind": "heading",
+   "start": 10721,
+   "end": 10732,
+   "text": "### Joint 2",
+   "tokens": []
+  },
+  {
+   "id": 58,
+   "kind": "list",
+   "start": 10734,
+   "end": 10846,
+   "text": "- Install both motor horns. Secure the top horn with a M3x6mm screw. No screws are required for the bottom horn.",
+   "tokens": []
+  },
+  {
+   "id": 59,
+   "kind": "list",
+   "start": 10847,
+   "end": 10888,
+   "text": "- Slide the second motor in from the top.",
+   "tokens": []
+  },
+  {
+   "id": 60,
+   "kind": "list",
+   "start": 10889,
+   "end": 10936,
+   "text": "- Fasten the second motor with 4 M2x6mm screws.",
+   "tokens": []
+  },
+  {
+   "id": 61,
+   "kind": "list",
+   "start": 10937,
+   "end": 10994,
+   "text": "- Attach the upper arm with 4 M3x6mm screws on each side.",
+   "tokens": []
+  },
+  {
+   "id": 62,
+   "kind": "heading",
+   "start": 11230,
+   "end": 11241,
+   "text": "### Joint 3",
+   "tokens": []
+  },
+  {
+   "id": 63,
+   "kind": "list",
+   "start": 11243,
+   "end": 11355,
+   "text": "- Install both motor horns. Secure the top horn with a M3x6mm screw. No screws are required for the bottom horn.",
+   "tokens": []
+  },
+  {
+   "id": 64,
+   "kind": "list",
+   "start": 11356,
+   "end": 11406,
+   "text": "- Insert motor 3 and fasten using 4 M2x6mm screws.",
+   "tokens": []
+  },
+  {
+   "id": 65,
+   "kind": "list",
+   "start": 11407,
+   "end": 11475,
+   "text": "- Connect the forearm to motor 3 using 4 M3x6mm screws on each side.",
+   "tokens": []
+  },
+  {
+   "id": 66,
+   "kind": "heading",
+   "start": 11711,
+   "end": 11722,
+   "text": "### Joint 4",
+   "tokens": []
+  },
+  {
+   "id": 67,
+   "kind": "list",
+   "start": 11724,
+   "end": 11836,
+   "text": "- Install both motor horns. Secure the top horn with a M3x6mm screw. No screws are required for the bottom horn.",
+   "tokens": []
+  },
+  {
+   "id": 68,
+   "kind": "list",
+   "start": 11837,
+   "end": 11865,
+   "text": "- Slide over motor holder 4.",
+   "tokens": []
+  },
+  {
+   "id": 69,
+   "kind": "list",
+   "start": 11866,
+   "end": 11885,
+   "text": "- Slide in motor 4.",
+   "tokens": []
+  },
+  {
+   "id": 70,
+   "kind": "list",
+   "start": 11886,
+   "end": 11924,
+   "text": "- Fasten motor 4 with 4 M2x6mm screws.",
+   "tokens": []
+  },
+  {
+   "id": 71,
+   "kind": "heading",
+   "start": 12160,
+   "end": 12171,
+   "text": "### Joint 5",
+   "tokens": []
+  },
+  {
+   "id": 72,
+   "kind": "list",
+   "start": 12173,
+   "end": 12253,
+   "text": "- Insert motor 5 into the wrist holder and secure it with 2 M2x6mm front screws.",
+   "tokens": []
+  },
+  {
+   "id": 73,
+   "kind": "list",
+   "start": 12254,
+   "end": 12342,
+   "text": "- Install only one motor horn on the wrist motor and secure it with a M3x6mm horn screw.",
+   "tokens": []
+  },
+  {
+   "id": 74,
+   "kind": "list",
+   "start": 12343,
+   "end": 12409,
+   "text": "- Secure the wrist to motor 4 using 4 M3x6mm screws on both sides.",
+   "tokens": []
+  },
+  {
+   "id": 75,
+   "kind": "heading",
+   "start": 12645,
+   "end": 12665,
+   "text": "### Gripper / Handle",
+   "tokens": []
+  },
+  {
+   "id": 76,
+   "kind": "list",
+   "start": 12719,
+   "end": 12815,
+   "text": "- Attach the gripper to motor 5, attach it to the motor horn on the wrist using 4 M3x6mm screws.",
+   "tokens": []
+  },
+  {
+   "id": 77,
+   "kind": "list",
+   "start": 12816,
+   "end": 12891,
+   "text": "- Insert the gripper motor and secure it with 2 M2x6mm screws on each side.",
+   "tokens": []
+  },
+  {
+   "id": 78,
+   "kind": "list",
+   "start": 12892,
+   "end": 13025,
+   "text": "- Install both motor horns on the gripper motor. Secure the top horn with a M3x6mm screw; no screws are required for the bottom horn.",
+   "tokens": []
+  },
+  {
+   "id": 79,
+   "kind": "list",
+   "start": 13026,
+   "end": 13102,
+   "text": "- Install the gripper claw and secure it with 4 M3x6mm screws on both sides.",
+   "tokens": []
+  },
+  {
+   "id": 80,
+   "kind": "list",
+   "start": 13375,
+   "end": 13451,
+   "text": "- Mount the leader holder onto the wrist and secure it with 4 M3x6mm screws.",
+   "tokens": []
+  },
+  {
+   "id": 81,
+   "kind": "list",
+   "start": 13452,
+   "end": 13514,
+   "text": "- Attach the handle to the leader holder using 1 M2x6mm screw.",
+   "tokens": []
+  },
+  {
+   "id": 82,
+   "kind": "list",
+   "start": 13515,
+   "end": 13634,
+   "text": "- Insert the gripper motor, secure it with 2 M2x6mm screws on each side, attach a motor horn using a M3x6mm horn screw.",
+   "tokens": []
+  },
+  {
+   "id": 83,
+   "kind": "list",
+   "start": 13635,
+   "end": 13686,
+   "text": "- Attach the follower trigger with 4 M3x6mm screws.",
+   "tokens": []
+  },
+  {
+   "id": 84,
+   "kind": "heading",
+   "start": 13948,
+   "end": 13960,
+   "text": "## Calibrate",
+   "tokens": []
+  },
+  {
+   "id": 85,
+   "kind": "para",
+   "start": 13962,
+   "end": 14240,
+   "text": "Next, you'll need to calibrate your robot to ensure that the leader and follower arms have the same position values when they are in the same physical position.\nThe calibration process is very important because it allows a neural network trained on one robot to work on another.",
+   "tokens": []
+  },
+  {
+   "id": 86,
+   "kind": "heading",
+   "start": 14242,
+   "end": 14255,
+   "text": "#### Follower",
+   "tokens": []
+  },
+  {
+   "id": 87,
+   "kind": "para",
+   "start": 14257,
+   "end": 14328,
+   "text": "Run the following command or API example to calibrate the follower arm:",
+   "tokens": []
+  },
+  {
+   "id": 88,
+   "kind": "para",
+   "start": 15042,
+   "end": 15284,
+   "text": "The video below shows how to perform the calibration. First you need to move the robot to the position where all joints are in the middle of their ranges. Then after pressing enter you have to move each joint through its full range of motion.",
+   "tokens": []
+  },
+  {
+   "id": 89,
+   "kind": "heading",
+   "start": 15286,
+   "end": 15309,
+   "text": "##### Calibration video",
+   "tokens": []
+  },
+  {
+   "id": 90,
+   "kind": "heading",
+   "start": 15553,
+   "end": 15564,
+   "text": "#### Leader",
+   "tokens": []
+  },
+  {
+   "id": 91,
+   "kind": "para",
+   "start": 15566,
+   "end": 15654,
+   "text": "Do the same steps to calibrate the leader arm, run the following command or API example:",
+   "tokens": []
+  },
+  {
+   "id": 92,
+   "kind": "para",
+   "start": 16352,
+   "end": 16513,
+   "text": "Congrats 🎉, your robot is all set to learn a task on its own. Start training it by following this tutorial: [Getting started with real-world robots](⟦0⟧)",
+   "tokens": [
+    "./il_robots"
+   ]
+  },
+  {
+   "id": 93,
+   "kind": "quote",
+   "start": 16515,
+   "end": 16635,
+   "text": "> [!TIP]\n> If you have any questions or need help, please reach out on [Discord](⟦0⟧).",
+   "tokens": [
+    "https://discord.com/invite/s3KuuzsPFb"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,615 @@
+{
+ "file": "libero_plus.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1937,
+   "text": "# LIBERO-plus",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1939,
+   "end": 2241,
+   "text": "LIBERO-plus is a **robustness benchmark** for Vision-Language-Action (VLA) models built on top of [LIBERO](⟦0⟧). It systematically stress-tests policies by applying **seven independent perturbation dimensions** to the original LIBERO task set, exposing failure modes that standard benchmarks miss.",
+   "tokens": [
+    "./libero"
+   ]
+  },
+  {
+   "id": 2,
+   "kind": "list",
+   "start": 2243,
+   "end": 2349,
+   "text": "- Paper: [In-depth Robustness Analysis of Vision-Language-Action Models](⟦0⟧)",
+   "tokens": [
+    "https://arxiv.org/abs/2510.13626"
+   ]
+  },
+  {
+   "id": 3,
+   "kind": "list",
+   "start": 2350,
+   "end": 2423,
+   "text": "- GitHub: [sylvestf/LIBERO-plus](⟦0⟧)",
+   "tokens": [
+    "https://github.com/sylvestf/LIBERO-plus"
+   ]
+  },
+  {
+   "id": 4,
+   "kind": "list",
+   "start": 2424,
+   "end": 2509,
+   "text": "- Dataset: [lerobot/libero_plus](⟦0⟧)",
+   "tokens": [
+    "https://huggingface.co/datasets/lerobot/libero_plus"
+   ]
+  },
+  {
+   "id": 5,
+   "kind": "heading",
+   "start": 2660,
+   "end": 2686,
+   "text": "## Perturbation dimensions",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "para",
+   "start": 2688,
+   "end": 2787,
+   "text": "LIBERO-plus creates ~10 000 task variants by perturbing each original LIBERO task along these axes:",
+   "tokens": []
+  },
+  {
+   "id": 7,
+   "kind": "table",
+   "start": 2789,
+   "end": 2870,
+   "text": "| Dimension             | What changes                                          |",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "table",
+   "start": 2953,
+   "end": 3034,
+   "text": "| Objects layout        | Target position, presence of confounding objects      |",
+   "tokens": []
+  },
+  {
+   "id": 9,
+   "kind": "table",
+   "start": 3035,
+   "end": 3116,
+   "text": "| Camera viewpoints     | Camera position, orientation, field-of-view           |",
+   "tokens": []
+  },
+  {
+   "id": 10,
+   "kind": "table",
+   "start": 3117,
+   "end": 3198,
+   "text": "| Robot initial states  | Manipulator start pose                                |",
+   "tokens": []
+  },
+  {
+   "id": 11,
+   "kind": "table",
+   "start": 3199,
+   "end": 3280,
+   "text": "| Language instructions | LLM-rewritten task description (paraphrase / synonym) |",
+   "tokens": []
+  },
+  {
+   "id": 12,
+   "kind": "table",
+   "start": 3281,
+   "end": 3362,
+   "text": "| Light conditions      | Intensity, direction, color, shadow                   |",
+   "tokens": []
+  },
+  {
+   "id": 13,
+   "kind": "table",
+   "start": 3363,
+   "end": 3444,
+   "text": "| Background textures   | Scene surface and object appearance                   |",
+   "tokens": []
+  },
+  {
+   "id": 14,
+   "kind": "table",
+   "start": 3445,
+   "end": 3526,
+   "text": "| Sensor noise          | Photometric distortions and image degradation         |",
+   "tokens": []
+  },
+  {
+   "id": 15,
+   "kind": "heading",
+   "start": 3528,
+   "end": 3552,
+   "text": "## Available task suites",
+   "tokens": []
+  },
+  {
+   "id": 16,
+   "kind": "para",
+   "start": 3554,
+   "end": 3604,
+   "text": "LIBERO-plus covers the same five suites as LIBERO:",
+   "tokens": []
+  },
+  {
+   "id": 17,
+   "kind": "table",
+   "start": 3606,
+   "end": 3716,
+   "text": "| Suite          | CLI name         | Tasks | Max steps | Description                                        |",
+   "tokens": []
+  },
+  {
+   "id": 18,
+   "kind": "table",
+   "start": 3828,
+   "end": 3938,
+   "text": "| LIBERO-Spatial | ⟦0⟧ | 10    | 280       | Tasks requiring reasoning about spatial relations  |",
+   "tokens": [
+    "`libero_spatial`"
+   ]
+  },
+  {
+   "id": 19,
+   "kind": "table",
+   "start": 3939,
+   "end": 4049,
+   "text": "| LIBERO-Object  | ⟦0⟧  | 10    | 280       | Tasks centered on manipulating different objects   |",
+   "tokens": [
+    "`libero_object`"
+   ]
+  },
+  {
+   "id": 20,
+   "kind": "table",
+   "start": 4050,
+   "end": 4160,
+   "text": "| LIBERO-Goal    | ⟦0⟧    | 10    | 300       | Goal-conditioned tasks with changing targets       |",
+   "tokens": [
+    "`libero_goal`"
+   ]
+  },
+  {
+   "id": 21,
+   "kind": "table",
+   "start": 4161,
+   "end": 4271,
+   "text": "| LIBERO-90      | ⟦0⟧      | 90    | 400       | Short-horizon tasks from the LIBERO-100 collection |",
+   "tokens": [
+    "`libero_90`"
+   ]
+  },
+  {
+   "id": 22,
+   "kind": "table",
+   "start": 4272,
+   "end": 4382,
+   "text": "| LIBERO-Long    | ⟦0⟧      | 10    | 520       | Long-horizon tasks from the LIBERO-100 collection  |",
+   "tokens": [
+    "`libero_10`"
+   ]
+  },
+  {
+   "id": 23,
+   "kind": "para",
+   "start": 4384,
+   "end": 4700,
+   "text": "⟦0⟧\n  Installing LIBERO-plus **replaces** vanilla LIBERO — it uninstalls ⟦1⟧\n  so that ⟦2⟧ resolves to the LIBERO-plus fork. You cannot have both\n  installed at the same time. To switch back to vanilla LIBERO, uninstall the\n  fork and reinstall with ⟦3⟧.",
+   "tokens": [
+    "<Tip warning={true}>",
+    "`hf-libero`",
+    "`import libero`",
+    "`pip install -e \".[libero]\"`"
+   ]
+  },
+  {
+   "id": 24,
+   "kind": "heading",
+   "start": 4709,
+   "end": 4724,
+   "text": "## Installation",
+   "tokens": []
+  },
+  {
+   "id": 25,
+   "kind": "heading",
+   "start": 4726,
+   "end": 4762,
+   "text": "### System dependencies (Linux only)",
+   "tokens": []
+  },
+  {
+   "id": 26,
+   "kind": "heading",
+   "start": 4841,
+   "end": 4859,
+   "text": "### Python package",
+   "tokens": []
+  },
+  {
+   "id": 27,
+   "kind": "para",
+   "start": 5132,
+   "end": 5439,
+   "text": "LIBERO-plus is installed from its GitHub fork rather than a pyproject extra — the fork ships as a namespace package that pip can't handle, so it must be cloned and added to ⟦0⟧. See ⟦1⟧ for the canonical install. MuJoCo is required, so only Linux is supported.",
+   "tokens": [
+    "`PYTHONPATH`",
+    "`docker/Dockerfile.benchmark.libero_plus`"
+   ]
+  },
+  {
+   "id": 28,
+   "kind": "para",
+   "start": 5441,
+   "end": 5506,
+   "text": "⟦0⟧\nSet the MuJoCo rendering backend before running evaluation:",
+   "tokens": [
+    "<Tip>"
+   ]
+  },
+  {
+   "id": 29,
+   "kind": "heading",
+   "start": 5577,
+   "end": 5608,
+   "text": "### Download LIBERO-plus assets",
+   "tokens": []
+  },
+  {
+   "id": 30,
+   "kind": "para",
+   "start": 5610,
+   "end": 5835,
+   "text": "LIBERO-plus ships its extended asset pack separately. Download ⟦0⟧ from the [Hugging Face dataset](⟦1⟧) and extract it into the LIBERO-plus package directory:",
+   "tokens": [
+    "`assets.zip`",
+    "https://huggingface.co/datasets/Sylvest/LIBERO-plus/tree/main"
+   ]
+  },
+  {
+   "id": 31,
+   "kind": "heading",
+   "start": 6022,
+   "end": 6035,
+   "text": "## Evaluation",
+   "tokens": []
+  },
+  {
+   "id": 32,
+   "kind": "heading",
+   "start": 6037,
+   "end": 6073,
+   "text": "### Default evaluation (recommended)",
+   "tokens": []
+  },
+  {
+   "id": 33,
+   "kind": "para",
+   "start": 6075,
+   "end": 6139,
+   "text": "Evaluate across the four standard suites (10 episodes per task):",
+   "tokens": []
+  },
+  {
+   "id": 34,
+   "kind": "heading",
+   "start": 6375,
+   "end": 6402,
+   "text": "### Single-suite evaluation",
+   "tokens": []
+  },
+  {
+   "id": 35,
+   "kind": "para",
+   "start": 6404,
+   "end": 6438,
+   "text": "Evaluate on one LIBERO-plus suite:",
+   "tokens": []
+  },
+  {
+   "id": 36,
+   "kind": "list",
+   "start": 6607,
+   "end": 6680,
+   "text": "- ⟦0⟧ picks the suite (⟦1⟧, ⟦2⟧, etc.).",
+   "tokens": [
+    "`--env.task`",
+    "`libero_spatial`",
+    "`libero_object`"
+   ]
+  },
+  {
+   "id": 37,
+   "kind": "list",
+   "start": 6681,
+   "end": 6796,
+   "text": "- ⟦0⟧ restricts to specific task indices (⟦1⟧, ⟦2⟧, etc.). Omit to run all tasks in the suite.",
+   "tokens": [
+    "`--env.task_ids`",
+    "`[0]`",
+    "`[1,2,3]`"
+   ]
+  },
+  {
+   "id": 38,
+   "kind": "list",
+   "start": 6797,
+   "end": 6866,
+   "text": "- ⟦0⟧ controls how many environments run in parallel.",
+   "tokens": [
+    "`--eval.batch_size`"
+   ]
+  },
+  {
+   "id": 39,
+   "kind": "list",
+   "start": 6867,
+   "end": 6928,
+   "text": "- ⟦0⟧ sets how many episodes to run per task.",
+   "tokens": [
+    "`--eval.n_episodes`"
+   ]
+  },
+  {
+   "id": 40,
+   "kind": "heading",
+   "start": 6930,
+   "end": 6956,
+   "text": "### Multi-suite evaluation",
+   "tokens": []
+  },
+  {
+   "id": 41,
+   "kind": "para",
+   "start": 6958,
+   "end": 7042,
+   "text": "Benchmark a policy across multiple suites at once by passing a comma-separated list:",
+   "tokens": []
+  },
+  {
+   "id": 42,
+   "kind": "heading",
+   "start": 7225,
+   "end": 7241,
+   "text": "### Control mode",
+   "tokens": []
+  },
+  {
+   "id": 43,
+   "kind": "para",
+   "start": 7243,
+   "end": 7442,
+   "text": "LIBERO-plus supports two control modes — ⟦0⟧ (default) and ⟦1⟧. Different VLA checkpoints are trained with different action parameterizations, so make sure the mode matches your policy:",
+   "tokens": [
+    "`relative`",
+    "`absolute`"
+   ]
+  },
+  {
+   "id": 44,
+   "kind": "heading",
+   "start": 7503,
+   "end": 7524,
+   "text": "### Reset performance",
+   "tokens": []
+  },
+  {
+   "id": 45,
+   "kind": "para",
+   "start": 7526,
+   "end": 7719,
+   "text": "By default, LeRobot preserves LIBERO's hard-reset behavior. With fixed initial\nstates enabled, you can opt into soft resets to skip rebuilding the simulator\nmodel and renderer on every episode:",
+   "tokens": []
+  },
+  {
+   "id": 46,
+   "kind": "para",
+   "start": 7780,
+   "end": 7998,
+   "text": "Soft resets are faster but are not bit-identical to hard resets after the\nenvironment's settling steps, so camera observations and policy results may\ndiffer slightly. Use hard resets when reproducing benchmark results.",
+   "tokens": []
+  },
+  {
+   "id": 47,
+   "kind": "heading",
+   "start": 8000,
+   "end": 8029,
+   "text": "### Policy inputs and outputs",
+   "tokens": []
+  },
+  {
+   "id": 48,
+   "kind": "para",
+   "start": 8031,
+   "end": 8048,
+   "text": "**Observations:**",
+   "tokens": []
+  },
+  {
+   "id": 49,
+   "kind": "list",
+   "start": 8050,
+   "end": 8156,
+   "text": "- ⟦0⟧ — 8-dim proprioceptive features (eef position, axis-angle orientation, gripper qpos)",
+   "tokens": [
+    "`observation.state`"
+   ]
+  },
+  {
+   "id": 50,
+   "kind": "list",
+   "start": 8157,
+   "end": 8235,
+   "text": "- ⟦0⟧ — main camera view (⟦1⟧), HWC uint8",
+   "tokens": [
+    "`observation.images.image`",
+    "`agentview_image`"
+   ]
+  },
+  {
+   "id": 51,
+   "kind": "list",
+   "start": 8236,
+   "end": 8325,
+   "text": "- ⟦0⟧ — wrist camera view (⟦1⟧), HWC uint8",
+   "tokens": [
+    "`observation.images.image2`",
+    "`robot0_eye_in_hand_image`"
+   ]
+  },
+  {
+   "id": 52,
+   "kind": "para",
+   "start": 8327,
+   "end": 8339,
+   "text": "**Actions:**",
+   "tokens": []
+  },
+  {
+   "id": 53,
+   "kind": "list",
+   "start": 8341,
+   "end": 8426,
+   "text": "- Continuous control in ⟦0⟧ — 6D end-effector delta + 1D gripper",
+   "tokens": [
+    "`Box(-1, 1, shape=(7,))`"
+   ]
+  },
+  {
+   "id": 54,
+   "kind": "heading",
+   "start": 8428,
+   "end": 8463,
+   "text": "### Recommended evaluation episodes",
+   "tokens": []
+  },
+  {
+   "id": 55,
+   "kind": "para",
+   "start": 8465,
+   "end": 8670,
+   "text": "For reproducible benchmarking, use **10 episodes per task** across all four standard suites (Spatial, Object, Goal, Long). This gives 400 total episodes and matches the protocol used for published results.",
+   "tokens": []
+  },
+  {
+   "id": 56,
+   "kind": "heading",
+   "start": 8672,
+   "end": 8683,
+   "text": "## Training",
+   "tokens": []
+  },
+  {
+   "id": 57,
+   "kind": "heading",
+   "start": 8685,
+   "end": 8696,
+   "text": "### Dataset",
+   "tokens": []
+  },
+  {
+   "id": 58,
+   "kind": "para",
+   "start": 8698,
+   "end": 8764,
+   "text": "A LeRobot-format training dataset for LIBERO-plus is available at:",
+   "tokens": []
+  },
+  {
+   "id": 59,
+   "kind": "list",
+   "start": 8766,
+   "end": 8842,
+   "text": "- [lerobot/libero_plus](⟦0⟧)",
+   "tokens": [
+    "https://huggingface.co/datasets/lerobot/libero_plus"
+   ]
+  },
+  {
+   "id": 60,
+   "kind": "heading",
+   "start": 8844,
+   "end": 8872,
+   "text": "### Example training command",
+   "tokens": []
+  },
+  {
+   "id": 61,
+   "kind": "heading",
+   "start": 9276,
+   "end": 9301,
+   "text": "## Relationship to LIBERO",
+   "tokens": []
+  },
+  {
+   "id": 62,
+   "kind": "para",
+   "start": 9303,
+   "end": 9348,
+   "text": "LIBERO-plus is a drop-in extension of LIBERO:",
+   "tokens": []
+  },
+  {
+   "id": 63,
+   "kind": "list",
+   "start": 9350,
+   "end": 9414,
+   "text": "- Same Python gym interface (⟦0⟧, ⟦1⟧)",
+   "tokens": [
+    "`LiberoEnv`",
+    "`LiberoProcessorStep`"
+   ]
+  },
+  {
+   "id": 64,
+   "kind": "list",
+   "start": 9415,
+   "end": 9464,
+   "text": "- Same camera names and observation/action format",
+   "tokens": []
+  },
+  {
+   "id": 65,
+   "kind": "list",
+   "start": 9465,
+   "end": 9488,
+   "text": "- Same task suite names",
+   "tokens": []
+  },
+  {
+   "id": 66,
+   "kind": "list",
+   "start": 9489,
+   "end": 9567,
+   "text": "- Installs under the same ⟦0⟧ Python package name (different GitHub repo)",
+   "tokens": [
+    "`libero`"
+   ]
+  },
+  {
+   "id": 67,
+   "kind": "para",
+   "start": 9569,
+   "end": 9658,
+   "text": "To use the original LIBERO benchmark, see [LIBERO](⟦0⟧) and use ⟦1⟧.",
+   "tokens": [
+    "./libero",
+    "`--env.type=libero`"
+   ]
+  }
+ ]
+}

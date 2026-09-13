@@ -1,0 +1,979 @@
+<script lang="ts">
+import {onMount} from "svelte";
+import Tip from "$lib/Tip.svelte";
+import CopyLLMTxtMenu from "$lib/CopyLLMTxtMenu.svelte";
+import Youtube from "$lib/Youtube.svelte";
+import Docstring from "$lib/Docstring.svelte";
+import CodeBlock from "$lib/CodeBlock.svelte";
+import CodeBlockFw from "$lib/CodeBlockFw.svelte";
+import DocNotebookDropdown from "$lib/DocNotebookDropdown.svelte";
+import CourseFloatingBanner from "$lib/CourseFloatingBanner.svelte";
+import IconCopyLink from "$lib/IconCopyLink.svelte";
+import FrameworkContent from "$lib/FrameworkContent.svelte";
+import Markdown from "$lib/Markdown.svelte";
+import Question from "$lib/Question.svelte";
+import FrameworkSwitchCourse from "$lib/FrameworkSwitchCourse.svelte";
+import InferenceApi from "$lib/InferenceApi.svelte";
+import TokenizersLanguageContent from "$lib/TokenizersLanguageContent.svelte";
+import ExampleCodeBlock from "$lib/ExampleCodeBlock.svelte";
+import Added from "$lib/Added.svelte";
+import Changed from "$lib/Changed.svelte";
+import Deprecated from "$lib/Deprecated.svelte";
+import PipelineIcon from "$lib/PipelineIcon.svelte";
+import PipelineTag from "$lib/PipelineTag.svelte";
+import Heading from "$lib/Heading.svelte";
+import HfOptions from "$lib/HfOptions.svelte";
+import HfOption from "$lib/HfOption.svelte";
+import EditOnGithub from "$lib/EditOnGithub.svelte";
+import InferenceSnippet from "$lib/InferenceSnippet/InferenceSnippet.svelte";
+import MermaidChart from "$lib/MermaidChart.svelte";
+let fw: "pt" | "tf" = "pt";
+onMount(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    fw = urlParams.get("fw") || "pt";
+});
+</script>
+<svelte:head>
+  <meta name="hf:doc:metadata" content={metadata} >
+</svelte:head>
+
+<!--HF DOCBUILD BODY START-->
+
+HF_DOC_BODY_START
+
+<CopyLLMTxtMenu containerStyle="float: right; margin-left: 10px; display: inline-flex; position: relative; z-index: 10;"></CopyLLMTxtMenu>
+
+# Robots
+
+Every robot in LeRobot implements the `Robot` interface: connect, read an observation, send an action,
+disconnect. Writing a policy or a recording script against that interface means it works with any supported
+arm without change.
+
+This page is the generated reference. For wiring, calibration and first-run instructions, start with the
+hardware guides — [SO-101](../so101), [LeKiwi](../lekiwi), [Hope Jr](../hope_jr), [Reachy 2](../reachy2),
+[OpenArm](../openarm) — or [Imitation Learning for Robots](../il_robots) for the end-to-end workflow. To add
+a robot of your own, see [Bring Your Own Hardware](../integrate_hardware).
+
+## Robot[[lerobot.robots.Robot]]
+
+The abstract base class. Subclasses implement every method below; the contract described here is what a
+policy or recording loop can rely on.
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.Robot"} anchor={"lerobot.robots.Robot"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/robot.py#L30"} parameters={[{"name": "config", "val": ": RobotConfig"}]}>
+<paramsdesc>- **config_class** (RobotConfig) -- The expected configuration class for this robot.
+- **name** (str) -- The unique robot name used to identify this robot type.</paramsdesc></Docstring>
+
+The base abstract class for all LeRobot-compatible robots.
+
+This class provides a standardized interface for interacting with physical robots.
+Subclasses must implement all abstract methods and properties to be usable.
+
+
+
+
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"connect"} anchor={"lerobot.robots.Robot.connect"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/robot.py#L124"} parameters={[{"name": "calibrate", "val": ": bool = True"}]}>
+<paramsdesc>- **calibrate** (bool) -- If True, automatically calibrate the robot after connecting if it's not
+  calibrated or needs calibration (this is hardware-dependant).</paramsdesc></Docstring>
+
+Establish communication with the robot.
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"disconnect"} anchor={"lerobot.robots.Robot.disconnect"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/robot.py#L208"} parameters={[]}>
+</Docstring>
+Disconnect from the robot and perform any necessary cleanup.
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"configure"} anchor={"lerobot.robots.Robot.configure"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/robot.py#L173"} parameters={[]}>
+</Docstring>
+
+Apply any one-time or runtime configuration to the robot.
+This may include setting motor parameters, control modes, or initial state.
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"calibrate"} anchor={"lerobot.robots.Robot.calibrate"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/robot.py#L141"} parameters={[]}>
+</Docstring>
+
+Calibrate the robot if applicable. If not, this should be a no-op.
+
+This method should collect any necessary data (e.g., motor offsets) and update the
+:pyattr:`calibration` dictionary accordingly.
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"get_observation"} anchor={"lerobot.robots.Robot.get_observation"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/robot.py#L181"} parameters={[]}>
+<rettype>RobotObservation</rettype><retdesc>A flat dictionary representing the robot's current sensory state. Its structure
+should match :pymeth:`observation_features`.</retdesc></Docstring>
+
+Retrieve the current observation from the robot.
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"send_action"} anchor={"lerobot.robots.Robot.send_action"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/robot.py#L193"} parameters={[{"name": "action", "val": ": dict"}]}>
+<paramsdesc>- **action** (RobotAction) -- Dictionary representing the desired action. Its structure should match
+  :pymeth:`action_features`.</paramsdesc><rettype>RobotAction</rettype><retdesc>The action actually sent to the motors potentially clipped or modified, e.g. by
+safety limits on velocity.</retdesc></Docstring>
+
+Send an action command to the robot.
+
+
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"observation_features"} anchor={"lerobot.robots.Robot.observation_features"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/robot.py#L88"} parameters={[]}>
+</Docstring>
+
+A dictionary describing the structure and types of the observations produced by the robot.
+Its structure (keys) should match the structure of what is returned by :pymeth:`get_observation`.
+Values for the dict should either be:
+- The type of the value if it's a simple value, e.g. `float` for single proprioceptive value (a joint's position/velocity)
+- A tuple representing the shape if it's an array-type value, e.g. `(height, width, channel)` for images
+
+Note: this property should be able to be called regardless of whether the robot is connected or not.
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"action_features"} anchor={"lerobot.robots.Robot.action_features"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/robot.py#L102"} parameters={[]}>
+</Docstring>
+
+A dictionary describing the structure and types of the actions expected by the robot. Its structure
+(keys) should match the structure of what is passed to :pymeth:`send_action`. Values for the dict
+should be the type of the value if it's a simple value, e.g. `float` for single proprioceptive value
+(a joint's goal position/velocity)
+
+Note: this property should be able to be called regardless of whether the robot is connected or not.
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"is_connected"} anchor={"lerobot.robots.Robot.is_connected"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/robot.py#L115"} parameters={[]}>
+</Docstring>
+
+Whether the robot is currently connected or not. If `False`, calling :pymeth:`get_observation` or
+:pymeth:`send_action` should raise an error.
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"is_calibrated"} anchor={"lerobot.robots.Robot.is_calibrated"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/robot.py#L135"} parameters={[]}>
+</Docstring>
+Whether the robot is currently calibrated or not. Should be always `True` if not applicable
+
+</div></div>
+
+## RobotConfig[[lerobot.robots.RobotConfig]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.RobotConfig"} anchor={"lerobot.robots.RobotConfig"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/config.py#L23"} parameters={[{"name": "id", "val": ": str | None = None"}, {"name": "calibration_dir", "val": ": pathlib.Path | None = None"}]}>
+</Docstring>
+
+
+</div>
+
+## make_robot_from_config[[lerobot.robots.make_robot_from_config]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"lerobot.robots.make_robot_from_config"} anchor={"lerobot.robots.make_robot_from_config"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/utils.py#L27"} parameters={[{"name": "config", "val": ": RobotConfig"}]}>
+</Docstring>
+
+
+</div>
+
+## SO-100 and SO-101 followers[[lerobot.robots.so_follower.SOFollower]]
+
+`SO100Follower` and `SO101Follower` are aliases of the same `SOFollower` class; the two arms differ in their
+configuration, not their control code. `SO100FollowerConfig` and `SO101FollowerConfig` are likewise aliases
+of `SOFollowerRobotConfig`.
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.so_follower.SOFollower"} anchor={"lerobot.robots.so_follower.SOFollower"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/so_follower/so_follower.py#L37"} parameters={[{"name": "config", "val": ": SOFollowerRobotConfig"}]}>
+</Docstring>
+
+Generic SO follower base implementing common functionality for SO-100/101/10X.
+Designed to be subclassed with a per-hardware-model `config_class` and `name`.
+
+
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"connect"} anchor={"lerobot.robots.so_follower.SOFollower.connect"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/so_follower/so_follower.py#L91"} parameters={[{"name": "calibrate", "val": ": bool = True"}]}>
+</Docstring>
+
+We assume that at connection time, arm is in a rest position,
+and torque can be safely disabled to run calibration.
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"send_action"} anchor={"lerobot.robots.so_follower.SOFollower.send_action"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/so_follower/so_follower.py#L204"} parameters={[{"name": "action", "val": ": dict"}]}>
+<rettype>RobotAction</rettype><retdesc>the action sent to the motors, potentially clipped.</retdesc><raises>- ``RobotDeviceNotConnectedError`` -- if robot is not connected.</raises><raisederrors>``RobotDeviceNotConnectedError``</raisederrors></Docstring>
+Command arm to move to a target joint configuration.
+
+The relative action magnitude may be clipped depending on the configuration parameter
+`max_relative_target`. In this case, the action sent differs from original action.
+Thus, this function always returns the action actually sent.
+
+
+
+
+
+
+
+
+
+
+</div></div>
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.so_follower.SOFollowerRobotConfig"} anchor={"lerobot.robots.so_follower.SOFollowerRobotConfig"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/so_follower/config_so_follower.py#L59"} parameters={[{"name": "port", "val": ": str"}, {"name": "disable_torque_on_disconnect", "val": ": bool = True"}, {"name": "max_relative_target", "val": ": float | dict[str, float] | None = None"}, {"name": "cameras", "val": ": dict = <factory>"}, {"name": "use_degrees", "val": ": bool = True"}, {"name": "position_p_coefficient", "val": ": int = 16"}, {"name": "position_i_coefficient", "val": ": int = 0"}, {"name": "position_d_coefficient", "val": ": int = 32"}, {"name": "num_read_retries", "val": ": int = 2"}, {"name": "id", "val": ": str | None = None"}, {"name": "calibration_dir", "val": ": pathlib.Path | None = None"}]}>
+</Docstring>
+
+
+</div>
+
+## BiSOFollower[[lerobot.robots.bi_so_follower.BiSOFollower]]
+
+Two SO followers driven as one bimanual robot.
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.bi_so_follower.BiSOFollower"} anchor={"lerobot.robots.bi_so_follower.BiSOFollower"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/bi_so_follower/bi_so_follower.py#L31"} parameters={[{"name": "config", "val": ": BiSOFollowerConfig"}]}>
+</Docstring>
+
+[Bimanual SO Follower Arms](https://github.com/TheRobotStudio/SO-ARM100) designed by TheRobotStudio
+
+
+</div>
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.bi_so_follower.BiSOFollowerConfig"} anchor={"lerobot.robots.bi_so_follower.BiSOFollowerConfig"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/bi_so_follower/config_bi_so_follower.py#L27"} parameters={[{"name": "left_arm_config", "val": ": SOFollowerConfig"}, {"name": "right_arm_config", "val": ": SOFollowerConfig"}, {"name": "cameras", "val": ": dict = <factory>"}, {"name": "id", "val": ": str | None = None"}, {"name": "calibration_dir", "val": ": pathlib.Path | None = None"}]}>
+</Docstring>
+Configuration class for Bi SO Follower robots.
+
+</div>
+
+## KochFollower[[lerobot.robots.koch_follower.KochFollower]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.koch_follower.KochFollower"} anchor={"lerobot.robots.koch_follower.KochFollower"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/koch_follower/koch_follower.py#L37"} parameters={[{"name": "config", "val": ": KochFollowerConfig"}]}>
+</Docstring>
+
+- [Koch v1.0](https://github.com/AlexanderKoch-Koch/low_cost_robot), with and without the wrist-to-elbow
+  expansion, developed by Alexander Koch from [Tau Robotics](https://tau-robotics.com)
+- [Koch v1.1](https://github.com/jess-moss/koch-v1-1) developed by Jess Moss
+
+
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"connect"} anchor={"lerobot.robots.koch_follower.KochFollower.connect"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/koch_follower/koch_follower.py#L92"} parameters={[{"name": "calibrate", "val": ": bool = True"}]}>
+</Docstring>
+
+We assume that at connection time, arm is in a rest position,
+and torque can be safely disabled to run calibration.
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"send_action"} anchor={"lerobot.robots.koch_follower.KochFollower.send_action"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/koch_follower/koch_follower.py#L214"} parameters={[{"name": "action", "val": ": dict"}]}>
+<paramsdesc>- **action** (RobotAction) -- The goal positions for the motors.</paramsdesc><rettype>RobotAction</rettype><retdesc>The action sent to the motors, potentially clipped.</retdesc></Docstring>
+Command arm to move to a target joint configuration.
+
+The relative action magnitude may be clipped depending on the configuration parameter
+`max_relative_target`. In this case, the action sent differs from original action.
+Thus, this function always returns the action actually sent.
+
+
+
+
+
+
+
+
+</div></div>
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.koch_follower.KochFollowerConfig"} anchor={"lerobot.robots.koch_follower.KochFollowerConfig"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/koch_follower/config_koch_follower.py#L24"} parameters={[{"name": "port", "val": ": str"}, {"name": "disable_torque_on_disconnect", "val": ": bool = True"}, {"name": "max_relative_target", "val": ": float | dict[str, float] | None = None"}, {"name": "cameras", "val": ": dict = <factory>"}, {"name": "use_degrees", "val": ": bool = False"}, {"name": "id", "val": ": str | None = None"}, {"name": "calibration_dir", "val": ": pathlib.Path | None = None"}]}>
+</Docstring>
+
+
+</div>
+
+## LeKiwi[[lerobot.robots.lekiwi.LeKiwi]]
+
+`LeKiwi` runs on the robot itself. `LeKiwiClient` is the host-side proxy that talks to it over the network
+and presents the same `Robot` interface.
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.lekiwi.LeKiwi"} anchor={"lerobot.robots.lekiwi.LeKiwi"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/lekiwi/lekiwi.py#L41"} parameters={[{"name": "config", "val": ": LeKiwiConfig"}]}>
+</Docstring>
+
+The robot includes a three omniwheel mobile base and a remote follower arm.
+The leader arm is connected locally (on the laptop) and its joint positions are recorded and then
+forwarded to the remote follower arm (after applying a safety clamp).
+In parallel, keyboard teleoperation is used to generate raw velocity commands for the wheels.
+
+
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"send_action"} anchor={"lerobot.robots.lekiwi.LeKiwi.send_action"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/lekiwi/lekiwi.py#L379"} parameters={[{"name": "action", "val": ": dict"}]}>
+<rettype>RobotAction</rettype><retdesc>the action sent to the motors, potentially clipped.</retdesc><raises>- ``RobotDeviceNotConnectedError`` -- if robot is not connected.</raises><raisederrors>``RobotDeviceNotConnectedError``</raisederrors></Docstring>
+Command lekiwi to move to a target joint configuration.
+
+The relative action magnitude may be clipped depending on the configuration parameter
+`max_relative_target`. In this case, the action sent differs from original action.
+Thus, this function always returns the action actually sent.
+
+
+
+
+
+
+
+
+
+
+</div></div>
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.lekiwi.LeKiwiConfig"} anchor={"lerobot.robots.lekiwi.LeKiwiConfig"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/lekiwi/config_lekiwi.py#L46"} parameters={[{"name": "port", "val": ": str = '/dev/ttyACM0'"}, {"name": "disable_torque_on_disconnect", "val": ": bool = True"}, {"name": "max_relative_target", "val": ": float | dict[str, float] | None = None"}, {"name": "cameras", "val": ": dict = <factory>"}, {"name": "use_degrees", "val": ": bool = True"}, {"name": "num_read_retries", "val": ": int = 2"}, {"name": "id", "val": ": str | None = None"}, {"name": "calibration_dir", "val": ": pathlib.Path | None = None"}]}>
+</Docstring>
+
+
+</div>
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.lekiwi.LeKiwiClient"} anchor={"lerobot.robots.lekiwi.LeKiwiClient"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/lekiwi/lekiwi_client.py#L33"} parameters={[{"name": "config", "val": ": LeKiwiClientConfig"}]}>
+</Docstring>
+
+
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"connect"} anchor={"lerobot.robots.lekiwi.LeKiwiClient.connect"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/lekiwi/lekiwi_client.py#L122"} parameters={[]}>
+</Docstring>
+Establishes ZMQ sockets with the remote mobile robot
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"disconnect"} anchor={"lerobot.robots.lekiwi.LeKiwiClient.disconnect"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/lekiwi/lekiwi_client.py#L339"} parameters={[]}>
+</Docstring>
+Cleans ZMQ comms
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"get_observation"} anchor={"lerobot.robots.lekiwi.LeKiwiClient.get_observation"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/lekiwi/lekiwi_client.py#L259"} parameters={[]}>
+</Docstring>
+
+Capture observations from the remote robot: current follower arm positions,
+present wheel speeds (converted to body-frame velocities: x, y, theta),
+and a camera frame. Receives over ZMQ, translate to body-frame vel
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"send_action"} anchor={"lerobot.robots.lekiwi.LeKiwiClient.send_action"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/lekiwi/lekiwi_client.py#L313"} parameters={[{"name": "action", "val": ": dict"}]}>
+<paramsdesc>- **action** (RobotAction) -- array containing the goal positions for the motors.</paramsdesc><rettype>np.ndarray</rettype><retdesc>the action sent to the motors, potentially clipped.</retdesc><raises>- ``RobotDeviceNotConnectedError`` -- if robot is not connected.</raises><raisederrors>``RobotDeviceNotConnectedError``</raisederrors></Docstring>
+Command lekiwi to move to a target joint configuration. Translates to motor space + sends over ZMQ
+
+
+
+
+
+
+
+
+
+
+
+
+</div></div>
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.lekiwi.LeKiwiClientConfig"} anchor={"lerobot.robots.lekiwi.LeKiwiClientConfig"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/lekiwi/config_lekiwi.py#L86"} parameters={[{"name": "remote_ip", "val": ": str"}, {"name": "port_zmq_cmd", "val": ": int = 5555"}, {"name": "port_zmq_observations", "val": ": int = 5556"}, {"name": "teleop_keys", "val": ": dict = <factory>"}, {"name": "cameras", "val": ": dict = <factory>"}, {"name": "polling_timeout_ms", "val": ": int = 15"}, {"name": "connect_timeout_s", "val": ": int = 5"}, {"name": "id", "val": ": str | None = None"}, {"name": "calibration_dir", "val": ": pathlib.Path | None = None"}]}>
+</Docstring>
+
+
+</div>
+
+## OpenArmFollower[[lerobot.robots.openarm_follower.OpenArmFollower]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.openarm_follower.OpenArmFollower"} anchor={"lerobot.robots.openarm_follower.OpenArmFollower"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/openarm_follower/openarm_follower.py#L39"} parameters={[{"name": "config", "val": ": OpenArmFollowerConfig"}]}>
+</Docstring>
+
+OpenArms Follower Robot which uses CAN bus communication to control 7 DOF arm with a gripper.
+The arm uses Damiao motors in MIT control mode.
+
+
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"calibrate"} anchor={"lerobot.robots.openarm_follower.OpenArmFollower.calibrate"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/openarm_follower/openarm_follower.py#L162"} parameters={[]}>
+</Docstring>
+
+Run calibration procedure for OpenArms robot.
+
+The calibration procedure:
+1. Disable torque
+2. Ask user to position arms in hanging position with grippers closed
+3. Set this as zero position
+4. Record range of motion for each joint
+5. Save calibration
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"configure"} anchor={"lerobot.robots.openarm_follower.OpenArmFollower.configure"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/openarm_follower/openarm_follower.py#L213"} parameters={[]}>
+</Docstring>
+Configure motors with appropriate settings.
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"connect"} anchor={"lerobot.robots.openarm_follower.OpenArmFollower.connect"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/openarm_follower/openarm_follower.py#L128"} parameters={[{"name": "calibrate", "val": ": bool = True"}]}>
+</Docstring>
+
+Connect to the robot and optionally calibrate.
+
+We assume that at connection time, the arms are in a safe rest position,
+and torque can be safely disabled to run calibration if needed.
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"disconnect"} anchor={"lerobot.robots.openarm_follower.OpenArmFollower.disconnect"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/openarm_follower/openarm_follower.py#L343"} parameters={[]}>
+</Docstring>
+Disconnect from robot.
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"get_observation"} anchor={"lerobot.robots.openarm_follower.OpenArmFollower.get_observation"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/openarm_follower/openarm_follower.py#L224"} parameters={[]}>
+</Docstring>
+
+Get current observation from robot including position, velocity, and torque.
+
+Reads all motor states (pos/vel/torque) in one CAN refresh cycle
+instead of 3 separate reads.
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"send_action"} anchor={"lerobot.robots.openarm_follower.OpenArmFollower.send_action"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/openarm_follower/openarm_follower.py#L264"} parameters={[{"name": "action", "val": ": dict"}, {"name": "custom_kp", "val": ": dict[str, float] | None = None"}, {"name": "custom_kd", "val": ": dict[str, float] | None = None"}]}>
+<paramsdesc>- **action** -- Dictionary with motor positions (e.g., "joint_1.pos", "joint_2.pos")
+- **custom_kp** -- Optional custom kp gains per motor (e.g., {"joint_1": 120.0, "joint_2": 150.0})
+- **custom_kd** -- Optional custom kd gains per motor (e.g., {"joint_1": 1.5, "joint_2": 2.0})</paramsdesc><retdesc>The action actually sent (potentially clipped)</retdesc></Docstring>
+
+Send action command to robot.
+
+The action magnitude may be clipped based on safety limits.
+
+
+
+
+
+
+</div></div>
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.openarm_follower.OpenArmFollowerConfig"} anchor={"lerobot.robots.openarm_follower.OpenArmFollowerConfig"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/openarm_follower/config_openarm_follower.py#L125"} parameters={[{"name": "port", "val": ": str"}, {"name": "side", "val": ": str | None = None"}, {"name": "can_interface", "val": ": str = 'socketcan'"}, {"name": "use_can_fd", "val": ": bool = True"}, {"name": "can_bitrate", "val": ": int = 1000000"}, {"name": "can_data_bitrate", "val": ": int = 5000000"}, {"name": "disable_torque_on_disconnect", "val": ": bool = True"}, {"name": "use_velocity_and_torque", "val": ": bool = False"}, {"name": "max_relative_target", "val": ": float | dict[str, float] | None = None"}, {"name": "cameras", "val": ": dict = <factory>"}, {"name": "motor_config", "val": ": dict = <factory>"}, {"name": "position_kp", "val": ": list = <factory>"}, {"name": "position_kd", "val": ": list = <factory>"}, {"name": "joint_limits", "val": ": dict = <factory>"}, {"name": "id", "val": ": str | None = None"}, {"name": "calibration_dir", "val": ": pathlib.Path | None = None"}]}>
+</Docstring>
+
+
+</div>
+
+## BiOpenArmFollower[[lerobot.robots.bi_openarm_follower.BiOpenArmFollower]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.bi_openarm_follower.BiOpenArmFollower"} anchor={"lerobot.robots.bi_openarm_follower.BiOpenArmFollower"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/bi_openarm_follower/bi_openarm_follower.py#L31"} parameters={[{"name": "config", "val": ": BiOpenArmFollowerConfig"}]}>
+</Docstring>
+
+Bimanual OpenArm Follower Arms
+
+
+</div>
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.bi_openarm_follower.BiOpenArmFollowerConfig"} anchor={"lerobot.robots.bi_openarm_follower.BiOpenArmFollowerConfig"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/bi_openarm_follower/config_bi_openarm_follower.py#L27"} parameters={[{"name": "id", "val": ": str | None = 'bi_openarm_follower'"}, {"name": "calibration_dir", "val": ": pathlib.Path | None = None"}, {"name": "left_arm_config", "val": ": OpenArmFollowerConfigBase"}, {"name": "right_arm_config", "val": ": OpenArmFollowerConfigBase"}, {"name": "cameras", "val": ": dict = <factory>"}]}>
+</Docstring>
+Configuration class for Bi OpenArm Follower robots.
+
+</div>
+
+## OmxFollower[[lerobot.robots.omx_follower.OmxFollower]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.omx_follower.OmxFollower"} anchor={"lerobot.robots.omx_follower.OmxFollower"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/omx_follower/omx_follower.py#L38"} parameters={[{"name": "config", "val": ": OmxFollowerConfig"}]}>
+</Docstring>
+
+- [OMX](https://github.com/ROBOTIS-GIT/open_manipulator),
+  expansion, developed by Woojin Wie and Junha Cha from [ROBOTIS](https://ai.robotis.com/)
+
+
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"connect"} anchor={"lerobot.robots.omx_follower.OmxFollower.connect"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/omx_follower/omx_follower.py#L92"} parameters={[{"name": "calibrate", "val": ": bool = True"}]}>
+</Docstring>
+
+For OMX robots that come pre-calibrated:
+- If default calibration from package doesn't match motors, read from motors and save
+- This allows using pre-calibrated robots without manual calibration
+- If no calibration file exists, use factory default values (homing_offset=0, range_min=0, range_max=4095)
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"send_action"} anchor={"lerobot.robots.omx_follower.OmxFollower.send_action"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/omx_follower/omx_follower.py#L197"} parameters={[{"name": "action", "val": ": dict"}]}>
+<paramsdesc>- **action** (RobotAction) -- The goal positions for the motors.</paramsdesc><rettype>RobotAction</rettype><retdesc>The action sent to the motors, potentially clipped.</retdesc></Docstring>
+Command arm to move to a target joint configuration.
+
+The relative action magnitude may be clipped depending on the configuration parameter
+`max_relative_target`. In this case, the action sent differs from original action.
+Thus, this function always returns the action actually sent.
+
+
+
+
+
+
+
+
+</div></div>
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.omx_follower.OmxFollowerConfig"} anchor={"lerobot.robots.omx_follower.OmxFollowerConfig"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/omx_follower/config_omx_follower.py#L24"} parameters={[{"name": "port", "val": ": str"}, {"name": "disable_torque_on_disconnect", "val": ": bool = True"}, {"name": "max_relative_target", "val": ": float | dict[str, float] | None = None"}, {"name": "cameras", "val": ": dict = <factory>"}, {"name": "use_degrees", "val": ": bool = False"}, {"name": "id", "val": ": str | None = None"}, {"name": "calibration_dir", "val": ": pathlib.Path | None = None"}]}>
+</Docstring>
+
+
+</div>
+
+## Reachy2Robot[[lerobot.robots.reachy2.Reachy2Robot]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.reachy2.Reachy2Robot"} anchor={"lerobot.robots.reachy2.Reachy2Robot"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/reachy2/robot_reachy2.py#L75"} parameters={[{"name": "config", "val": ": Reachy2RobotConfig"}]}>
+</Docstring>
+
+[Reachy 2](https://www.pollen-robotics.com/reachy/), by Pollen Robotics.
+
+
+</div>
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.reachy2.Reachy2RobotConfig"} anchor={"lerobot.robots.reachy2.Reachy2RobotConfig"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/reachy2/configuration_reachy2.py#L25"} parameters={[{"name": "max_relative_target", "val": ": float | None = None"}, {"name": "ip_address", "val": ": str | None = 'localhost'"}, {"name": "port", "val": ": int = 50065"}, {"name": "disable_torque_on_disconnect", "val": ": bool = False"}, {"name": "use_external_commands", "val": ": bool = False"}, {"name": "with_mobile_base", "val": ": bool = True"}, {"name": "with_l_arm", "val": ": bool = True"}, {"name": "with_r_arm", "val": ": bool = True"}, {"name": "with_neck", "val": ": bool = True"}, {"name": "with_antennas", "val": ": bool = True"}, {"name": "with_left_teleop_camera", "val": ": bool = False"}, {"name": "with_right_teleop_camera", "val": ": bool = False"}, {"name": "with_torso_camera", "val": ": bool = False"}, {"name": "camera_width", "val": ": int = 640"}, {"name": "camera_height", "val": ": int = 480"}, {"name": "cameras", "val": ": dict = <factory>"}, {"name": "id", "val": ": str | None = None"}, {"name": "calibration_dir", "val": ": pathlib.Path | None = None"}]}>
+</Docstring>
+
+
+</div>
+
+## UnitreeG1[[lerobot.robots.unitree_g1.UnitreeG1]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.unitree_g1.UnitreeG1"} anchor={"lerobot.robots.unitree_g1.UnitreeG1"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/unitree_g1/unitree_g1.py#L148"} parameters={[{"name": "config", "val": ": UnitreeG1Config"}]}>
+</Docstring>
+
+
+</div>
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.unitree_g1.UnitreeG1Config"} anchor={"lerobot.robots.unitree_g1.UnitreeG1Config"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/unitree_g1/config_unitree_g1.py#L49"} parameters={[{"name": "kp", "val": ": list = <factory>"}, {"name": "kd", "val": ": list = <factory>"}, {"name": "default_positions", "val": ": list = <factory>"}, {"name": "control_dt", "val": ": float = 0.004"}, {"name": "is_simulation", "val": ": bool = True"}, {"name": "robot_ip", "val": ": str = '192.168.123.164'"}, {"name": "cameras", "val": ": dict = <factory>"}, {"name": "gravity_compensation", "val": ": bool = False"}, {"name": "controller", "val": ": str | None = None"}, {"name": "id", "val": ": str | None = None"}, {"name": "calibration_dir", "val": ": pathlib.Path | None = None"}]}>
+</Docstring>
+
+
+</div>
+
+## Hope Jr[[lerobot.robots.hope_jr.HopeJrArm]]
+
+The Hope Jr humanoid is exposed as two independent robots, an arm and a hand.
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.hope_jr.HopeJrArm"} anchor={"lerobot.robots.hope_jr.HopeJrArm"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/hope_jr/hope_jr_arm.py#L37"} parameters={[{"name": "config", "val": ": HopeJrArmConfig"}]}>
+</Docstring>
+
+
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"connect"} anchor={"lerobot.robots.hope_jr.HopeJrArm.connect"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/hope_jr/hope_jr_arm.py#L90"} parameters={[{"name": "calibrate", "val": ": bool = True"}]}>
+</Docstring>
+
+We assume that at connection time, arm is in a rest position,
+and torque can be safely disabled to run calibration.
+
+
+</div></div>
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.hope_jr.HopeJrArmConfig"} anchor={"lerobot.robots.hope_jr.HopeJrArmConfig"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/hope_jr/config_hope_jr.py#L42"} parameters={[{"name": "port", "val": ": str"}, {"name": "disable_torque_on_disconnect", "val": ": bool = True"}, {"name": "max_relative_target", "val": ": float | dict[str, float] | None = None"}, {"name": "cameras", "val": ": dict = <factory>"}, {"name": "id", "val": ": str | None = None"}, {"name": "calibration_dir", "val": ": pathlib.Path | None = None"}]}>
+</Docstring>
+
+
+</div>
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.hope_jr.HopeJrHand"} anchor={"lerobot.robots.hope_jr.HopeJrHand"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/hope_jr/hope_jr_hand.py#L61"} parameters={[{"name": "config", "val": ": HopeJrHandConfig"}]}>
+</Docstring>
+
+
+</div>
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.hope_jr.HopeJrHandConfig"} anchor={"lerobot.robots.hope_jr.HopeJrHandConfig"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/hope_jr/config_hope_jr.py#L26"} parameters={[{"name": "port", "val": ": str"}, {"name": "side", "val": ": str"}, {"name": "disable_torque_on_disconnect", "val": ": bool = True"}, {"name": "cameras", "val": ": dict = <factory>"}, {"name": "id", "val": ": str | None = None"}, {"name": "calibration_dir", "val": ": pathlib.Path | None = None"}]}>
+</Docstring>
+
+
+</div>
+
+## RebotB601Follower[[lerobot.robots.rebot_b601_follower.RebotB601Follower]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.rebot_b601_follower.RebotB601Follower"} anchor={"lerobot.robots.rebot_b601_follower.RebotB601Follower"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/rebot_b601_follower/rebot_b601_follower.py#L58"} parameters={[{"name": "config", "val": ": RebotB601FollowerRobotConfig"}]}>
+</Docstring>
+Seeed Studio reBot B601-DM follower arm (6-DOF + gripper, Damiao CAN motors).
+
+Motor communication is handled by the `motorbridge` package over a CAN bus,
+reached either through a Damiao serial bridge or a SocketCAN adapter.
+
+
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"disable_torque"} anchor={"lerobot.robots.rebot_b601_follower.RebotB601Follower.disable_torque"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/rebot_b601_follower/rebot_b601_follower.py#L206"} parameters={[]}>
+</Docstring>
+Disable motor torque so the arm can be moved by hand (read-only debugging).
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"send_action"} anchor={"lerobot.robots.rebot_b601_follower.RebotB601Follower.send_action"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/rebot_b601_follower/rebot_b601_follower.py#L249"} parameters={[{"name": "action", "val": ": dict"}]}>
+</Docstring>
+Command the arm to a target joint configuration.
+
+Positions are expressed in degrees. The relative action magnitude may be
+clipped depending on `max_relative_target`, so the action actually sent is
+always returned.
+
+
+</div></div>
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.rebot_b601_follower.RebotB601FollowerRobotConfig"} anchor={"lerobot.robots.rebot_b601_follower.RebotB601FollowerRobotConfig"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/rebot_b601_follower/config_rebot_b601_follower.py#L106"} parameters={[{"name": "port", "val": ": str"}, {"name": "can_adapter", "val": ": str = 'damiao'"}, {"name": "dm_serial_baud", "val": ": int = 921600"}, {"name": "disable_torque_on_disconnect", "val": ": bool = True"}, {"name": "max_relative_target", "val": ": float | dict[str, float] | None = None"}, {"name": "cameras", "val": ": dict = <factory>"}, {"name": "motor_can_ids", "val": ": dict = <factory>"}, {"name": "pos_vel_velocity", "val": ": float | list[float] = <factory>"}, {"name": "control_mode", "val": ": str = 'mit'"}, {"name": "mit_kp", "val": ": float | list[float] = <factory>"}, {"name": "mit_kd", "val": ": float | list[float] = <factory>"}, {"name": "gripper_control_mode", "val": ": str = 'force_pos'"}, {"name": "gripper_torque_ratio", "val": ": float = 0.07"}, {"name": "gripper_mit_kp", "val": ": float = 8.0"}, {"name": "gripper_mit_kd", "val": ": float = 0.3"}, {"name": "joint_limits", "val": ": dict = <factory>"}, {"name": "id", "val": ": str | None = None"}, {"name": "calibration_dir", "val": ": pathlib.Path | None = None"}]}>
+</Docstring>
+Registered configuration for the reBot B601-DM follower robot.
+
+</div>
+
+## BiRebotB601Follower[[lerobot.robots.bi_rebot_b601_follower.BiRebotB601Follower]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.bi_rebot_b601_follower.BiRebotB601Follower"} anchor={"lerobot.robots.bi_rebot_b601_follower.BiRebotB601Follower"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/bi_rebot_b601_follower/bi_rebot_b601_follower.py#L31"} parameters={[{"name": "config", "val": ": BiRebotB601FollowerConfig"}]}>
+</Docstring>
+Bimanual Seeed Studio reBot B601-DM follower.
+
+Composes two single-arm `RebotB601Follower` instances. Observation and
+action keys of each arm are namespaced with a `left_` / `right_` prefix.
+
+
+</div>
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.bi_rebot_b601_follower.BiRebotB601FollowerConfig"} anchor={"lerobot.robots.bi_rebot_b601_follower.BiRebotB601FollowerConfig"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/bi_rebot_b601_follower/config_bi_rebot_b601_follower.py#L27"} parameters={[{"name": "left_arm_config", "val": ": RebotB601FollowerConfig"}, {"name": "right_arm_config", "val": ": RebotB601FollowerConfig"}, {"name": "cameras", "val": ": dict = <factory>"}, {"name": "id", "val": ": str | None = None"}, {"name": "calibration_dir", "val": ": pathlib.Path | None = None"}]}>
+</Docstring>
+Configuration class for the bimanual reBot B601-DM follower robot.
+
+</div>
+
+## EarthRoverMiniPlus[[lerobot.robots.earthrover_mini_plus.EarthRoverMiniPlus]]
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.earthrover_mini_plus.EarthRoverMiniPlus"} anchor={"lerobot.robots.earthrover_mini_plus.EarthRoverMiniPlus"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/earthrover_mini_plus/robot_earthrover_mini_plus.py#L72"} parameters={[{"name": "config", "val": ": EarthRoverMiniPlusConfig"}]}>
+<paramsdesc>- **config** -- Robot configuration
+- **sdk_base_url** -- Base URL of the Frodobots SDK server, taken from
+  `config.sdk_url` (default: http://localhost:8000)</paramsdesc></Docstring>
+
+EarthRover Mini Plus robot controlled via Frodobots SDK HTTP API.
+
+This robot uses cloud-based control through the Frodobots SDK instead of direct
+hardware connection. Cameras stream via WebRTC through Agora cloud, and control
+commands are sent via HTTP POST requests.
+
+The robot supports:
+- Dual cameras (front and rear) accessed via SDK HTTP endpoints
+- Linear and angular velocity control
+- Battery and orientation telemetry
+
+
+
+
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"calibrate"} anchor={"lerobot.robots.earthrover_mini_plus.EarthRoverMiniPlus.calibrate"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/earthrover_mini_plus/robot_earthrover_mini_plus.py#L152"} parameters={[]}>
+</Docstring>
+Calibration not needed for SDK-based robot.
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"configure"} anchor={"lerobot.robots.earthrover_mini_plus.EarthRoverMiniPlus.configure"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/earthrover_mini_plus/robot_earthrover_mini_plus.py#L165"} parameters={[]}>
+</Docstring>
+Configure robot (no-op for SDK-based robot).
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"connect"} anchor={"lerobot.robots.earthrover_mini_plus.EarthRoverMiniPlus.connect"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/earthrover_mini_plus/robot_earthrover_mini_plus.py#L123"} parameters={[{"name": "calibrate", "val": ": bool = True"}]}>
+<paramsdesc>- **calibrate** -- Not used for SDK-based robot (kept for API compatibility)</paramsdesc><raises>- ``DeviceAlreadyConnectedError`` -- If robot is already connected
+- ``DeviceNotConnectedError`` -- If cannot connect to SDK server</raises><raisederrors>``DeviceAlreadyConnectedError`` or ``DeviceNotConnectedError``</raisederrors></Docstring>
+Connect to robot via Frodobots SDK.
+
+
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"disconnect"} anchor={"lerobot.robots.earthrover_mini_plus.EarthRoverMiniPlus.disconnect"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/earthrover_mini_plus/robot_earthrover_mini_plus.py#L365"} parameters={[]}>
+<raises>- ``DeviceNotConnectedError`` -- If robot is not connected</raises><raisederrors>``DeviceNotConnectedError``</raisederrors></Docstring>
+Disconnect from robot.
+
+Stops the robot and closes connection to SDK.
+
+
+
+
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"get_observation"} anchor={"lerobot.robots.earthrover_mini_plus.EarthRoverMiniPlus.get_observation"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/earthrover_mini_plus/robot_earthrover_mini_plus.py#L247"} parameters={[]}>
+<rettype>RobotObservation</rettype><retdesc>Observation containing:
+- front: Front camera image (480, 640, 3) in RGB format
+- rear: Rear camera image (480, 640, 3) in RGB format
+- speed: float - Current speed (raw SDK value)
+- battery_level: float - Battery level (0-100)
+- orientation: float - Robot orientation in degrees
+- gps_latitude: float - GPS latitude coordinate
+- gps_longitude: float - GPS longitude coordinate
+- gps_signal: float - GPS signal strength (percentage)
+- signal_level: float - Network signal level (0-5)
+- vibration: float - Vibration sensor reading
+- lamp: float - Lamp state (0=off, 1=on)
+- accelerometer_x/y/z: float - Accelerometer axes (raw SDK value)
+- gyroscope_x/y/z: float - Gyroscope axes (raw SDK value)
+- magnetometer_filtered_x/y/z: float - Magnetometer axes (raw SDK value)
+- wheel_rpm_0/1/2/3: float - Wheel RPMs</retdesc><raises>- ``DeviceNotConnectedError`` -- If robot is not connected</raises><raisederrors>``DeviceNotConnectedError``</raisederrors></Docstring>
+Get current robot observation from SDK.
+
+Camera frames are retrieved from SDK endpoints /v2/front and /v2/rear.
+Frames are decoded from base64 and converted from BGR to RGB format.
+Robot telemetry is retrieved from /data endpoint.
+Sensor arrays (accels, gyros, mags, rpms) each contain entries of
+[values..., timestamp]; the latest reading from each array is used.
+
+
+
+
+
+
+
+
+
+Note:
+Camera frames are retrieved from SDK endpoints /v2/front and /v2/rear.
+Frames are decoded from base64 and converted from BGR to RGB format.
+Robot telemetry is retrieved from /data endpoint.
+All SDK values are normalized to appropriate ranges for dataset recording.
+
+
+</div>
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"send_action"} anchor={"lerobot.robots.earthrover_mini_plus.EarthRoverMiniPlus.send_action"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/earthrover_mini_plus/robot_earthrover_mini_plus.py#L333"} parameters={[{"name": "action", "val": ": dict"}]}>
+<paramsdesc>- **action** -- Action dict with keys:
+  - linear_velocity: Target linear velocity (-1 to 1)
+  - angular_velocity: Target angular velocity (-1 to 1)</paramsdesc><rettype>RobotAction</rettype><retdesc>The action that was sent (matches action_features keys)</retdesc><raises>- ``DeviceNotConnectedError`` -- If robot is not connected</raises><raisederrors>``DeviceNotConnectedError``</raisederrors></Docstring>
+Send action to robot via SDK.
+
+
+
+
+
+
+
+
+
+
+
+Note:
+Actions are sent to SDK via POST /control endpoint.
+SDK expects commands in range [-1, 1].
+
+
+</div></div>
+
+<div class="docstring border-l-2 border-t-2 pl-4 pt-3.5 border-gray-100 rounded-tl-xl mb-6 mt-8">
+
+
+<Docstring name={"class lerobot.robots.earthrover_mini_plus.EarthRoverMiniPlusConfig"} anchor={"lerobot.robots.earthrover_mini_plus.EarthRoverMiniPlusConfig"} source={"https://github.com/huggingface/lerobot/blob/main/src/lerobot/robots/earthrover_mini_plus/config_earthrover_mini_plus.py#L25"} parameters={[{"name": "sdk_url", "val": ": str = 'http://localhost:8000'"}, {"name": "id", "val": ": str | None = None"}, {"name": "calibration_dir", "val": ": pathlib.Path | None = None"}]}>
+<paramsdesc>- **sdk_url** -- URL of the Frodobots SDK server (default: http://localhost:8000)</paramsdesc></Docstring>
+Configuration for EarthRover Mini Plus robot using Frodobots SDK.
+
+This robot uses cloud-based control via the Frodobots SDK HTTP API.
+Camera frames are accessed directly through SDK HTTP endpoints.
+
+
+
+
+</div>
+
+<!--HF DOCBUILD BODY END-->
+
+HF_DOC_BODY_END
+

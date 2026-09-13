@@ -1,0 +1,863 @@
+{
+ "file": "api/datasets.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1934,
+   "text": "# Datasets",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1936,
+   "end": 2106,
+   "text": "⟦0⟧ is the format every LeRobot script reads and writes. It is episode-aware, decodes video\nobservations on the fly, and round-trips to the Hugging Face Hub.",
+   "tokens": [
+    "`LeRobotDataset`"
+   ]
+  },
+  {
+   "id": 2,
+   "kind": "para",
+   "start": 2108,
+   "end": 2298,
+   "text": "See [Using LeRobotDataset](⟦0⟧) for the format and the common operations,\n[Porting Large Datasets](⟦1⟧) for migration, and [Tools](⟦2⟧) for the CLI.",
+   "tokens": [
+    "../lerobot-dataset-v3",
+    "../porting_datasets_v3",
+    "../tools"
+   ]
+  },
+  {
+   "id": 3,
+   "kind": "heading",
+   "start": 2300,
+   "end": 2352,
+   "text": "## LeRobotDataset⟦0⟧",
+   "tokens": [
+    "[[lerobot.datasets.LeRobotDataset]]"
+   ]
+  },
+  {
+   "id": 4,
+   "kind": "docfield",
+   "start": 4330,
+   "end": 4629,
+   "text": "⟦0⟧- **frame** -- Dict mapping feature names to their values for this frame.\n  Must include a ⟦1⟧ key. Torch tensors are converted to numpy.⟦2⟧⟦3⟧- ⟦4⟧ -- If the dataset is read-only (no writer).⟦5⟧⟦6⟧⟦7⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "`'task'`",
+    "</paramsdesc>",
+    "<raises>",
+    "`RuntimeError`",
+    "</raises>",
+    "<raisederrors>`RuntimeError`</raisederrors>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 5,
+   "kind": "para",
+   "start": 4630,
+   "end": 4679,
+   "text": "Add a single frame to the current episode buffer.",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "para",
+   "start": 4681,
+   "end": 4790,
+   "text": "Delegates to ⟦0⟧. The dataset must be in\nwrite mode (created via ⟦1⟧ or ⟦2⟧).",
+   "tokens": [
+    "`DatasetWriter.add_frame`",
+    "`create`",
+    "`resume`"
+   ]
+  },
+  {
+   "id": 7,
+   "kind": "docfield",
+   "start": 5182,
+   "end": 5449,
+   "text": "⟦0⟧- **delete_images** -- If ⟦1⟧, also remove temporary image files written\n  to disk for the current episode.⟦2⟧⟦3⟧- ⟦4⟧ -- If the dataset is read-only (no writer).⟦5⟧⟦6⟧⟦7⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "`True`",
+    "</paramsdesc>",
+    "<raises>",
+    "`RuntimeError`",
+    "</raises>",
+    "<raisederrors>`RuntimeError`</raisederrors>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 8,
+   "kind": "para",
+   "start": 5450,
+   "end": 5500,
+   "text": "Discard the current episode buffer without saving.",
+   "tokens": []
+  },
+  {
+   "id": 9,
+   "kind": "para",
+   "start": 5502,
+   "end": 5617,
+   "text": "Delegates to ⟦0⟧. Useful for\ndiscarding a failed or interrupted recording episode.",
+   "tokens": [
+    "`DatasetWriter.clear_episode_buffer`"
+   ]
+  },
+  {
+   "id": 10,
+   "kind": "para",
+   "start": 5964,
+   "end": 6029,
+   "text": "⟦0⟧\nRemove the transform applied to visual observations.",
+   "tokens": [
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 11,
+   "kind": "docfield",
+   "start": 7423,
+   "end": 9190,
+   "text": "⟦0⟧- **repo_id** -- Repository identifier, typically ⟦1⟧.\n- **fps** -- Frames per second used during data collection.\n- **features** -- Feature specification dict mapping feature names to their\n  type/shape metadata.\n- **root** -- Local directory for dataset storage. Defaults to\n  ⟦2⟧.\n- **robot_type** -- Optional robot type string stored in metadata.\n- **use_videos** -- If ⟦3⟧, visual modalities are stored as MP4 videos.\n  If ⟦4⟧, they are stored as images.\n- **tolerance_s** -- Timestamp synchronization tolerance in seconds.\n- **image_writer_processes** -- Number of subprocesses for async image\n  writing. ⟦5⟧ means use threads only.\n- **image_writer_threads** -- Number of threads for async image writing.\n- **video_backend** -- Video decoding backend (used when reading back).\n- **batch_encoding_size** -- Number of episodes to accumulate before\n  batch-encoding videos. ⟦6⟧ means encode immediately.\n- **rgb_encoder** -- Video encoder settings for cameras (codec, quality, etc.).\n  When ⟦7⟧, ⟦8⟧ is used.\n- **depth_encoder** -- Video encoder settings for depth cameras (codec, quality, etc.).\n  When ⟦9⟧, ⟦10⟧ is used.\n- **encoder_threads** -- Number of encoder threads (global). ⟦11⟧\n  lets the codec decide.\n- **metadata_buffer_size** -- Number of episode metadata records to buffer\n  before flushing to parquet.\n- **streaming_encoding** -- If ⟦12⟧, encode video frames in real-time\n  during capture instead of writing images first.\n- **encoder_queue_maxsize** -- Max buffered frames per camera when using\n  streaming encoding.⟦13⟧⟦14⟧A new ⟦15⟧ in write mode.⟦16⟧⟦17⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "`'&amp;lcub;hf_user}/&amp;lcub;dataset_name}'`",
+    "`$HF_LEROBOT_HOME/&amp;lcub;repo_id}`",
+    "`True`",
+    "`False`",
+    "`0`",
+    "`1`",
+    "`None`",
+    "`rgb_encoder_defaults()`",
+    "`None`",
+    "`depth_encoder_defaults()`",
+    "`None`",
+    "`True`",
+    "</paramsdesc>",
+    "<retdesc>",
+    "`LeRobotDataset`",
+    "</retdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 12,
+   "kind": "para",
+   "start": 9191,
+   "end": 9251,
+   "text": "Create a new LeRobotDataset from scratch for recording data.",
+   "tokens": []
+  },
+  {
+   "id": 13,
+   "kind": "para",
+   "start": 9253,
+   "end": 9389,
+   "text": "Returns a write-mode dataset with an active ⟦0⟧. Use\n⟦1⟧ / ⟦2⟧ to populate it, then\n⟦3⟧ when done.",
+   "tokens": [
+    "`DatasetWriter`",
+    "`add_frame`",
+    "`save_episode`",
+    "`finalize`"
+   ]
+  },
+  {
+   "id": 14,
+   "kind": "para",
+   "start": 9706,
+   "end": 9760,
+   "text": "⟦0⟧\nFlush all pending work and close writers.",
+   "tokens": [
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 15,
+   "kind": "para",
+   "start": 9762,
+   "end": 9907,
+   "text": "Must be called after data collection/conversion, otherwise footer metadata\nwon't be written to the parquet files and the dataset will be invalid.",
+   "tokens": []
+  },
+  {
+   "id": 16,
+   "kind": "para",
+   "start": 9909,
+   "end": 10030,
+   "text": "Idempotent — safe to call multiple times.  DatasetWriter.__del__ acts as a\nsafety net if this is never called explicitly.",
+   "tokens": []
+  },
+  {
+   "id": 17,
+   "kind": "para",
+   "start": 10377,
+   "end": 10439,
+   "text": "⟦0⟧\nGet a raw frame without image transforms applied.",
+   "tokens": [
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 18,
+   "kind": "para",
+   "start": 10441,
+   "end": 10589,
+   "text": "Unlike ⟦0⟧, this returns the raw HF dataset row at the given\nindex with no delta-timestamp expansion, video decoding, or image transforms.",
+   "tokens": [
+    "`__getitem__`"
+   ]
+  },
+  {
+   "id": 19,
+   "kind": "para",
+   "start": 10922,
+   "end": 10991,
+   "text": "⟦0⟧\nCheck if there are unsaved frames in the episode buffer.",
+   "tokens": [
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 20,
+   "kind": "docfield",
+   "start": 11781,
+   "end": 12615,
+   "text": "⟦0⟧- **branch** -- Optional branch to push to. Created from the current\n  revision if it does not exist.\n- **tags** -- Optional list of tags for the dataset card.\n- **license** -- License identifier for the dataset card.\n- **tag_version** -- If ⟦1⟧, create a Git tag for the current codebase\n  version.\n- **push_videos** -- If ⟦2⟧, skip uploading the ⟦3⟧ directory.\n- **private** -- If ⟦4⟧, create a private repository. If ⟦5⟧\n  (default), defer to the org default on the Hub (only affects orgs).\n- **allow_patterns** -- Glob pattern(s) restricting which files to upload.\n- **upload_large_folder** -- If ⟦6⟧, use ⟦7⟧ instead\n  of ⟦8⟧ for very large datasets.\n- ****card_kwargs** -- Additional keyword arguments forwarded to dataset card\n  creation.⟦9⟧⟦10⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "`True`",
+    "`False`",
+    "`videos/`",
+    "`True`",
+    "`None`",
+    "`True`",
+    "`upload_large_folder`",
+    "`upload_folder`",
+    "</paramsdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 21,
+   "kind": "para",
+   "start": 12616,
+   "end": 12659,
+   "text": "Upload the dataset to the Hugging Face Hub.",
+   "tokens": []
+  },
+  {
+   "id": 22,
+   "kind": "para",
+   "start": 12661,
+   "end": 12845,
+   "text": "Creates the repository if it does not exist, uploads all dataset files\n(optionally excluding videos), generates a dataset card, and tags the\nrevision with the current codebase version.",
+   "tokens": []
+  },
+  {
+   "id": 23,
+   "kind": "docfield",
+   "start": 14045,
+   "end": 15678,
+   "text": "⟦0⟧- **repo_id** -- Repository identifier of the existing dataset.\n- **root** -- Local directory of the dataset. When provided, Hub downloads\n  are materialized directly into this directory. When omitted,\n  Hub downloads use a revision-safe snapshot cache under\n  ⟦1⟧.\n- **tolerance_s** -- Timestamp synchronization tolerance in seconds.\n- **revision** -- Git revision (branch, tag, or commit hash). Defaults to\n  current codebase version tag.\n- **force_cache_sync** -- If ⟦2⟧, re-download metadata from the Hub even\n  if a local cache exists.\n- **video_backend** -- Video decoding backend for reading back data.\n- **batch_encoding_size** -- Number of episodes to accumulate before\n  batch-encoding videos.\n- **rgb_encoder** -- Video encoder settings for cameras (codec, quality, etc.).\n  When ⟦3⟧, ⟦4⟧ is used.\n- **depth_encoder** -- Video encoder settings for depth cameras (codec, quality, etc.).\n  When ⟦5⟧, ⟦6⟧ is used.\n- **encoder_threads** -- Number of encoder threads (global). ⟦7⟧\n  lets the codec decide.\n- **image_writer_processes** -- Subprocesses for async image writing.\n- **image_writer_threads** -- Threads for async image writing.\n- **streaming_encoding** -- If ⟦8⟧, encode video in real-time during\n  capture.\n- **encoder_queue_maxsize** -- Max buffered frames per camera for streaming.\n- **token** -- Authentication token used if metadata must be downloaded\n  from the Hub. The token is not retained on the dataset instance.⟦9⟧⟦10⟧A ⟦11⟧ in write mode, ready to append episodes.⟦12⟧⟦13⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "`$HF_LEROBOT_HOME/hub`",
+    "`True`",
+    "`None`",
+    "`rgb_encoder_defaults()`",
+    "`None`",
+    "`depth_encoder_defaults()`",
+    "`None`",
+    "`True`",
+    "</paramsdesc>",
+    "<retdesc>",
+    "`LeRobotDataset`",
+    "</retdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 24,
+   "kind": "para",
+   "start": 15679,
+   "end": 15719,
+   "text": "Resume recording on an existing dataset.",
+   "tokens": []
+  },
+  {
+   "id": 25,
+   "kind": "para",
+   "start": 15721,
+   "end": 15931,
+   "text": "Loads metadata from an existing dataset (local or Hub) and creates a\n⟦0⟧ for appending new episodes. The underlying HF\ndataset is not loaded until ⟦1⟧ is called and data is\nsubsequently read.",
+   "tokens": [
+    "`DatasetWriter`",
+    "`finalize`"
+   ]
+  },
+  {
+   "id": 26,
+   "kind": "docfield",
+   "start": 16366,
+   "end": 16764,
+   "text": "⟦0⟧- **episode_data** -- Optional pre-built episode dict. If ⟦1⟧, uses the\n  internal episode buffer populated by ⟦2⟧.\n- **parallel_encoding** -- If ⟦3⟧ and multiple cameras exist, encode\n  videos in parallel using a process pool.⟦4⟧⟦5⟧- ⟦6⟧ -- If the dataset is read-only (no writer).⟦7⟧⟦8⟧⟦9⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "`None`",
+    "`add_frame`",
+    "`True`",
+    "</paramsdesc>",
+    "<raises>",
+    "`RuntimeError`",
+    "</raises>",
+    "<raisederrors>`RuntimeError`</raisederrors>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 27,
+   "kind": "para",
+   "start": 16765,
+   "end": 16805,
+   "text": "Save the current episode buffer to disk.",
+   "tokens": []
+  },
+  {
+   "id": 28,
+   "kind": "para",
+   "start": 16807,
+   "end": 16947,
+   "text": "Delegates to ⟦0⟧. Encodes videos, writes\nparquet data, and updates metadata. The episode buffer is reset afterward.",
+   "tokens": [
+    "`DatasetWriter.save_episode`"
+   ]
+  },
+  {
+   "id": 29,
+   "kind": "para",
+   "start": 17330,
+   "end": 17395,
+   "text": "⟦0⟧\nSelect specific columns from the underlying dataset.",
+   "tokens": [
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 30,
+   "kind": "para",
+   "start": 17397,
+   "end": 17547,
+   "text": "Useful for extracting action sequences during replay without loading all features.\nReturns a ⟦0⟧ containing only the requested columns.",
+   "tokens": [
+    "`datasets.Dataset`"
+   ]
+  },
+  {
+   "id": 31,
+   "kind": "para",
+   "start": 17956,
+   "end": 18022,
+   "text": "⟦0⟧\nReplace the transform applied to visual observations.",
+   "tokens": [
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 32,
+   "kind": "heading",
+   "start": 18038,
+   "end": 18106,
+   "text": "## LeRobotDatasetMetadata⟦0⟧",
+   "tokens": [
+    "[[lerobot.datasets.LeRobotDatasetMetadata]]"
+   ]
+  },
+  {
+   "id": 33,
+   "kind": "para",
+   "start": 18846,
+   "end": 18900,
+   "text": "⟦0⟧\nMetadata container for a LeRobot dataset.",
+   "tokens": [
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 34,
+   "kind": "para",
+   "start": 18902,
+   "end": 19049,
+   "text": "Manages the ⟦0⟧, ⟦1⟧, ⟦2⟧, and\n⟦3⟧ parquet files that describe a dataset's structure, content,\nand statistics.",
+   "tokens": [
+    "`info.json`",
+    "`stats.json`",
+    "`tasks.parquet`",
+    "`episodes/`"
+   ]
+  },
+  {
+   "id": 35,
+   "kind": "docfield",
+   "start": 19874,
+   "end": 20829,
+   "text": "⟦0⟧- **repo_id** -- Repository identifier (e.g. ⟦1⟧).\n- **fps** -- Frames per second used during data collection.\n- **features** -- Feature specification dict mapping feature names to their\n  type/shape metadata.\n- **robot_type** -- Optional robot type string stored in metadata.\n- **root** -- Local directory for the dataset. Defaults to\n  ⟦2⟧. Must not already exist.\n- **use_videos** -- If ⟦3⟧, visual modalities are encoded as MP4 videos.\n- **metadata_buffer_size** -- Number of episode metadata records to buffer\n  before flushing to parquet.\n- **chunks_size** -- Max number of files per chunk directory. ⟦4⟧ uses\n  the default.\n- **data_files_size_in_mb** -- Max parquet file size in MB. ⟦5⟧ uses the\n  default.\n- **video_files_size_in_mb** -- Max video file size in MB. ⟦6⟧ uses the\n  default.⟦7⟧⟦8⟧A new ⟦9⟧ instance.⟦10⟧⟦11⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "`'user/my_dataset'`",
+    "`$HF_LEROBOT_HOME/&amp;lcub;repo_id}`",
+    "`True`",
+    "`None`",
+    "`None`",
+    "`None`",
+    "</paramsdesc>",
+    "<retdesc>",
+    "`LeRobotDatasetMetadata`",
+    "</retdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 36,
+   "kind": "para",
+   "start": 20830,
+   "end": 20885,
+   "text": "Create metadata for a new LeRobot dataset from scratch.",
+   "tokens": []
+  },
+  {
+   "id": 37,
+   "kind": "para",
+   "start": 20887,
+   "end": 21014,
+   "text": "Initializes the ⟦0⟧ file on disk with the provided feature\nschema and dataset settings. No episode data is written yet.",
+   "tokens": [
+    "`info.json`"
+   ]
+  },
+  {
+   "id": 38,
+   "kind": "para",
+   "start": 21354,
+   "end": 21422,
+   "text": "⟦0⟧\nGuarantee metadata is fully loaded for read operations.",
+   "tokens": [
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 39,
+   "kind": "para",
+   "start": 21424,
+   "end": 21583,
+   "text": "Idempotent — when metadata is already in memory this is a single\n⟦0⟧ check.  Call this before transitioning from write to\nread mode on the same instance.",
+   "tokens": [
+    "`is None`"
+   ]
+  },
+  {
+   "id": 40,
+   "kind": "docfield",
+   "start": 22021,
+   "end": 22299,
+   "text": "⟦0⟧- **predicate** -- Predicate over per-episode metadata rows used to select episodes.\n- **candidates** -- Optional list of episode indices to restrict evaluation to.⟦1⟧⟦2⟧List of sorted episode indices that satisfy the predicate.⟦3⟧⟦4⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "</paramsdesc>",
+    "<retdesc>",
+    "</retdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 41,
+   "kind": "para",
+   "start": 22300,
+   "end": 22359,
+   "text": "Filter episodes whose metadata satisfies a given predicate.",
+   "tokens": []
+  },
+  {
+   "id": 42,
+   "kind": "para",
+   "start": 22685,
+   "end": 22749,
+   "text": "⟦0⟧\nFlush metadata buffer and close the parquet writer.",
+   "tokens": [
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 43,
+   "kind": "para",
+   "start": 22751,
+   "end": 22792,
+   "text": "Idempotent — safe to call multiple times.",
+   "tokens": []
+  },
+  {
+   "id": 44,
+   "kind": "docfield",
+   "start": 23134,
+   "end": 23244,
+   "text": "⟦0⟧Dict containing chunks_size, data_files_size_in_mb, and video_files_size_in_mb.⟦1⟧⟦2⟧",
+   "tokens": [
+    "<retdesc>",
+    "</retdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 45,
+   "kind": "para",
+   "start": 23245,
+   "end": 23286,
+   "text": "Get current chunk and file size settings.",
+   "tokens": []
+  },
+  {
+   "id": 46,
+   "kind": "docfield",
+   "start": 23666,
+   "end": 23927,
+   "text": "⟦0⟧- **ep_index** -- Zero-based episode index.⟦1⟧⟦2⟧Path to the parquet file containing this episode's data.⟦3⟧⟦4⟧- ⟦5⟧ -- If ⟦6⟧ is out of range.⟦7⟧⟦8⟧⟦9⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "</paramsdesc>",
+    "<retdesc>",
+    "</retdesc>",
+    "<raises>",
+    "`IndexError`",
+    "`ep_index`",
+    "</raises>",
+    "<raisederrors>`IndexError`</raisederrors>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 47,
+   "kind": "para",
+   "start": 23928,
+   "end": 23994,
+   "text": "Return the relative parquet file path for the given episode index.",
+   "tokens": []
+  },
+  {
+   "id": 48,
+   "kind": "para",
+   "start": 24382,
+   "end": 24504,
+   "text": "Given a task in natural language, returns its task_index if the task already exists in the dataset,\notherwise return None.",
+   "tokens": []
+  },
+  {
+   "id": 49,
+   "kind": "docfield",
+   "start": 24921,
+   "end": 25280,
+   "text": "⟦0⟧- **ep_index** -- Zero-based episode index.\n- **vid_key** -- Feature key identifying the video stream\n  (e.g. ⟦1⟧).⟦2⟧⟦3⟧Path to the video file containing this episode's frames.⟦4⟧⟦5⟧- ⟦6⟧ -- If ⟦7⟧ is out of range.⟦8⟧⟦9⟧⟦10⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "`'observation.images.laptop'`",
+    "</paramsdesc>",
+    "<retdesc>",
+    "</retdesc>",
+    "<raises>",
+    "`IndexError`",
+    "`ep_index`",
+    "</raises>",
+    "<raisederrors>`IndexError`</raisederrors>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 50,
+   "kind": "para",
+   "start": 25281,
+   "end": 25353,
+   "text": "Return the relative video file path for the given episode and video key.",
+   "tokens": []
+  },
+  {
+   "id": 51,
+   "kind": "para",
+   "start": 25744,
+   "end": 25836,
+   "text": "⟦0⟧\nRescale depth feature stats in place from their recorded unit to ⟦1⟧.",
+   "tokens": [
+    "</Docstring>",
+    "`output_unit`"
+   ]
+  },
+  {
+   "id": 52,
+   "kind": "para",
+   "start": 25838,
+   "end": 26078,
+   "text": "Depth stats are stored in the unit the frames were recorded in\n(⟦0⟧), while frames are returned in\n⟦1⟧ on read. This converts the unit-bearing stat entries so\nstats match the frames consumers see.",
+   "tokens": [
+    "`features[key][\"info\"][\"depth_unit\"]`",
+    "`output_unit`"
+   ]
+  },
+  {
+   "id": 53,
+   "kind": "docfield",
+   "start": 26628,
+   "end": 27029,
+   "text": "⟦0⟧- **episode_index** -- Zero-based index of the episode being saved.\n- **episode_length** -- Number of frames in this episode.\n- **episode_tasks** -- List of task descriptions for this episode.\n- **episode_stats** -- Per-feature statistics for this episode.\n- **episode_metadata** -- Additional metadata (chunk/file indices, frame\n  ranges, video timestamps, etc.).⟦1⟧⟦2⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "</paramsdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 54,
+   "kind": "para",
+   "start": 27030,
+   "end": 27097,
+   "text": "Persist episode metadata, update dataset info, and aggregate stats.",
+   "tokens": []
+  },
+  {
+   "id": 55,
+   "kind": "para",
+   "start": 27099,
+   "end": 27293,
+   "text": "Writes the episode's metadata to the buffered parquet writer, increments\nthe total episode/frame counters in ⟦0⟧, and merges the\nepisode's statistics into the running dataset statistics.",
+   "tokens": [
+    "`info.json`"
+   ]
+  },
+  {
+   "id": 56,
+   "kind": "docfield",
+   "start": 27671,
+   "end": 27883,
+   "text": "⟦0⟧- **tasks** -- List of unique task descriptions in natural language.⟦1⟧⟦2⟧- ⟦3⟧ -- If ⟦4⟧ contains duplicates.⟦5⟧⟦6⟧⟦7⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "</paramsdesc>",
+    "<raises>",
+    "`ValueError`",
+    "`tasks`",
+    "</raises>",
+    "<raisederrors>`ValueError`</raisederrors>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 57,
+   "kind": "para",
+   "start": 27884,
+   "end": 27943,
+   "text": "Register tasks for the current episode and persist to disk.",
+   "tokens": []
+  },
+  {
+   "id": 58,
+   "kind": "para",
+   "start": 27945,
+   "end": 28072,
+   "text": "New tasks that do not already exist in the dataset are assigned\nsequential task indices and appended to the tasks parquet file.",
+   "tokens": []
+  },
+  {
+   "id": 59,
+   "kind": "docfield",
+   "start": 28610,
+   "end": 28944,
+   "text": "⟦0⟧- **chunks_size** -- Maximum number of files per chunk directory. If None, keeps current value.\n- **data_files_size_in_mb** -- Maximum size for data parquet files in MB. If None, keeps current value.\n- **video_files_size_in_mb** -- Maximum size for video files in MB. If None, keeps current value.⟦1⟧⟦2⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "</paramsdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 60,
+   "kind": "para",
+   "start": 28945,
+   "end": 29004,
+   "text": "Update chunk and file size settings after dataset creation.",
+   "tokens": []
+  },
+  {
+   "id": 61,
+   "kind": "para",
+   "start": 29006,
+   "end": 29195,
+   "text": "This allows users to customize storage organization without modifying the constructor.\nThese settings control how episodes are chunked and how large files can grow before\ncreating new ones.",
+   "tokens": []
+  },
+  {
+   "id": 62,
+   "kind": "docfield",
+   "start": 29765,
+   "end": 30263,
+   "text": "⟦0⟧- **video_key** -- If provided, only update this video key. Otherwise update\n  all video keys in the dataset.\n- **video_encoder** -- Encoder configuration used to produce the\n  videos. When provided, its fields are recorded as\n  ⟦1⟧ entries alongside the stream-derived\n  ⟦2⟧ entries (see ⟦3⟧).\n- **preserve_keys** -- Keys whose existing values are kept instead of being\n  recomputed. ⟦4⟧ (default) recomputes every key.⟦5⟧⟦6⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "`video.&amp;lt;field>`",
+    "`video.*`",
+    "`get_video_info`",
+    "`None`",
+    "</paramsdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 63,
+   "kind": "para",
+   "start": 30264,
+   "end": 30322,
+   "text": "Populate or refresh per-feature video info in ⟦0⟧.",
+   "tokens": [
+    "`info.json`"
+   ]
+  },
+  {
+   "id": 64,
+   "kind": "para",
+   "start": 30324,
+   "end": 30507,
+   "text": "Warning: this function writes info from first episode videos, implicitly assuming that all videos have\nbeen encoded the same way. Also, this means it assumes the first episode exists.",
+   "tokens": []
+  },
+  {
+   "id": 65,
+   "kind": "para",
+   "start": 30509,
+   "end": 30762,
+   "text": "Always re-probes the videos and overwrites existing info for every recomputed\nkey. ⟦0⟧ lists keys whose existing values must be kept (e.g.\ndata-intrinsic entries like ⟦1⟧ and depth quantization params)\ninstead of being recomputed.",
+   "tokens": [
+    "`preserve_keys`",
+    "`is_depth_map`"
+   ]
+  },
+  {
+   "id": 66,
+   "kind": "heading",
+   "start": 30781,
+   "end": 30843,
+   "text": "## MultiLeRobotDataset⟦0⟧",
+   "tokens": [
+    "[[lerobot.datasets.MultiLeRobotDataset]]"
+   ]
+  },
+  {
+   "id": 67,
+   "kind": "para",
+   "start": 31711,
+   "end": 31786,
+   "text": "⟦0⟧\nA dataset consisting of multiple underlying ⟦1⟧s.",
+   "tokens": [
+    "</Docstring>",
+    "`LeRobotDataset`"
+   ]
+  },
+  {
+   "id": 68,
+   "kind": "para",
+   "start": 31788,
+   "end": 31919,
+   "text": "The underlying ⟦0⟧s are effectively concatenated, and this class adopts much of the API\nstructure of ⟦1⟧.",
+   "tokens": [
+    "`LeRobotDataset`",
+    "`LeRobotDataset`"
+   ]
+  },
+  {
+   "id": 69,
+   "kind": "para",
+   "start": 32257,
+   "end": 32326,
+   "text": "⟦0⟧\nRemove the transform from this dataset and its children.",
+   "tokens": [
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 70,
+   "kind": "para",
+   "start": 32737,
+   "end": 32806,
+   "text": "⟦0⟧\nReplace the transform for this dataset and its children.",
+   "tokens": [
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 71,
+   "kind": "heading",
+   "start": 32822,
+   "end": 32892,
+   "text": "## StreamingLeRobotDataset⟦0⟧",
+   "tokens": [
+    "[[lerobot.datasets.StreamingLeRobotDataset]]"
+   ]
+  },
+  {
+   "id": 72,
+   "kind": "para",
+   "start": 34256,
+   "end": 34312,
+   "text": "⟦0⟧\nLeRobotDataset with streaming capabilities.",
+   "tokens": [
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 73,
+   "kind": "para",
+   "start": 34314,
+   "end": 34602,
+   "text": "This class extends LeRobotDataset to add streaming functionality, allowing data to be streamed\nrather than loaded entirely into memory. This is especially useful for large datasets that may\nnot fit in memory or when you want to quickly explore a dataset without downloading it completely.",
+   "tokens": []
+  },
+  {
+   "id": 74,
+   "kind": "para",
+   "start": 34604,
+   "end": 34812,
+   "text": "The key innovation is using a Backtrackable iterator that maintains a bounded buffer of recent\nitems, allowing us to access previous frames for delta timestamps without loading the entire\ndataset into memory.",
+   "tokens": []
+  },
+  {
+   "id": 75,
+   "kind": "para",
+   "start": 34814,
+   "end": 34822,
+   "text": "Example:",
+   "tokens": []
+  },
+  {
+   "id": 76,
+   "kind": "para",
+   "start": 34901,
+   "end": 34913,
+   "text": "Basic usage:",
+   "tokens": []
+  },
+  {
+   "id": 77,
+   "kind": "para",
+   "start": 36033,
+   "end": 36092,
+   "text": "⟦0⟧\nMakes a frame starting from a dataset iterator",
+   "tokens": [
+    "</Docstring>"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,244 @@
+<script lang="ts">
+import {onMount} from "svelte";
+import Tip from "$lib/Tip.svelte";
+import CopyLLMTxtMenu from "$lib/CopyLLMTxtMenu.svelte";
+import Youtube from "$lib/Youtube.svelte";
+import Docstring from "$lib/Docstring.svelte";
+import CodeBlock from "$lib/CodeBlock.svelte";
+import CodeBlockFw from "$lib/CodeBlockFw.svelte";
+import DocNotebookDropdown from "$lib/DocNotebookDropdown.svelte";
+import CourseFloatingBanner from "$lib/CourseFloatingBanner.svelte";
+import IconCopyLink from "$lib/IconCopyLink.svelte";
+import FrameworkContent from "$lib/FrameworkContent.svelte";
+import Markdown from "$lib/Markdown.svelte";
+import Question from "$lib/Question.svelte";
+import FrameworkSwitchCourse from "$lib/FrameworkSwitchCourse.svelte";
+import InferenceApi from "$lib/InferenceApi.svelte";
+import TokenizersLanguageContent from "$lib/TokenizersLanguageContent.svelte";
+import ExampleCodeBlock from "$lib/ExampleCodeBlock.svelte";
+import Added from "$lib/Added.svelte";
+import Changed from "$lib/Changed.svelte";
+import Deprecated from "$lib/Deprecated.svelte";
+import PipelineIcon from "$lib/PipelineIcon.svelte";
+import PipelineTag from "$lib/PipelineTag.svelte";
+import Heading from "$lib/Heading.svelte";
+import HfOptions from "$lib/HfOptions.svelte";
+import HfOption from "$lib/HfOption.svelte";
+import EditOnGithub from "$lib/EditOnGithub.svelte";
+import InferenceSnippet from "$lib/InferenceSnippet/InferenceSnippet.svelte";
+import MermaidChart from "$lib/MermaidChart.svelte";
+let fw: "pt" | "tf" = "pt";
+onMount(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    fw = urlParams.get("fw") || "pt";
+});
+</script>
+<svelte:head>
+  <meta name="hf:doc:metadata" content={metadata} >
+</svelte:head>
+
+<!--HF DOCBUILD BODY START-->
+
+HF_DOC_BODY_START
+
+<CopyLLMTxtMenu containerStyle="float: right; margin-left: 10px; display: inline-flex; position: relative; z-index: 10;"></CopyLLMTxtMenu>
+
+# RoboCasa365
+
+[RoboCasa365](https://robocasa.ai) 是一个大规模 simulation 框架，用于在日常生活厨房任务中训练和 benchmark **通用机器人**。它提供横跨 2,500 个厨房环境的 365 个多样化操作任务、3,200+ 个物体资产和 600+ 小时的人类 demonstration 数据，运行在 PandaOmron 12 自由度移动机械臂（全向底座上的 Franka 机械臂）上。
+
+- 论文：[RoboCasa: Large-Scale Simulation of Everyday Tasks for Generalist Robots](https://arxiv.org/abs/2406.02523)
+- GitHub：[robocasa/robocasa](https://github.com/robocasa/robocasa)
+- 项目网站：[robocasa.ai](https://robocasa.ai)
+- 预训练 policy：[`lerobot/smolvla_robocasa`](https://huggingface.co/lerobot/smolvla_robocasa)
+- 单任务 dataset (CloseFridge)：[`pepijn223/robocasa_CloseFridge`](https://huggingface.co/datasets/pepijn223/robocasa_CloseFridge)
+
+<img
+  src="https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/lerobot/robocasa-banner.webp"
+  alt="RoboCasa365 benchmark overview"
+  width="85%"
+/>
+
+## 可用任务
+
+RoboCasa365 将其 365 个任务组织为两个系列和三个上游 benchmark 组，LeRobot 将它们作为一等 `--env.task` 快捷方式公开：
+
+| 系列    | 任务 | 描述                                                                     |
+| --------- | ----- | ------------------------------------------------------------------------------- |
+| 原子    | ~65   | 单一技能任务：拾取放置、门/抽屉操作、电器控制 |
+| 组合 | ~300  | 跨 60+ 个类别的多步骤任务：烹饪、清洁、整理等     |
+
+**原子任务示例：** `CloseFridge`、`OpenDrawer`、`OpenCabinet`、`TurnOnMicrowave`、`TurnOffStove`、`NavigateKitchen`、`PickPlaceCounterToStove`。
+
+**组合任务类别：** 烘焙、煮沸、冲泡、切菜、清理餐桌、解冻食物、装洗碗机、泡茶、用微波炉加热食物、洗碗等。
+
+`--env.task` 接受三种形式：
+
+- 单个任务名称（`CloseFridge`）
+- 逗号分隔的列表（`CloseFridge,OpenBlenderLid,PickPlaceCoffee`）
+- benchmark 组快捷方式——`atomic_seen`、`composite_seen`、`composite_unseen`、`pretrain50`、`pretrain100`、`pretrain200`、`pretrain300`——它会自动扩展为上游任务列表并自动设置 dataset `split`（`target` 或 `pretrain`）。
+
+## 安装
+
+RoboCasa 及其依赖项 `robosuite` 未发布到 PyPI，并且 RoboCasa 自己的 `setup.py` 硬编码了 `lerobot==0.3.3`，这与本仓库的 `lerobot` 冲突。因此 LeRobot **不** 公开 `robocasa` 附加项——请以可编辑克隆的方式手动安装这两个软件包（在 `robocasa` 上使用 `--no-deps` 以跳过其被覆盖的 `lerobot` 版本锁定）：
+
+```bash
+# After following the standard LeRobot installation instructions.
+
+git clone https://github.com/robocasa/robocasa.git ~/robocasa
+git clone https://github.com/ARISE-Initiative/robosuite.git ~/robosuite
+pip install -e ~/robocasa --no-deps
+pip install -e ~/robosuite
+
+# Robocasa's runtime deps (the ones its setup.py would have pulled, minus
+# the bad lerobot pin).
+pip install numpy numba scipy mujoco pygame Pillow opencv-python \
+            pyyaml pynput tqdm termcolor imageio h5py lxml hidapi \
+            tianshou gymnasium
+
+python -m robocasa.scripts.setup_macros
+# Lightweight assets (lightwheel object meshes + textures). Enough for
+# the default env out of the box.
+python -m robocasa.scripts.download_kitchen_assets \
+  --type tex tex_generative fixtures_lw objs_lw
+# Optional: full objaverse/aigen registries (~30GB) for richer object
+# variety. Enable at eval time via --env.obj_registries (see below).
+# python -m robocasa.scripts.download_kitchen_assets --type objs_objaverse
+```
+
+<Tip>
+RoboCasa 需要 MuJoCo。在训练或评估之前设置渲染后端：
+
+```bash
+export MUJOCO_GL=egl  # for headless servers (HPC, cloud)
+```
+
+</Tip>
+
+### 物体注册表
+
+默认情况下，环境仅从 `lightwheel` 注册表（即 `--type objs_lw` 随附的内容）采样物体，当 objaverse / aigen 资源包不在磁盘上时，这可避免 `Probabilities contain NaN` 崩溃。如果你已下载完整的资产集，可在运行时启用完整注册表：
+
+```bash
+--env.obj_registries='[objaverse,lightwheel]'
+```
+
+## 评估
+
+下面所有评估片段都与 CI 命令一致（参见 `.github/workflows/benchmark_tests.yml`）。`--rename_map` 参数将 RoboCasa 的原生相机键（`robot0_agentview_left` / `robot0_eye_in_hand` / `robot0_agentview_right`）映射到已发布的 `smolvla_robocasa` policy 训练时所用的三相机（`camera1` / `camera2` / `camera3`）输入布局。
+
+默认情况下，每个任务使用 RoboCasa 注册的 rollout 时长。设置 `--env.episode_length=<steps>` 可将相同的显式时长应用于每个选定的任务。
+
+### 单任务评估（推荐用于快速迭代）
+
+```bash
+lerobot-eval \
+  --policy.path=lerobot/smolvla_robocasa \
+  --env.type=robocasa \
+  --env.task=CloseFridge \
+  --eval.batch_size=1 \
+  --eval.n_episodes=20 \
+  --eval.use_async_envs=false \
+  --policy.device=cuda \
+  '--rename_map={"observation.images.robot0_agentview_left": "observation.images.camera1", "observation.images.robot0_eye_in_hand": "observation.images.camera2", "observation.images.robot0_agentview_right": "observation.images.camera3"}'
+```
+
+### 多任务评估
+
+传入逗号分隔的任务列表：
+
+```bash
+lerobot-eval \
+  --policy.path=lerobot/smolvla_robocasa \
+  --env.type=robocasa \
+  --env.task=CloseFridge,OpenCabinet,OpenDrawer,TurnOnMicrowave,TurnOffStove \
+  --eval.batch_size=1 \
+  --eval.n_episodes=20 \
+  --eval.use_async_envs=false \
+  --policy.device=cuda \
+  '--rename_map={"observation.images.robot0_agentview_left": "observation.images.camera1", "observation.images.robot0_eye_in_hand": "observation.images.camera2", "observation.images.robot0_agentview_right": "observation.images.camera3"}'
+```
+
+### benchmark 组评估
+
+运行整个上游组（例如使用 `split=target` 运行全部 18 个 `atomic_seen` 任务）：
+
+```bash
+lerobot-eval \
+  --policy.path=lerobot/smolvla_robocasa \
+  --env.type=robocasa \
+  --env.task=atomic_seen \
+  --eval.batch_size=1 \
+  --eval.n_episodes=20 \
+  --eval.use_async_envs=false \
+  --policy.device=cuda \
+  '--rename_map={"observation.images.robot0_agentview_left": "observation.images.camera1", "observation.images.robot0_eye_in_hand": "observation.images.camera2", "observation.images.robot0_agentview_right": "observation.images.camera3"}'
+```
+
+### 推荐的评估 episode 数
+
+**每个任务 20 个 episode**，以实现可复现的 benchmark。与已发表结果中使用的协议一致。
+
+## policy 输入和输出
+
+**observation**（原始 RoboCasa 相机名称逐字保留）：
+
+- `observation.state` — 16 维本体感受 state（底座位置、底座四元数、相对 end-effector 位置、相对 end-effector 四元数、gripper qpos）
+- `observation.images.robot0_agentview_left` — 左智能体视图，256×256 HWC uint8
+- `observation.images.robot0_eye_in_hand` — 腕部相机视图，256×256 HWC uint8
+- `observation.images.robot0_agentview_right` — 右智能体视图，256×256 HWC uint8
+
+**action：**
+
+- 在 `Box(-1, 1, shape=(12,))` 中的连续控制——底座运动 (4D) + 控制模式 (1D) + end-effector 位置 (3D) + end-effector 旋转 (3D) + gripper (1D)。
+
+## 训练
+
+### 单任务示例
+
+Hub 上有一个即用型单任务 dataset：
+[`pepijn223/robocasa_CloseFridge`](https://huggingface.co/datasets/pepijn223/robocasa_CloseFridge)。
+
+在 `CloseFridge` 上 fine-tune SmolVLA 基础模型：
+
+```bash
+lerobot-train \
+  --policy.type=smolvla \
+  --policy.repo_id=${HF_USER}/smolvla_robocasa_CloseFridge \
+  --policy.load_vlm_weights=true \
+  --policy.push_to_hub=true \
+  --dataset.repo_id=pepijn223/robocasa_CloseFridge \
+  --env.type=robocasa \
+  --env.task=CloseFridge \
+  --output_dir=./outputs/smolvla_robocasa_CloseFridge \
+  --steps=100000 \
+  --batch_size=4 \
+  --env_eval_freq=5000 \
+  --eval.batch_size=1 \
+  --eval.n_episodes=5 \
+  --save_freq=10000
+```
+
+评估得到的 checkpoint：
+
+```bash
+lerobot-eval \
+  --policy.path=${HF_USER}/smolvla_robocasa_CloseFridge \
+  --env.type=robocasa \
+  --env.task=CloseFridge \
+  --eval.batch_size=1 \
+  --eval.n_episodes=20
+```
+
+## 复现已发表结果
+
+已发布的 checkpoint [`lerobot/smolvla_robocasa`](https://huggingface.co/lerobot/smolvla_robocasa) 使用[评估](#evaluation)一节中的命令进行评估。每个涉及该 benchmark 的 PR，CI 都会运行一个 10 个原子任务的冒烟评估（每个一个 episode），选择不需要 objaverse 资源包的以固定装置为中心的任务。
+
+
+
+<EditOnGithub source="https://github.com/huggingface/lerobot/blob/main/docs/source/robocasa.mdx" />
+
+<!--HF DOCBUILD BODY END-->
+
+HF_DOC_BODY_END
+

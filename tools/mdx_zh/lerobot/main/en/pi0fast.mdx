@@ -1,0 +1,295 @@
+<script lang="ts">
+import {onMount} from "svelte";
+import Tip from "$lib/Tip.svelte";
+import CopyLLMTxtMenu from "$lib/CopyLLMTxtMenu.svelte";
+import Youtube from "$lib/Youtube.svelte";
+import Docstring from "$lib/Docstring.svelte";
+import CodeBlock from "$lib/CodeBlock.svelte";
+import CodeBlockFw from "$lib/CodeBlockFw.svelte";
+import DocNotebookDropdown from "$lib/DocNotebookDropdown.svelte";
+import CourseFloatingBanner from "$lib/CourseFloatingBanner.svelte";
+import IconCopyLink from "$lib/IconCopyLink.svelte";
+import FrameworkContent from "$lib/FrameworkContent.svelte";
+import Markdown from "$lib/Markdown.svelte";
+import Question from "$lib/Question.svelte";
+import FrameworkSwitchCourse from "$lib/FrameworkSwitchCourse.svelte";
+import InferenceApi from "$lib/InferenceApi.svelte";
+import TokenizersLanguageContent from "$lib/TokenizersLanguageContent.svelte";
+import ExampleCodeBlock from "$lib/ExampleCodeBlock.svelte";
+import Added from "$lib/Added.svelte";
+import Changed from "$lib/Changed.svelte";
+import Deprecated from "$lib/Deprecated.svelte";
+import PipelineIcon from "$lib/PipelineIcon.svelte";
+import PipelineTag from "$lib/PipelineTag.svelte";
+import Heading from "$lib/Heading.svelte";
+import HfOptions from "$lib/HfOptions.svelte";
+import HfOption from "$lib/HfOption.svelte";
+import EditOnGithub from "$lib/EditOnGithub.svelte";
+import InferenceSnippet from "$lib/InferenceSnippet/InferenceSnippet.svelte";
+import MermaidChart from "$lib/MermaidChart.svelte";
+let fw: "pt" | "tf" = "pt";
+onMount(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    fw = urlParams.get("fw") || "pt";
+});
+</script>
+<svelte:head>
+  <meta name="hf:doc:metadata" content={metadata} >
+</svelte:head>
+
+<!--HF DOCBUILD BODY START-->
+
+HF_DOC_BODY_START
+
+<CopyLLMTxtMenu containerStyle="float: right; margin-left: 10px; display: inline-flex; position: relative; z-index: 10;"></CopyLLMTxtMenu>
+
+# π₀-FAST (Pi0-FAST)
+
+π₀-FAST 是一个**面向通用机器人控制的视觉-语言-action 模型**，它使用自回归下一 token 预测来对连续的机器人 action 建模。
+
+## 模型概览
+
+π₀-FAST 将视觉-语言模型的强大能力与一种新颖的 action 标记化方法 **FAST（频域 action sequence 标记化）** 相结合。这使得可以在高度灵巧的任务上训练自回归 VLA，而这些任务使用标准的基于分箱的离散化是不可能完成的，同时训练速度比 π₀ 等基于扩散的方法**快达 5 倍**。
+
+<img
+  src="https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/lerobot/lerobot-pifast.png"
+  alt="An overview of Pi0-FAST"
+  width="85%"
+/>
+
+### 为什么使用 FAST？
+
+机器人 action 标记化的标准方法使用简单的逐维、逐时间步分箱方案。虽然对简单行为尚可，但对于需要精确性和高频控制的复杂灵巧技能，这种方案会迅速失效。
+
+FAST 通过使用信号处理技术压缩 action sequence 来解决这一问题，得到一串密集的 action token 序列，可以像语言 token 一样进行自回归预测。
+
+### FAST 标记化的工作原理
+
+FAST 分词器通过以下步骤压缩 action sequence：
+
+1. **归一化**：取一个形状为 `(H, D)` 的连续 action chunk，其中 `H` 是时间跨度，`D` 是 action 维度。使用受支持的归一化方法之一进行归一化（推荐使用 Quantiles 以处理离群值）。
+
+2. **离散余弦变换 (DCT)**：对每个 action 维度分别应用 DCT（通过 scipy）。DCT 是一种常用于图像和音频编解码器（JPEG、MP3）的压缩算法。
+
+3. **量化**：对每个 action 维度取整并移除不重要的系数，生成稀疏的频率矩阵。
+
+4. **展平**：将矩阵展平为一维向量，低频分量在前。
+
+5. **字节对编码 (BPE)**：训练一个 BPE 分词器，将 DCT 系数压缩为密集的 action token，相比先前的标记化方法通常可实现 **10 倍压缩**。
+
+这种方法可以通过训练**任何现有 VLM** 预测这些 FAST token，将其转变为 VLA。
+
+## 安装要求
+
+1. 按照我们的[安装指南](./installation)安装 LeRobot。
+2. 运行以下命令安装 π₀-FAST 依赖：
+
+   ```bash
+   pip install -e ".[pi]"
+   ```
+
+## 训练自定义 FAST 分词器
+
+对于 FAST 分词器，你有两个选项：
+
+1. **使用预训练分词器**：`lerobot/fast-action-tokenizer` 分词器在 100 万+ 真实机器人 action sequence 上训练，可作为通用分词器使用。
+
+2. **训练你自己的分词器**：为了在你的特定 dataset 上获得最佳性能，你可以在自己的数据上 fine-tune 分词器。
+
+### 训练你自己的分词器
+
+```bash
+lerobot-train-tokenizer \
+    --repo_id "user/my-lerobot-dataset" \
+    --action_horizon 10 \
+    --encoded_dims "0:6" \
+    --vocab_size 1024 \
+    --scale 10.0 \
+    --normalization_mode QUANTILES \
+    --output_dir "./my_fast_tokenizer" \
+    --push_to_hub \
+    --hub_repo_id "username/my-action-tokenizer"
+```
+
+### 关键分词器参数
+
+| 参数              | 描述                                                                       | 默认值      |
+| ---------------------- | --------------------------------------------------------------------------------- | ------------ |
+| `--repo_id`            | LeRobot dataset 仓库 ID                                                     | 必填     |
+| `--action_horizon`     | 每个 action chunk 中的未来 action 数量                                            | `10`         |
+| `--encoded_dims`       | 要编码的逗号分隔维度范围（例如 `"0:6,7:23"`）                   | `"0:6,7:23"` |
+| `--vocab_size`         | BPE 词表大小                                                               | `1024`       |
+| `--scale`              | 用于量化的 DCT 缩放因子                                               | `10.0`       |
+| `--normalization_mode` | 归一化模式（`MEAN_STD`、`MIN_MAX`、`QUANTILES`、`QUANTILE10`、`IDENTITY`） | `QUANTILES`  |
+| `--sample_fraction`    | 每个 episode 采样的 action chunk 比例                                          | `0.1`        |
+
+## 用法
+
+要在 LeRobot 中使用 π₀-FAST，请将 policy 类型指定为：
+
+```python
+policy.type=pi0_fast
+```
+
+## 训练
+
+要训练 π₀-FAST，你可以使用 LeRobot 训练脚本：
+
+```bash
+lerobot-train \
+    --dataset.repo_id=your_dataset \
+    --policy.type=pi0_fast \
+    --output_dir=./outputs/pi0fast_training \
+    --job_name=pi0fast_training \
+    --policy.pretrained_path=lerobot/pi0fast-base \
+    --policy.dtype=bfloat16 \
+    --policy.gradient_checkpointing=true \
+    --policy.chunk_size=10 \
+    --policy.n_action_steps=10 \
+    --policy.max_action_tokens=256 \
+    --steps=100000 \
+    --batch_size=4 \
+    --policy.device=cuda
+```
+
+### 关键训练参数
+
+| 参数                              | 描述                                        | 默认值                         |
+| -------------------------------------- | -------------------------------------------------- | ------------------------------- |
+| `--policy.gradient_checkpointing=true` | 在训练期间显著降低内存占用 | `false`                         |
+| `--policy.dtype=bfloat16`              | 使用混合精度训练以提高效率        | `float32`                       |
+| `--policy.chunk_size`                  | 要预测的 action 步数（action 时间跨度） | `50`                            |
+| `--policy.n_action_steps`              | 要执行的 action 步数                  | `50`                            |
+| `--policy.max_action_tokens`           | 每个 action chunk 的 FAST token 最大数量     | `256`                           |
+| `--policy.action_tokenizer_name`       | 要使用的 FAST 分词器                              | `lerobot/fast-action-tokenizer` |
+| `--policy.compile_model=true`          | 启用 torch.compile 以加快训练           | `false`                         |
+
+## inference
+
+### 用于快速 inference 的 KV 缓存
+
+π₀-FAST 支持 **KV 缓存**，这是 LLM inference 中广泛使用的优化。它缓存注意力机制中的键值对，避免自回归解码期间的冗余计算。
+
+```python
+# KV-caching is enabled by default
+policy.use_kv_cache=true
+```
+
+### inference 示例
+
+```python
+from lerobot.policies.pi0_fast import PI0FastPolicy, PI0FastConfig
+
+# Load the policy
+policy = PI0FastPolicy.from_pretrained("your-model-path")
+
+# During inference
+actions = policy.predict_action_chunk(batch)
+```
+
+## 模型架构
+
+π₀-FAST 使用基于 PaliGemma 的架构：
+
+- **视觉编码器**：用于图像理解的 SigLIP 视觉塔
+- **语言模型**：Gemma 2B，用于处理语言指令并预测 action token
+
+该模型以图像、文本指令和机器人 state 为输入，输出离散的 FAST token，再解码回连续 action。
+
+## 配置选项
+
+| 参数            | 描述                                     | 默认值    |
+| -------------------- | ----------------------------------------------- | ---------- |
+| `paligemma_variant`  | VLM 主干变体（`gemma_300m`、`gemma_2b`） | `gemma_2b` |
+| `max_state_dim`      | 最大 state vector 维度（填充后）         | `32`       |
+| `max_action_dim`     | 最大 action 向量维度（填充后）        | `32`       |
+| `temperature`        | 采样温度（0.0 表示贪心）           | `0.0`      |
+| `max_decoding_steps` | 最大解码步数                          | `256`      |
+| `use_kv_cache`       | 启用 KV 缓存以加快 inference          | `true`     |
+
+## 与 π₀ 的比较
+
+| 特性               | π₀                        | π₀-FAST                      |
+| --------------------- | ------------------------- | ---------------------------- |
+| action representation | 流匹配（扩散） | 自回归 token（FAST） |
+| 训练速度        | 1x                        | **快 5 倍**                |
+| 灵巧度             | 高                      | 高                         |
+| inference 方法      | 迭代去噪       | 自回归解码      |
+| KV 缓存            | 不适用                       | 支持                    |
+
+## 复现 π₀Fast 结果
+
+我们使用 LeRobot 实现复现 π₀Fast 在 LIBERO benchmark 上的结果。我们采用 LeRobot PiFast 基础模型 [lerobot/pi0fast-base](https://huggingface.co/lerobot/pi0fast-base)，并使用 [HuggingFace LIBERO dataset](https://huggingface.co/datasets/HuggingFaceVLA/libero)在 8 块 H100 GPU 上以 bfloat16、批次大小 256 额外 fine-tune 40k 步。
+
+fine-tune 后的模型见此处：
+
+- **π₀Fast LIBERO**：[lerobot/pi0fast-libero](https://huggingface.co/lerobot/pi0fast-libero)
+
+使用以下训练命令：
+
+```bash
+lerobot-train \
+  --dataset.repo_id=lerobot/libero \
+  --output_dir=outputs/libero_pi0fast \
+  --job_name=libero_pi0fast \
+  --policy.path=lerobot/pi0fast-base \
+  --policy.dtype=bfloat16 \
+  --steps=100000 \
+  --save_freq=20000 \
+  --batch_size=4 \
+  --policy.device=cuda \
+  --policy.scheduler_warmup_steps=4000 \
+  --policy.scheduler_decay_steps=100000 \
+  --policy.scheduler_decay_lr=1e-5 \
+  --policy.gradient_checkpointing=true \
+  --policy.chunk_size=10 \
+  --policy.n_action_steps=10 \
+  --policy.max_action_tokens=256 \
+  --policy.empty_cameras=1 \
+```
+
+然后我们使用 LeRobot LIBERO 实现评估 fine-tune 后的模型，运行以下命令：
+
+```bash
+tasks="libero_object,libero_spatial,libero_goal,libero_10"
+lerobot-eval \
+  --policy.path=lerobot/pi0fast-libero \
+  --policy.max_action_tokens=256 \
+  --env.type=libero \
+  --policy.gradient_checkpointing=false \
+  --env.task=${tasks} \
+  --eval.batch_size=1 \
+  --eval.n_episodes=1 \
+  --rename_map='{"observation.images.image":"observation.images.base_0_rgb","observation.images.image2":"observation.images.left_wrist_0_rgb"}'
+```
+
+**注意：**我们设置 `n_action_steps=10`，与原始 OpenPI 实现类似。
+
+### 结果
+
+我们在 LIBERO benchmark 上得到以下结果：
+
+| 模型       | LIBERO Spatial | LIBERO Object | LIBERO Goal | LIBERO 10 | 平均  |
+| ----------- | -------------- | ------------- | ----------- | --------- | -------- |
+| **π₀-fast** | 70.0           | 100.0         | 100.0       | 60.0      | **82.5** |
+
+完整的评估输出文件夹（包括视频）见[此处](https://drive.google.com/drive/folders/1HXpwPTRm4hx6g1sF2P7OOqGG0TwPU7LQ?usp=sharing)
+
+## 许可证
+
+本模型遵循 **Apache 2.0 许可证**，与原始 [OpenPI 仓库](https://github.com/Physical-Intelligence/openpi)一致。
+
+## 参考资料
+
+- [FAST: Efficient Robot Action Tokenization](https://www.physicalintelligence.company/research/fast) - Physical Intelligence 博客
+- [OpenPI 仓库](https://github.com/Physical-Intelligence/openpi) - 原始实现
+- [Hugging Face 上的 FAST 分词器](https://huggingface.co/physical-intelligence/fast) - 预训练分词器
+
+
+
+<EditOnGithub source="https://github.com/huggingface/lerobot/blob/main/docs/source/pi0fast.mdx" />
+
+<!--HF DOCBUILD BODY END-->
+
+HF_DOC_BODY_END
+

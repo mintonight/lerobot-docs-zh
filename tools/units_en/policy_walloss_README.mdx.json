@@ -1,0 +1,143 @@
+{
+ "file": "policy_walloss_README.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1934,
+   "text": "# WALL-OSS",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1936,
+   "end": 2190,
+   "text": "This repository contains the Hugging Face port of [**WALL-OSS**](⟦0⟧), a Vision-Language-Action model for cross-embodiment robotic control based on Qwen2.5-VL with flow matching/FAST action prediction.",
+   "tokens": [
+    "https://x2robot.com/en/research/68bc2cde8497d7f238dde690"
+   ]
+  },
+  {
+   "id": 2,
+   "kind": "heading",
+   "start": 2197,
+   "end": 2214,
+   "text": "## Model Overview",
+   "tokens": []
+  },
+  {
+   "id": 3,
+   "kind": "table",
+   "start": 2216,
+   "end": 2294,
+   "text": "| Feature            | Description                                           |",
+   "tokens": []
+  },
+  {
+   "id": 4,
+   "kind": "table",
+   "start": 2374,
+   "end": 2452,
+   "text": "| Base Model         | Qwen2.5-VL (Vision-Language Model)                    |",
+   "tokens": []
+  },
+  {
+   "id": 5,
+   "kind": "table",
+   "start": 2453,
+   "end": 2531,
+   "text": "| Action Prediction  | Flow Matching (diffusion) or FAST (discrete tokens)   |",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "table",
+   "start": 2532,
+   "end": 2610,
+   "text": "| Architecture       | Mixture of Experts (MoE) with action-specific routing |",
+   "tokens": []
+  },
+  {
+   "id": 7,
+   "kind": "table",
+   "start": 2611,
+   "end": 2689,
+   "text": "| Multi-Modal Inputs | Vision (images/videos), Language, Proprioception      |",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "heading",
+   "start": 2696,
+   "end": 2719,
+   "text": "## Additional Resources",
+   "tokens": []
+  },
+  {
+   "id": 9,
+   "kind": "para",
+   "start": 2721,
+   "end": 2760,
+   "text": "Paper: ⟦0⟧",
+   "tokens": [
+    "https://arxiv.org/pdf/2509.11766"
+   ]
+  },
+  {
+   "id": 10,
+   "kind": "para",
+   "start": 2762,
+   "end": 2823,
+   "text": "Official Repository: ⟦0⟧",
+   "tokens": [
+    "https://github.com/X-Square-Robot/wall-x"
+   ]
+  },
+  {
+   "id": 11,
+   "kind": "para",
+   "start": 2825,
+   "end": 2876,
+   "text": "Hugging Face: ⟦0⟧",
+   "tokens": [
+    "https://huggingface.co/x-square-robot"
+   ]
+  },
+  {
+   "id": 12,
+   "kind": "heading",
+   "start": 2883,
+   "end": 2894,
+   "text": "## Citation",
+   "tokens": []
+  },
+  {
+   "id": 13,
+   "kind": "para",
+   "start": 2896,
+   "end": 2930,
+   "text": "If you use this work, please cite:",
+   "tokens": []
+  },
+  {
+   "id": 14,
+   "kind": "heading",
+   "start": 3425,
+   "end": 3435,
+   "text": "## License",
+   "tokens": []
+  },
+  {
+   "id": 15,
+   "kind": "para",
+   "start": 3437,
+   "end": 3574,
+   "text": "This model follows the **Apache 2.0 License**, consistent with the original [WallX repository](⟦0⟧).",
+   "tokens": [
+    "https://github.com/X-Square-Robot/wall-x"
+   ]
+  }
+ ]
+}

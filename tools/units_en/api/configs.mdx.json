@@ -1,0 +1,106 @@
+{
+ "file": "api/configs.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1939,
+   "text": "# Configuration",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1941,
+   "end": 2145,
+   "text": "LeRobot configuration is plain dataclasses parsed by [draccus](⟦0⟧), so every\nfield is settable from the CLI. ⟦1⟧ is the top-level object for ⟦2⟧.",
+   "tokens": [
+    "https://github.com/dlwh/draccus",
+    "`TrainPipelineConfig`",
+    "`lerobot-train`"
+   ]
+  },
+  {
+   "id": 2,
+   "kind": "para",
+   "start": 2147,
+   "end": 2348,
+   "text": "Polymorphic configs (policies, robots, environments) use ⟦0⟧: a subclass registers\nitself with ⟦1⟧ and is then selectable by that name on the command line.",
+   "tokens": [
+    "`draccus.ChoiceRegistry`",
+    "`@register_subclass(\"name\")`"
+   ]
+  },
+  {
+   "id": 3,
+   "kind": "heading",
+   "start": 2350,
+   "end": 2417,
+   "text": "## TrainPipelineConfig⟦0⟧",
+   "tokens": [
+    "[[lerobot.configs.train.TrainPipelineConfig]]"
+   ]
+  },
+  {
+   "id": 4,
+   "kind": "heading",
+   "start": 5001,
+   "end": 5056,
+   "text": "## PreTrainedConfig⟦0⟧",
+   "tokens": [
+    "[[lerobot.configs.PreTrainedConfig]]"
+   ]
+  },
+  {
+   "id": 5,
+   "kind": "docfield",
+   "start": 6161,
+   "end": 6986,
+   "text": "⟦0⟧- **n_obs_steps** -- Number of environment steps worth of observations to pass to the policy (takes the\n  current step and additional steps going back).\n- **input_features** -- A dictionary defining the PolicyFeature of the input data for the policy. The key represents\n  the input data name, and the value is PolicyFeature, which consists of FeatureType and shape attributes.\n- **output_features** -- A dictionary defining the PolicyFeature of the output data for the policy. The key represents\n  the output data name, and the value is PolicyFeature, which consists of FeatureType and shape attributes.\n- **normalization_mapping** -- A dictionary that maps from a str value of FeatureType (e.g., \"STATE\", \"VISUAL\") to\n  a corresponding NormalizationMode (e.g., NormalizationMode.MIN_MAX)⟦1⟧⟦2⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "</paramsdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 6,
+   "kind": "para",
+   "start": 6988,
+   "end": 7031,
+   "text": "Base configuration class for policy models.",
+   "tokens": []
+  },
+  {
+   "id": 7,
+   "kind": "heading",
+   "start": 7044,
+   "end": 7093,
+   "text": "## DatasetConfig⟦0⟧",
+   "tokens": [
+    "[[lerobot.configs.DatasetConfig]]"
+   ]
+  },
+  {
+   "id": 8,
+   "kind": "heading",
+   "start": 8125,
+   "end": 8168,
+   "text": "## EvalConfig⟦0⟧",
+   "tokens": [
+    "[[lerobot.configs.EvalConfig]]"
+   ]
+  },
+  {
+   "id": 9,
+   "kind": "heading",
+   "start": 8801,
+   "end": 8846,
+   "text": "## WandBConfig⟦0⟧",
+   "tokens": [
+    "[[lerobot.configs.WandBConfig]]"
+   ]
+  }
+ ]
+}

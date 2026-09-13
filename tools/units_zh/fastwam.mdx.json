@@ -1,0 +1,237 @@
+{
+ "file": "fastwam.mdx",
+ "units": [
+  {
+   "id": 0,
+   "zh": "# FastWAM"
+  },
+  {
+   "id": 1,
+   "zh": "FastWAM 是一个用于机器人控制的世界 action 模型（World Action Model）policy。LeRobot 集成通过标准 policy API 暴露 FastWAM，因此可以用 ⟦0⟧ 配置、用 ⟦1⟧ 训练，并通过 LeRobot 预训练 policy 接口加载。"
+  },
+  {
+   "id": 2,
+   "zh": "## 模型概览"
+  },
+  {
+   "id": 3,
+   "zh": "FastWAM 在训练期间保留视频建模，但在 inference 时直接预测 action，而不是迭代生成未来 observation。这个 LeRobot policy 封装了 FastWAM action 模型，将 LeRobot 批次适配为 FastWAM 训练样本，并提供用于归一化和 action 后处理的标准处理器流水线。"
+  },
+  {
+   "id": 4,
+   "zh": "该实现默认从 ⟦0⟧ 初始化视觉世界模型组件，并预测形状为 ⟦1⟧ 的 action chunk。"
+  },
+  {
+   "id": 5,
+   "zh": "### LeRobot 集成涵盖的内容"
+  },
+  {
+   "id": 6,
+   "zh": "- 通过 LeRobot 进行标准 ⟦0⟧ 配置"
+  },
+  {
+   "id": 7,
+   "zh": "- 图像、state、action 和语言任务批次适配"
+  },
+  {
+   "id": 8,
+   "zh": "- 通过 ⟦0⟧ 和 ⟦1⟧ 进行 action chunk inference"
+  },
+  {
+   "id": 9,
+   "zh": "- 通过 LeRobot policy API 保存/加载 checkpoint"
+  },
+  {
+   "id": 10,
+   "zh": "- 可配置的 LIBERO gripper action 后处理"
+  },
+  {
+   "id": 11,
+   "zh": "## 安装要求"
+  },
+  {
+   "id": 12,
+   "zh": "从源码安装 LeRobot，然后安装 FastWAM 依赖："
+  },
+  {
+   "id": 13,
+   "zh": "这会从 ⟦0⟧ 安装 FastWAM policy 可选项：⟦1⟧、\n⟦2⟧、⟦3⟧ 和 ⟦4⟧，以及 LeRobot 的基础依赖。"
+  },
+  {
+   "id": 14,
+   "zh": "对于 LIBERO 评估，还需安装 benchmark 依赖："
+  },
+  {
+   "id": 15,
+   "zh": "这会安装两个可选项。除上述 FastWAM 依赖外，\n⟦0⟧ 可选项还会安装 LeRobot dataset 依赖、Linux 上的 ⟦1⟧，以及\n⟦2⟧。"
+  },
+  {
+   "id": 16,
+   "zh": "FastWAM 使用 Wan2.2 TI2V 主干。默认模型 id 为："
+  },
+  {
+   "id": 17,
+   "zh": "## 数据要求"
+  },
+  {
+   "id": 18,
+   "zh": "FastWAM 期望一个 LeRobot dataset，包含："
+  },
+  {
+   "id": 19,
+   "zh": "- 一个或多个视觉 observation，其宽度拼接后等于 ⟦0⟧"
+  },
+  {
+   "id": 20,
+   "zh": "- 当 ⟦1⟧ 不为 ⟦2⟧ 时的 ⟦0⟧"
+  },
+  {
+   "id": 21,
+   "zh": "- 通过 dataset task 字段提供的语言任务指令，或预计算的 ⟦0⟧ 和 ⟦1⟧ 张量"
+  },
+  {
+   "id": 22,
+   "zh": "默认视觉设置为一个名为 ⟦0⟧、形状为 ⟦1⟧ 的图像特征。如果 dataset 使用两个相机，请配置 ⟦2⟧，使其高度都匹配 ⟦3⟧，宽度之和为 ⟦4⟧。"
+  },
+  {
+   "id": 23,
+   "zh": "## 用法"
+  },
+  {
+   "id": 24,
+   "zh": "使用以下命令创建新的 FastWAM policy："
+  },
+  {
+   "id": 25,
+   "zh": "使用以下命令在 LIBERO-10 上评估现有的 LeRobot 格式 checkpoint："
+  },
+  {
+   "id": 26,
+   "zh": "对于 ⟦0⟧、⟦1⟧ 和 ⟦2⟧，请使用\n⟦3⟧。"
+  },
+  {
+   "id": 27,
+   "zh": "对于真实机器人 rollout，使用相同的 checkpoint 路径："
+  },
+  {
+   "id": 28,
+   "zh": "## 配置说明"
+  },
+  {
+   "id": 29,
+   "zh": "### 图像特征"
+  },
+  {
+   "id": 30,
+   "zh": "⟦0⟧ 是拼接后的 FastWAM 图像张量的尺寸，形如 ⟦1⟧。每个配置的图像特征必须具有形状 ⟦2⟧，且所有相机宽度之和必须等于所配置的宽度。"
+  },
+  {
+   "id": 31,
+   "zh": "### action chunking"
+  },
+  {
+   "id": 32,
+   "zh": "⟦0⟧ 控制训练期间监督、inference 期间预测的未来 action 数量。⟦1⟧ 控制 policy 预测新 action chunk 之前会消费多少个 action。⟦2⟧ 必须小于或等于 ⟦3⟧。"
+  },
+  {
+   "id": 33,
+   "zh": "### Wan 组件"
+  },
+  {
+   "id": 34,
+   "zh": "FastWAM 从配置的 Wan 模型目录或 Hugging Face Hub 模型 id 加载 Wan VAE、视频 DiT、文本编码器和分词器。由 ⟦0⟧ 保存的 LeRobot 格式 FastWAM checkpoint 还会复制 ⟦1⟧ 所需的本地 Wan 组件文件。"
+  },
+  {
+   "id": 35,
+   "zh": "### 注意力后端"
+  },
+  {
+   "id": 36,
+   "zh": "FastWAM 的 DiT 对所有注意力都使用 PyTorch 的 ⟦0⟧（SDPA）。它**不**使用 FlashAttention：其 Transformer 混合（MoT）路由需要任意的布尔 ⟦1⟧ 注意力掩码，而 FlashAttention 的 varlen API 无法表达。因此安装 ⟦2⟧ 包对 FastWAM 路径没有影响。（注意，SDPA 本身仍可能在内部选择 PyTorch 自带的 flash / 内存高效 / math 内核——这与 ⟦3⟧ 包无关。）"
+  },
+  {
+   "id": 37,
+   "zh": "### 编译后的 action inference"
+  },
+  {
+   "id": 38,
+   "zh": "FastWAM 可以编译其视频预填充和缓存的 action 去噪计算图，以减少\n重复 inference 步骤中的 Python 和 CUDA 内核启动开销："
+  },
+  {
+   "id": 39,
+   "zh": "该选项默认禁用。首次 action prediction 会针对当前输入形状编译计算图，因此较慢；\n后续相同形状的预测会复用它。形状变化可能触发重新编译。\n在不支持的 PyTorch 或加速器配置上，仍可使用 eager 路径。"
+  },
+  {
+   "id": 40,
+   "zh": "### LIBERO action 开关"
+  },
+  {
+   "id": 41,
+   "zh": "FastWAM LIBERO checkpoint 默认使用 ⟦0⟧，\n以匹配原始 FastWAM 评估流水线所使用的 gripper action 约定："
+  },
+  {
+   "id": 42,
+   "zh": "## 结果"
+  },
+  {
+   "id": 43,
+   "zh": "使用 [⟦0⟧](⟦1⟧) 在 LIBERO 上评估："
+  },
+  {
+   "id": 44,
+   "zh": "| 套件          | 成功率 | n_episodes |"
+  },
+  {
+   "id": 45,
+   "zh": "| libero_spatial |        97.6% |        500 |"
+  },
+  {
+   "id": 46,
+   "zh": "| libero_object  |        99.0% |        500 |"
+  },
+  {
+   "id": 47,
+   "zh": "| libero_goal    |        95.0% |        500 |"
+  },
+  {
+   "id": 48,
+   "zh": "| libero_10      |        94.0% |        500 |"
+  },
+  {
+   "id": 49,
+   "zh": "| **平均**    |    **96.4%** |       2000 |"
+  },
+  {
+   "id": 50,
+   "zh": "复现：⟦0⟧（1x H20 140 GB）。"
+  },
+  {
+   "id": 51,
+   "zh": "## 参考资料"
+  },
+  {
+   "id": 52,
+   "zh": "- [Fast-WAM 论文](⟦0⟧)"
+  },
+  {
+   "id": 53,
+   "zh": "- [Fast-WAM 项目主页](⟦0⟧)"
+  },
+  {
+   "id": 54,
+   "zh": "- [Fast-WAM 代码](⟦0⟧)"
+  },
+  {
+   "id": 55,
+   "zh": "- [发布的上游 checkpoint](⟦0⟧)"
+  },
+  {
+   "id": 56,
+   "zh": "- [Wan2.2 TI2V 5B](⟦0⟧)"
+  },
+  {
+   "id": 57,
+   "zh": "## 引用"
+  }
+ ]
+}

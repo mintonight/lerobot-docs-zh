@@ -1,0 +1,259 @@
+<script lang="ts">
+import {onMount} from "svelte";
+import Tip from "$lib/Tip.svelte";
+import CopyLLMTxtMenu from "$lib/CopyLLMTxtMenu.svelte";
+import Youtube from "$lib/Youtube.svelte";
+import Docstring from "$lib/Docstring.svelte";
+import CodeBlock from "$lib/CodeBlock.svelte";
+import CodeBlockFw from "$lib/CodeBlockFw.svelte";
+import DocNotebookDropdown from "$lib/DocNotebookDropdown.svelte";
+import CourseFloatingBanner from "$lib/CourseFloatingBanner.svelte";
+import IconCopyLink from "$lib/IconCopyLink.svelte";
+import FrameworkContent from "$lib/FrameworkContent.svelte";
+import Markdown from "$lib/Markdown.svelte";
+import Question from "$lib/Question.svelte";
+import FrameworkSwitchCourse from "$lib/FrameworkSwitchCourse.svelte";
+import InferenceApi from "$lib/InferenceApi.svelte";
+import TokenizersLanguageContent from "$lib/TokenizersLanguageContent.svelte";
+import ExampleCodeBlock from "$lib/ExampleCodeBlock.svelte";
+import Added from "$lib/Added.svelte";
+import Changed from "$lib/Changed.svelte";
+import Deprecated from "$lib/Deprecated.svelte";
+import PipelineIcon from "$lib/PipelineIcon.svelte";
+import PipelineTag from "$lib/PipelineTag.svelte";
+import Heading from "$lib/Heading.svelte";
+import HfOptions from "$lib/HfOptions.svelte";
+import HfOption from "$lib/HfOption.svelte";
+import EditOnGithub from "$lib/EditOnGithub.svelte";
+import InferenceSnippet from "$lib/InferenceSnippet/InferenceSnippet.svelte";
+import MermaidChart from "$lib/MermaidChart.svelte";
+let fw: "pt" | "tf" = "pt";
+onMount(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    fw = urlParams.get("fw") || "pt";
+});
+</script>
+<svelte:head>
+  <meta name="hf:doc:metadata" content={metadata} >
+</svelte:head>
+
+<!--HF DOCBUILD BODY START-->
+
+HF_DOC_BODY_START
+
+<CopyLLMTxtMenu containerStyle="float: right; margin-left: 10px; display: inline-flex; position: relative; z-index: 10;"></CopyLLMTxtMenu>
+
+# OMX
+
+<img
+  src="https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/lerobot/omx_mainimage.png"
+  alt="OMX"
+  width=600
+/>
+
+## 订购并组装零件
+
+首先，按照官方组装指南组装 OMX 硬件。
+
+OMX 组装指南：https://ai.robotis.com/omx/assembly_guide_omx.html
+
+OMX 机器人在出厂时已预先配置好。电机 ID、通信参数和关节偏移都已在出厂时设置完成，因此在使用 LeRobot 之前无需额外的电机设置或 calibration。
+
+## 安装 LeRobot 🤗
+
+要安装 LeRobot，请遵循我们的[安装指南](./installation)
+
+除了这些说明之外，你还需要安装 Dynamixel SDK：
+
+```bash
+pip install -e ".[dynamixel]"
+```
+
+## 连接机器人
+
+要为每个总线舵机适配器查找端口，请运行此脚本：
+
+```bash
+lerobot-find-port
+```
+
+运行此命令，当提示时，断开 leader arm 或 follower arm 的 USB 线缆并按回车。输出将显示 'The port of this MotorsBus is [port]'。这可以识别断开的那条手臂的端口。对另一条手臂重复此操作，以确定两个端口。
+
+<hfoptions id="find_port">
+<hfoption id="Mac">
+
+macOS 上的输出示例：
+
+```
+Finding all available ports for the MotorBus.
+['/dev/tty.usbmodem575E0032081', '/dev/tty.usbmodem575E0031751']
+Remove the USB cable from your MotorsBus and press Enter when done.
+
+[...Disconnect corresponding leader or follower arm and press Enter...]
+
+The port of this MotorsBus is /dev/tty.usbmodem575E0032081
+Reconnect the USB cable.
+```
+
+找到的端口为：`/dev/tty.usbmodem575E0032081`，对应你的 leader arm 或 follower arm。
+
+</hfoption>
+<hfoption id="Linux">
+
+在 Linux 上，我们强烈建议使用 udev 规则为 OMX leader arm 和 follower arm 分配持久且人类可读的设备名称。这可以避免设备名称（如 ttyACM0 和 ttyACM1）在机器人拔下、重新插上或系统重启时发生变化的问题。
+
+#### 1. 找到你的设备序列号
+
+你应该已经使用 `lerobot-find-port` 获得了 leader arm 和 follower arm 类似 ../../ttyACM? 的端口号。你可以使用 `ls -l /dev/serial/by-id/` 命令将这些结果与序列号对应起来。
+要创建 udev 规则，你需要每个 OMX 设备唯一的序列号。最简单的方法是列出以下路径下的设备：
+
+```bash
+ls -l /dev/serial/by-id/
+```
+
+你将看到类似这样的输出：
+
+```bash
+usb-ROBOTIS_OpenRB-150_228BDD7B503059384C2E3120FF0A2B19-if00 -> ../../ttyACM0
+usb-ROBOTIS_OpenRB-150_67E1ED68503059384C2E3120FF092234-if00 -> ../../ttyACM1
+```
+
+在每一行中，序列号是位于 `usb-ROBOTIS_OpenRB-150_` 之后、`-if00` 之前的长字符串。
+
+follower arm 序列号：`228BDD7B503059384C2E3120FF0A2B19`
+
+leader arm 序列号：`67E1ED68503059384C2E3120FF092234`
+
+#### 2. 创建 udev 规则
+
+创建一个新的 udev 规则文件：
+
+```bash
+sudo nano /etc/udev/rules.d/99-omx.rules
+```
+
+粘贴以下行，并将序列号替换为你上面找到的值：
+
+```bash
+SUBSYSTEM=="tty", ATTRS{idVendor}=="0403", ATTRS{serial}=="228BDD7B503059384C2E3120FF0A2B19", SYMLINK+="omx_follower"
+SUBSYSTEM=="tty", ATTRS{idVendor}=="0403", ATTRS{serial}=="67E1ED68503059384C2E3120FF092234", SYMLINK+="omx_leader"
+```
+
+保存文件并重新加载 udev 规则：
+
+```bash
+sudo udevadm control --reload-rules
+sudo udevadm trigger
+```
+
+现在将两个设备各拔下再重新插上一次。
+
+#### 3. 验证符号链接
+
+检查持久化设备名称是否存在：
+
+```bash
+ls -l /dev/omx_follower /dev/omx_leader
+```
+
+你应该看到它们指向 ttyACM\* 设备：
+
+```bash
+/dev/omx_follower -> ttyACM*
+/dev/omx_leader   -> ttyACM*
+```
+
+这些名称在重启和重新连接后保持稳定。
+
+</hfoption>
+</hfoptions>
+
+## teleoperation
+
+确定正确的端口后，你可以直接使用 leader arm teleoperation follower arm。
+
+<hfoptions id="teleoperate">
+<hfoption id="Mac">
+
+### 无相机 teleoperation
+
+```bash
+lerobot-teleoperate \
+  --robot.type=omx_follower \
+  --robot.port=<your_follower_port> \
+  --robot.id=omx_follower_arm \
+  --teleop.type=omx_leader \
+  --teleop.port=<your_leader_port> \
+  --teleop.id=omx_leader_arm
+```
+
+在 teleoperation 过程中，leader arm 的运动会由 follower arm 实时镜像。OMX 已预先配置好，无需任何 calibration 步骤即可立即开始 teleoperation。
+
+### 带相机 teleoperation
+
+你也可以通过为 follower arm 提供相机配置，在 teleoperation 期间启用相机输入。
+
+```bash
+lerobot-teleoperate \
+  --robot.type=omx_follower \
+  --robot.port=<your_follower_port> \
+  --robot.id=omx_follower_arm \
+  --robot.cameras="{front: {type: opencv, index_or_path: '/dev/video0', width: 640, height: 480, fps: 30}}" \
+  --teleop.type=omx_leader \
+  --teleop.port=<your_leader_port> \
+  --teleop.id=omx_leader_arm \
+  --display_data=true
+```
+
+启用相机后，相机画面将实时显示并与机器人 state 同步。此设置适用于视觉监控，也可在之后复用于演示录制和模仿学习。
+
+</hfoption>
+<hfoption id="Linux">
+
+### 无相机 teleoperation
+
+```bash
+lerobot-teleoperate \
+  --robot.type=omx_follower \
+  --robot.port=/dev/omx_follower \
+  --robot.id=omx_follower_arm \
+  --teleop.type=omx_leader \
+  --teleop.port=/dev/omx_leader \
+  --teleop.id=omx_leader_arm
+```
+
+在 teleoperation 过程中，leader arm 的运动会由 follower arm 实时镜像。OMX 已预先配置好，无需任何 calibration 步骤即可立即开始 teleoperation。
+
+### 带相机 teleoperation
+
+你也可以通过为 follower arm 提供相机配置，在 teleoperation 期间启用相机输入。
+
+```bash
+lerobot-teleoperate \
+  --robot.type=omx_follower \
+  --robot.port=/dev/omx_follower \
+  --robot.id=omx_follower_arm \
+  --robot.cameras="{front: {type: opencv, index_or_path: '/dev/video0', width: 640, height: 480, fps: 30}}" \
+  --teleop.type=omx_leader \
+  --teleop.port=/dev/omx_leader \
+  --teleop.id=omx_leader_arm \
+  --display_data=true
+```
+
+启用相机后，相机画面将实时显示并与机器人 state 同步。此设置适用于视觉监控，也可在之后复用于演示录制和模仿学习。
+
+</hfoption>
+</hfoptions>
+
+恭喜 🎉，你的机器人已经准备好自主学习一项任务了。
+
+> 如果你有任何问题或需要帮助，请在 [Discord](https://discord.com/invite/robotis) 上联系我们。
+
+
+
+<EditOnGithub source="https://github.com/huggingface/lerobot/blob/main/docs/source/omx.mdx" />
+
+<!--HF DOCBUILD BODY END-->
+
+HF_DOC_BODY_END
+

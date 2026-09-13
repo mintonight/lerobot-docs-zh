@@ -1,0 +1,767 @@
+{
+ "file": "introduction_processors.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1952,
+   "text": "# Introduction to Processors",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1954,
+   "end": 2408,
+   "text": "In robotics, there's a fundamental mismatch between the data that robots and humans produce and what machine learning models expect.\nRobots output raw sensor data like camera images and joint positions that need normalization, batching, and device placement before models can process them.\nLanguage instructions from humans must be tokenized into numerical representations, and different robots use different coordinate systems that need standardization.",
+   "tokens": []
+  },
+  {
+   "id": 2,
+   "kind": "para",
+   "start": 2410,
+   "end": 2709,
+   "text": "The challenge extends to model outputs as well.\nModels might output end-effector positions while robots need joint-space commands, or teleoperators produce relative movements while robots expect absolute commands.\nModel predictions are often normalized and need conversion back to real-world scales.",
+   "tokens": []
+  },
+  {
+   "id": 3,
+   "kind": "para",
+   "start": 2711,
+   "end": 3010,
+   "text": "Cross-domain translation adds another layer of complexity.\nTraining data from one robot setup needs adaptation for deployment on different hardware, models trained with specific camera configurations must work with new arrangements, and datasets with different naming conventions need harmonization.",
+   "tokens": []
+  },
+  {
+   "id": 4,
+   "kind": "para",
+   "start": 3012,
+   "end": 3317,
+   "text": "**That's where processors come in.** They serve as universal translators that bridge these gaps, ensuring seamless data flow from sensors to models to actuators.\nProcessors handle all the preprocessing and postprocessing steps needed to convert raw environment data into model-ready inputs and vice versa.",
+   "tokens": []
+  },
+  {
+   "id": 5,
+   "kind": "para",
+   "start": 3319,
+   "end": 3378,
+   "text": "This means that your favorite policy can be used like this:",
+   "tokens": []
+  },
+  {
+   "id": 6,
+   "kind": "heading",
+   "start": 4081,
+   "end": 4104,
+   "text": "## What are Processors?",
+   "tokens": []
+  },
+  {
+   "id": 7,
+   "kind": "para",
+   "start": 4106,
+   "end": 4355,
+   "text": "In robotics, data comes in many forms: images from cameras, joint positions from sensors, text instructions from users, and more. Each type of data requires specific transformations before a model can use it effectively. Models need this data to be:",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "list",
+   "start": 4357,
+   "end": 4433,
+   "text": "- **Normalized**: Scaled to appropriate ranges for neural network processing",
+   "tokens": []
+  },
+  {
+   "id": 9,
+   "kind": "list",
+   "start": 4434,
+   "end": 4502,
+   "text": "- **Batched**: Organized with proper dimensions for batch processing",
+   "tokens": []
+  },
+  {
+   "id": 10,
+   "kind": "list",
+   "start": 4503,
+   "end": 4563,
+   "text": "- **Tokenized**: Text converted to numerical representations",
+   "tokens": []
+  },
+  {
+   "id": 11,
+   "kind": "list",
+   "start": 4564,
+   "end": 4622,
+   "text": "- **Device-placed**: Moved to the right hardware (CPU/GPU)",
+   "tokens": []
+  },
+  {
+   "id": 12,
+   "kind": "list",
+   "start": 4623,
+   "end": 4675,
+   "text": "- **Type-converted**: Cast to appropriate data types",
+   "tokens": []
+  },
+  {
+   "id": 13,
+   "kind": "para",
+   "start": 4677,
+   "end": 4905,
+   "text": "Processors handle these transformations through composable, reusable steps that can be chained together into pipelines. Think of them as a modular assembly line where each station performs a specific transformation on your data.",
+   "tokens": []
+  },
+  {
+   "id": 14,
+   "kind": "heading",
+   "start": 4907,
+   "end": 4923,
+   "text": "## Core Concepts",
+   "tokens": []
+  },
+  {
+   "id": 15,
+   "kind": "heading",
+   "start": 4925,
+   "end": 4972,
+   "text": "### EnvTransition: The Universal Data Container",
+   "tokens": []
+  },
+  {
+   "id": 16,
+   "kind": "para",
+   "start": 4974,
+   "end": 5144,
+   "text": "The ⟦0⟧ is the fundamental data structure that flows through all processors.\nIt's a typed dictionary that represents a complete robot-environment interaction:",
+   "tokens": [
+    "`EnvTransition`"
+   ]
+  },
+  {
+   "id": 17,
+   "kind": "list",
+   "start": 5146,
+   "end": 5213,
+   "text": "- **OBSERVATION**: All sensor data (images, states, proprioception)",
+   "tokens": []
+  },
+  {
+   "id": 18,
+   "kind": "list",
+   "start": 5214,
+   "end": 5270,
+   "text": "- **ACTION**: The action to execute or that was executed",
+   "tokens": []
+  },
+  {
+   "id": 19,
+   "kind": "list",
+   "start": 5271,
+   "end": 5314,
+   "text": "- **REWARD**: Reinforcement learning signal",
+   "tokens": []
+  },
+  {
+   "id": 20,
+   "kind": "list",
+   "start": 5315,
+   "end": 5364,
+   "text": "- **DONE/TRUNCATED**: Episode boundary indicators",
+   "tokens": []
+  },
+  {
+   "id": 21,
+   "kind": "list",
+   "start": 5365,
+   "end": 5395,
+   "text": "- **INFO**: Arbitrary metadata",
+   "tokens": []
+  },
+  {
+   "id": 22,
+   "kind": "list",
+   "start": 5396,
+   "end": 5480,
+   "text": "- **COMPLEMENTARY_DATA**: Task descriptions, indices, padding flags, inter-step data",
+   "tokens": []
+  },
+  {
+   "id": 23,
+   "kind": "heading",
+   "start": 5482,
+   "end": 5519,
+   "text": "### ProcessorStep: The Building Block",
+   "tokens": []
+  },
+  {
+   "id": 24,
+   "kind": "para",
+   "start": 5521,
+   "end": 5653,
+   "text": "A ⟦0⟧ is a single transformation unit that processes transitions. It's an abstract base class with two required methods:",
+   "tokens": [
+    "`ProcessorStep`"
+   ]
+  },
+  {
+   "id": 25,
+   "kind": "para",
+   "start": 6252,
+   "end": 6366,
+   "text": "⟦0⟧ is the core of your processor step. It takes an ⟦1⟧ and returns a modified ⟦2⟧.",
+   "tokens": [
+    "`__call__`",
+    "`EnvTransition`",
+    "`EnvTransition`"
+   ]
+  },
+  {
+   "id": 26,
+   "kind": "para",
+   "start": 6368,
+   "end": 6454,
+   "text": "⟦0⟧ is used to declare how this step transforms feature shapes/types.",
+   "tokens": [
+    "`transform_features`"
+   ]
+  },
+  {
+   "id": 27,
+   "kind": "heading",
+   "start": 6456,
+   "end": 6507,
+   "text": "### DataProcessorPipeline: The Generic Orchestrator",
+   "tokens": []
+  },
+  {
+   "id": 28,
+   "kind": "para",
+   "start": 6509,
+   "end": 6605,
+   "text": "The ⟦0⟧ chains multiple ⟦1⟧ instances together:",
+   "tokens": [
+    "`DataProcessorPipeline[TInput, TOutput]`",
+    "`ProcessorStep`"
+   ]
+  },
+  {
+   "id": 29,
+   "kind": "heading",
+   "start": 7053,
+   "end": 7105,
+   "text": "## RobotProcessorPipeline vs PolicyProcessorPipeline",
+   "tokens": []
+  },
+  {
+   "id": 30,
+   "kind": "para",
+   "start": 7107,
+   "end": 7165,
+   "text": "The key distinction is in the data structures they handle:",
+   "tokens": []
+  },
+  {
+   "id": 31,
+   "kind": "table",
+   "start": 7167,
+   "end": 7276,
+   "text": "| Aspect          | RobotProcessorPipeline                       | PolicyProcessorPipeline                  |",
+   "tokens": []
+  },
+  {
+   "id": 32,
+   "kind": "table",
+   "start": 7387,
+   "end": 7496,
+   "text": "| **Input**       | ⟦0⟧ - Individual robot values   | ⟦1⟧ - Batched tensors       |",
+   "tokens": [
+    "`dict[str, Any]`",
+    "`dict[str, Any]`"
+   ]
+  },
+  {
+   "id": 33,
+   "kind": "table",
+   "start": 7497,
+   "end": 7606,
+   "text": "| **Output**      | ⟦0⟧ - Individual robot commands | ⟦1⟧ - Policy predictions      |",
+   "tokens": [
+    "`dict[str, Any]`",
+    "`torch.Tensor`"
+   ]
+  },
+  {
+   "id": 34,
+   "kind": "table",
+   "start": 7607,
+   "end": 7716,
+   "text": "| **Use Case**    | Real-time robot control                      | Model training/inference                 |",
+   "tokens": []
+  },
+  {
+   "id": 35,
+   "kind": "table",
+   "start": 7717,
+   "end": 7826,
+   "text": "| **Data Format** | Unbatched, heterogeneous                     | Batched, homogeneous                     |",
+   "tokens": []
+  },
+  {
+   "id": 36,
+   "kind": "table",
+   "start": 7827,
+   "end": 7936,
+   "text": "| **Examples**    | ⟦0⟧                           | ⟦1⟧ |",
+   "tokens": [
+    "`{\"joint_1\": 0.5}`",
+    "`{\"observation.state\": tensor([[0.5]])}`"
+   ]
+  },
+  {
+   "id": 37,
+   "kind": "para",
+   "start": 7938,
+   "end": 8001,
+   "text": "**Use ⟦0⟧** for robot hardware interfaces:",
+   "tokens": [
+    "`RobotProcessorPipeline`"
+   ]
+  },
+  {
+   "id": 38,
+   "kind": "para",
+   "start": 8373,
+   "end": 8447,
+   "text": "**Use ⟦0⟧** for model training and batch processing:",
+   "tokens": [
+    "`PolicyProcessorPipeline`"
+   ]
+  },
+  {
+   "id": 39,
+   "kind": "heading",
+   "start": 8865,
+   "end": 8887,
+   "text": "## Converter Functions",
+   "tokens": []
+  },
+  {
+   "id": 40,
+   "kind": "para",
+   "start": 8889,
+   "end": 9191,
+   "text": "LeRobot provides converter functions to bridge different data formats in ⟦0⟧. These functions handle the crucial translations between robot hardware data structures, policy model formats, and the internal ⟦1⟧ representation that flows through processor pipelines.",
+   "tokens": [
+    "`lerobot.processor.converters`",
+    "`EnvTransition`"
+   ]
+  },
+  {
+   "id": 41,
+   "kind": "table",
+   "start": 9193,
+   "end": 9293,
+   "text": "| Category                       | Function                      | Description                     |",
+   "tokens": []
+  },
+  {
+   "id": 42,
+   "kind": "table",
+   "start": 9395,
+   "end": 9495,
+   "text": "| **Robot Hardware Converters**  | ⟦0⟧  | Robot dict → EnvTransition      |",
+   "tokens": [
+    "`robot_action_to_transition`"
+   ]
+  },
+  {
+   "id": 43,
+   "kind": "table",
+   "start": 9496,
+   "end": 9596,
+   "text": "|                                | ⟦0⟧   | Robot obs → EnvTransition       |",
+   "tokens": [
+    "`observation_to_transition`"
+   ]
+  },
+  {
+   "id": 44,
+   "kind": "table",
+   "start": 9597,
+   "end": 9697,
+   "text": "|                                | ⟦0⟧  | EnvTransition → Robot dict      |",
+   "tokens": [
+    "`transition_to_robot_action`"
+   ]
+  },
+  {
+   "id": 45,
+   "kind": "table",
+   "start": 9698,
+   "end": 9798,
+   "text": "| **Policy/Training Converters** | ⟦0⟧         | Batch dict → EnvTransition      |",
+   "tokens": [
+    "`batch_to_transition`"
+   ]
+  },
+  {
+   "id": 46,
+   "kind": "table",
+   "start": 9799,
+   "end": 9899,
+   "text": "|                                | ⟦0⟧         | EnvTransition → Batch dict      |",
+   "tokens": [
+    "`transition_to_batch`"
+   ]
+  },
+  {
+   "id": 47,
+   "kind": "table",
+   "start": 9900,
+   "end": 10000,
+   "text": "|                                | ⟦0⟧ | Policy tensor → EnvTransition   |",
+   "tokens": [
+    "`policy_action_to_transition`"
+   ]
+  },
+  {
+   "id": 48,
+   "kind": "table",
+   "start": 10001,
+   "end": 10101,
+   "text": "|                                | ⟦0⟧ | EnvTransition → Policy tensor   |",
+   "tokens": [
+    "`transition_to_policy_action`"
+   ]
+  },
+  {
+   "id": 49,
+   "kind": "table",
+   "start": 10102,
+   "end": 10202,
+   "text": "| **Utilities**                  | ⟦0⟧           | Build transitions with defaults |",
+   "tokens": [
+    "`create_transition`"
+   ]
+  },
+  {
+   "id": 50,
+   "kind": "table",
+   "start": 10203,
+   "end": 10303,
+   "text": "|                                | ⟦0⟧         | Pass-through converter          |",
+   "tokens": [
+    "`identity_transition`"
+   ]
+  },
+  {
+   "id": 51,
+   "kind": "para",
+   "start": 10305,
+   "end": 10671,
+   "text": "The key insight is that **robot hardware converters** work with individual values and dictionaries, while **policy/training converters** work with batched tensors and model outputs. The converter functions automatically handle the structural differences, so your processor steps can focus on the core transformations without worrying about data format compatibility.",
+   "tokens": []
+  },
+  {
+   "id": 52,
+   "kind": "heading",
+   "start": 10673,
+   "end": 10694,
+   "text": "## Processor Examples",
+   "tokens": []
+  },
+  {
+   "id": 53,
+   "kind": "para",
+   "start": 10696,
+   "end": 10801,
+   "text": "The following examples demonstrate real-world processor configurations for policy training and inference.",
+   "tokens": []
+  },
+  {
+   "id": 54,
+   "kind": "para",
+   "start": 10803,
+   "end": 10866,
+   "text": "Here is an example processor for policy training and inference:",
+   "tokens": []
+  },
+  {
+   "id": 55,
+   "kind": "heading",
+   "start": 11814,
+   "end": 11877,
+   "text": "### An interaction between a robot and a policy with processors",
+   "tokens": []
+  },
+  {
+   "id": 56,
+   "kind": "para",
+   "start": 11879,
+   "end": 12067,
+   "text": "The most common real-world scenario combines both pipeline types robot hardware generates observations that need policy processing, and policy outputs need robot-compatible postprocessing:",
+   "tokens": []
+  },
+  {
+   "id": 57,
+   "kind": "heading",
+   "start": 12623,
+   "end": 12674,
+   "text": "## Feature Contracts: Shape and Type Transformation",
+   "tokens": []
+  },
+  {
+   "id": 58,
+   "kind": "para",
+   "start": 12676,
+   "end": 12884,
+   "text": "Processors don't just transform data - they can also **change the data structure itself**. The ⟦0⟧ method declares these changes, which is crucial for dataset recording and policy creation.",
+   "tokens": [
+    "`transform_features()`"
+   ]
+  },
+  {
+   "id": 59,
+   "kind": "heading",
+   "start": 12886,
+   "end": 12918,
+   "text": "### Why Feature Contracts Matter",
+   "tokens": []
+  },
+  {
+   "id": 60,
+   "kind": "para",
+   "start": 12920,
+   "end": 12978,
+   "text": "When building datasets or policies, LeRobot needs to know:",
+   "tokens": []
+  },
+  {
+   "id": 61,
+   "kind": "list",
+   "start": 12980,
+   "end": 13030,
+   "text": "- **What data fields will exist** after processing",
+   "tokens": []
+  },
+  {
+   "id": 62,
+   "kind": "list",
+   "start": 13031,
+   "end": 13079,
+   "text": "- **What shapes and types** each field will have",
+   "tokens": []
+  },
+  {
+   "id": 63,
+   "kind": "list",
+   "start": 13080,
+   "end": 13141,
+   "text": "- **How to configure models** for the expected data structure",
+   "tokens": []
+  },
+  {
+   "id": 64,
+   "kind": "heading",
+   "start": 14045,
+   "end": 14080,
+   "text": "### Feature Specification Functions",
+   "tokens": []
+  },
+  {
+   "id": 65,
+   "kind": "para",
+   "start": 14082,
+   "end": 14892,
+   "text": "⟦0⟧ and ⟦1⟧ solve a critical dataset creation problem: determining the exact final data structure before any data is processed.\nSince processor pipelines can add new features (like velocity fields), change tensor shapes (like cropping images), or rename keys, datasets need to know the complete output specification upfront to allocate proper storage and define schemas.\nThese functions work together by starting with robot hardware specifications (⟦2⟧) then simulating the entire pipeline transformation (⟦3⟧) to compute the final feature dictionary that gets passed to ⟦4⟧, ensuring perfect alignment between what processors output and what datasets expect to store.",
+   "tokens": [
+    "`create_initial_features()`",
+    "`aggregate_pipeline_dataset_features()`",
+    "`create_initial_features()`",
+    "`aggregate_pipeline_dataset_features()`",
+    "`LeRobotDataset.create()`"
+   ]
+  },
+  {
+   "id": 66,
+   "kind": "heading",
+   "start": 15609,
+   "end": 15634,
+   "text": "## Common Processor Steps",
+   "tokens": []
+  },
+  {
+   "id": 67,
+   "kind": "para",
+   "start": 15636,
+   "end": 15734,
+   "text": "LeRobot provides many registered processor steps. Here are the most commonly used core processors:",
+   "tokens": []
+  },
+  {
+   "id": 68,
+   "kind": "heading",
+   "start": 15736,
+   "end": 15760,
+   "text": "### Essential Processors",
+   "tokens": []
+  },
+  {
+   "id": 69,
+   "kind": "list",
+   "start": 15762,
+   "end": 15869,
+   "text": "- **⟦0⟧**: Normalize observations/actions using dataset statistics (mean/std or min/max)",
+   "tokens": [
+    "`normalizer_processor`"
+   ]
+  },
+  {
+   "id": 70,
+   "kind": "list",
+   "start": 15870,
+   "end": 15950,
+   "text": "- **⟦0⟧**: Move tensors to CPU/GPU with optional dtype conversion",
+   "tokens": [
+    "`device_processor`"
+   ]
+  },
+  {
+   "id": 71,
+   "kind": "list",
+   "start": 15951,
+   "end": 16038,
+   "text": "- **⟦0⟧**: Add batch dimensions to transitions for model compatibility",
+   "tokens": [
+    "`to_batch_processor`"
+   ]
+  },
+  {
+   "id": 72,
+   "kind": "list",
+   "start": 16039,
+   "end": 16128,
+   "text": "- **⟦0⟧**: Rename observation keys using mapping dictionaries",
+   "tokens": [
+    "`rename_observations_processor`"
+   ]
+  },
+  {
+   "id": 73,
+   "kind": "list",
+   "start": 16129,
+   "end": 16233,
+   "text": "- **⟦0⟧**: Tokenize natural language task descriptions into tokens and attention masks",
+   "tokens": [
+    "`tokenizer_processor`"
+   ]
+  },
+  {
+   "id": 74,
+   "kind": "heading",
+   "start": 16235,
+   "end": 16249,
+   "text": "### Next Steps",
+   "tokens": []
+  },
+  {
+   "id": 75,
+   "kind": "list",
+   "start": 16251,
+   "end": 16351,
+   "text": "- **[Implement Your Own Processor](⟦0⟧)** - Create custom processor steps",
+   "tokens": [
+    "./implement_your_own_processor"
+   ]
+  },
+  {
+   "id": 76,
+   "kind": "list",
+   "start": 16352,
+   "end": 16445,
+   "text": "- **[Debug Your Pipeline](⟦0⟧)** - Troubleshoot and optimize pipelines",
+   "tokens": [
+    "./debug_processor_pipeline"
+   ]
+  },
+  {
+   "id": 77,
+   "kind": "list",
+   "start": 16446,
+   "end": 16555,
+   "text": "- **[Processors for Robots and Teleoperators](⟦0⟧)** - Real-world integration patterns",
+   "tokens": [
+    "./processors_robots_teleop"
+   ]
+  },
+  {
+   "id": 78,
+   "kind": "heading",
+   "start": 16557,
+   "end": 16567,
+   "text": "## Summary",
+   "tokens": []
+  },
+  {
+   "id": 79,
+   "kind": "para",
+   "start": 16569,
+   "end": 16640,
+   "text": "Processors solve the data translation problem in robotics by providing:",
+   "tokens": []
+  },
+  {
+   "id": 80,
+   "kind": "list",
+   "start": 16642,
+   "end": 16710,
+   "text": "- **Modular transformations**: Composable, reusable processing steps",
+   "tokens": []
+  },
+  {
+   "id": 81,
+   "kind": "list",
+   "start": 16711,
+   "end": 16774,
+   "text": "- **Type safety**: Generic pipelines with compile-time checking",
+   "tokens": []
+  },
+  {
+   "id": 82,
+   "kind": "list",
+   "start": 16775,
+   "end": 16833,
+   "text": "- **Performance optimization**: GPU-accelerated operations",
+   "tokens": []
+  },
+  {
+   "id": 83,
+   "kind": "list",
+   "start": 16834,
+   "end": 16914,
+   "text": "- **Robot/Policy distinction**: Separate pipelines for different data structures",
+   "tokens": []
+  },
+  {
+   "id": 84,
+   "kind": "list",
+   "start": 16915,
+   "end": 16988,
+   "text": "- **Comprehensive ecosystem**: 30+ registered processors for common tasks",
+   "tokens": []
+  },
+  {
+   "id": 85,
+   "kind": "para",
+   "start": 16990,
+   "end": 17177,
+   "text": "The key insight: ⟦0⟧ handles unbatched robot hardware data, while ⟦1⟧ handles batched model data. Choose the right tool for your data structure!",
+   "tokens": [
+    "`RobotProcessorPipeline`",
+    "`PolicyProcessorPipeline`"
+   ]
+  }
+ ]
+}

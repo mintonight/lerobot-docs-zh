@@ -1,0 +1,1395 @@
+{
+ "file": "api/robots.mdx",
+ "units": [
+  {
+   "id": 0,
+   "kind": "heading",
+   "start": 1924,
+   "end": 1932,
+   "text": "# Robots",
+   "tokens": []
+  },
+  {
+   "id": 1,
+   "kind": "para",
+   "start": 1934,
+   "end": 2164,
+   "text": "Every robot in LeRobot implements the ⟦0⟧ interface: connect, read an observation, send an action,\ndisconnect. Writing a policy or a recording script against that interface means it works with any supported\narm without change.",
+   "tokens": [
+    "`Robot`"
+   ]
+  },
+  {
+   "id": 2,
+   "kind": "para",
+   "start": 2166,
+   "end": 2560,
+   "text": "This page is the generated reference. For wiring, calibration and first-run instructions, start with the\nhardware guides — [SO-101](⟦0⟧), [LeKiwi](⟦1⟧), [Hope Jr](⟦2⟧), [Reachy 2](⟦3⟧),\n[OpenArm](⟦4⟧) — or [Imitation Learning for Robots](⟦5⟧) for the end-to-end workflow. To add\na robot of your own, see [Bring Your Own Hardware](⟦6⟧).",
+   "tokens": [
+    "../so101",
+    "../lekiwi",
+    "../hope_jr",
+    "../reachy2",
+    "../openarm",
+    "../il_robots",
+    "../integrate_hardware"
+   ]
+  },
+  {
+   "id": 3,
+   "kind": "heading",
+   "start": 2562,
+   "end": 2594,
+   "text": "## Robot⟦0⟧",
+   "tokens": [
+    "[[lerobot.robots.Robot]]"
+   ]
+  },
+  {
+   "id": 4,
+   "kind": "para",
+   "start": 2596,
+   "end": 2737,
+   "text": "The abstract base class. Subclasses implement every method below; the contract described here is what a\npolicy or recording loop can rely on.",
+   "tokens": []
+  },
+  {
+   "id": 5,
+   "kind": "docfield",
+   "start": 3069,
+   "end": 3266,
+   "text": "⟦0⟧- **config_class** (RobotConfig) -- The expected configuration class for this robot.\n- **name** (str) -- The unique robot name used to identify this robot type.⟦1⟧⟦2⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "</paramsdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 6,
+   "kind": "para",
+   "start": 3268,
+   "end": 3326,
+   "text": "The base abstract class for all LeRobot-compatible robots.",
+   "tokens": []
+  },
+  {
+   "id": 7,
+   "kind": "para",
+   "start": 3328,
+   "end": 3486,
+   "text": "This class provides a standardized interface for interacting with physical robots.\nSubclasses must implement all abstract methods and properties to be usable.",
+   "tokens": []
+  },
+  {
+   "id": 8,
+   "kind": "docfield",
+   "start": 3815,
+   "end": 4013,
+   "text": "⟦0⟧- **calibrate** (bool) -- If True, automatically calibrate the robot after connecting if it's not\n  calibrated or needs calibration (this is hardware-dependant).⟦1⟧⟦2⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "</paramsdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 9,
+   "kind": "para",
+   "start": 4015,
+   "end": 4054,
+   "text": "Establish communication with the robot.",
+   "tokens": []
+  },
+  {
+   "id": 10,
+   "kind": "para",
+   "start": 4350,
+   "end": 4423,
+   "text": "⟦0⟧\nDisconnect from the robot and perform any necessary cleanup.",
+   "tokens": [
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 11,
+   "kind": "para",
+   "start": 4728,
+   "end": 4861,
+   "text": "Apply any one-time or runtime configuration to the robot.\nThis may include setting motor parameters, control modes, or initial state.",
+   "tokens": []
+  },
+  {
+   "id": 12,
+   "kind": "para",
+   "start": 5167,
+   "end": 5233,
+   "text": "Calibrate the robot if applicable. If not, this should be a no-op.",
+   "tokens": []
+  },
+  {
+   "id": 13,
+   "kind": "para",
+   "start": 5235,
+   "end": 5363,
+   "text": "This method should collect any necessary data (e.g., motor offsets) and update the\n:pyattr:⟦0⟧ dictionary accordingly.",
+   "tokens": [
+    "`calibration`"
+   ]
+  },
+  {
+   "id": 14,
+   "kind": "para",
+   "start": 5667,
+   "end": 5857,
+   "text": "⟦0⟧⟦1⟧A flat dictionary representing the robot's current sensory state. Its structure\nshould match :pymeth:⟦2⟧.⟦3⟧⟦4⟧",
+   "tokens": [
+    "<rettype>RobotObservation</rettype>",
+    "<retdesc>",
+    "`observation_features`",
+    "</retdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 15,
+   "kind": "para",
+   "start": 5859,
+   "end": 5907,
+   "text": "Retrieve the current observation from the robot.",
+   "tokens": []
+  },
+  {
+   "id": 16,
+   "kind": "docfield",
+   "start": 6242,
+   "end": 6514,
+   "text": "⟦0⟧- **action** (RobotAction) -- Dictionary representing the desired action. Its structure should match\n  :pymeth:⟦1⟧.⟦2⟧⟦3⟧⟦4⟧The action actually sent to the motors potentially clipped or modified, e.g. by",
+   "tokens": [
+    "<paramsdesc>",
+    "`action_features`",
+    "</paramsdesc>",
+    "<rettype>RobotAction</rettype>",
+    "<retdesc>"
+   ]
+  },
+  {
+   "id": 17,
+   "kind": "para",
+   "start": 6515,
+   "end": 6563,
+   "text": "safety limits on velocity.⟦0⟧⟦1⟧",
+   "tokens": [
+    "</retdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 18,
+   "kind": "para",
+   "start": 6565,
+   "end": 6601,
+   "text": "Send an action command to the robot.",
+   "tokens": []
+  },
+  {
+   "id": 19,
+   "kind": "para",
+   "start": 6934,
+   "end": 7160,
+   "text": "A dictionary describing the structure and types of the observations produced by the robot.\nIts structure (keys) should match the structure of what is returned by :pymeth:⟦0⟧.\nValues for the dict should either be:",
+   "tokens": [
+    "`get_observation`"
+   ]
+  },
+  {
+   "id": 20,
+   "kind": "list",
+   "start": 7161,
+   "end": 7283,
+   "text": "- The type of the value if it's a simple value, e.g. ⟦0⟧ for single proprioceptive value (a joint's position/velocity)",
+   "tokens": [
+    "`float`"
+   ]
+  },
+  {
+   "id": 21,
+   "kind": "list",
+   "start": 7284,
+   "end": 7388,
+   "text": "- A tuple representing the shape if it's an array-type value, e.g. ⟦0⟧ for images",
+   "tokens": [
+    "`(height, width, channel)`"
+   ]
+  },
+  {
+   "id": 22,
+   "kind": "para",
+   "start": 7390,
+   "end": 7490,
+   "text": "Note: this property should be able to be called regardless of whether the robot is connected or not.",
+   "tokens": []
+  },
+  {
+   "id": 23,
+   "kind": "para",
+   "start": 7808,
+   "end": 8141,
+   "text": "A dictionary describing the structure and types of the actions expected by the robot. Its structure\n(keys) should match the structure of what is passed to :pymeth:⟦0⟧. Values for the dict\nshould be the type of the value if it's a simple value, e.g. ⟦1⟧ for single proprioceptive value\n(a joint's goal position/velocity)",
+   "tokens": [
+    "`send_action`",
+    "`float`"
+   ]
+  },
+  {
+   "id": 24,
+   "kind": "para",
+   "start": 8143,
+   "end": 8243,
+   "text": "Note: this property should be able to be called regardless of whether the robot is connected or not.",
+   "tokens": []
+  },
+  {
+   "id": 25,
+   "kind": "para",
+   "start": 8555,
+   "end": 8697,
+   "text": "Whether the robot is currently connected or not. If ⟦0⟧, calling :pymeth:⟦1⟧ or\n:pymeth:⟦2⟧ should raise an error.",
+   "tokens": [
+    "`False`",
+    "`get_observation`",
+    "`send_action`"
+   ]
+  },
+  {
+   "id": 26,
+   "kind": "para",
+   "start": 8997,
+   "end": 9101,
+   "text": "⟦0⟧\nWhether the robot is currently calibrated or not. Should be always ⟦1⟧ if not applicable",
+   "tokens": [
+    "</Docstring>",
+    "`True`"
+   ]
+  },
+  {
+   "id": 27,
+   "kind": "heading",
+   "start": 9117,
+   "end": 9161,
+   "text": "## RobotConfig⟦0⟧",
+   "tokens": [
+    "[[lerobot.robots.RobotConfig]]"
+   ]
+  },
+  {
+   "id": 28,
+   "kind": "heading",
+   "start": 9599,
+   "end": 9665,
+   "text": "## make_robot_from_config⟦0⟧",
+   "tokens": [
+    "[[lerobot.robots.make_robot_from_config]]"
+   ]
+  },
+  {
+   "id": 29,
+   "kind": "heading",
+   "start": 10048,
+   "end": 10119,
+   "text": "## SO-100 and SO-101 followers⟦0⟧",
+   "tokens": [
+    "[[lerobot.robots.so_follower.SOFollower]]"
+   ]
+  },
+  {
+   "id": 30,
+   "kind": "para",
+   "start": 10121,
+   "end": 10365,
+   "text": "⟦0⟧ and ⟦1⟧ are aliases of the same ⟦2⟧ class; the two arms differ in their\nconfiguration, not their control code. ⟦3⟧ and ⟦4⟧ are likewise aliases\nof ⟦5⟧.",
+   "tokens": [
+    "`SO100Follower`",
+    "`SO101Follower`",
+    "`SOFollower`",
+    "`SO100FollowerConfig`",
+    "`SO101FollowerConfig`",
+    "`SOFollowerRobotConfig`"
+   ]
+  },
+  {
+   "id": 31,
+   "kind": "para",
+   "start": 10773,
+   "end": 10930,
+   "text": "Generic SO follower base implementing common functionality for SO-100/101/10X.\nDesigned to be subclassed with a per-hardware-model ⟦0⟧ and ⟦1⟧.",
+   "tokens": [
+    "`config_class`",
+    "`name`"
+   ]
+  },
+  {
+   "id": 32,
+   "kind": "para",
+   "start": 11305,
+   "end": 11420,
+   "text": "We assume that at connection time, arm is in a rest position,\nand torque can be safely disabled to run calibration.",
+   "tokens": []
+  },
+  {
+   "id": 33,
+   "kind": "para",
+   "start": 11786,
+   "end": 12093,
+   "text": "⟦0⟧⟦1⟧the action sent to the motors, potentially clipped.⟦2⟧⟦3⟧- ⟦4⟧ -- if robot is not connected.⟦5⟧⟦6⟧⟦7⟧\nCommand arm to move to a target joint configuration.",
+   "tokens": [
+    "<rettype>RobotAction</rettype>",
+    "<retdesc>",
+    "</retdesc>",
+    "<raises>",
+    "``RobotDeviceNotConnectedError``",
+    "</raises>",
+    "<raisederrors>``RobotDeviceNotConnectedError``</raisederrors>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 34,
+   "kind": "para",
+   "start": 12095,
+   "end": 12324,
+   "text": "The relative action magnitude may be clipped depending on the configuration parameter\n⟦0⟧. In this case, the action sent differs from original action.\nThus, this function always returns the action actually sent.",
+   "tokens": [
+    "`max_relative_target`"
+   ]
+  },
+  {
+   "id": 35,
+   "kind": "heading",
+   "start": 13356,
+   "end": 13417,
+   "text": "## BiSOFollower⟦0⟧",
+   "tokens": [
+    "[[lerobot.robots.bi_so_follower.BiSOFollower]]"
+   ]
+  },
+  {
+   "id": 36,
+   "kind": "para",
+   "start": 13419,
+   "end": 13465,
+   "text": "Two SO followers driven as one bimanual robot.",
+   "tokens": []
+  },
+  {
+   "id": 37,
+   "kind": "para",
+   "start": 13886,
+   "end": 13985,
+   "text": "[Bimanual SO Follower Arms](⟦0⟧) designed by TheRobotStudio",
+   "tokens": [
+    "https://github.com/TheRobotStudio/SO-ARM100"
+   ]
+  },
+  {
+   "id": 38,
+   "kind": "para",
+   "start": 14650,
+   "end": 14709,
+   "text": "⟦0⟧\nConfiguration class for Bi SO Follower robots.",
+   "tokens": [
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 39,
+   "kind": "heading",
+   "start": 14719,
+   "end": 14779,
+   "text": "## KochFollower⟦0⟧",
+   "tokens": [
+    "[[lerobot.robots.koch_follower.KochFollower]]"
+   ]
+  },
+  {
+   "id": 40,
+   "kind": "list",
+   "start": 15196,
+   "end": 15387,
+   "text": "- [Koch v1.0](⟦0⟧), with and without the wrist-to-elbow\n  expansion, developed by Alexander Koch from [Tau Robotics](⟦1⟧)",
+   "tokens": [
+    "https://github.com/AlexanderKoch-Koch/low_cost_robot",
+    "https://tau-robotics.com"
+   ]
+  },
+  {
+   "id": 41,
+   "kind": "list",
+   "start": 15388,
+   "end": 15464,
+   "text": "- [Koch v1.1](⟦0⟧) developed by Jess Moss",
+   "tokens": [
+    "https://github.com/jess-moss/koch-v1-1"
+   ]
+  },
+  {
+   "id": 42,
+   "kind": "para",
+   "start": 15847,
+   "end": 15962,
+   "text": "We assume that at connection time, arm is in a rest position,\nand torque can be safely disabled to run calibration.",
+   "tokens": []
+  },
+  {
+   "id": 43,
+   "kind": "docfield",
+   "start": 16336,
+   "end": 16537,
+   "text": "⟦0⟧- **action** (RobotAction) -- The goal positions for the motors.⟦1⟧⟦2⟧⟦3⟧The action sent to the motors, potentially clipped.⟦4⟧⟦5⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "</paramsdesc>",
+    "<rettype>RobotAction</rettype>",
+    "<retdesc>",
+    "</retdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 44,
+   "kind": "para",
+   "start": 16538,
+   "end": 16590,
+   "text": "Command arm to move to a target joint configuration.",
+   "tokens": []
+  },
+  {
+   "id": 45,
+   "kind": "para",
+   "start": 16592,
+   "end": 16821,
+   "text": "The relative action magnitude may be clipped depending on the configuration parameter\n⟦0⟧. In this case, the action sent differs from original action.\nThus, this function always returns the action actually sent.",
+   "tokens": [
+    "`max_relative_target`"
+   ]
+  },
+  {
+   "id": 46,
+   "kind": "heading",
+   "start": 17634,
+   "end": 17675,
+   "text": "## LeKiwi⟦0⟧",
+   "tokens": [
+    "[[lerobot.robots.lekiwi.LeKiwi]]"
+   ]
+  },
+  {
+   "id": 47,
+   "kind": "para",
+   "start": 17677,
+   "end": 17824,
+   "text": "⟦0⟧ runs on the robot itself. ⟦1⟧ is the host-side proxy that talks to it over the network\nand presents the same ⟦2⟧ interface.",
+   "tokens": [
+    "`LeKiwi`",
+    "`LeKiwiClient`",
+    "`Robot`"
+   ]
+  },
+  {
+   "id": 48,
+   "kind": "para",
+   "start": 18195,
+   "end": 18532,
+   "text": "The robot includes a three omniwheel mobile base and a remote follower arm.\nThe leader arm is connected locally (on the laptop) and its joint positions are recorded and then\nforwarded to the remote follower arm (after applying a safety clamp).\nIn parallel, keyboard teleoperation is used to generate raw velocity commands for the wheels.",
+   "tokens": []
+  },
+  {
+   "id": 49,
+   "kind": "para",
+   "start": 18873,
+   "end": 19183,
+   "text": "⟦0⟧⟦1⟧the action sent to the motors, potentially clipped.⟦2⟧⟦3⟧- ⟦4⟧ -- if robot is not connected.⟦5⟧⟦6⟧⟦7⟧\nCommand lekiwi to move to a target joint configuration.",
+   "tokens": [
+    "<rettype>RobotAction</rettype>",
+    "<retdesc>",
+    "</retdesc>",
+    "<raises>",
+    "``RobotDeviceNotConnectedError``",
+    "</raises>",
+    "<raisederrors>``RobotDeviceNotConnectedError``</raisederrors>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 50,
+   "kind": "para",
+   "start": 19185,
+   "end": 19414,
+   "text": "The relative action magnitude may be clipped depending on the configuration parameter\n⟦0⟧. In this case, the action sent differs from original action.\nThus, this function always returns the action actually sent.",
+   "tokens": [
+    "`max_relative_target`"
+   ]
+  },
+  {
+   "id": 51,
+   "kind": "para",
+   "start": 20958,
+   "end": 21023,
+   "text": "⟦0⟧\nEstablishes ZMQ sockets with the remote mobile robot",
+   "tokens": [
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 52,
+   "kind": "para",
+   "start": 21345,
+   "end": 21374,
+   "text": "⟦0⟧\nCleans ZMQ comms",
+   "tokens": [
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 53,
+   "kind": "para",
+   "start": 21720,
+   "end": 21934,
+   "text": "Capture observations from the remote robot: current follower arm positions,\npresent wheel speeds (converted to body-frame velocities: x, y, theta),\nand a camera frame. Receives over ZMQ, translate to body-frame vel",
+   "tokens": []
+  },
+  {
+   "id": 54,
+   "kind": "docfield",
+   "start": 22294,
+   "end": 22653,
+   "text": "⟦0⟧- **action** (RobotAction) -- array containing the goal positions for the motors.⟦1⟧⟦2⟧⟦3⟧the action sent to the motors, potentially clipped.⟦4⟧⟦5⟧- ⟦6⟧ -- if robot is not connected.⟦7⟧⟦8⟧⟦9⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "</paramsdesc>",
+    "<rettype>np.ndarray</rettype>",
+    "<retdesc>",
+    "</retdesc>",
+    "<raises>",
+    "``RobotDeviceNotConnectedError``",
+    "</raises>",
+    "<raisederrors>``RobotDeviceNotConnectedError``</raisederrors>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 55,
+   "kind": "para",
+   "start": 22654,
+   "end": 22752,
+   "text": "Command lekiwi to move to a target joint configuration. Translates to motor space + sends over ZMQ",
+   "tokens": []
+  },
+  {
+   "id": 56,
+   "kind": "heading",
+   "start": 23611,
+   "end": 23680,
+   "text": "## OpenArmFollower⟦0⟧",
+   "tokens": [
+    "[[lerobot.robots.openarm_follower.OpenArmFollower]]"
+   ]
+  },
+  {
+   "id": 57,
+   "kind": "para",
+   "start": 24118,
+   "end": 24259,
+   "text": "OpenArms Follower Robot which uses CAN bus communication to control 7 DOF arm with a gripper.\nThe arm uses Damiao motors in MIT control mode.",
+   "tokens": []
+  },
+  {
+   "id": 58,
+   "kind": "para",
+   "start": 24614,
+   "end": 24659,
+   "text": "Run calibration procedure for OpenArms robot.",
+   "tokens": []
+  },
+  {
+   "id": 59,
+   "kind": "para",
+   "start": 24661,
+   "end": 24687,
+   "text": "The calibration procedure:",
+   "tokens": []
+  },
+  {
+   "id": 60,
+   "kind": "list",
+   "start": 24688,
+   "end": 24705,
+   "text": "1. Disable torque",
+   "tokens": []
+  },
+  {
+   "id": 61,
+   "kind": "list",
+   "start": 24706,
+   "end": 24775,
+   "text": "2. Ask user to position arms in hanging position with grippers closed",
+   "tokens": []
+  },
+  {
+   "id": 62,
+   "kind": "list",
+   "start": 24776,
+   "end": 24804,
+   "text": "3. Set this as zero position",
+   "tokens": []
+  },
+  {
+   "id": 63,
+   "kind": "list",
+   "start": 24805,
+   "end": 24845,
+   "text": "4. Record range of motion for each joint",
+   "tokens": []
+  },
+  {
+   "id": 64,
+   "kind": "list",
+   "start": 24846,
+   "end": 24865,
+   "text": "5. Save calibration",
+   "tokens": []
+  },
+  {
+   "id": 65,
+   "kind": "para",
+   "start": 25212,
+   "end": 25268,
+   "text": "⟦0⟧\nConfigure motors with appropriate settings.",
+   "tokens": [
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 66,
+   "kind": "para",
+   "start": 25669,
+   "end": 25715,
+   "text": "Connect to the robot and optionally calibrate.",
+   "tokens": []
+  },
+  {
+   "id": 67,
+   "kind": "para",
+   "start": 25717,
+   "end": 25853,
+   "text": "We assume that at connection time, the arms are in a safe rest position,\nand torque can be safely disabled to run calibration if needed.",
+   "tokens": []
+  },
+  {
+   "id": 68,
+   "kind": "para",
+   "start": 26202,
+   "end": 26237,
+   "text": "⟦0⟧\nDisconnect from robot.",
+   "tokens": [
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 69,
+   "kind": "para",
+   "start": 26609,
+   "end": 26685,
+   "text": "Get current observation from robot including position, velocity, and torque.",
+   "tokens": []
+  },
+  {
+   "id": 70,
+   "kind": "para",
+   "start": 26687,
+   "end": 26780,
+   "text": "Reads all motor states (pos/vel/torque) in one CAN refresh cycle\ninstead of 3 separate reads.",
+   "tokens": []
+  },
+  {
+   "id": 71,
+   "kind": "docfield",
+   "start": 27298,
+   "end": 27678,
+   "text": "⟦0⟧- **action** -- Dictionary with motor positions (e.g., \"joint_1.pos\", \"joint_2.pos\")\n- **custom_kp** -- Optional custom kp gains per motor (e.g., ⟦1⟧)\n- **custom_kd** -- Optional custom kd gains per motor (e.g., ⟦2⟧)⟦3⟧⟦4⟧The action actually sent (potentially clipped)⟦5⟧⟦6⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "{\"joint_1\": 120.0, \"joint_2\": 150.0}",
+    "{\"joint_1\": 1.5, \"joint_2\": 2.0}",
+    "</paramsdesc>",
+    "<retdesc>",
+    "</retdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 72,
+   "kind": "para",
+   "start": 27680,
+   "end": 27709,
+   "text": "Send action command to robot.",
+   "tokens": []
+  },
+  {
+   "id": 73,
+   "kind": "para",
+   "start": 27711,
+   "end": 27770,
+   "text": "The action magnitude may be clipped based on safety limits.",
+   "tokens": []
+  },
+  {
+   "id": 74,
+   "kind": "heading",
+   "start": 29090,
+   "end": 29166,
+   "text": "## BiOpenArmFollower⟦0⟧",
+   "tokens": [
+    "[[lerobot.robots.bi_openarm_follower.BiOpenArmFollower]]"
+   ]
+  },
+  {
+   "id": 75,
+   "kind": "para",
+   "start": 29622,
+   "end": 29652,
+   "text": "Bimanual OpenArm Follower Arms",
+   "tokens": []
+  },
+  {
+   "id": 76,
+   "kind": "para",
+   "start": 30382,
+   "end": 30446,
+   "text": "⟦0⟧\nConfiguration class for Bi OpenArm Follower robots.",
+   "tokens": [
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 77,
+   "kind": "heading",
+   "start": 30456,
+   "end": 30513,
+   "text": "## OmxFollower⟦0⟧",
+   "tokens": [
+    "[[lerobot.robots.omx_follower.OmxFollower]]"
+   ]
+  },
+  {
+   "id": 78,
+   "kind": "list",
+   "start": 30923,
+   "end": 31071,
+   "text": "- [OMX](⟦0⟧),\n  expansion, developed by Woojin Wie and Junha Cha from [ROBOTIS](⟦1⟧)",
+   "tokens": [
+    "https://github.com/ROBOTIS-GIT/open_manipulator",
+    "https://ai.robotis.com/"
+   ]
+  },
+  {
+   "id": 79,
+   "kind": "para",
+   "start": 31450,
+   "end": 31490,
+   "text": "For OMX robots that come pre-calibrated:",
+   "tokens": []
+  },
+  {
+   "id": 80,
+   "kind": "list",
+   "start": 31491,
+   "end": 31576,
+   "text": "- If default calibration from package doesn't match motors, read from motors and save",
+   "tokens": []
+  },
+  {
+   "id": 81,
+   "kind": "list",
+   "start": 31577,
+   "end": 31645,
+   "text": "- This allows using pre-calibrated robots without manual calibration",
+   "tokens": []
+  },
+  {
+   "id": 82,
+   "kind": "list",
+   "start": 31646,
+   "end": 31752,
+   "text": "- If no calibration file exists, use factory default values (homing_offset=0, range_min=0, range_max=4095)",
+   "tokens": []
+  },
+  {
+   "id": 83,
+   "kind": "docfield",
+   "start": 32122,
+   "end": 32323,
+   "text": "⟦0⟧- **action** (RobotAction) -- The goal positions for the motors.⟦1⟧⟦2⟧⟦3⟧The action sent to the motors, potentially clipped.⟦4⟧⟦5⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "</paramsdesc>",
+    "<rettype>RobotAction</rettype>",
+    "<retdesc>",
+    "</retdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 84,
+   "kind": "para",
+   "start": 32324,
+   "end": 32376,
+   "text": "Command arm to move to a target joint configuration.",
+   "tokens": []
+  },
+  {
+   "id": 85,
+   "kind": "para",
+   "start": 32378,
+   "end": 32607,
+   "text": "The relative action magnitude may be clipped depending on the configuration parameter\n⟦0⟧. In this case, the action sent differs from original action.\nThus, this function always returns the action actually sent.",
+   "tokens": [
+    "`max_relative_target`"
+   ]
+  },
+  {
+   "id": 86,
+   "kind": "heading",
+   "start": 33414,
+   "end": 33468,
+   "text": "## Reachy2Robot⟦0⟧",
+   "tokens": [
+    "[[lerobot.robots.reachy2.Reachy2Robot]]"
+   ]
+  },
+  {
+   "id": 87,
+   "kind": "para",
+   "start": 33867,
+   "end": 33939,
+   "text": "[Reachy 2](⟦0⟧), by Pollen Robotics.",
+   "tokens": [
+    "https://www.pollen-robotics.com/reachy/"
+   ]
+  },
+  {
+   "id": 88,
+   "kind": "heading",
+   "start": 35310,
+   "end": 35361,
+   "text": "## UnitreeG1⟦0⟧",
+   "tokens": [
+    "[[lerobot.robots.unitree_g1.UnitreeG1]]"
+   ]
+  },
+  {
+   "id": 89,
+   "kind": "heading",
+   "start": 36727,
+   "end": 36773,
+   "text": "## Hope Jr⟦0⟧",
+   "tokens": [
+    "[[lerobot.robots.hope_jr.HopeJrArm]]"
+   ]
+  },
+  {
+   "id": 90,
+   "kind": "para",
+   "start": 36775,
+   "end": 36852,
+   "text": "The Hope Jr humanoid is exposed as two independent robots, an arm and a hand.",
+   "tokens": []
+  },
+  {
+   "id": 91,
+   "kind": "para",
+   "start": 37604,
+   "end": 37719,
+   "text": "We assume that at connection time, arm is in a rest position,\nand torque can be safely disabled to run calibration.",
+   "tokens": []
+  },
+  {
+   "id": 92,
+   "kind": "heading",
+   "start": 39507,
+   "end": 39583,
+   "text": "## RebotB601Follower⟦0⟧",
+   "tokens": [
+    "[[lerobot.robots.rebot_b601_follower.RebotB601Follower]]"
+   ]
+  },
+  {
+   "id": 93,
+   "kind": "para",
+   "start": 40030,
+   "end": 40120,
+   "text": "⟦0⟧\nSeeed Studio reBot B601-DM follower arm (6-DOF + gripper, Damiao CAN motors).",
+   "tokens": [
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 94,
+   "kind": "para",
+   "start": 40122,
+   "end": 40267,
+   "text": "Motor communication is handled by the ⟦0⟧ package over a CAN bus,\nreached either through a Damiao serial bridge or a SocketCAN adapter.",
+   "tokens": [
+    "`motorbridge`"
+   ]
+  },
+  {
+   "id": 95,
+   "kind": "para",
+   "start": 40629,
+   "end": 40717,
+   "text": "⟦0⟧\nDisable motor torque so the arm can be moved by hand (read-only debugging).",
+   "tokens": [
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 96,
+   "kind": "para",
+   "start": 41113,
+   "end": 41174,
+   "text": "⟦0⟧\nCommand the arm to a target joint configuration.",
+   "tokens": [
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 97,
+   "kind": "para",
+   "start": 41176,
+   "end": 41340,
+   "text": "Positions are expressed in degrees. The relative action magnitude may be\nclipped depending on ⟦0⟧, so the action actually sent is\nalways returned.",
+   "tokens": [
+    "`max_relative_target`"
+   ]
+  },
+  {
+   "id": 98,
+   "kind": "para",
+   "start": 42814,
+   "end": 42889,
+   "text": "⟦0⟧\nRegistered configuration for the reBot B601-DM follower robot.",
+   "tokens": [
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 99,
+   "kind": "heading",
+   "start": 42899,
+   "end": 42982,
+   "text": "## BiRebotB601Follower⟦0⟧",
+   "tokens": [
+    "[[lerobot.robots.bi_rebot_b601_follower.BiRebotB601Follower]]"
+   ]
+  },
+  {
+   "id": 100,
+   "kind": "para",
+   "start": 43442,
+   "end": 43500,
+   "text": "⟦0⟧\nBimanual Seeed Studio reBot B601-DM follower.",
+   "tokens": [
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 101,
+   "kind": "para",
+   "start": 43502,
+   "end": 43645,
+   "text": "Composes two single-arm ⟦0⟧ instances. Observation and\naction keys of each arm are namespaced with a ⟦1⟧ / ⟦2⟧ prefix.",
+   "tokens": [
+    "`RebotB601Follower`",
+    "`left_`",
+    "`right_`"
+   ]
+  },
+  {
+   "id": 102,
+   "kind": "para",
+   "start": 44370,
+   "end": 44449,
+   "text": "⟦0⟧\nConfiguration class for the bimanual reBot B601-DM follower robot.",
+   "tokens": [
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 103,
+   "kind": "heading",
+   "start": 44459,
+   "end": 44538,
+   "text": "## EarthRoverMiniPlus⟦0⟧",
+   "tokens": [
+    "[[lerobot.robots.earthrover_mini_plus.EarthRoverMiniPlus]]"
+   ]
+  },
+  {
+   "id": 104,
+   "kind": "docfield",
+   "start": 44993,
+   "end": 45188,
+   "text": "⟦0⟧- **config** -- Robot configuration\n- **sdk_base_url** -- Base URL of the Frodobots SDK server, taken from\n  ⟦1⟧ (default: ⟦2⟧)⟦3⟧⟦4⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "`config.sdk_url`",
+    "http://localhost:8000",
+    "</paramsdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 105,
+   "kind": "para",
+   "start": 45190,
+   "end": 45255,
+   "text": "EarthRover Mini Plus robot controlled via Frodobots SDK HTTP API.",
+   "tokens": []
+  },
+  {
+   "id": 106,
+   "kind": "para",
+   "start": 45257,
+   "end": 45458,
+   "text": "This robot uses cloud-based control through the Frodobots SDK instead of direct\nhardware connection. Cameras stream via WebRTC through Agora cloud, and control\ncommands are sent via HTTP POST requests.",
+   "tokens": []
+  },
+  {
+   "id": 107,
+   "kind": "para",
+   "start": 45460,
+   "end": 45479,
+   "text": "The robot supports:",
+   "tokens": []
+  },
+  {
+   "id": 108,
+   "kind": "list",
+   "start": 45480,
+   "end": 45543,
+   "text": "- Dual cameras (front and rear) accessed via SDK HTTP endpoints",
+   "tokens": []
+  },
+  {
+   "id": 109,
+   "kind": "list",
+   "start": 45544,
+   "end": 45581,
+   "text": "- Linear and angular velocity control",
+   "tokens": []
+  },
+  {
+   "id": 110,
+   "kind": "list",
+   "start": 45582,
+   "end": 45617,
+   "text": "- Battery and orientation telemetry",
+   "tokens": []
+  },
+  {
+   "id": 111,
+   "kind": "para",
+   "start": 45981,
+   "end": 46037,
+   "text": "⟦0⟧\nCalibration not needed for SDK-based robot.",
+   "tokens": [
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 112,
+   "kind": "para",
+   "start": 46404,
+   "end": 46461,
+   "text": "⟦0⟧\nConfigure robot (no-op for SDK-based robot).",
+   "tokens": [
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 113,
+   "kind": "docfield",
+   "start": 46869,
+   "end": 47044,
+   "text": "⟦0⟧- **calibrate** -- Not used for SDK-based robot (kept for API compatibility)⟦1⟧⟦2⟧- ⟦3⟧ -- If robot is already connected",
+   "tokens": [
+    "<paramsdesc>",
+    "</paramsdesc>",
+    "<raises>",
+    "``DeviceAlreadyConnectedError``"
+   ]
+  },
+  {
+   "id": 114,
+   "kind": "list",
+   "start": 47045,
+   "end": 47257,
+   "text": "- ⟦0⟧ -- If cannot connect to SDK server⟦1⟧⟦2⟧⟦3⟧\nConnect to robot via Frodobots SDK.",
+   "tokens": [
+    "``DeviceNotConnectedError``",
+    "</raises>",
+    "<raisederrors>``DeviceAlreadyConnectedError`` or ``DeviceNotConnectedError``</raisederrors>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 115,
+   "kind": "docfield",
+   "start": 47633,
+   "end": 47776,
+   "text": "⟦0⟧- ⟦1⟧ -- If robot is not connected⟦2⟧⟦3⟧⟦4⟧",
+   "tokens": [
+    "<raises>",
+    "``DeviceNotConnectedError``",
+    "</raises>",
+    "<raisederrors>``DeviceNotConnectedError``</raisederrors>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 116,
+   "kind": "para",
+   "start": 47777,
+   "end": 47799,
+   "text": "Disconnect from robot.",
+   "tokens": []
+  },
+  {
+   "id": 117,
+   "kind": "para",
+   "start": 47801,
+   "end": 47846,
+   "text": "Stops the robot and closes connection to SDK.",
+   "tokens": []
+  },
+  {
+   "id": 118,
+   "kind": "para",
+   "start": 48230,
+   "end": 48297,
+   "text": "⟦0⟧⟦1⟧Observation containing:",
+   "tokens": [
+    "<rettype>RobotObservation</rettype>",
+    "<retdesc>"
+   ]
+  },
+  {
+   "id": 119,
+   "kind": "list",
+   "start": 48298,
+   "end": 48353,
+   "text": "- front: Front camera image (480, 640, 3) in RGB format",
+   "tokens": []
+  },
+  {
+   "id": 120,
+   "kind": "list",
+   "start": 48354,
+   "end": 48407,
+   "text": "- rear: Rear camera image (480, 640, 3) in RGB format",
+   "tokens": []
+  },
+  {
+   "id": 121,
+   "kind": "list",
+   "start": 48408,
+   "end": 48454,
+   "text": "- speed: float - Current speed (raw SDK value)",
+   "tokens": []
+  },
+  {
+   "id": 122,
+   "kind": "list",
+   "start": 48455,
+   "end": 48501,
+   "text": "- battery_level: float - Battery level (0-100)",
+   "tokens": []
+  },
+  {
+   "id": 123,
+   "kind": "list",
+   "start": 48502,
+   "end": 48553,
+   "text": "- orientation: float - Robot orientation in degrees",
+   "tokens": []
+  },
+  {
+   "id": 124,
+   "kind": "list",
+   "start": 48554,
+   "end": 48601,
+   "text": "- gps_latitude: float - GPS latitude coordinate",
+   "tokens": []
+  },
+  {
+   "id": 125,
+   "kind": "list",
+   "start": 48602,
+   "end": 48651,
+   "text": "- gps_longitude: float - GPS longitude coordinate",
+   "tokens": []
+  },
+  {
+   "id": 126,
+   "kind": "list",
+   "start": 48652,
+   "end": 48706,
+   "text": "- gps_signal: float - GPS signal strength (percentage)",
+   "tokens": []
+  },
+  {
+   "id": 127,
+   "kind": "list",
+   "start": 48707,
+   "end": 48757,
+   "text": "- signal_level: float - Network signal level (0-5)",
+   "tokens": []
+  },
+  {
+   "id": 128,
+   "kind": "list",
+   "start": 48758,
+   "end": 48803,
+   "text": "- vibration: float - Vibration sensor reading",
+   "tokens": []
+  },
+  {
+   "id": 129,
+   "kind": "list",
+   "start": 48804,
+   "end": 48844,
+   "text": "- lamp: float - Lamp state (0=off, 1=on)",
+   "tokens": []
+  },
+  {
+   "id": 130,
+   "kind": "list",
+   "start": 48845,
+   "end": 48910,
+   "text": "- accelerometer_x/y/z: float - Accelerometer axes (raw SDK value)",
+   "tokens": []
+  },
+  {
+   "id": 131,
+   "kind": "list",
+   "start": 48911,
+   "end": 48968,
+   "text": "- gyroscope_x/y/z: float - Gyroscope axes (raw SDK value)",
+   "tokens": []
+  },
+  {
+   "id": 132,
+   "kind": "list",
+   "start": 48969,
+   "end": 49041,
+   "text": "- magnetometer_filtered_x/y/z: float - Magnetometer axes (raw SDK value)",
+   "tokens": []
+  },
+  {
+   "id": 133,
+   "kind": "list",
+   "start": 49042,
+   "end": 49274,
+   "text": "- wheel_rpm_0/1/2/3: float - Wheel RPMs⟦0⟧⟦1⟧- ⟦2⟧ -- If robot is not connected⟦3⟧⟦4⟧⟦5⟧\nGet current robot observation from SDK.",
+   "tokens": [
+    "</retdesc>",
+    "<raises>",
+    "``DeviceNotConnectedError``",
+    "</raises>",
+    "<raisederrors>``DeviceNotConnectedError``</raisederrors>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 134,
+   "kind": "para",
+   "start": 49276,
+   "end": 49599,
+   "text": "Camera frames are retrieved from SDK endpoints /v2/front and /v2/rear.\nFrames are decoded from base64 and converted from BGR to RGB format.\nRobot telemetry is retrieved from /data endpoint.\nSensor arrays (accels, gyros, mags, rpms) each contain entries of\n[values..., timestamp]; the latest reading from each array is used.",
+   "tokens": []
+  },
+  {
+   "id": 135,
+   "kind": "para",
+   "start": 49609,
+   "end": 49879,
+   "text": "Note:\nCamera frames are retrieved from SDK endpoints /v2/front and /v2/rear.\nFrames are decoded from base64 and converted from BGR to RGB format.\nRobot telemetry is retrieved from /data endpoint.\nAll SDK values are normalized to appropriate ranges for dataset recording.",
+   "tokens": []
+  },
+  {
+   "id": 136,
+   "kind": "docfield",
+   "start": 50286,
+   "end": 50706,
+   "text": "⟦0⟧- **action** -- Action dict with keys:\n  - linear_velocity: Target linear velocity (-1 to 1)\n  - angular_velocity: Target angular velocity (-1 to 1)⟦1⟧⟦2⟧⟦3⟧The action that was sent (matches action_features keys)⟦4⟧⟦5⟧- ⟦6⟧ -- If robot is not connected⟦7⟧⟦8⟧⟦9⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "</paramsdesc>",
+    "<rettype>RobotAction</rettype>",
+    "<retdesc>",
+    "</retdesc>",
+    "<raises>",
+    "``DeviceNotConnectedError``",
+    "</raises>",
+    "<raisederrors>``DeviceNotConnectedError``</raisederrors>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 137,
+   "kind": "para",
+   "start": 50707,
+   "end": 50736,
+   "text": "Send action to robot via SDK.",
+   "tokens": []
+  },
+  {
+   "id": 138,
+   "kind": "para",
+   "start": 50748,
+   "end": 50844,
+   "text": "Note:\nActions are sent to SDK via POST /control endpoint.\nSDK expects commands in range [-1, 1].",
+   "tokens": []
+  },
+  {
+   "id": 139,
+   "kind": "docfield",
+   "start": 51447,
+   "end": 51565,
+   "text": "⟦0⟧- **sdk_url** -- URL of the Frodobots SDK server (default: ⟦1⟧)⟦2⟧⟦3⟧",
+   "tokens": [
+    "<paramsdesc>",
+    "http://localhost:8000",
+    "</paramsdesc>",
+    "</Docstring>"
+   ]
+  },
+  {
+   "id": 140,
+   "kind": "para",
+   "start": 51566,
+   "end": 51631,
+   "text": "Configuration for EarthRover Mini Plus robot using Frodobots SDK.",
+   "tokens": []
+  },
+  {
+   "id": 141,
+   "kind": "para",
+   "start": 51633,
+   "end": 51764,
+   "text": "This robot uses cloud-based control via the Frodobots SDK HTTP API.\nCamera frames are accessed directly through SDK HTTP endpoints.",
+   "tokens": []
+  }
+ ]
+}
